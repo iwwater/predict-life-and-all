@@ -1,0 +1,128 @@
+[
+  {
+    "id": "mao_zedong",
+    "name_zh": "毛泽东",
+    "name_en": "Mao Zedong",
+    "year": 1893, "month": 12, "day": 26, "hour": 7, "minute": 30,
+    "lat": 27.66, "lng": 111.99, "tz": "Asia/Shanghai",
+    "gender": "male",
+    "note": "一代伟人，大起大落"
+  },
+  {
+    "id": "luxun",
+    "name_zh": "鲁迅",
+    "name_en": "Lu Xun",
+    "year": 1881, "month": 9, "day": 25, "hour": 9, "minute": 0,
+    "lat": 30.04, "lng": 120.62, "tz": "Asia/Shanghai",
+    "gender": "male",
+    "note": "中国现代文学奠基人"
+  },
+  {
+    "id": "tsai_chin",
+    "name_zh": "蔡健雅",
+    "name_en": "Tanya Chua",
+    "year": 1975, "month": 1, "day": 28, "hour": 4, "minute": 0,
+    "lat": 1.30, "lng": 103.83, "tz": "Asia/Singapore",
+    "gender": "female",
+    "note": "新加坡歌手/词曲作者"
+  },
+  {
+    "id": "jackson_wang",
+    "name_zh": "王嘉尔",
+    "name_en": "Jackson Wang",
+    "year": 1994, "month": 3, "day": 28, "hour": 6, "minute": 0,
+    "lat": 22.32, "lng": 114.17, "tz": "Asia/Hong_Kong",
+    "gender": "male",
+    "note": "韩国男团 GOT7 成员"
+  },
+  {
+    "id": "steve_jobs",
+    "name_zh": "乔布斯",
+    "name_en": "Steve Jobs",
+    "year": 1955, "month": 2, "day": 24, "hour": 19, "minute": 15,
+    "lat": 37.33, "lng": -121.89, "tz": "America/Los_Angeles",
+    "gender": "male",
+    "note": "苹果创始人"
+  },
+  {
+    "id": "leonardo_dicaprio",
+    "name_zh": "莱昂纳多·迪卡普里奥",
+    "name_en": "Leonardo DiCaprio",
+    "year": 1974, "month": 11, "day": 11, "hour": 14, "minute": 47,
+    "lat": 34.05, "lng": -118.24, "tz": "America/Los_Angeles",
+    "gender": "male",
+    "note": "奥斯卡影帝"
+  },
+  {
+    "id": "emma_watson",
+    "name_zh": "艾玛·沃特森",
+    "name_en": "Emma Watson",
+    "year": 1990, "month": 4, "day": 15, "hour": 18, "minute": 0,
+    "lat": 51.51, "lng": -0.13, "tz": "Europe/London",
+    "gender": "female",
+    "note": "英国演员，联合国妇女署亲善大使"
+  },
+  {
+    "id": "narendra_modi",
+    "name_zh": "莫迪",
+    "name_en": "Narendra Modi",
+    "year": 1950, "month": 9, "day": 17, "hour": 11, "minute": 0,
+    "lat": 23.18, "lng": 72.63, "tz": "Asia/Kolkata",
+    "gender": "male",
+    "note": "印度总理（适合吠陀验证）"
+  },
+  {
+    "id": "mo_salah",
+    "name_zh": "穆罕默德·萨拉赫",
+    "name_en": "Mohamed Salah",
+    "year": 1992, "month": 6, "day": 15, "hour": 3, "minute": 0,
+    "lat": 30.80, "lng": 31.00, "tz": "Africa/Cairo",
+    "gender": "male",
+    "note": "埃及足球巨星（非洲/中东验证，赤道附近纬度）"
+  },
+  {
+    "id": "pele",
+    "name_zh": "贝利",
+    "name_en": "Pelé",
+    "year": 1940, "month": 10, "day": 23, "hour": 3, "minute": 0,
+    "lat": -21.78, "lng": -46.56, "tz": "America/Sao_Paulo",
+    "gender": "male",
+    "note": "巴西球王（南半球验证，季节与北半球完全相反）"
+  },
+  {
+    "id": "hugh_jackman",
+    "name_zh": "休·杰克曼",
+    "name_en": "Hugh Jackman",
+    "year": 1968, "month": 10, "day": 12, "hour": 10, "minute": 30,
+    "lat": -33.87, "lng": 151.21, "tz": "Australia/Sydney",
+    "gender": "male",
+    "note": "澳洲演员（南半球+东十区验证）"
+  },
+  {
+    "id": "greta_thunberg",
+    "name_zh": "格蕾塔·通贝里",
+    "name_en": "Greta Thunberg",
+    "year": 2003, "month": 1, "day": 3, "hour": 9, "minute": 0,
+    "lat": 59.33, "lng": 18.06, "tz": "Europe/Stockholm",
+    "gender": "female",
+    "note": "瑞典气候活动家（极高纬度60°N+验证）"
+  },
+  {
+  "id": "vladimir_putin",
+  "name_zh": "普京",
+  "name_en": "Vladimir Putin",
+  "year": 1952, "month": 10, "day": 7, "hour": 9, "minute": 30,
+  "lat": 59.93, "lng": 30.33, "tz": "Europe/Moscow",
+  "gender": "male",
+  "note": "俄罗斯总统（东三区+高纬度验证）"
+  },
+  {
+    "id": "shakira",
+    "name_zh": "夏奇拉",
+    "name_en": "Shakira",
+    "year": 1977, "month": 2, "day": 2, "hour": 9, "minute": 0,
+    "lat": 10.96, "lng": -74.80, "tz": "America/Bogota",
+    "gender": "female",
+    "note": "哥伦比亚歌手（北半球低纬度+西五区验证）"
+  }
+]

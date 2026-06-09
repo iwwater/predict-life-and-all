@@ -1,0 +1,65 @@
+# ---------- Stage 1: build with full toolchain ----------
+FROM python:3.11-slim AS builder
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+WORKDIR /build
+
+# System deps: build tools for any wheel that needs compiling
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Layer 1: deps only
+COPY pyproject.toml ./
+# `uv` would be nicer, but we stick to pip for fewer moving parts in Docker
+RUN pip install --upgrade pip \
+    && pip install \
+        "lunar-python>=1.4.0" \
+        "iztro-py>=0.1.0" \
+        "kinqimen>=0.1.0" \
+        "skyfield>=1.48" \
+        "fastapi>=0.110" \
+        "uvicorn[standard]>=0.27" \
+        "pydantic>=2.6" \
+        "python-multipart>=0.0.9" \
+        "httpx>=0.27"
+
+# ---------- Stage 2: minimal runtime ----------
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PORT=8000
+
+WORKDIR /app
+
+# Copy installed site-packages from builder
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+# Pre-fetch JPL DE421 ephemeris (~17 MB) so runtime never needs network
+# Skyfield's default URL; the file is public domain.
+RUN mkdir -p /app/data && \
+    curl -fsSL -o /app/data/de421.bsp \
+        https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de421.bsp \
+    && ls -lh /app/data/de421.bsp
+
+# Skyfield looks for 'de421.bsp' in CWD or ~/.skyfield. Symlink the CWD copy
+# so engines/western.py + engines/vedic.py (which call load("de421.bsp"))
+# find it without code changes.
+ENV SKYFIELD_PATH=/app/data
+
+# Copy app code
+COPY divination/ /app/divination/
+COPY server/     /app/server/
+
+EXPOSE 8000
+
+# Use the pre-baked ephemeris, fall back to cwd lookup
+ENV PYTHONPATH=/app
+
+CMD ["uvicorn", "server.main:app", "--host", "0.0.0.0", "--port", "8000"]

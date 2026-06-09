@@ -1,0 +1,281 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "Mystic Hub · 玄枢" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e8]: Mystic Hub
+        - generic [ref=e9]: · 玄枢
+      - navigation [ref=e10]:
+        - link "首页" [ref=e11] [cursor=pointer]:
+          - /url: /
+        - link "今日" [ref=e12] [cursor=pointer]:
+          - /url: /daily
+        - link "排盘" [ref=e13] [cursor=pointer]:
+          - /url: /cast
+        - link "历史" [ref=e14] [cursor=pointer]:
+          - /url: /history
+        - link "关于" [ref=e15] [cursor=pointer]:
+          - /url: /about
+  - main [ref=e16]:
+    - generic [ref=e107]:
+      - generic [ref=e108]:
+        - generic [ref=e109]:
+          - generic [ref=e111]: 你的灵魂
+          - generic [ref=e112]: 1990-5-15 8:30
+          - generic [ref=e113]: · male
+        - generic [ref=e114]:
+          - button "☆ 收藏" [ref=e115] [cursor=pointer]
+          - group "反馈" [ref=e116]:
+            - button "准" [ref=e117] [cursor=pointer]
+            - button "不准" [ref=e118] [cursor=pointer]
+            - button "待观察" [ref=e119] [cursor=pointer]
+          - button "生成分享卡" [ref=e120] [cursor=pointer]
+          - link "再排一次" [ref=e121] [cursor=pointer]:
+            - /url: /cast
+      - generic [ref=e122]:
+        - button "八字 · 东 · 四柱命盘，看命局、大运、流年" [ref=e123] [cursor=pointer]:
+          - generic [ref=e124]: 八字
+          - generic [ref=e125]: · 东
+          - generic [ref=e126]: · 四柱命盘，看命局、大运、流年
+        - button "西方占星 · 西 · 西方本命盘，太阳月亮上升与行星" [ref=e127] [cursor=pointer]:
+          - generic [ref=e128]: 西方占星
+          - generic [ref=e129]: · 西
+          - generic [ref=e130]: · 西方本命盘，太阳月亮上升与行星
+      - generic [ref=e131]:
+        - generic [ref=e132]:
+          - generic [ref=e133]:
+            - generic [ref=e134]:
+              - generic [ref=e135]:
+                - heading "四柱· 四根柱子·八字" [level=3] [ref=e136]:
+                  - generic [ref=e137]:
+                    - text: 四柱
+                    - generic [ref=e138]: · 四根柱子
+                  - text: ·八字
+                - generic [ref=e139]:
+                  - generic [ref=e140]: 你的主心骨
+                  - text: 庚
+              - generic [ref=e141]:
+                - generic [ref=e142]:
+                  - generic [ref=e144]:
+                    - text: 年柱
+                    - generic [ref=e145]: · 出生那年
+                  - generic [ref=e146]: 庚
+                  - generic [ref=e147]: 午
+                  - generic [ref=e148]: 藏:丁/己
+                  - generic [ref=e149]: 比肩
+                  - generic [ref=e150]: 沐浴
+                - generic [ref=e151]:
+                  - generic [ref=e153]:
+                    - text: 月柱
+                    - generic [ref=e154]: · 出生那月
+                  - generic [ref=e155]: 辛
+                  - generic [ref=e156]: 巳
+                  - generic [ref=e157]: 藏:丙/庚/戊
+                  - generic [ref=e158]: 劫财
+                  - generic [ref=e159]: 长生
+                - generic [ref=e160]:
+                  - generic [ref=e162]:
+                    - text: 日柱
+                    - generic [ref=e163]: · 你自己
+                  - generic [ref=e164]: 庚
+                  - generic [ref=e165]: 辰
+                  - generic [ref=e166]: 藏:戊/乙/癸
+                  - generic [ref=e167]: 日主
+                  - generic [ref=e168]: 养
+                - generic [ref=e169]:
+                  - generic [ref=e171]:
+                    - text: 时柱
+                    - generic [ref=e172]: · 出生那时
+                  - generic [ref=e173]: 庚
+                  - generic [ref=e174]: 辰
+                  - generic [ref=e175]: 藏:戊/乙/癸
+                  - generic [ref=e176]: 比肩
+                  - generic [ref=e177]: 养
+            - generic [ref=e178]:
+              - generic [ref=e180]:
+                - generic [ref=e181]: 庚 的五行
+                - img [ref=e182]:
+                  - generic [ref=e192]:
+                    - generic [ref=e194]: 木
+                    - generic [ref=e195]: "0.4"
+                  - generic [ref=e196]:
+                    - generic [ref=e198]: 火
+                    - generic [ref=e199]: "3.4"
+                  - generic [ref=e200]:
+                    - generic [ref=e202]: 土
+                    - generic [ref=e203]: "3.7"
+                  - generic [ref=e204]:
+                    - generic [ref=e206]: 金
+                    - generic [ref=e207]: "4.2"
+                  - generic [ref=e208]:
+                    - generic [ref=e210]: 水
+                    - generic [ref=e211]: "0.2"
+              - generic [ref=e212]:
+                - heading "大运· 十年大运·十年换一次" [level=3] [ref=e213]:
+                  - generic [ref=e214]:
+                    - text: 大运
+                    - generic [ref=e215]: · 十年大运
+                  - text: ·十年换一次
+                - list [ref=e216]:
+                  - listitem [ref=e217]:
+                    - generic [ref=e218]: 大运·壬午
+                    - generic [ref=e219]: 1997-2006
+                  - listitem [ref=e220]:
+                    - generic [ref=e221]: 大运·癸未
+                    - generic [ref=e222]: 2007-2016
+                  - listitem [ref=e223]:
+                    - generic [ref=e224]: 大运·甲申
+                    - generic [ref=e225]: 2017-2026
+                  - listitem [ref=e226]:
+                    - generic [ref=e227]: 大运·乙酉
+                    - generic [ref=e228]: 2027-2036
+                  - listitem [ref=e229]:
+                    - generic [ref=e230]: 大运·丙戌
+                    - generic [ref=e231]: 2037-2046
+                  - listitem [ref=e232]:
+                    - generic [ref=e233]: 大运·丁亥
+                    - generic [ref=e234]: 2047-2056
+                  - listitem [ref=e235]:
+                    - generic [ref=e236]: 大运·戊子
+                    - generic [ref=e237]: 2057-2066
+                  - listitem [ref=e238]:
+                    - generic [ref=e239]: 大运·己丑
+                    - generic [ref=e240]: 2067-2076
+            - generic [ref=e241]:
+              - heading "日主身强评分" [level=3] [ref=e242]
+              - generic [ref=e246]: 49/100
+              - generic [ref=e247]:
+                - generic [ref=e248]: 比劫3
+                - generic [ref=e249]: 印星2
+                - generic [ref=e250]: 食伤0
+                - generic [ref=e251]: 官杀2
+                - generic [ref=e252]: 财0
+                - generic [ref=e253]: 月令分5
+            - generic [ref=e254]:
+              - heading "流年 丙午 与原局互动" [level=3] [ref=e255]
+              - generic [ref=e256]: 流年丙与month柱辛天干合
+            - generic [ref=e257]:
+              - heading "十二长生· 强弱阶段·庚阳顺" [level=3] [ref=e258]:
+                - generic [ref=e259]:
+                  - text: 十二长生
+                  - generic [ref=e260]: · 强弱阶段
+                - text: ·庚阳顺
+              - generic [ref=e261]:
+                - generic [ref=e262]:
+                  - generic [ref=e263]: year
+                  - generic [ref=e264]: 午→沐浴
+                - generic [ref=e265]:
+                  - generic [ref=e266]: month
+                  - generic [ref=e267]: 巳→长生
+                - generic [ref=e268]:
+                  - generic [ref=e269]: day
+                  - generic [ref=e270]: 辰→养
+                - generic [ref=e271]:
+                  - generic [ref=e272]: hour
+                  - generic [ref=e273]: 辰→养
+            - generic [ref=e274]:
+              - heading "当前运势" [level=3] [ref=e275]
+              - generic [ref=e276]: 大运 甲申(2017-2026) · 2026年丙午
+              - generic [ref=e277]: "阶段评分: 70"
+            - generic [ref=e278]:
+              - generic [ref=e279]:
+                - generic [ref=e280]: 排盘算法
+                - generic [ref=e281]: lunar-python+strength-v1
+              - generic [ref=e282]:
+                - generic [ref=e283]: 学派
+                - generic [ref=e284]: 东方·命
+          - generic [ref=e285]:
+            - generic [ref=e286]:
+              - generic [ref=e287]: 本次采用的起法
+              - generic [ref=e288]: vv1
+            - generic [ref=e289]: "方法: bazi · 模式: natal · 对象: self_life"
+            - generic [ref=e290]: "输入: birth (year/month/day/hour/minute, optional gender/calendar)"
+            - generic [ref=e291]: "历法来源: lunar-python"
+            - group [ref=e292]:
+              - generic "不可判断范围 / 限制 (3)" [ref=e293] [cursor=pointer]
+            - generic [ref=e294]:
+              - generic [ref=e295]: 八字专项 · 身强 / 当前大运 / 流年 / 12 长生
+              - generic [ref=e296]: "日主身强评分: 49 / 100"
+              - generic [ref=e297]: 同党 = 比劫 3 + 印星 2; 异党 = 食伤 0 / 官杀 2 / 财 0; 月令分 5
+              - generic [ref=e298]: "当前大运: 甲申 (2017-2026, 虚岁 37) · 阶段分 70"
+              - generic [ref=e299]: "流年: 2026年丙午"
+              - generic [ref=e300]:
+                - generic [ref=e301]: "流年 丙午 与原局互动:"
+                - list [ref=e302]:
+                  - listitem [ref=e303]:
+                    - text: 流年丙与month柱辛天干合
+                    - generic [ref=e304]: (天干合)
+              - generic [ref=e305]:
+                - generic [ref=e306]: "12 长生 (庚 阳顺):"
+                - generic [ref=e307]:
+                  - generic [ref=e308]:
+                    - generic [ref=e309]: year · 庚午
+                    - generic [ref=e310]: 午 → 沐浴
+                  - generic [ref=e311]:
+                    - generic [ref=e312]: month · 辛巳
+                    - generic [ref=e313]: 巳 → 长生
+                  - generic [ref=e314]:
+                    - generic [ref=e315]: day · 庚辰
+                    - generic [ref=e316]: 辰 → 养
+                  - generic [ref=e317]:
+                    - generic [ref=e318]: hour · 庚辰
+                    - generic [ref=e319]: 辰 → 养
+          - generic [ref=e320]:
+            - generic [ref=e321]:
+              - generic [ref=e322]:
+                - heading "运势走势·K 线图" [level=3] [ref=e323]
+                - generic [ref=e324]: 从大运地支五行推导出来的"运势强度"折线,看每十年起伏
+              - generic [ref=e325]:
+                - generic [ref=e326]: ●
+                - text: 升
+                - generic [ref=e327]: /
+                - generic [ref=e328]: ●
+                - text: 降
+            - generic [ref=e330]:
+              - generic [ref=e331]: 横轴 = 出生后每一年(流年)
+              - generic [ref=e332]: 纵轴 = 运势强度(0-100,数字越高那年越顺)
+              - generic [ref=e333]: 每根 K 线代表一个十年的"主调"
+        - generic [ref=e335]:
+          - generic [ref=e336]:
+            - generic [ref=e337]:
+              - heading "AI 解读" [level=3] [ref=e338]
+              - generic [ref=e339]: · 已完成
+            - button "重新解读" [ref=e340] [cursor=pointer]
+          - generic [ref=e341]:
+            - heading "整体印象" [level=3] [ref=e342]
+            - paragraph [ref=e343]: 基于你提供的盘面，这是一个内外兼修、倾向于在独立探索与协作借力之间不断调试的能量结构。整体气场偏于内敛但不乏锋芒，早期需要积累，中期有突破窗口。
+            - heading "性格特质" [level=3] [ref=e344]
+            - paragraph [ref=e345]:
+              - strong [ref=e346]: 核心优势：
+            - list [ref=e347]:
+              - listitem [ref=e348]: 观察力敏锐，能迅速捕捉到别人忽略的细节和氛围变化。
+              - listitem [ref=e349]: 有持续学习和自我修正的内在驱动力，不易被一时的得失击倒。
+              - listitem [ref=e350]: 在压力下反而能激发出更强的韧性和创造力。
+            - paragraph [ref=e351]:
+              - strong [ref=e352]: 潜在盲点：
+            - list [ref=e353]:
+              - listitem [ref=e354]: 过于内省时容易陷入反复思量而错失行动的时机。
+              - listitem [ref=e355]: 在关系层面倾向于先照顾别人，偶尔忽略自己的边界。
+            - heading "事业与方向" [level=3] [ref=e356]
+            - paragraph [ref=e357]: 当前的盘面能量偏向于需要深耕的领域。短期内不宜频繁跳转方向，在已有积累上做深、做强会比追逐新风口更顺。留意身边愿意提供资源或信息的人，他们的出现不是偶然。
+            - paragraph [ref=e358]: 中长期来看，大约在两三年后有一个明显的上升波段，那段时间适合往外走、扩大影响力。现在则是打磨核心能力的阶段。
+            - heading "感情与人际" [level=3] [ref=e359]
+            - paragraph [ref=e360]: 盘面显示在关系中你倾向于用行动而不是语言来表达在意。对方能感受到你的付出，但偶尔也会希望你直接说出来。适度的坦诚表达，不但不会削弱关系，反而能让彼此的边界更清晰。
+            - heading "当前提示与建议" [level=3] [ref=e361]
+            - list [ref=e362]:
+              - listitem [ref=e363]:
+                - strong [ref=e364]: 把想说的话写下来：
+                - text: 即使不发给任何人，梳理清楚自己的想法本身就是一次有效的自我对话。
+              - listitem [ref=e365]:
+                - strong [ref=e366]: 在'先照顾好自己'和'照顾他人'之间重新校准：
+                - text: 本周至少为自己留出三次完全的独处时间。
+              - listitem [ref=e367]:
+                - strong [ref=e368]: 那个搁置了很久的小项目，往前推一步：
+                - text: 不必做到完美，只要让它在物理世界里有了一点点进展就行。
+            - paragraph [ref=e369]: (以上为传统文化象征视角的参考，非科学预测，重大决定请结合现实并咨询专业人士。)
+            - paragraph [ref=e370]: (以上为传统文化象征视角的参考，非科学预测，重大决定请结合现实并咨询专业人士。)
+          - generic [ref=e372]: 以上为传统文化象征视角的参考,非科学预测,重大决定请结合现实并咨询专业人士。
+  - contentinfo [ref=e20]:
+    - generic [ref=e21]:
+      - paragraph [ref=e22]: 免责声明:本站所有解读为传统文化象征视角的参考,非科学预测,亦不构成医疗、法律、财务等专业意见。 重大决定请结合现实并咨询专业人士。
+      - paragraph [ref=e23]: 合规:全栈 MIT/BSD 许可,零 AGPL,可闭源商用。 你的 LLM API Key 仅存在浏览器本地,不会上传到本服务后端。

@@ -1,0 +1,39 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "Mystic Hub · 玄枢" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e8]: Mystic Hub
+        - generic [ref=e9]: · 玄枢
+      - navigation [ref=e10]:
+        - link "首页" [ref=e11] [cursor=pointer]:
+          - /url: /
+        - link "今日" [ref=e12] [cursor=pointer]:
+          - /url: /daily
+        - link "排盘" [ref=e13] [cursor=pointer]:
+          - /url: /cast
+        - link "历史" [ref=e14] [cursor=pointer]:
+          - /url: /history
+        - link "关于" [ref=e15] [cursor=pointer]:
+          - /url: /about
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - generic [ref=e19]:
+        - generic [ref=e20]: Mystic Hub · 玄枢
+        - heading "中西融通, 十二术数排盘 + AI 解读" [level=1] [ref=e21]:
+          - text: 中西融通,
+          - text: 十二术数排盘 + AI 解读
+        - paragraph [ref=e22]: 一个工具,十种命 / 卜 / 风水术数 + 西方占星 · 吠陀 · 塔罗 · 数字命理。 排盘结果以传统文化象征视角呈现,AI 解读融合中西。重大决定请结合现实并咨询专业人士。
+        - generic [ref=e23]:
+          - link "开始排盘" [ref=e24] [cursor=pointer]:
+            - /url: /cast
+          - link "关于 & 免责" [ref=e25] [cursor=pointer]:
+            - /url: /about
+      - heading "十二种占卜法" [level=2] [ref=e27]
+      - generic [ref=e28]:
+        - generic [ref=e29]: 合规:全栈 MIT/BSD,零 AGPL,可闭源商用。
+        - generic [ref=e30]: 隐私:你的 LLM API Key 仅存在浏览器本地;解读时浏览器直连 provider,Key 不出前端。
+  - contentinfo [ref=e31]:
+    - generic [ref=e32]:
+      - paragraph [ref=e33]: 免责声明:本站所有解读为传统文化象征视角的参考,非科学预测,亦不构成医疗、法律、财务等专业意见。 重大决定请结合现实并咨询专业人士。
+      - paragraph [ref=e34]: 合规:全栈 MIT/BSD 许可,零 AGPL,可闭源商用。 你的 LLM API Key 仅存在浏览器本地,不会上传到本服务后端。

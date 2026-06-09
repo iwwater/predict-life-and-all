@@ -1,0 +1,357 @@
+[    1754ms] [LOG] === isDesktopDevice === @ :403
+[    1754ms] [LOG] === headerRightElement === JSHandle@node @ :384
+[    1755ms] [LOG] === accountLinks === [a.flex.items-center.gap-1.5.whitespace-nowrap.font-medium.text-gray-600.hover:text-gray-900.dark:te…] @ :323
+[    1755ms] [LOG] Successfully added auth component to desktop header @ :394
+[    1815ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/quickstart-preparation. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    1815ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/quickstart-sdk. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    1815ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/text-ai-coding-tools. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    1815ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/text-generation. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    1815ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/api-reference/text-prompt-caching. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    1816ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/api-reference/anthropic-api-compatible-cache. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    1816ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/video-generation. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    1816ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/video-agent. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    1816ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/video-prompt. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    1816ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/speech-voice-clone. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    1817ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/speech-t2a-websocket. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    1817ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/speech-t2a-async. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    1817ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/image-generation. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    1817ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/music-generation. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    1817ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/mcp-guide. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    1817ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/token-plan-mcp-guide. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    1817ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/local-deploy. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    2103ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://platform.minimax.io/backend/user/biz_info:0
+[    2104ms] [LOG] === isDesktopDevice === @ :403
+[    2104ms] [LOG] === headerRightElement === JSHandle@node @ :384
+[    2104ms] [LOG] === accountLinks === [] @ :323
+[    2104ms] [LOG] Successfully added auth component to desktop header @ :394
+[    2289ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/faq/about-apis. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    2290ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/faq/about-account. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    2291ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/api-reference/api-overview. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    2292ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/token-plan/intro. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    2292ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/pricing/overview. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    2293ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/release-notes/models. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    2294ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/faq/contact-us. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[    2417ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://platform.minimax.io/cdn-cgi/rum?:0
+[    2607ms] [LOG] === accountLinks === [] @ :323
+[    3116ms] [LOG] === accountLinks === [] @ :323
+[    3629ms] [LOG] === accountLinks === [] @ :323
+[    4139ms] [LOG] === accountLinks === [] @ :323
+[    4652ms] [LOG] === accountLinks === [] @ :323
+[    5164ms] [LOG] === accountLinks === [] @ :323
+[    5670ms] [LOG] === accountLinks === [] @ :323
+[    6181ms] [LOG] === accountLinks === [] @ :323
+[    6692ms] [LOG] === accountLinks === [] @ :323
+[    7204ms] [LOG] === accountLinks === [] @ :323
+[    7713ms] [LOG] === accountLinks === [] @ :323
+[    8223ms] [LOG] === accountLinks === [] @ :323
+[    8733ms] [LOG] === accountLinks === [] @ :323
+[    9245ms] [LOG] === accountLinks === [] @ :323
+[    9755ms] [LOG] === accountLinks === [] @ :323
+[   10267ms] [LOG] === accountLinks === [] @ :323
+[   10778ms] [LOG] === accountLinks === [] @ :323
+[   11289ms] [LOG] === accountLinks === [] @ :323
+[   11798ms] [LOG] === accountLinks === [] @ :323
+[   12308ms] [LOG] === accountLinks === [] @ :323
+[   12822ms] [LOG] === accountLinks === [] @ :323
+[   13331ms] [LOG] === accountLinks === [] @ :323
+[   13838ms] [LOG] === accountLinks === [] @ :323
+[   14349ms] [LOG] === accountLinks === [] @ :323
+[   14861ms] [LOG] === accountLinks === [] @ :323
+[   15372ms] [LOG] === accountLinks === [] @ :323
+[   15881ms] [LOG] === accountLinks === [] @ :323
+[   16389ms] [LOG] === accountLinks === [] @ :323
+[   17550ms] [LOG] === isDesktopDevice === @ :403
+[   17550ms] [LOG] === headerRightElement === JSHandle@node @ :384
+[   17551ms] [LOG] === accountLinks === [a.flex.items-center.gap-1.5.whitespace-nowrap.font-medium.text-gray-600.hover:text-gray-900.dark:te…] @ :323
+[   17551ms] [LOG] Successfully added auth component to desktop header @ :394
+[   17644ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/quickstart-preparation. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   17644ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/quickstart-sdk. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   17644ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/text-ai-coding-tools. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   17644ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/text-generation. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   17644ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/api-reference/text-prompt-caching. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   17645ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/api-reference/anthropic-api-compatible-cache. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   17645ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/video-generation. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   17645ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/video-agent. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   17645ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/video-prompt. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   17645ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/speech-voice-clone. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   17645ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/speech-t2a-websocket. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   17645ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/speech-t2a-async. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   17646ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/music-generation. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   17646ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/mcp-guide. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   17646ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/token-plan-mcp-guide. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   17646ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/local-deploy. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   17732ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://platform.minimax.io/backend/user/biz_info:0
+[   17733ms] [LOG] === isDesktopDevice === @ :403
+[   17733ms] [LOG] === headerRightElement === JSHandle@node @ :384
+[   17733ms] [LOG] === accountLinks === [] @ :323
+[   17733ms] [LOG] Successfully added auth component to desktop header @ :394
+[   18218ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/faq/about-account. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   18218ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/faq/contact-us. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   18218ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/guides/models-intro. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   18219ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/api-reference/api-overview. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   18219ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/token-plan/intro. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   18219ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/pricing/overview. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   18219ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/release-notes/models. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   18219ms] [ERROR] Failed to fetch RSC payload for https://platform.minimax.io/docs/faq/about-apis. Falling back to browser navigation. TypeError: url.includes is not a function
+    at shouldIntercept (<anonymous>:12:16)
+    at window.fetch (<anonymous>:86:12)
+    at _ (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:40251)
+    at async v (https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:39053)
+    at async Object.a [as task] (https://platform.minimax.io/docs/_next/static/chunks/416a21ec893ce085.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:1:13164) @ https://platform.minimax.io/docs/_next/static/chunks/ec4f98f9a543b86d.js?dpl=dpl_66rsiuqqmRuEz1t1AMPGLZBKgxTu:0
+[   18239ms] [LOG] === accountLinks === [] @ :323
+[   18292ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://platform.minimax.io/cdn-cgi/rum?:0
+[   18749ms] [LOG] === accountLinks === [] @ :323
+[   19262ms] [LOG] === accountLinks === [] @ :323
+[   19773ms] [LOG] === accountLinks === [] @ :323
+[   20281ms] [LOG] === accountLinks === [] @ :323
+[   20789ms] [LOG] === accountLinks === [] @ :323
+[   21300ms] [LOG] === accountLinks === [] @ :323
+[   21813ms] [LOG] === accountLinks === [] @ :323
+[   22323ms] [LOG] === accountLinks === [] @ :323
+[   22834ms] [LOG] === accountLinks === [] @ :323
+[   23342ms] [LOG] === accountLinks === [] @ :323
+[   23852ms] [LOG] === accountLinks === [] @ :323
+[   24366ms] [LOG] === accountLinks === [] @ :323
+[   24873ms] [LOG] === accountLinks === [] @ :323
+[   25384ms] [LOG] === accountLinks === [] @ :323
+[   25895ms] [LOG] === accountLinks === [] @ :323
+[   26406ms] [LOG] === accountLinks === [] @ :323
+[   26915ms] [LOG] === accountLinks === [] @ :323
+[   27428ms] [LOG] === accountLinks === [] @ :323
+[   27938ms] [LOG] === accountLinks === [] @ :323
+[   28446ms] [LOG] === accountLinks === [] @ :323

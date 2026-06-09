@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+.eggs/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Node
+node_modules/
+apps/web/.vite/
+apps/web/dist/
+apps/web/.env
+apps/web/.env.local
+
+# Environment / secrets (project root)
+.env
+.env.local
+.env.*.local
+
+# Skyfield 缓存(运行时下载)
+de421.bsp
+*.bsp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp

@@ -1,0 +1,112 @@
+[      60ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:21550
+[      72ms] [WARNING] ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition. @ http://127.0.0.1:5173/node_modules/.vite/deps/react-router-dom.js?v=a075f848:4426
+[      72ms] [WARNING] ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath. @ http://127.0.0.1:5173/node_modules/.vite/deps/react-router-dom.js?v=a075f848:4426
+[   37110ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:5173/about:0
+[ 1153016ms] Error: Objects are not valid as a React child (found: object with keys {year_stem, year_branch, month_stem, month_branch, day_stem, day_branch, time_stem, time_branch}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:9934:17)
+    at reconcileChildFibers2 (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:10564:15)
+    at reconcileChildren (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:14290:37)
+    at updateHostComponent (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:14807:11)
+    at beginWork (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:15935:22)
+    at HTMLUnknownElement.callCallback2 (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:3674:22)
+    at Object.invokeGuardedCallbackDev (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:3699:24)
+    at invokeGuardedCallback (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:3733:39)
+    at beginWork$1 (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:19765:15)
+    at performUnitOfWork (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:19198:20)
+[ 1153019ms] Error: Objects are not valid as a React child (found: object with keys {year, month, day, is_leap_month}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:9934:17)
+    at reconcileChildFibers2 (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:10564:15)
+    at reconcileChildren (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:14290:37)
+    at updateHostComponent (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:14807:11)
+    at beginWork (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:15935:22)
+    at HTMLUnknownElement.callCallback2 (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:3674:22)
+    at Object.invokeGuardedCallbackDev (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:3699:24)
+    at invokeGuardedCallback (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:3733:39)
+    at beginWork$1 (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:19765:15)
+    at performUnitOfWork (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:19198:20)
+[ 1153023ms] Error: Objects are not valid as a React child (found: object with keys {year_stem, year_branch, month_stem, month_branch, day_stem, day_branch, time_stem, time_branch}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:9934:17)
+    at reconcileChildFibers2 (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:10564:15)
+    at reconcileChildren (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:14290:37)
+    at updateHostComponent (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:14807:11)
+    at beginWork (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:15935:22)
+    at HTMLUnknownElement.callCallback2 (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:3674:22)
+    at Object.invokeGuardedCallbackDev (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:3699:24)
+    at invokeGuardedCallback (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:3733:39)
+    at beginWork$1 (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:19765:15)
+    at performUnitOfWork (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:19198:20)
+[ 1153023ms] Error: Objects are not valid as a React child (found: object with keys {year, month, day, is_leap_month}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:9934:17)
+    at reconcileChildFibers2 (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:10564:15)
+    at reconcileChildren (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:14290:37)
+    at updateHostComponent (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:14807:11)
+    at beginWork (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:15935:22)
+    at HTMLUnknownElement.callCallback2 (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:3674:22)
+    at Object.invokeGuardedCallbackDev (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:3699:24)
+    at invokeGuardedCallback (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:3733:39)
+    at beginWork$1 (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:19765:15)
+    at performUnitOfWork (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:19198:20)
+[ 1153025ms] [ERROR] The above error occurred in the <span> component:
+
+    at span
+    at div
+    at div
+    at div
+    at ZiweiChart (http://127.0.0.1:5173/src/components/charts/ZiweiChart.tsx?t=1780719978524:19:30)
+    at ChartRenderer (http://127.0.0.1:5173/src/components/charts/index.tsx:29:33)
+    at div
+    at div
+    at div
+    at Result (http://127.0.0.1:5173/src/pages/Result.tsx?t=1780715947838:26:27)
+    at RenderedRoute (http://127.0.0.1:5173/node_modules/.vite/deps/react-router-dom.js?v=a075f848:4122:5)
+    at Outlet (http://127.0.0.1:5173/node_modules/.vite/deps/react-router-dom.js?v=a075f848:4528:26)
+    at main
+    at div
+    at Layout
+    at RenderedRoute (http://127.0.0.1:5173/node_modules/.vite/deps/react-router-dom.js?v=a075f848:4122:5)
+    at Routes (http://127.0.0.1:5173/node_modules/.vite/deps/react-router-dom.js?v=a075f848:4592:5)
+    at Router (http://127.0.0.1:5173/node_modules/.vite/deps/react-router-dom.js?v=a075f848:4535:15)
+    at BrowserRouter (http://127.0.0.1:5173/node_modules/.vite/deps/react-router-dom.js?v=a075f848:5273:5)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries. @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:14031
+[ 1153025ms] [ERROR] The above error occurred in the <span> component:
+
+    at span
+    at div
+    at div
+    at div
+    at ZiweiChart (http://127.0.0.1:5173/src/components/charts/ZiweiChart.tsx?t=1780719978524:19:30)
+    at ChartRenderer (http://127.0.0.1:5173/src/components/charts/index.tsx:29:33)
+    at div
+    at div
+    at div
+    at Result (http://127.0.0.1:5173/src/pages/Result.tsx?t=1780715947838:26:27)
+    at RenderedRoute (http://127.0.0.1:5173/node_modules/.vite/deps/react-router-dom.js?v=a075f848:4122:5)
+    at Outlet (http://127.0.0.1:5173/node_modules/.vite/deps/react-router-dom.js?v=a075f848:4528:26)
+    at main
+    at div
+    at Layout
+    at RenderedRoute (http://127.0.0.1:5173/node_modules/.vite/deps/react-router-dom.js?v=a075f848:4122:5)
+    at Routes (http://127.0.0.1:5173/node_modules/.vite/deps/react-router-dom.js?v=a075f848:4592:5)
+    at Router (http://127.0.0.1:5173/node_modules/.vite/deps/react-router-dom.js?v=a075f848:4535:15)
+    at BrowserRouter (http://127.0.0.1:5173/node_modules/.vite/deps/react-router-dom.js?v=a075f848:5273:5)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries. @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:14031
+[ 1153025ms] Error: Objects are not valid as a React child (found: object with keys {year_stem, year_branch, month_stem, month_branch, day_stem, day_branch, time_stem, time_branch}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:9934:17)
+    at reconcileChildFibers2 (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:10564:15)
+    at reconcileChildren (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:14290:37)
+    at updateHostComponent (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:14807:11)
+    at beginWork (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:15935:22)
+    at beginWork$1 (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:19753:22)
+    at performUnitOfWork (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:19198:20)
+    at workLoopSync (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:19137:13)
+    at renderRootSync (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:19116:15)
+    at recoverFromConcurrentError (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:18736:28)
+[ 1159056ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5173/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=a672b41f:21550
+[ 1159082ms] [WARNING] ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition. @ http://127.0.0.1:5173/node_modules/.vite/deps/react-router-dom.js?v=a075f848:4426
+[ 1159082ms] [WARNING] ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath. @ http://127.0.0.1:5173/node_modules/.vite/deps/react-router-dom.js?v=a075f848:4426

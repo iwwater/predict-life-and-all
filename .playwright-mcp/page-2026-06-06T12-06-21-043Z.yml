@@ -1,0 +1,215 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "Mystic Hub · 玄枢" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e8]: Mystic Hub
+        - generic [ref=e9]: · 玄枢
+      - navigation [ref=e10]:
+        - link "首页" [ref=e11] [cursor=pointer]:
+          - /url: /
+        - link "今日" [ref=e12] [cursor=pointer]:
+          - /url: /daily
+        - link "排盘" [ref=e13] [cursor=pointer]:
+          - /url: /cast
+        - link "历史" [ref=e14] [cursor=pointer]:
+          - /url: /history
+        - link "关于" [ref=e15] [cursor=pointer]:
+          - /url: /about
+  - main [ref=e16]:
+    - generic [ref=e107]:
+      - generic [ref=e108]:
+        - generic [ref=e109]:
+          - generic [ref=e111]: 你的灵魂
+          - generic [ref=e112]: 1990-5-15 8:30
+          - generic [ref=e113]: · male
+        - generic [ref=e114]:
+          - button "☆ 收藏" [ref=e115] [cursor=pointer]
+          - group "反馈" [ref=e116]:
+            - button "准" [ref=e117] [cursor=pointer]
+            - button "不准" [ref=e118] [cursor=pointer]
+            - button "待观察" [ref=e119] [cursor=pointer]
+          - button "生成分享卡" [ref=e120] [cursor=pointer]
+          - link "再排一次" [ref=e121] [cursor=pointer]:
+            - /url: /cast
+      - generic [ref=e122]:
+        - button "八字 · 东 · 四柱命盘，看命局、大运、流年" [ref=e123] [cursor=pointer]:
+          - generic [ref=e124]: 八字
+          - generic [ref=e125]: · 东
+          - generic [ref=e126]: · 四柱命盘，看命局、大运、流年
+        - button "西方占星 · 西 · 西方本命盘，太阳月亮上升与行星" [active] [ref=e127] [cursor=pointer]:
+          - generic [ref=e128]: 西方占星
+          - generic [ref=e129]: · 西
+          - generic [ref=e130]: · 西方本命盘，太阳月亮上升与行星
+      - generic [ref=e131]:
+        - generic [ref=e132]:
+          - generic [ref=e373]:
+            - generic [ref=e374]:
+              - generic [ref=e375]:
+                - heading "西方占星 · 圆形星盘" [level=3] [ref=e376]
+                - generic [ref=e378]:
+                  - generic [ref=e379]: 你给人的第一印象
+                  - text: 巨蟹 1.51°
+              - generic [ref=e380]:
+                - img "western astrology chart" [ref=e381]:
+                  - generic [ref=e387]: ♈
+                  - generic [ref=e390]: ♉
+                  - generic [ref=e393]: ♊
+                  - generic [ref=e395]: ♋
+                  - generic [ref=e398]: ♌
+                  - generic [ref=e401]: ♍
+                  - generic [ref=e403]: ♎
+                  - generic [ref=e406]: ♏
+                  - generic [ref=e409]: ♐
+                  - generic [ref=e411]: ♑
+                  - generic [ref=e414]: ♒
+                  - generic [ref=e417]: ♓
+                  - generic [ref=e450]: ☉
+                  - generic [ref=e453]: ☽
+                  - generic [ref=e456]: ☿
+                  - generic [ref=e459]: ♀
+                  - generic [ref=e462]: ♂
+                  - generic [ref=e465]: ♃
+                  - generic [ref=e468]: ♄
+                  - generic [ref=e469]: skyfield+self
+                  - generic [ref=e470]: ASC 巨蟹
+                - generic [ref=e471]:
+                  - generic [ref=e472]:
+                    - generic [ref=e473]: ☉
+                    - generic [ref=e474]: 太阳
+                    - generic [ref=e475]: 白羊 0.00°
+                  - generic [ref=e476]:
+                    - generic [ref=e477]: ☽
+                    - generic [ref=e478]: 月亮
+                    - generic [ref=e479]: 双鱼 28.31°
+                  - generic [ref=e480]:
+                    - generic [ref=e481]: ☿
+                    - generic [ref=e482]: 水星
+                    - generic [ref=e483]: 双鱼 27.58°
+                  - generic [ref=e484]:
+                    - generic [ref=e485]: ♀
+                    - generic [ref=e486]: 金星
+                    - generic [ref=e487]: 双鱼 28.22°
+                  - generic [ref=e488]:
+                    - generic [ref=e489]: ♂
+                    - generic [ref=e490]: 火星
+                    - generic [ref=e491]: 双鱼 28.28°
+                  - generic [ref=e492]:
+                    - generic [ref=e493]: ♃
+                    - generic [ref=e494]: 木星
+                    - generic [ref=e495]: 白羊 0.14°
+                  - generic [ref=e496]:
+                    - generic [ref=e497]: ♄
+                    - generic [ref=e498]: 土星
+                    - generic [ref=e499]: 白羊 0.15°
+            - generic [ref=e500]:
+              - generic [ref=e501]:
+                - generic [ref=e502]:
+                  - text: 相位
+                  - generic [ref=e503]: · 行星间角度
+                - text: · 行星之间的角度关系
+              - generic [ref=e504]:
+                - generic [ref=e505]:
+                  - generic [ref=e507]: 太阳
+                  - generic [ref=e508]: →
+                  - generic [ref=e509]: 月亮
+                  - generic [ref=e510]: 合相
+                - generic [ref=e511]:
+                  - generic [ref=e513]: 太阳
+                  - generic [ref=e514]: →
+                  - generic [ref=e515]: 水星
+                  - generic [ref=e516]: 合相
+                - generic [ref=e517]:
+                  - generic [ref=e519]: 太阳
+                  - generic [ref=e520]: →
+                  - generic [ref=e521]: 金星
+                  - generic [ref=e522]: 合相
+                - generic [ref=e523]:
+                  - generic [ref=e525]: 太阳
+                  - generic [ref=e526]: →
+                  - generic [ref=e527]: 火星
+                  - generic [ref=e528]: 合相
+                - generic [ref=e529]:
+                  - generic [ref=e531]: 太阳
+                  - generic [ref=e532]: →
+                  - generic [ref=e533]: 木星
+                  - generic [ref=e534]: 合相
+                - generic [ref=e535]:
+                  - generic [ref=e537]: 太阳
+                  - generic [ref=e538]: →
+                  - generic [ref=e539]: 土星
+                  - generic [ref=e540]: 合相
+                - generic [ref=e541]:
+                  - generic [ref=e543]: 月亮
+                  - generic [ref=e544]: →
+                  - generic [ref=e545]: 水星
+                  - generic [ref=e546]: 合相
+                - generic [ref=e547]:
+                  - generic [ref=e549]: 月亮
+                  - generic [ref=e550]: →
+                  - generic [ref=e551]: 金星
+                  - generic [ref=e552]: 合相
+                - generic [ref=e553]:
+                  - generic [ref=e555]: 月亮
+                  - generic [ref=e556]: →
+                  - generic [ref=e557]: 火星
+                  - generic [ref=e558]: 合相
+          - generic [ref=e320]:
+            - generic [ref=e321]:
+              - generic [ref=e322]:
+                - heading "运势走势·K 线图" [level=3] [ref=e323]
+                - generic [ref=e324]: 从大运地支五行推导出来的"运势强度"折线,看每十年起伏
+              - generic [ref=e325]:
+                - generic [ref=e326]: ●
+                - text: 升
+                - generic [ref=e327]: /
+                - generic [ref=e328]: ●
+                - text: 降
+            - generic [ref=e330]:
+              - generic [ref=e331]: 横轴 = 出生后每一年(流年)
+              - generic [ref=e332]: 纵轴 = 运势强度(0-100,数字越高那年越顺)
+              - generic [ref=e333]: 每根 K 线代表一个十年的"主调"
+        - generic [ref=e335]:
+          - generic [ref=e336]:
+            - generic [ref=e337]:
+              - heading "AI 解读" [level=3] [ref=e338]
+              - generic [ref=e339]: · 已完成
+            - button "重新解读" [ref=e340] [cursor=pointer]
+          - generic [ref=e341]:
+            - heading "整体印象" [level=3] [ref=e342]
+            - paragraph [ref=e343]: 基于你提供的盘面，这是一个内外兼修、倾向于在独立探索与协作借力之间不断调试的能量结构。整体气场偏于内敛但不乏锋芒，早期需要积累，中期有突破窗口。
+            - heading "性格特质" [level=3] [ref=e344]
+            - paragraph [ref=e345]:
+              - strong [ref=e346]: 核心优势：
+            - list [ref=e347]:
+              - listitem [ref=e348]: 观察力敏锐，能迅速捕捉到别人忽略的细节和氛围变化。
+              - listitem [ref=e349]: 有持续学习和自我修正的内在驱动力，不易被一时的得失击倒。
+              - listitem [ref=e350]: 在压力下反而能激发出更强的韧性和创造力。
+            - paragraph [ref=e351]:
+              - strong [ref=e352]: 潜在盲点：
+            - list [ref=e353]:
+              - listitem [ref=e354]: 过于内省时容易陷入反复思量而错失行动的时机。
+              - listitem [ref=e355]: 在关系层面倾向于先照顾别人，偶尔忽略自己的边界。
+            - heading "事业与方向" [level=3] [ref=e356]
+            - paragraph [ref=e357]: 当前的盘面能量偏向于需要深耕的领域。短期内不宜频繁跳转方向，在已有积累上做深、做强会比追逐新风口更顺。留意身边愿意提供资源或信息的人，他们的出现不是偶然。
+            - paragraph [ref=e358]: 中长期来看，大约在两三年后有一个明显的上升波段，那段时间适合往外走、扩大影响力。现在则是打磨核心能力的阶段。
+            - heading "感情与人际" [level=3] [ref=e359]
+            - paragraph [ref=e360]: 盘面显示在关系中你倾向于用行动而不是语言来表达在意。对方能感受到你的付出，但偶尔也会希望你直接说出来。适度的坦诚表达，不但不会削弱关系，反而能让彼此的边界更清晰。
+            - heading "当前提示与建议" [level=3] [ref=e361]
+            - list [ref=e362]:
+              - listitem [ref=e363]:
+                - strong [ref=e364]: 把想说的话写下来：
+                - text: 即使不发给任何人，梳理清楚自己的想法本身就是一次有效的自我对话。
+              - listitem [ref=e365]:
+                - strong [ref=e366]: 在'先照顾好自己'和'照顾他人'之间重新校准：
+                - text: 本周至少为自己留出三次完全的独处时间。
+              - listitem [ref=e367]:
+                - strong [ref=e368]: 那个搁置了很久的小项目，往前推一步：
+                - text: 不必做到完美，只要让它在物理世界里有了一点点进展就行。
+            - paragraph [ref=e369]: (以上为传统文化象征视角的参考，非科学预测，重大决定请结合现实并咨询专业人士。)
+            - paragraph [ref=e370]: (以上为传统文化象征视角的参考，非科学预测，重大决定请结合现实并咨询专业人士。)
+          - generic [ref=e372]: 以上为传统文化象征视角的参考,非科学预测,重大决定请结合现实并咨询专业人士。
+  - contentinfo [ref=e20]:
+    - generic [ref=e21]:
+      - paragraph [ref=e22]: 免责声明:本站所有解读为传统文化象征视角的参考,非科学预测,亦不构成医疗、法律、财务等专业意见。 重大决定请结合现实并咨询专业人士。
+      - paragraph [ref=e23]: 合规:全栈 MIT/BSD 许可,零 AGPL,可闭源商用。 你的 LLM API Key 仅存在浏览器本地,不会上传到本服务后端。

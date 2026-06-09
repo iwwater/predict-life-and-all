@@ -1,0 +1,171 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "Mystic Hub · 玄枢" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e8]: Mystic Hub
+        - generic [ref=e9]: · 玄枢
+      - navigation [ref=e10]:
+        - link "首页" [ref=e11] [cursor=pointer]:
+          - /url: /
+        - link "排盘" [ref=e12] [cursor=pointer]:
+          - /url: /cast
+        - link "历史" [ref=e13] [cursor=pointer]:
+          - /url: /history
+        - link "关于" [ref=e14] [cursor=pointer]:
+          - /url: /about
+  - main [ref=e15]:
+    - generic [ref=e163]:
+      - generic [ref=e164]:
+        - generic [ref=e165]:
+          - generic [ref=e167]: 你的灵魂
+          - generic [ref=e168]: 1990-5-15 8:30
+          - generic [ref=e169]: · male
+        - generic [ref=e170]:
+          - button "☆ 收藏" [ref=e171] [cursor=pointer]
+          - group "反馈" [ref=e172]:
+            - button "准" [ref=e173] [cursor=pointer]
+            - button "不准" [ref=e174] [cursor=pointer]
+            - button "待观察" [ref=e175] [cursor=pointer]
+          - button "生成分享卡" [active] [ref=e176] [cursor=pointer]
+          - link "再排一次" [ref=e177] [cursor=pointer]:
+            - /url: /cast
+      - generic [ref=e178]:
+        - button "六爻 · 东 · 一事一卦，重世应、动爻、用神" [ref=e179] [cursor=pointer]:
+          - generic [ref=e180]: 六爻
+          - generic [ref=e181]: · 东
+          - generic [ref=e182]: · 一事一卦，重世应、动爻、用神
+        - button "塔罗 · 西 · 按问题选择牌阵，而不是只抽几张" [ref=e183] [cursor=pointer]:
+          - generic [ref=e184]: 塔罗
+          - generic [ref=e185]: · 西
+          - generic [ref=e186]: · 按问题选择牌阵，而不是只抽几张
+        - button "紫微 · 东 · 十二宫星曜，看命身宫与限运" [ref=e187] [cursor=pointer]:
+          - generic [ref=e188]: 紫微
+          - generic [ref=e189]: · 东
+          - generic [ref=e190]: · 十二宫星曜，看命身宫与限运
+        - button "西方占星 · 西 · 西方本命盘，太阳月亮上升与行星" [ref=e191] [cursor=pointer]:
+          - generic [ref=e192]: 西方占星
+          - generic [ref=e193]: · 西
+          - generic [ref=e194]: · 西方本命盘，太阳月亮上升与行星
+      - generic [ref=e195]:
+        - generic [ref=e196]:
+          - generic [ref=e334]:
+            - generic [ref=e335]:
+              - generic [ref=e336]:
+                - heading "塔罗 · 关系十字" [level=3] [ref=e337]
+                - generic [ref=e338]:
+                  - generic [ref=e339]: 5 张
+                  - generic [ref=e340]: relationship
+              - generic [ref=e341]:
+                - generic [ref=e342]:
+                  - generic [ref=e343]:
+                    - generic [ref=e344]: 你
+                    - generic [ref=e345]: 圣杯9
+                    - generic [ref=e346]: 逆位
+                  - generic [ref=e347]: 你在关系中的状态
+                - generic [ref=e348]:
+                  - generic [ref=e349]:
+                    - generic [ref=e350]: 对方
+                    - generic [ref=e351]: 魔术师
+                    - generic [ref=e352]: 正位
+                  - generic [ref=e353]: 对方的状态
+                - generic [ref=e354]:
+                  - generic [ref=e355]:
+                    - generic [ref=e356]: 互动
+                    - generic [ref=e357]: 圣杯4
+                    - generic [ref=e358]: 正位
+                  - generic [ref=e359]: 双方能量如何交换
+                - generic [ref=e360]:
+                  - generic [ref=e361]:
+                    - generic [ref=e362]: 阻碍
+                    - generic [ref=e363]: 世界
+                    - generic [ref=e364]: 逆位
+                  - generic [ref=e365]: 关系卡点
+                - generic [ref=e366]:
+                  - generic [ref=e367]:
+                    - generic [ref=e368]: 建议
+                    - generic [ref=e369]: 恶魔
+                    - generic [ref=e370]: 正位
+                  - generic [ref=e371]: 下一步建议
+            - generic [ref=e372]:
+              - generic [ref=e373]: 牌位与牌面
+              - list [ref=e374]:
+                - listitem [ref=e375]:
+                  - generic [ref=e376]: 你
+                  - generic [ref=e377]: 圣杯9
+                  - generic [ref=e378]: 逆位 · 受阻/反向
+                  - generic [ref=e379]: 情感、关系、感受 · 9
+                - listitem [ref=e380]:
+                  - generic [ref=e381]: 对方
+                  - generic [ref=e382]: 魔术师
+                  - generic [ref=e383]: 正位 · 正向能量
+                  - generic [ref=e384]: 创造力、行动、资源
+                - listitem [ref=e385]:
+                  - generic [ref=e386]: 互动
+                  - generic [ref=e387]: 圣杯4
+                  - generic [ref=e388]: 正位 · 正向能量
+                  - generic [ref=e389]: 情感、关系、感受 · 4
+                - listitem [ref=e390]:
+                  - generic [ref=e391]: 阻碍
+                  - generic [ref=e392]: 世界
+                  - generic [ref=e393]: 逆位 · 受阻/反向
+                  - generic [ref=e394]: 完成、整合、阶段闭合
+                - listitem [ref=e395]:
+                  - generic [ref=e396]: 建议
+                  - generic [ref=e397]: 恶魔
+                  - generic [ref=e398]: 正位 · 正向能量
+                  - generic [ref=e399]: 束缚、欲望、执念
+              - generic [ref=e400]: "起法: 78-card Waite-style deck, sample without replacement, upright/reversed orientation；seed: 1780732657700837900-"
+          - generic [ref=e319]:
+            - generic [ref=e320]: 本次采用的起法
+            - generic [ref=e321]: "方法: tarot · 模式: tarot_spread · 对象: relationship"
+            - generic [ref=e401]: "抽牌规则: 78-card Waite-style deck, sample without replacement, upright/reversed orientation"
+        - generic [ref=e323]:
+          - generic [ref=e324]:
+            - generic [ref=e325]:
+              - heading "AI 解读" [level=3] [ref=e326]
+              - generic [ref=e327]: · 已完成
+            - button "重新解读" [ref=e328] [cursor=pointer]
+          - generic [ref=e329]:
+            - paragraph [ref=e330]:
+              - text: 【整体】(Mock 解读)—— 基于你提供的盘面,我看到一个倾向于内省与表达并存的能量结构。
+              - text: 【事业财运】盘面显示金气偏旺、根气偏弱,倾向于在协作中借力会更顺。
+              - text: 【建议】1) 多与人合作;2) 留意春夏之交的机会;3) 给自己留点独处时间复盘。
+            - paragraph [ref=e331]: (以上为传统文化象征视角的参考,非科学预测,重大决定请结合现实并咨询专业人士。)
+          - generic [ref=e333]: 以上为传统文化象征视角的参考,非科学预测,重大决定请结合现实并咨询专业人士。
+      - dialog "分享卡" [ref=e402]:
+        - generic [ref=e403]:
+          - generic [ref=e404]:
+            - generic [ref=e405]: 分享卡
+            - button "关闭" [ref=e406] [cursor=pointer]
+          - generic [ref=e407]: 关系感情 · 6月6日
+          - generic [ref=e408]: "方法: 六爻 / 塔罗 / 紫微 / 西方占星"
+          - generic [ref=e409]: 聚焦关系状态与互动模式,适合沟通前自我观察。
+          - generic [ref=e410]:
+            - generic [ref=e411]: 盘面依据
+            - list [ref=e412]:
+              - listitem [ref=e413]: · 六爻 · 模式 time_qigua · 主题 relationship · 六爻 · 标准起法
+              - listitem [ref=e414]: · 塔罗 · 模式 tarot_spread · 主题 relationship · 塔罗 · 标准起法
+              - listitem [ref=e415]: · 紫微 · 模式 natal · 主题 relationship · 紫微 · 标准起法
+              - listitem [ref=e416]: · 西方占星 · 模式 默认 · 主题 relationship · 西方占星 · 标准起法
+          - generic [ref=e417]:
+            - generic [ref=e418]: 牌面
+            - list [ref=e419]:
+              - listitem [ref=e420]: "牌阵: 关系十字(5 张)"
+              - listitem [ref=e421]: · 你 · 圣杯9 (逆位)
+              - listitem [ref=e422]: · 对方 · 魔术师 (正位)
+              - listitem [ref=e423]: · 互动 · 圣杯4 (正位)
+              - listitem [ref=e424]: · 阻碍 · 世界 (逆位)
+              - listitem [ref=e425]: · 建议 · 恶魔 (正位)
+          - generic [ref=e426]:
+            - generic [ref=e427]: 建议
+            - list [ref=e428]:
+              - listitem [ref=e429]: 把结果当作自我观察工具,不替代现实判断。
+              - listitem [ref=e430]: 重大决定请结合现实并咨询专业人士。
+              - listitem [ref=e431]: 建议记下今天的实际体验,几周后回看验证。
+          - generic [ref=e432]: 本卡来自玄枢 Mystic Hub · 传统文化象征视角 · 非科学预测,仅作自我观察与文化参考。
+          - button "复制全文" [ref=e434] [cursor=pointer]
+  - contentinfo [ref=e101]:
+    - generic [ref=e102]:
+      - paragraph [ref=e103]: 免责声明:本站所有解读为传统文化象征视角的参考,非科学预测,亦不构成医疗、法律、财务等专业意见。 重大决定请结合现实并咨询专业人士。
+      - paragraph [ref=e104]: 合规:全栈 MIT/BSD 许可,零 AGPL,可闭源商用。 你的 LLM API Key 仅存在浏览器本地,不会上传到本服务后端。

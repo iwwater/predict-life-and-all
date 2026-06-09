@@ -1,0 +1,34 @@
+[     849ms] [LOG] [LocaleProvider] 初始化, initialLocale: undefined @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/376-d8ec1f801843a066.js:0
+[     850ms] [LOG] [LocaleProvider] 检测到的 locale: en @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/376-d8ec1f801843a066.js:0
+[     867ms] [LOG] [Testimonials] 无数据，不渲染 @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/394-b322d420f1ed9481.js:0
+[     875ms] [LOG] [useAuth] mount, locale: en @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/394-b322d420f1ed9481.js:0
+[     875ms] [LOG] [auth] getBizUserInfo locale: en goOrigin: https://www.minimax.io @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/394-b322d420f1ed9481.js:0
+[     875ms] [LOG] [auth] requesting: https://www.minimax.io/backend/user/biz_info @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/394-b322d420f1ed9481.js:0
+[     877ms] [LOG] [Apollo API] 📡 请求 URL: https://www.minimax.io/setting/get_app_settings @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/376-d8ec1f801843a066.js:0
+[     877ms] [LOG] [Apollo API] 📡 请求参数: {fe_setting_key: login_menu} @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/376-d8ec1f801843a066.js:0
+[     878ms] [LOG] [useAuth] mount, locale: en @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/394-b322d420f1ed9481.js:0
+[     878ms] [LOG] [auth] getBizUserInfo locale: en goOrigin: https://www.minimax.io @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/394-b322d420f1ed9481.js:0
+[     878ms] [LOG] [auth] requesting: https://www.minimax.io/backend/user/biz_info @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/394-b322d420f1ed9481.js:0
+[     879ms] [LOG] [Apollo API] 📡 请求 URL: https://www.minimax.io/setting/get_app_settings @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/376-d8ec1f801843a066.js:0
+[     879ms] [LOG] [Apollo API] 📡 请求参数: {fe_setting_key: home_footer_navigation} @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/376-d8ec1f801843a066.js:0
+[     879ms] [LOG] [Locale] 🔗 语言检测: en (pathname: / ) @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/376-d8ec1f801843a066.js:0
+[     879ms] [LOG] [LocaleProvider] SSR 已传入导航数据，跳过客户端获取 @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/376-d8ec1f801843a066.js:0
+[    1070ms] [LOG] [Apollo API] 📥 响应数据: {base_resp: Object, data: Object} @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/376-d8ec1f801843a066.js:0
+[    1074ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://www.minimax.io/backend/user/biz_info:0
+[    1075ms] [ERROR] [auth] biz_info request failed: AxiosError: Request failed with status code 401
+    at eH (https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/418-e0bd6f743b09e2b3.js:1:44137)
+    at XMLHttpRequest.y (https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/418-e0bd6f743b09e2b3.js:1:49258)
+    at tR.request (https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/418-e0bd6f743b09e2b3.js:1:61006)
+    at async n.get (https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/376-d8ec1f801843a066.js:1:71102)
+    at async v (https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/394-b322d420f1ed9481.js:1:60537) @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/945-f8b3d55c7ef9fade.js:0
+[    1075ms] [LOG] [useAuth] biz_info result: null @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/394-b322d420f1ed9481.js:0
+[    1112ms] [LOG] [Apollo API] 📥 响应数据: {base_resp: Object, data: Object} @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/376-d8ec1f801843a066.js:0
+[    1112ms] [LOG] [Footer] Apollo 数据: {qrcode: Array(3), zh: Array(4), en: Array(4)} @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/394-b322d420f1ed9481.js:0
+[    1274ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://www.minimax.io/backend/user/biz_info:0
+[    1276ms] [ERROR] [auth] biz_info request failed: AxiosError: Request failed with status code 401
+    at eH (https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/418-e0bd6f743b09e2b3.js:1:44137)
+    at XMLHttpRequest.y (https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/418-e0bd6f743b09e2b3.js:1:49258)
+    at tR.request (https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/418-e0bd6f743b09e2b3.js:1:61006)
+    at async n.get (https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/376-d8ec1f801843a066.js:1:71102)
+    at async v (https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/394-b322d420f1ed9481.js:1:60537) @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/945-f8b3d55c7ef9fade.js:0
+[    1276ms] [LOG] [useAuth] biz_info result: null @ https://file.cdn.minimax.io/open_platform_web/prod-en-minimax-0.1.49/_next/static/chunks/394-b322d420f1ed9481.js:0

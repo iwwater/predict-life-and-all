@@ -1,0 +1,20 @@
+[      45ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:5192/node_modules/.vite/deps/chunk-XWFYSYQD.js?v=b4550ae6:21550
+[      54ms] [WARNING] ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition. @ http://127.0.0.1:5192/node_modules/.vite/deps/react-router-dom.js?v=b4550ae6:4426
+[      54ms] [WARNING] ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath. @ http://127.0.0.1:5192/node_modules/.vite/deps/react-router-dom.js?v=b4550ae6:4426
+[  422969ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5192/@vite/client:559
+[  422970ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_RESET @ http://127.0.0.1:5192/src/index.css?t=1780748147618:0
+[  422970ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_RESET @ http://127.0.0.1:5192/src/pages/Cast.tsx?t=1780748147618:0
+[  422970ms] [ERROR] [hmr] Failed to reload /src/index.css. This could be due to syntax errors or importing non-existent modules. (see errors above) @ http://127.0.0.1:5192/@vite/client:175
+[  422970ms] [ERROR] [hmr] Failed to reload /src/pages/Cast.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ http://127.0.0.1:5192/@vite/client:175
+[  424984ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5192/:0
+[  428007ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5192/:0
+[  431032ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5192/:0
+[  434062ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5192/:0
+[  437092ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5192/:0
+[  440131ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5192/:0
+[  443158ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5192/:0
+[  446182ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5192/:0
+[  449210ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5192/:0
+[  452255ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5192/:0
+[  455275ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5192/:0
+[  458304ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:5192/:0

@@ -1,0 +1,75 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "Mystic Hub · 玄枢" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e8]: Mystic Hub
+        - generic [ref=e9]: · 玄枢
+      - navigation [ref=e10]:
+        - link "首页" [ref=e11] [cursor=pointer]:
+          - /url: /
+        - link "今日" [ref=e12] [cursor=pointer]:
+          - /url: /daily
+        - link "排盘" [ref=e13] [cursor=pointer]:
+          - /url: /cast
+        - link "历史" [ref=e14] [cursor=pointer]:
+          - /url: /history
+        - link "关于" [ref=e15] [cursor=pointer]:
+          - /url: /about
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - generic [ref=e18]:
+        - heading "今天你适合问什么" [level=2] [ref=e19]
+        - generic [ref=e20]:
+          - link "今日 今日塔罗 + 日柱 + 一问" [ref=e21] [cursor=pointer]:
+            - /url: /daily
+            - generic [ref=e22]: 今日
+            - generic [ref=e23]: 今日塔罗 + 日柱 + 一问
+          - link "本命 长期命局与核心主题" [ref=e24] [cursor=pointer]:
+            - /url: /cast?subject=self_life
+            - generic [ref=e25]: 本命
+            - generic [ref=e26]: 长期命局与核心主题
+          - link "关系 双方状态、互动、阻碍" [ref=e27] [cursor=pointer]:
+            - /url: /cast?subject=relationship
+            - generic [ref=e28]: 关系
+            - generic [ref=e29]: 双方状态、互动、阻碍
+          - link "事业 工作路径与机会阻力" [ref=e30] [cursor=pointer]:
+            - /url: /cast?subject=career
+            - generic [ref=e31]: 事业
+            - generic [ref=e32]: 工作路径与机会阻力
+          - link "具体一事 该不该做、何时做" [ref=e33] [cursor=pointer]:
+            - /url: /cast?subject=decision
+            - generic [ref=e34]: 具体一事
+            - generic [ref=e35]: 该不该做、何时做
+          - link "住宅 命卦、坐向、三元九运" [ref=e36] [cursor=pointer]:
+            - /url: /cast?subject=home_fengshui
+            - generic [ref=e37]: 住宅
+            - generic [ref=e38]: 命卦、坐向、三元九运
+        - generic [ref=e39]:
+          - generic [ref=e40]: 最近的问题 · 继续追问
+          - list [ref=e41]:
+            - listitem [ref=e42]:
+              - generic [ref=e43]:
+                - generic [ref=e44]: 关系感情
+                - text: 我们最近沟通变少, 是不是对方不在意了?2026/6/6 17:15:30
+              - link "继续追问" [ref=e45] [cursor=pointer]:
+                - /url: /cast?fromHistory=006e0906-ee24-419f-a0ae-5336f6a425ae
+      - generic [ref=e47]:
+        - generic [ref=e48]: Mystic Hub · 玄枢
+        - heading "中西融通, 十二术数排盘 + AI 解读" [level=1] [ref=e49]:
+          - text: 中西融通,
+          - text: 十二术数排盘 + AI 解读
+        - paragraph [ref=e50]: 一个工具,十种命 / 卜 / 风水术数 + 西方占星 · 吠陀 · 塔罗 · 数字命理。 排盘结果以传统文化象征视角呈现,AI 解读融合中西。重大决定请结合现实并咨询专业人士。
+        - generic [ref=e51]:
+          - link "开始排盘" [ref=e52] [cursor=pointer]:
+            - /url: /cast
+          - link "关于 & 免责" [ref=e53] [cursor=pointer]:
+            - /url: /about
+      - heading "十二种占卜法" [level=2] [ref=e55]
+      - generic [ref=e56]:
+        - generic [ref=e57]: 合规:全栈 MIT/BSD,零 AGPL,可闭源商用。
+        - generic [ref=e58]: 隐私:你的 LLM API Key 仅存在浏览器本地;解读时浏览器直连 provider,Key 不出前端。
+  - contentinfo [ref=e59]:
+    - generic [ref=e60]:
+      - paragraph [ref=e61]: 免责声明:本站所有解读为传统文化象征视角的参考,非科学预测,亦不构成医疗、法律、财务等专业意见。 重大决定请结合现实并咨询专业人士。
+      - paragraph [ref=e62]: 合规:全栈 MIT/BSD 许可,零 AGPL,可闭源商用。 你的 LLM API Key 仅存在浏览器本地,不会上传到本服务后端。

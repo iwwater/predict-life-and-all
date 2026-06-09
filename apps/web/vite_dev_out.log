@@ -1,0 +1,110 @@
+
+  [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m227[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m5180[22m/[39m
+[2m15:10:29[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/components/Interpretation.tsx[22m
+[2m15:11:38[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Home.tsx, /src/pages/Cast.tsx, /src/components/Interpretation.tsx[22m
+[2m15:11:38[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Cast.tsx[22m
+[2m15:12:09[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m15:41:36[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Result.tsx, /src/pages/Home.tsx, /src/pages/Cast.tsx[22m
+[2m15:41:36[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Cast.tsx[22m
+[2m15:42:50[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Cast.tsx, /src/index.css[22m
+[2m15:43:16[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/TarotChart.tsx, /src/index.css[22m
+[2m15:43:57[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Result.tsx, /src/index.css[22m
+[2m16:35:21[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/History.tsx[22m
+[2m16:35:34[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Cast.tsx, /src/index.css[22m
+[2m16:36:02[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/History.tsx, /src/index.css[22m
+[2m16:36:46[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/History.tsx, /src/index.css[22m
+[2m16:38:50[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/History.tsx[22m
+[2m16:39:03[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Cast.tsx, /src/index.css[22m
+[2m16:41:02[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Result.tsx, /src/index.css[22m
+[2m16:42:40[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Result.tsx, /src/index.css[22m
+[2m16:43:32[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Result.tsx, /src/index.css[22m
+[2m16:48:51[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Cast.tsx, /src/index.css[22m
+[2m16:51:40[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/History.tsx, /src/index.css[22m
+[2m16:52:09[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Cast.tsx, /src/index.css[22m
+[2m16:55:19[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Cast.tsx, /src/index.css[22m
+[2m17:08:02[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Home.tsx, /src/pages/Cast.tsx, /src/components/Interpretation.tsx[22m
+[2m17:08:55[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m17:08:55[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Layout.tsx, /src/index.css[22m
+[2m17:09:19[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Home.tsx, /src/index.css[22m
+[2m17:09:37[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Cast.tsx, /src/index.css[22m
+[2m17:10:04[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Home.tsx, /src/index.css[22m
+[2m17:10:28[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Home.tsx, /src/index.css[22m
+[2m17:10:46[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Home.tsx, /src/index.css[22m
+[2m17:11:01[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Home.tsx, /src/index.css[22m
+[2m17:13:25[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Home.tsx, /src/index.css[22m
+[2m17:13:51[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Cast.tsx, /src/index.css[22m
+[2m17:14:34[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Home.tsx, /src/index.css[22m
+[2m17:14:47[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Home.tsx, /src/index.css[22m
+[2m17:56:26[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Result.tsx, /src/index.css[22m
+[2m18:07:45[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Cast.tsx, /src/index.css[22m
+[2m18:08:06[22m [36m[1m[vite][22m[39m [32m✨ new dependencies optimized: [33mdompurify[32m[39m
+[2m18:08:06[22m [36m[1m[vite][22m[39m [32m✨ optimized dependencies changed. reloading[39m
+[2m20:01:37[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Home.tsx, /src/index.css[22m
+[2m20:10:20[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Interpretation.tsx, /src/index.css[22m
+[2m20:10:53[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/BaziChart.tsx, /src/index.css[22m
+[2m20:46:32[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Cast.tsx[22m
+[2m20:46:50[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/components/Settings.tsx, /src/components/Interpretation.tsx[22m
+[2m20:47:13[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Settings.tsx, /src/index.css[22m
+[2m20:47:22[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Settings.tsx, /src/index.css[22m
+[2m20:48:24[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Settings.tsx, /src/index.css[22m
+[2m20:48:35[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Cast.tsx[22m
+[2m20:57:08[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/components/Settings.tsx, /src/components/Interpretation.tsx[22m
+[2m20:57:14[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/ElementsRadar.tsx, /src/index.css[22m
+[2m20:57:44[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/ElementsRadar.tsx, /src/index.css[22m
+[2m20:57:50[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/ZiweiChart.tsx, /src/index.css[22m
+[2m20:58:35[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/ZiweiChart.tsx, /src/index.css[22m
+[2m20:58:41[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/ZiweiChart.tsx, /src/index.css[22m
+[2m20:58:45[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/WesternChart.tsx, /src/index.css[22m
+[2m20:59:41[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/WesternChart.tsx, /src/index.css[22m
+[2m21:03:55[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Settings.tsx, /src/index.css[22m
+[2m21:04:24[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Settings.tsx, /src/index.css[22m
+[2m21:08:24[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/ZiweiChart.tsx, /src/index.css[22m
+[2m21:15:35[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Cast.tsx[22m
+[2m21:15:47[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Cast.tsx, /src/index.css[22m
+[2m21:17:03[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Cast.tsx[22m
+[2m22:44:24[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Cast.tsx[22m
+[2m22:44:26[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Cast.tsx[22m
+[2m22:44:33[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/index.tsx, /src/index.css[22m
+[2m22:45:19[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Result.tsx, /src/pages/Home.tsx, /src/pages/Cast.tsx, /src/pages/History.tsx, /src/pages/Daily.tsx[22m
+[2m22:45:23[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Result.tsx, /src/pages/Home.tsx, /src/pages/Cast.tsx, /src/pages/History.tsx, /src/pages/Daily.tsx[22m
+[2m22:45:28[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Result.tsx, /src/pages/Home.tsx, /src/pages/Cast.tsx, /src/pages/History.tsx, /src/pages/Daily.tsx[22m
+[2m22:45:31[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Result.tsx, /src/pages/Home.tsx, /src/pages/Cast.tsx, /src/pages/History.tsx, /src/pages/Daily.tsx[22m
+[2m22:45:38[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/MethodInfo.tsx, /src/index.css[22m
+[2m22:46:03[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Cast.tsx, /src/index.css[22m
+[2m22:46:04[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Cast.tsx, /src/index.css[22m
+[2m22:46:06[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Home.tsx, /src/index.css[22m
+[2m22:46:12[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Home.tsx, /src/index.css[22m
+[2m22:46:14[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/About.tsx, /src/index.css[22m
+[2m22:46:30[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Home.tsx, /src/index.css[22m
+[2m23:13:10[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/WesternChart.tsx, /src/index.css[22m
+[2m23:14:18[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/VedicChart.tsx, /src/index.css[22m
+[2m23:15:32[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/ZiweiChart.tsx, /src/index.css[22m
+[2m23:21:07[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/ZiweiChart.tsx, /src/index.css[22m
+[2m23:21:10[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Result.tsx[22m
+[2m23:21:12[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Result.tsx[22m
+[2m23:42:43[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/WesternChart.tsx, /src/index.css[22m
+[2m00:25:10[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Cast.tsx[22m
+[2m00:25:16[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Result.tsx, /src/pages/Home.tsx, /src/pages/Cast.tsx, /src/pages/History.tsx, /src/pages/Daily.tsx[22m
+[2m00:25:21[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Result.tsx, /src/pages/Home.tsx, /src/pages/Cast.tsx, /src/pages/History.tsx, /src/pages/Daily.tsx[22m
+[2m00:25:27[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Result.tsx[22m
+[2m00:25:33[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Result.tsx, /src/index.css[22m
+[2m00:25:44[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/MethodInfo.tsx, /src/index.css[22m
+[2m00:26:13[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Cast.tsx, /src/index.css[22m
+[2m00:26:17[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Cast.tsx, /src/index.css[22m
+[2m00:26:22[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Cast.tsx, /src/index.css[22m
+[2m00:26:29[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Cast.tsx, /src/index.css[22m
+[2m00:26:37[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Cast.tsx, /src/index.css[22m
+[2m00:27:22[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/index.tsx, /src/index.css[22m
+[2m00:27:28[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/index.tsx, /src/index.css[22m
+[2m00:28:39[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/Result.tsx, /src/pages/Home.tsx, /src/pages/Cast.tsx, /src/pages/History.tsx, /src/pages/Daily.tsx[22m
+[2m00:28:51[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Home.tsx, /src/index.css[22m
+[2m00:29:01[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Home.tsx, /src/index.css[22m
+[2m00:29:05[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Home.tsx, /src/index.css[22m
+[2m00:29:16[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Home.tsx, /src/index.css[22m
+[2m00:29:38[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m00:29:43[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Layout.tsx, /src/index.css[22m
+[2m00:31:40[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/XuankongChart.tsx, /src/index.css[22m
+[2m00:31:49[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/XuankongChart.tsx, /src/index.css[22m
+[2m00:32:02[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/BazhaiChart.tsx, /src/index.css[22m

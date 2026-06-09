@@ -1,0 +1,25 @@
+[2m13:04:54[22m [31m[1m[vite][22m[39m [31mInternal server error: Transform failed with 1 error:
+E:/work/predict life and all/apps/web/src/lib/compass.ts:18:155: ERROR: Expected "}" but found "艮"[39m
+  Plugin: [35mvite:esbuild[39m
+  File: [36mE:/work/predict life and all/apps/web/src/lib/compass.ts[39m:18:155
+[33m  
+  [33mExpected "}" but found "艮"[33m
+  17 |    { code: "正北", range: "337.5°–22.5°",  sans: "子", trigram: "坎", element: "水", hint: "正北方,五行属水,主智慧与事业运" },
+  18 |    { code: "东北", range: "22.5°–67.5°",   sans: "艮", trigram: "艮", element: "土", hint: "东北方,五行属土,主稳定与停止(家宅最忌"艮"位动)" },
+  19 |    { code: "正东", range: "67.5°–112.5°",  sans: "卯", trigram: "震", element: "木", hint: "正东方,五行属木,主成长与家庭(传统认为最宜作大门)" },
+     |                                        ^
+  20 |    { code: "东南", range: "112.5°–157.5°", sans: "巽", trigram: "巽", element: "木", hint: "东南方,五行属木,主文昌与学业" },
+  21 |    { code: "正南", range: "157.5°–202.5°", sans: "午", trigram: "离", element: "火", hint: "正南方,五行属火,主名声与心火" },
+  [39m
+      at failureErrorWithLog (E:\work\predict life and all\apps\web\node_modules\esbuild\lib\main.js:1472:15)
+      at E:\work\predict life and all\apps\web\node_modules\esbuild\lib\main.js:755:50
+      at responseCallbacks.<computed> (E:\work\predict life and all\apps\web\node_modules\esbuild\lib\main.js:622:9)
+      at handleIncomingPacket (E:\work\predict life and all\apps\web\node_modules\esbuild\lib\main.js:677:12)
+      at Socket.readFromStdout (E:\work\predict life and all\apps\web\node_modules\esbuild\lib\main.js:600:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:563:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:514:3)
+      at Readable.push (node:internal/streams/readable:394:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+[2m13:04:54[22m [31m[1m[vite][22m[39m Pre-transform error: Transform failed with 1 error:
+E:/work/predict life and all/apps/web/src/lib/compass.ts:18:155: ERROR: Expected "}" but found "艮"

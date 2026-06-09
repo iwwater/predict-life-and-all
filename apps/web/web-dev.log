@@ -1,0 +1,28 @@
+
+> mystic-hub-web@0.1.0 dev
+> vite --host 127.0.0.1 --port 5173
+
+
+  [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m243[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m5173[22m/[39m
+[2m12:19:07[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Interpretation.tsx, /src/index.css[22m
+[2m13:04:54[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Cast.tsx, /src/index.css[22m
+[2m13:25:20[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/BaziChart.tsx, /src/index.css[22m
+[2m13:26:18[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/ZiweiChart.tsx, /src/index.css[22m
+[2m13:26:40[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/QimenChart.tsx, /src/index.css[22m
+[2m13:27:13[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/WesternChart.tsx, /src/index.css[22m
+[2m13:27:29[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/VedicChart.tsx, /src/index.css[22m
+[2m13:27:55[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/BazhaiChart.tsx, /src/index.css[22m
+[2m13:31:05[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/XuankongChart.tsx, /src/index.css[22m
+[2m13:31:33[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/LiyaoChart.tsx, /src/index.css[22m
+[2m13:32:05[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/MeihuaChart.tsx, /src/index.css[22m
+[2m13:32:24[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/ChengguChart.tsx, /src/index.css[22m
+[2m13:33:00[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/TarotChart.tsx, /src/index.css[22m
+[2m13:33:13[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/charts/NumerologyChart.tsx, /src/index.css[22m
+[2m13:33:26[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/BaziKline.tsx, /src/index.css[22m
+[2m13:33:51[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Settings.tsx, /src/index.css[22m
+[2m13:33:57[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Interpretation.tsx, /src/index.css[22m
+[2m13:34:28[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Result.tsx, /src/index.css[22m
+[2m13:34:45[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Home.tsx, /src/index.css[22m
+[2m13:35:05[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/History.tsx, /src/index.css[22m

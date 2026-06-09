@@ -1,0 +1,20 @@
+{
+  "name": "Mystic Hub · 玄枢 — East-West Divination Platform",
+  "short_name": "Mystic Hub",
+  "description": "East-West divination platform: Ba Zi, Zi Wei, Qi Men, Feng Shui + Western Astrology, Tarot, Lenormand. AI-powered readings across 14 arts.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a0e14",
+  "theme_color": "#0a0e14",
+  "categories": ["lifestyle", "education"],
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

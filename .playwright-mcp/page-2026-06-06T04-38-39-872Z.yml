@@ -1,0 +1,201 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "Mystic Hub · 玄枢" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e8]: Mystic Hub
+        - generic [ref=e9]: · 玄枢
+      - navigation [ref=e10]:
+        - link "首页" [ref=e11] [cursor=pointer]:
+          - /url: /
+        - link "排盘" [ref=e12] [cursor=pointer]:
+          - /url: /cast
+        - link "历史" [ref=e13] [cursor=pointer]:
+          - /url: /history
+        - link "关于" [ref=e14] [cursor=pointer]:
+          - /url: /about
+  - main [ref=e15]:
+    - generic [ref=e252]:
+      - generic [ref=e253]:
+        - generic [ref=e254]:
+          - generic [ref=e256]: 你的灵魂
+          - generic [ref=e257]: 1990-5-15 8:30
+          - generic [ref=e258]: · male
+        - link "再排一次" [ref=e259] [cursor=pointer]:
+          - /url: /cast
+      - generic [ref=e260]:
+        - button "八字 · 东 · 中国最常见的命理,看生辰八字配五行" [ref=e261] [cursor=pointer]:
+          - generic [ref=e262]: 八字
+          - generic [ref=e263]: · 东
+          - generic [ref=e264]: · 中国最常见的命理,看生辰八字配五行
+        - button "奇门 · 东 · 起一个时局看吉凶,择吉决策用" [ref=e265] [cursor=pointer]:
+          - generic [ref=e266]: 奇门
+          - generic [ref=e267]: · 东
+          - generic [ref=e268]: · 起一个时局看吉凶,择吉决策用
+        - button "紫微 · 东 · 中国传统的星命学,十二宫看人" [ref=e269] [cursor=pointer]:
+          - generic [ref=e270]: 紫微
+          - generic [ref=e271]: · 东
+          - generic [ref=e272]: · 中国传统的星命学,十二宫看人
+        - button "八宅 · 东 · 看房子八个方位,哪个该坐哪个该避" [ref=e273] [cursor=pointer]:
+          - generic [ref=e274]: 八宅
+          - generic [ref=e275]: · 东
+          - generic [ref=e276]: · 看房子八个方位,哪个该坐哪个该避
+        - button "西方占星 · 西 · 西方星座,看太阳月亮上升和行星" [ref=e277] [cursor=pointer]:
+          - generic [ref=e278]: 西方占星
+          - generic [ref=e279]: · 西
+          - generic [ref=e280]: · 西方星座,看太阳月亮上升和行星
+        - button "吠陀 · 西 · 印度占星,基于恒星而非黄道" [ref=e281] [cursor=pointer]:
+          - generic [ref=e282]: 吠陀
+          - generic [ref=e283]: · 西
+          - generic [ref=e284]: · 印度占星,基于恒星而非黄道
+        - button "六爻 · 东 · 摇铜钱起卦,问一件具体事" [ref=e285] [cursor=pointer]:
+          - generic [ref=e286]: 六爻
+          - generic [ref=e287]: · 东
+          - generic [ref=e288]: · 摇铜钱起卦,问一件具体事
+        - button "梅花 · 东 · 报数或听声音起卦,快速卜" [ref=e289] [cursor=pointer]:
+          - generic [ref=e290]: 梅花
+          - generic [ref=e291]: · 东
+          - generic [ref=e292]: · 报数或听声音起卦,快速卜
+        - button "称骨 · 东 · 袁天罡称骨算命,按出生日查骨重" [ref=e293] [cursor=pointer]:
+          - generic [ref=e294]: 称骨
+          - generic [ref=e295]: · 东
+          - generic [ref=e296]: · 袁天罡称骨算命,按出生日查骨重
+        - button "玄空 · 东 · 玄空飞星,理气派风水的代表" [ref=e297] [cursor=pointer]:
+          - generic [ref=e298]: 玄空
+          - generic [ref=e299]: · 东
+          - generic [ref=e300]: · 玄空飞星,理气派风水的代表
+        - button "塔罗 · 西 · 78 张牌抽几张,回应你当下的问题" [ref=e301] [cursor=pointer]:
+          - generic [ref=e302]: 塔罗
+          - generic [ref=e303]: · 西
+          - generic [ref=e304]: · 78 张牌抽几张,回应你当下的问题
+        - button "数字命理 · 西 · 毕达哥拉斯数字命理,看生命灵数" [ref=e305] [cursor=pointer]:
+          - generic [ref=e306]: 数字命理
+          - generic [ref=e307]: · 西
+          - generic [ref=e308]: · 毕达哥拉斯数字命理,看生命灵数
+      - generic [ref=e309]:
+        - generic [ref=e310]:
+          - generic [ref=e311]:
+            - generic [ref=e312]:
+              - generic [ref=e313]:
+                - heading "四柱· 四根柱子·八字" [level=3] [ref=e314]:
+                  - generic [ref=e315]:
+                    - text: 四柱
+                    - generic [ref=e316]: · 四根柱子
+                  - text: ·八字
+                - generic [ref=e317]:
+                  - generic [ref=e318]: 你的主心骨
+                  - text: 庚
+              - generic [ref=e319]:
+                - generic [ref=e320]:
+                  - generic [ref=e322]:
+                    - text: 年柱
+                    - generic [ref=e323]: · 出生那年
+                  - generic [ref=e324]: 庚
+                  - generic [ref=e325]: 午
+                - generic [ref=e326]:
+                  - generic [ref=e328]:
+                    - text: 月柱
+                    - generic [ref=e329]: · 出生那月
+                  - generic [ref=e330]: 辛
+                  - generic [ref=e331]: 巳
+                - generic [ref=e332]:
+                  - generic [ref=e334]:
+                    - text: 日柱
+                    - generic [ref=e335]: · 你自己
+                  - generic [ref=e336]: 庚
+                  - generic [ref=e337]: 辰
+                - generic [ref=e338]:
+                  - generic [ref=e340]:
+                    - text: 时柱
+                    - generic [ref=e341]: · 出生那时
+                  - generic [ref=e342]: 庚
+                  - generic [ref=e343]: 辰
+            - generic [ref=e344]:
+              - generic [ref=e346]:
+                - generic [ref=e347]: 庚 的五行
+                - img [ref=e348]:
+                  - generic [ref=e358]:
+                    - generic [ref=e360]: 木
+                    - generic [ref=e361]: "0"
+                  - generic [ref=e362]:
+                    - generic [ref=e364]: 火
+                    - generic [ref=e365]: "0"
+                  - generic [ref=e366]:
+                    - generic [ref=e368]: 土
+                    - generic [ref=e369]: "0"
+                  - generic [ref=e370]:
+                    - generic [ref=e372]: 金
+                    - generic [ref=e373]: "4"
+                  - generic [ref=e374]:
+                    - generic [ref=e376]: 水
+                    - generic [ref=e377]: "0"
+              - generic [ref=e378]:
+                - heading "大运· 十年大运·十年换一次" [level=3] [ref=e379]:
+                  - generic [ref=e380]:
+                    - text: 大运
+                    - generic [ref=e381]: · 十年大运
+                  - text: ·十年换一次
+                - list [ref=e382]:
+                  - listitem [ref=e383]:
+                    - generic [ref=e384]: 大运·壬午
+                    - generic [ref=e385]: 1997-2006
+                  - listitem [ref=e386]:
+                    - generic [ref=e387]: 大运·癸未
+                    - generic [ref=e388]: 2007-2016
+                  - listitem [ref=e389]:
+                    - generic [ref=e390]: 大运·甲申
+                    - generic [ref=e391]: 2017-2026
+                  - listitem [ref=e392]:
+                    - generic [ref=e393]: 大运·乙酉
+                    - generic [ref=e394]: 2027-2036
+                  - listitem [ref=e395]:
+                    - generic [ref=e396]: 大运·丙戌
+                    - generic [ref=e397]: 2037-2046
+                  - listitem [ref=e398]:
+                    - generic [ref=e399]: 大运·丁亥
+                    - generic [ref=e400]: 2047-2056
+                  - listitem [ref=e401]:
+                    - generic [ref=e402]: 大运·戊子
+                    - generic [ref=e403]: 2057-2066
+                  - listitem [ref=e404]:
+                    - generic [ref=e405]: 大运·己丑
+                    - generic [ref=e406]: 2067-2076
+            - generic [ref=e407]:
+              - generic [ref=e408]:
+                - generic [ref=e409]: 排盘算法
+                - generic [ref=e410]: lunar-python
+              - generic [ref=e411]:
+                - generic [ref=e412]: 学派
+                - generic [ref=e413]: 东方·命
+          - generic [ref=e414]:
+            - generic [ref=e415]:
+              - generic [ref=e416]:
+                - heading "运势走势·K 线图" [level=3] [ref=e417]
+                - generic [ref=e418]: 从大运地支五行推导出来的"运势强度"折线,看每十年起伏
+              - generic [ref=e419]:
+                - generic [ref=e420]: ●
+                - text: 升
+                - generic [ref=e421]: /
+                - generic [ref=e422]: ●
+                - text: 降
+            - generic [ref=e424]:
+              - generic [ref=e425]: 横轴 = 出生后每一年(流年)
+              - generic [ref=e426]: 纵轴 = 运势强度(0-100,数字越高那年越顺)
+              - generic [ref=e427]: 每根 K 线代表一个十年的"主调"
+        - generic [ref=e429]:
+          - generic [ref=e430]:
+            - generic [ref=e431]:
+              - heading "AI 解读" [level=3] [ref=e432]
+              - generic [ref=e433]: · 已完成
+            - button "重新解读" [ref=e434] [cursor=pointer]
+          - generic [ref=e435]:
+            - paragraph [ref=e436]:
+              - text: 【整体】(Mock 解读)—— 基于你提供的盘面,我看到一个倾向于内省与表达并存的能量结构。
+              - text: 【事业财运】盘面显示金气偏旺、根气偏弱,倾向于在协作中借力会更顺。
+              - text: 【建议】1) 多与人合作;2) 留意春夏之交的机会;3) 给自己留点独处时间复盘。
+            - paragraph [ref=e437]: (以上为传统文化象征视角的参考,非科学预测,重大决定请结合现实并咨询专业人士。)
+          - generic [ref=e439]: 以上为传统文化象征视角的参考,非科学预测,重大决定请结合现实并咨询专业人士。
+  - contentinfo [ref=e19]:
+    - generic [ref=e20]:
+      - paragraph [ref=e21]: 免责声明:本站所有解读为传统文化象征视角的参考,非科学预测,亦不构成医疗、法律、财务等专业意见。 重大决定请结合现实并咨询专业人士。
+      - paragraph [ref=e22]: 合规:全栈 MIT/BSD 许可,零 AGPL,可闭源商用。 你的 LLM API Key 仅存在浏览器本地,不会上传到本服务后端。

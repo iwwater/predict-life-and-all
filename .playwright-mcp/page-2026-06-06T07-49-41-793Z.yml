@@ -1,0 +1,189 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "Mystic Hub · 玄枢" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e8]: Mystic Hub
+        - generic [ref=e9]: · 玄枢
+      - navigation [ref=e10]:
+        - link "首页" [ref=e11] [cursor=pointer]:
+          - /url: /
+        - link "排盘" [ref=e12] [cursor=pointer]:
+          - /url: /cast
+        - link "历史" [ref=e13] [cursor=pointer]:
+          - /url: /history
+        - link "关于" [ref=e14] [cursor=pointer]:
+          - /url: /about
+  - main [ref=e15]:
+    - generic [ref=e23]:
+      - generic [ref=e24]:
+        - heading "你要测什么" [level=2] [ref=e25]
+        - generic [ref=e26]:
+          - button "本命格局 长期命局、性格、人生阶段" [ref=e27] [cursor=pointer]:
+            - generic [ref=e28]: 本命格局
+            - generic [ref=e29]: 长期命局、性格、人生阶段
+          - button "流年/阶段运 今年、近几年、大运限运" [ref=e30] [cursor=pointer]:
+            - generic [ref=e31]: 流年/阶段运
+            - generic [ref=e32]: 今年、近几年、大运限运
+          - button "具体一事 成败、去留、该不该做" [ref=e33] [cursor=pointer]:
+            - generic [ref=e34]: 具体一事
+            - generic [ref=e35]: 成败、去留、该不该做
+          - button "关系感情 双方状态、互动、阻碍" [ref=e36] [cursor=pointer]:
+            - generic [ref=e37]: 关系感情
+            - generic [ref=e38]: 双方状态、互动、阻碍
+          - button "事业工作 工作路径、机会、阻力" [ref=e39] [cursor=pointer]:
+            - generic [ref=e40]: 事业工作
+            - generic [ref=e41]: 工作路径、机会、阻力
+          - button "求财 财运、项目、交易" [ref=e42] [cursor=pointer]:
+            - generic [ref=e43]: 求财
+            - generic [ref=e44]: 财运、项目、交易
+          - button "寻人寻物 短期寻找、方向线索" [ref=e45] [cursor=pointer]:
+            - generic [ref=e46]: 寻人寻物
+            - generic [ref=e47]: 短期寻找、方向线索
+          - button "住宅风水 命卦、坐向、三元九运" [ref=e48] [cursor=pointer]:
+            - generic [ref=e49]: 住宅风水
+            - generic [ref=e50]: 命卦、坐向、三元九运
+          - button "塔罗指引 今日建议、身心灵、复杂牌阵" [ref=e51] [cursor=pointer]:
+            - generic [ref=e52]: 塔罗指引
+            - generic [ref=e53]: 今日建议、身心灵、复杂牌阵
+      - generic [ref=e54]:
+        - heading "出生与时间" [level=3] [ref=e55]
+        - generic [ref=e56]:
+          - generic [ref=e57]:
+            - generic [ref=e58]: 年
+            - spinbutton [ref=e59]: "1990"
+          - generic [ref=e60]:
+            - generic [ref=e61]: 月
+            - spinbutton [ref=e62]: "5"
+          - generic [ref=e63]:
+            - generic [ref=e64]: 日
+            - spinbutton [ref=e65]: "15"
+          - generic [ref=e66]:
+            - generic [ref=e67]: 时
+            - spinbutton [ref=e68]: "8"
+          - generic [ref=e69]:
+            - generic [ref=e70]: 分
+            - spinbutton [ref=e71]: "30"
+          - generic [ref=e72]:
+            - generic [ref=e73]: 性别
+            - combobox [ref=e74]:
+              - option "男" [selected]
+              - option "女"
+              - option "未指定"
+        - generic [ref=e75]:
+          - generic [ref=e76]: 出生城市
+          - combobox [ref=e77]:
+            - option "北京"
+            - option "上海" [selected]
+            - option "广州"
+            - option "深圳"
+            - option "杭州"
+            - option "成都"
+            - option "重庆"
+            - option "武汉"
+            - option "西安"
+            - option "南京"
+            - option "天津"
+            - option "苏州"
+            - option "厦门"
+            - option "青岛"
+            - option "大连"
+            - option "长沙"
+            - option "昆明"
+            - option "哈尔滨"
+            - option "香港"
+            - option "澳门"
+            - option "台北"
+            - option "东京"
+            - option "首尔"
+            - option "新加坡"
+            - option "曼谷"
+            - option "吉隆坡"
+            - option "雅加达"
+            - option "马尼拉"
+            - option "迪拜"
+            - option "孟买"
+            - option "新德里"
+            - option "伦敦"
+            - option "巴黎"
+            - option "柏林"
+            - option "罗马"
+            - option "马德里"
+            - option "阿姆斯特丹"
+            - option "莫斯科"
+            - option "纽约"
+            - option "芝加哥"
+            - option "丹佛"
+            - option "洛杉矶"
+            - option "旧金山"
+            - option "西雅图"
+            - option "多伦多"
+            - option "温哥华"
+            - option "墨西哥城"
+            - option "圣保罗"
+            - option "布宜诺斯艾利斯"
+            - option "悉尼"
+            - option "墨尔本"
+            - option "奥克兰"
+            - option "开罗"
+            - option "约翰内斯堡"
+            - option "内罗毕"
+          - generic [ref=e78]: "上海: 31.23, 121.47, Asia/Shanghai"
+      - generic [ref=e79]:
+        - generic [ref=e80]:
+          - heading "推荐术数与起法" [level=3] [ref=e81]
+          - generic [ref=e82]: "本命格局: 长期命局、性格、人生阶段"
+        - generic [ref=e83]:
+          - 'button "八字四柱 四柱命盘，看命局、大运、流年 起法: natal" [ref=e84] [cursor=pointer]':
+            - generic [ref=e85]: 八字四柱
+            - generic [ref=e86]: 四柱命盘，看命局、大运、流年
+            - generic [ref=e87]: "起法: natal"
+          - 'button "紫微斗数 十二宫星曜，看命身宫与限运 起法: natal" [ref=e88] [cursor=pointer]':
+            - generic [ref=e89]: 紫微斗数
+            - generic [ref=e90]: 十二宫星曜，看命身宫与限运
+            - generic [ref=e91]: "起法: natal"
+          - 'button "西方占星 西方本命盘，太阳月亮上升与行星 起法: natal" [ref=e92] [cursor=pointer]':
+            - generic [ref=e93]: 西方占星
+            - generic [ref=e94]: 西方本命盘，太阳月亮上升与行星
+            - generic [ref=e95]: "起法: natal"
+          - 'button "吠陀占星 吠陀恒星黄道命盘 起法: natal" [ref=e96] [cursor=pointer]':
+            - generic [ref=e97]: 吠陀占星
+            - generic [ref=e98]: 吠陀恒星黄道命盘
+            - generic [ref=e99]: "起法: natal"
+        - button "收起更多术数" [active] [ref=e108] [cursor=pointer]
+        - generic [ref=e109]:
+          - button "称骨 传统称骨表，命重量歌诀参考" [ref=e110] [cursor=pointer]:
+            - generic [ref=e111]: 称骨
+            - generic [ref=e112]: 传统称骨表，命重量歌诀参考
+          - button "数字命理 生命灵数与数字主题" [ref=e113] [cursor=pointer]:
+            - generic [ref=e114]: 数字命理
+            - generic [ref=e115]: 生命灵数与数字主题
+          - button "奇门遁甲 时家奇门，一事一局看行动时机" [ref=e116] [cursor=pointer]:
+            - generic [ref=e117]: 奇门遁甲
+            - generic [ref=e118]: 时家奇门，一事一局看行动时机
+          - button "六爻 一事一卦，重世应、动爻、用神" [ref=e119] [cursor=pointer]:
+            - generic [ref=e120]: 六爻
+            - generic [ref=e121]: 一事一卦，重世应、动爻、用神
+          - button "梅花易数 时间/数字/外应起卦，看体用生克" [ref=e122] [cursor=pointer]:
+            - generic [ref=e123]: 梅花易数
+            - generic [ref=e124]: 时间/数字/外应起卦，看体用生克
+          - button "八宅 宅主命卦与四吉四凶方" [ref=e125] [cursor=pointer]:
+            - generic [ref=e126]: 八宅
+            - generic [ref=e127]: 宅主命卦与四吉四凶方
+          - button "玄空飞星 三元九运、坐山向星、宅盘理气" [ref=e128] [cursor=pointer]:
+            - generic [ref=e129]: 玄空飞星
+            - generic [ref=e130]: 三元九运、坐山向星、宅盘理气
+          - button "塔罗 按问题选择牌阵，而不是只抽几张" [ref=e131] [cursor=pointer]:
+            - generic [ref=e132]: 塔罗
+            - generic [ref=e133]: 按问题选择牌阵，而不是只抽几张
+      - generic [ref=e101]:
+        - generic [ref=e102]: 问题
+        - textbox "我的命局和近几年运势怎么看?" [ref=e103]
+        - generic [ref=e104]: 系统会把“测算对象、起法、参数”写入盘面依据，解读只基于盘面事实。
+      - generic [ref=e105]:
+        - button "重置" [ref=e106] [cursor=pointer]
+        - button "排盘 (4 法)" [ref=e107] [cursor=pointer]
+  - contentinfo [ref=e19]:
+    - generic [ref=e20]:
+      - paragraph [ref=e21]: 免责声明:本站所有解读为传统文化象征视角的参考,非科学预测,亦不构成医疗、法律、财务等专业意见。 重大决定请结合现实并咨询专业人士。
+      - paragraph [ref=e22]: 合规:全栈 MIT/BSD 许可,零 AGPL,可闭源商用。 你的 LLM API Key 仅存在浏览器本地,不会上传到本服务后端。

@@ -1,0 +1,121 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "Mystic Hub · 玄枢" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e8]: Mystic Hub
+        - generic [ref=e9]: · 玄枢
+      - navigation [ref=e10]:
+        - link "首页" [ref=e11] [cursor=pointer]:
+          - /url: /
+        - link "今日" [ref=e12] [cursor=pointer]:
+          - /url: /daily
+        - link "排盘" [ref=e13] [cursor=pointer]:
+          - /url: /cast
+        - link "历史" [ref=e14] [cursor=pointer]:
+          - /url: /history
+        - link "关于" [ref=e15] [cursor=pointer]:
+          - /url: /about
+  - main [ref=e16]:
+    - generic [ref=e159]:
+      - generic [ref=e160]:
+        - generic [ref=e161]:
+          - generic [ref=e163]: 你的灵魂
+          - generic [ref=e164]: 1990-5-15 8:30
+          - generic [ref=e165]: · male
+        - generic [ref=e166]:
+          - button "☆ 收藏" [ref=e167] [cursor=pointer]
+          - group "反馈" [ref=e168]:
+            - button "准" [ref=e169] [cursor=pointer]
+            - button "不准" [ref=e170] [cursor=pointer]
+            - button "待观察" [ref=e171] [cursor=pointer]
+          - button "生成分享卡" [ref=e172] [cursor=pointer]
+          - link "再排一次" [ref=e173] [cursor=pointer]:
+            - /url: /cast
+      - button "塔罗 · 西 · 按问题选择牌阵，而不是只抽几张" [ref=e175] [cursor=pointer]:
+        - generic [ref=e176]: 塔罗
+        - generic [ref=e177]: · 西
+        - generic [ref=e178]: · 按问题选择牌阵，而不是只抽几张
+      - generic [ref=e179]:
+        - generic [ref=e180]:
+          - generic [ref=e181]:
+            - generic [ref=e182]:
+              - generic [ref=e183]:
+                - heading "塔罗 · 单张指引" [level=3] [ref=e184]
+                - generic [ref=e185]:
+                  - generic [ref=e186]: 1 张
+                  - generic [ref=e187]: tarot_guidance
+              - generic [ref=e189]:
+                - generic [ref=e190]:
+                  - generic [ref=e191]: 当下指引
+                  - generic [ref=e192]: 星币8
+                  - generic [ref=e193]: 逆位
+                - generic [ref=e194]: 回应当前最需要看见的重点
+            - generic [ref=e195]:
+              - generic [ref=e196]: 牌位与牌面
+              - list [ref=e197]:
+                - listitem [ref=e198]:
+                  - generic [ref=e199]: 当下指引
+                  - generic [ref=e200]: 星币8
+                  - generic [ref=e201]: 逆位 · 受阻/反向
+                  - generic [ref=e202]: 匠气、失去热情、埋头苦干、损耗
+              - generic [ref=e203]: "起法: 78-card Waite-style deck, sample without replacement, upright/reversed orientation (~65% upright)；seed: 1780746067979771400-"
+          - generic [ref=e204]:
+            - generic [ref=e205]:
+              - generic [ref=e206]: 本次采用的起法
+              - generic [ref=e207]: vv1
+            - generic [ref=e208]: "方法: tarot · 模式: tarot_spread · 对象: tarot_guidance"
+            - generic [ref=e209]: "输入: user question + seed (seed optional; deterministic when provided)"
+            - generic [ref=e210]: "抽牌规则: 78-card Waite-style deck, sample without replacement, upright/reversed orientation (~65% upright)"
+            - group [ref=e211]:
+              - generic "不可判断范围 / 限制 (3)" [ref=e212] [cursor=pointer]
+            - generic [ref=e213]:
+              - generic [ref=e214]: 塔罗专项 · 牌位模板 + 牌阵推荐
+              - generic [ref=e215]: "牌阵推荐: subject=tarot_guidance, time_budget=reflective → 身心灵三张 (3 张)"
+              - generic [ref=e217]:
+                - text: 当下指引 星币8 逆位
+                - generic [ref=e218]: "在当前问题上,这张 星币8逆位指出你最需要看见的核心能量: 匠气、失去热情、埋头苦干、损耗。可以问自己,最近生活里哪一刻和这张牌的画面最像?"
+        - generic [ref=e220]:
+          - generic [ref=e221]:
+            - generic [ref=e222]:
+              - heading "AI 解读" [level=3] [ref=e223]
+              - generic [ref=e224]: · 已完成
+            - button "重新解读" [ref=e225] [cursor=pointer]
+          - generic [ref=e226]:
+            - heading "整体印象" [level=3] [ref=e227]
+            - paragraph [ref=e228]: 基于你提供的盘面，这是一个内外兼修、倾向于在独立探索与协作借力之间不断调试的能量结构。整体气场偏于内敛但不乏锋芒，早期需要积累，中期有突破窗口。
+            - heading "性格特质" [level=3] [ref=e229]
+            - paragraph [ref=e230]:
+              - strong [ref=e231]: 核心优势：
+            - list [ref=e232]:
+              - listitem [ref=e233]: 观察力敏锐，能迅速捕捉到别人忽略的细节和氛围变化。
+              - listitem [ref=e234]: 有持续学习和自我修正的内在驱动力，不易被一时的得失击倒。
+              - listitem [ref=e235]: 在压力下反而能激发出更强的韧性和创造力。
+            - paragraph [ref=e236]:
+              - strong [ref=e237]: 潜在盲点：
+            - list [ref=e238]:
+              - listitem [ref=e239]: 过于内省时容易陷入反复思量而错失行动的时机。
+              - listitem [ref=e240]: 在关系层面倾向于先照顾别人，偶尔忽略自己的边界。
+            - heading "事业与方向" [level=3] [ref=e241]
+            - paragraph [ref=e242]: 当前的盘面能量偏向于需要深耕的领域。短期内不宜频繁跳转方向，在已有积累上做深、做强会比追逐新风口更顺。留意身边愿意提供资源或信息的人，他们的出现不是偶然。
+            - paragraph [ref=e243]: 中长期来看，大约在两三年后有一个明显的上升波段，那段时间适合往外走、扩大影响力。现在则是打磨核心能力的阶段。
+            - heading "感情与人际" [level=3] [ref=e244]
+            - paragraph [ref=e245]: 盘面显示在关系中你倾向于用行动而不是语言来表达在意。对方能感受到你的付出，但偶尔也会希望你直接说出来。适度的坦诚表达，不但不会削弱关系，反而能让彼此的边界更清晰。
+            - heading "当前提示与建议" [level=3] [ref=e246]
+            - list [ref=e247]:
+              - listitem [ref=e248]:
+                - strong [ref=e249]: 把想说的话写下来：
+                - text: 即使不发给任何人，梳理清楚自己的想法本身就是一次有效的自我对话。
+              - listitem [ref=e250]:
+                - strong [ref=e251]: 在'先照顾好自己'和'照顾他人'之间重新校准：
+                - text: 本周至少为自己留出三次完全的独处时间。
+              - listitem [ref=e252]:
+                - strong [ref=e253]: 那个搁置了很久的小项目，往前推一步：
+                - text: 不必做到完美，只要让它在物理世界里有了一点点进展就行。
+            - paragraph [ref=e254]: (以上为传统文化象征视角的参考，非科学预测，重大决定请结合现实并咨询专业人士。)
+            - paragraph [ref=e255]: (以上为传统文化象征视角的参考，非科学预测，重大决定请结合现实并咨询专业人士。)
+          - generic [ref=e257]: 以上为传统文化象征视角的参考,非科学预测,重大决定请结合现实并咨询专业人士。
+  - contentinfo [ref=e51]:
+    - generic [ref=e52]:
+      - paragraph [ref=e53]: 免责声明:本站所有解读为传统文化象征视角的参考,非科学预测,亦不构成医疗、法律、财务等专业意见。 重大决定请结合现实并咨询专业人士。
+      - paragraph [ref=e54]: 合规:全栈 MIT/BSD 许可,零 AGPL,可闭源商用。 你的 LLM API Key 仅存在浏览器本地,不会上传到本服务后端。

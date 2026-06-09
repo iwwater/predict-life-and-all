@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+.eggs/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.bsp
+
+# Node
+apps/web/node_modules/
+apps/web/.vite/
+apps/web/.env
+apps/web/.env.local
+apps/web/dist/
+
+# Runtime / OS
+.DS_Store
+Thumbs.db
+.playwright-mcp/
+uvicorn.log
+uvicorn.log.err
+tmp/
+*.png
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore

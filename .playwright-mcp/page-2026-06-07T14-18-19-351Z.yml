@@ -1,0 +1,421 @@
+- generic [active] [ref=e1]:
+  - blockquote [ref=e2]:
+    - heading [level=2] [ref=e3]: Documentation Index
+    - paragraph [ref=e4]:
+      - text: "Fetch the complete documentation index at:"
+      - link [ref=e5] [cursor=pointer]:
+        - /url: /docs/llms.txt
+        - text: /docs/llms.txt
+    - paragraph [ref=e6]: Use this file to discover all available pages before exploring further.
+  - generic [ref=e7]:
+    - link "Skip to main content" [ref=e8] [cursor=pointer]:
+      - /url: "#content-area"
+    - generic [ref=e10]:
+      - banner [ref=e11]:
+        - generic [ref=e13]:
+          - paragraph [ref=e15]:
+            - text: 🎉 MiniMax-M3 is now available! A Frontier Model at your fingertips for Coding & Agent. ➔
+            - link "Try Now" [ref=e16] [cursor=pointer]:
+              - /url: https://platform.minimax.io/docs/guides/models-intro
+            - text: .
+          - button "Dismiss banner" [ref=e17] [cursor=pointer]:
+            - img [ref=e18]
+        - generic [ref=e23]:
+          - generic [ref=e26]:
+            - link "MiniMax API Docs home page light logo" [ref=e28] [cursor=pointer]:
+              - /url: https://minimax.io
+              - generic [ref=e29]: MiniMax API Docs home page
+              - img "light logo" [ref=e30]
+            - button "Open search" [ref=e32] [cursor=pointer]:
+              - generic [ref=e33]:
+                - img [ref=e34]
+                - generic [ref=e37]: Search...
+              - generic [ref=e38]: Ctrl K
+            - generic [ref=e39]:
+              - navigation "Main" [ref=e40]:
+                - list [ref=e41]:
+                  - listitem [ref=e42]:
+                    - link "Documentation" [ref=e43] [cursor=pointer]:
+                      - /url: https://platform.minimax.io/docs
+                  - listitem [ref=e44]:
+                    - link "Pricing" [ref=e45] [cursor=pointer]:
+                      - /url: https://platform.minimax.io/docs/pricing/overview
+                  - listitem [ref=e46]:
+                    - link "Console" [ref=e47] [cursor=pointer]:
+                      - /url: https://platform.minimax.io/login
+              - link "Sign Up" [ref=e48] [cursor=pointer]:
+                - /url: /login
+                - text: Sign Up
+                - img [ref=e50]
+          - generic [ref=e53]:
+            - link "Developer Guides" [ref=e54] [cursor=pointer]:
+              - /url: /docs/guides/models-intro
+              - text: Developer Guides
+            - link "API" [ref=e56] [cursor=pointer]:
+              - /url: /docs/api-reference/api-overview
+              - text: API
+            - link "Token Plan" [ref=e58] [cursor=pointer]:
+              - /url: /docs/token-plan/intro
+              - text: Token Plan
+            - link "Pricing" [ref=e60] [cursor=pointer]:
+              - /url: /docs/pricing/overview
+              - text: Pricing
+            - link "Release Notes" [ref=e62] [cursor=pointer]:
+              - /url: /docs/release-notes/models
+              - text: Release Notes
+            - link "Developer Program" [ref=e64] [cursor=pointer]:
+              - /url: https://platform.minimax.io/contact-us
+              - text: Developer Program
+      - generic [ref=e66]:
+        - navigation "Pages" [ref=e67]:
+          - generic [ref=e70]:
+            - generic [ref=e71]:
+              - heading "Get started" [level=3] [ref=e73]
+              - list [ref=e74]:
+                - listitem [ref=e75]:
+                  - link "Models" [ref=e76] [cursor=pointer]:
+                    - /url: /docs/guides/models-intro
+                    - generic [ref=e79]: Models
+                - listitem [ref=e80]:
+                  - button "Quick Start" [ref=e81] [cursor=pointer]:
+                    - generic [ref=e82]: Quick Start
+                    - img [ref=e84]
+            - generic [ref=e86]:
+              - heading "Use Guides" [level=3] [ref=e88]
+              - list [ref=e89]:
+                - listitem [ref=e90]:
+                  - button "Text" [ref=e91] [cursor=pointer]:
+                    - generic [ref=e92]: Text
+                    - img [ref=e94]
+                - listitem [ref=e96]:
+                  - button "Video" [ref=e97] [cursor=pointer]:
+                    - generic [ref=e98]: Video
+                    - img [ref=e100]
+                - listitem [ref=e102]:
+                  - button "Speech" [ref=e103] [cursor=pointer]:
+                    - generic [ref=e104]: Speech
+                    - img [ref=e106]
+                - listitem [ref=e108]:
+                  - button "Image" [ref=e109] [cursor=pointer]:
+                    - generic [ref=e110]: Image
+                    - img [ref=e112]
+                - listitem [ref=e114]:
+                  - button "Music" [ref=e115] [cursor=pointer]:
+                    - generic [ref=e116]: Music
+                    - img [ref=e118]
+                - listitem [ref=e120]:
+                  - button "MCP" [ref=e121] [cursor=pointer]:
+                    - generic [ref=e122]: MCP
+                    - img [ref=e124]
+                - listitem [ref=e126]:
+                  - button "Local Deployment" [ref=e127] [cursor=pointer]:
+                    - generic [ref=e128]: Local Deployment
+                    - img [ref=e130]
+            - generic [ref=e132]:
+              - heading "FAQs" [level=3] [ref=e134]
+              - list [ref=e135]:
+                - listitem [ref=e136]:
+                  - link "About APIs" [ref=e137] [cursor=pointer]:
+                    - /url: /docs/faq/about-apis
+                    - generic [ref=e140]: About APIs
+                - listitem [ref=e141]:
+                  - link "About Account" [ref=e142] [cursor=pointer]:
+                    - /url: /docs/faq/about-account
+                    - generic [ref=e145]: About Account
+                - listitem [ref=e146]:
+                  - link "Contact Us" [ref=e147] [cursor=pointer]:
+                    - /url: /docs/faq/contact-us
+                    - generic [ref=e150]: Contact Us
+            - generic [ref=e151]:
+              - heading "Terms & Policy" [level=3] [ref=e153]
+              - list [ref=e154]:
+                - listitem [ref=e155]:
+                  - link "Terms of Service" [ref=e156] [cursor=pointer]:
+                    - /url: https://platform.minimax.io/protocol/terms-of-service
+                    - generic [ref=e157]:
+                      - generic [ref=e159]: Terms of Service
+                      - img [ref=e161]
+                - listitem [ref=e163]:
+                  - link "Privacy Policy" [ref=e164] [cursor=pointer]:
+                    - /url: https://platform.minimax.io/protocol/privacy-policy
+                    - generic [ref=e165]:
+                      - generic [ref=e167]: Privacy Policy
+                      - img [ref=e169]
+        - main [ref=e171]:
+          - generic [ref=e172]:
+            - navigation "On this page" [ref=e176]:
+              - heading "On this page" [level=2] [ref=e177]:
+                - button "On this page" [ref=e178] [cursor=pointer]:
+                  - img [ref=e179]
+                  - generic [ref=e180]: On this page
+              - list [ref=e182]:
+                - listitem [ref=e183]:
+                  - link "Language" [ref=e184] [cursor=pointer]:
+                    - /url: "#language"
+                - listitem [ref=e185]:
+                  - link "Video" [ref=e186] [cursor=pointer]:
+                    - /url: "#video"
+                - listitem [ref=e187]:
+                  - link "Audio" [ref=e188] [cursor=pointer]:
+                    - /url: "#audio"
+                - listitem [ref=e189]:
+                  - link "Music" [ref=e190] [cursor=pointer]:
+                    - /url: "#music"
+            - generic [ref=e191]:
+              - generic [ref=e192]:
+                - generic [ref=e193]:
+                  - generic [ref=e194]: Get started
+                  - generic [ref=e195]:
+                    - heading "Models" [level=1] [ref=e196]
+                    - generic [ref=e197]:
+                      - button "Copy page" [ref=e198] [cursor=pointer]:
+                        - generic [ref=e199]:
+                          - img [ref=e200]
+                          - generic [ref=e203]: Copy page
+                      - button "More actions" [ref=e204] [cursor=pointer]:
+                        - img [ref=e205]
+                - paragraph [ref=e208]: Overview of MiniMax AI models and their capabilities
+              - generic [ref=e209]:
+                - heading "Navigate to header Language" [level=3] [ref=e210]:
+                  - link "Navigate to header" [ref=e211] [cursor=pointer]:
+                    - /url: "#language"
+                    - img [ref=e213]
+                  - generic [ref=e215] [cursor=pointer]: Language
+                - table [ref=e218]:
+                  - rowgroup [ref=e219]:
+                    - row "Models Description Features" [ref=e220]:
+                      - columnheader "Models" [ref=e221]:
+                        - strong [ref=e222]: Models
+                      - columnheader "Description" [ref=e223]:
+                        - strong [ref=e224]: Description
+                      - columnheader "Features" [ref=e225]:
+                        - strong [ref=e226]: Features
+                  - rowgroup [ref=e227]:
+                    - row "MiniMax-M3 Frontier multimodal coding model with 1M context window • Multimodal • 1M context window • Frontier coding" [ref=e228]:
+                      - cell "MiniMax-M3" [ref=e229]:
+                        - link "MiniMax-M3" [ref=e230] [cursor=pointer]:
+                          - /url: https://platform.minimax.io/docs/api-reference/text-anthropic-api
+                      - cell "Frontier multimodal coding model with 1M context window" [ref=e231]
+                      - cell "• Multimodal • 1M context window • Frontier coding" [ref=e232]:
+                        - text: • Multimodal
+                        - text: • 1M context window
+                        - text: • Frontier coding
+                    - row "MiniMax-M2.7 Beginning the journey of recursive self-improvement • Top real-world engineering • Professional office delivery • Character-rich interaction" [ref=e233]:
+                      - cell "MiniMax-M2.7" [ref=e234]:
+                        - link "MiniMax-M2.7" [ref=e235] [cursor=pointer]:
+                          - /url: https://platform.minimax.io/docs/api-reference/text-anthropic-api
+                      - cell "Beginning the journey of recursive self-improvement" [ref=e236]
+                      - cell "• Top real-world engineering • Professional office delivery • Character-rich interaction" [ref=e237]:
+                        - text: • Top real-world engineering
+                        - text: • Professional office delivery
+                        - text: • Character-rich interaction
+                    - row "MiniMax-M2.7-highspeed Same performance as M2.7 • Significantly faster inference • Polyglot code mastery • Precision code refactoring • Low latency" [ref=e238]:
+                      - cell "MiniMax-M2.7-highspeed" [ref=e239]:
+                        - link "MiniMax-M2.7-highspeed" [ref=e240] [cursor=pointer]:
+                          - /url: https://platform.minimax.io/docs/api-reference/text-anthropic-api
+                      - cell "Same performance as M2.7 • Significantly faster inference" [ref=e241]:
+                        - text: Same performance as M2.7
+                        - text: • Significantly faster inference
+                      - cell "• Polyglot code mastery • Precision code refactoring • Low latency" [ref=e242]:
+                        - text: • Polyglot code mastery
+                        - text: • Precision code refactoring
+                        - text: • Low latency
+                - group [ref=e243]:
+                  - generic "Legacy Models" [ref=e244] [cursor=pointer]:
+                    - img [ref=e246]
+                    - paragraph [ref=e248]: Legacy Models
+                - heading "Navigate to header Video" [level=3] [ref=e249]:
+                  - link "Navigate to header" [ref=e250] [cursor=pointer]:
+                    - /url: "#video"
+                    - img [ref=e252]
+                  - generic [ref=e254] [cursor=pointer]: Video
+                - table [ref=e257]:
+                  - rowgroup [ref=e258]:
+                    - row "Models Description Res.& Dur. FPS" [ref=e259]:
+                      - columnheader "Models" [ref=e260]:
+                        - strong [ref=e261]: Models
+                      - columnheader "Description" [ref=e262]:
+                        - strong [ref=e263]: Description
+                      - columnheader "Res.& Dur." [ref=e264]:
+                        - strong [ref=e265]: Res.& Dur.
+                      - columnheader "FPS" [ref=e266]:
+                        - strong [ref=e267]: FPS
+                  - rowgroup [ref=e268]:
+                    - row "MiniMax Hailuo 2.3 • Text to Video & Image to Video • SOTA instruction following • Extreme physics mastery • 1080p 6s • 768p 6s, 10s 24 fps" [ref=e269]:
+                      - cell "MiniMax Hailuo 2.3" [ref=e270]:
+                        - link "MiniMax Hailuo 2.3" [ref=e271] [cursor=pointer]:
+                          - /url: https://platform.minimax.io/docs/api-reference/video-generation-t2v
+                      - cell "• Text to Video & Image to Video • SOTA instruction following • Extreme physics mastery" [ref=e272]:
+                        - text: • Text to Video & Image to Video
+                        - text: • SOTA instruction following
+                        - text: • Extreme physics mastery
+                      - cell "• 1080p 6s • 768p 6s, 10s" [ref=e273]:
+                        - text: • 1080p 6s
+                        - text: • 768p 6s, 10s
+                      - cell "24 fps" [ref=e274]
+                    - row "MiniMax Hailuo 2.3Fast • Image to Video • Extreme physics mastery • Value and Efficiency • 1080p 6s • 768p 6s, 10s 24 fps" [ref=e275]:
+                      - cell "MiniMax Hailuo 2.3Fast" [ref=e276]:
+                        - link "MiniMax Hailuo 2.3Fast" [ref=e277] [cursor=pointer]:
+                          - /url: https://platform.minimax.io/docs/api-reference/video-generation-i2v
+                      - cell "• Image to Video • Extreme physics mastery • Value and Efficiency" [ref=e278]:
+                        - text: • Image to Video
+                        - text: • Extreme physics mastery
+                        - text: • Value and Efficiency
+                      - cell "• 1080p 6s • 768p 6s, 10s" [ref=e279]:
+                        - text: • 1080p 6s
+                        - text: • 768p 6s, 10s
+                      - cell "24 fps" [ref=e280]
+                - group [ref=e281]:
+                  - generic "Legacy Models" [ref=e282] [cursor=pointer]:
+                    - img [ref=e284]
+                    - paragraph [ref=e286]: Legacy Models
+                - heading "Navigate to header Audio" [level=3] [ref=e287]:
+                  - link "Navigate to header" [ref=e288] [cursor=pointer]:
+                    - /url: "#audio"
+                    - img [ref=e290]
+                  - generic [ref=e292] [cursor=pointer]: Audio
+                - table [ref=e295]:
+                  - rowgroup [ref=e296]:
+                    - row "Models Description Features" [ref=e297]:
+                      - columnheader "Models" [ref=e298]:
+                        - strong [ref=e299]: Models
+                      - columnheader "Description" [ref=e300]:
+                        - strong [ref=e301]: Description
+                      - columnheader "Features" [ref=e302]:
+                        - strong [ref=e303]: Features
+                  - rowgroup [ref=e304]:
+                    - row "speech-2.8-hd • Ultra-realistic quality featuring sound tags • 40 languages supported • 7 emotions supported • specified languages and dialects supported" [ref=e305]:
+                      - cell "speech-2.8-hd" [ref=e306]:
+                        - link "speech-2.8-hd" [ref=e307] [cursor=pointer]:
+                          - /url: https://platform.minimax.io/docs/api-reference/speech-t2a-http
+                      - cell "• Ultra-realistic quality featuring sound tags" [ref=e308]
+                      - cell "• 40 languages supported • 7 emotions supported • specified languages and dialects supported" [ref=e309]:
+                        - text: • 40 languages supported
+                        - text: • 7 emotions supported
+                        - text: • specified languages and dialects supported
+                    - row "speech-2.8-turbo • Seamless speed meets natural flow • 40 languages supported • 7 emotions supported • specified languages and dialects supported" [ref=e310]:
+                      - cell "speech-2.8-turbo" [ref=e311]:
+                        - link "speech-2.8-turbo" [ref=e312] [cursor=pointer]:
+                          - /url: https://platform.minimax.io/docs/api-reference/speech-t2a-http
+                      - cell "• Seamless speed meets natural flow" [ref=e313]
+                      - cell "• 40 languages supported • 7 emotions supported • specified languages and dialects supported" [ref=e314]:
+                        - text: • 40 languages supported
+                        - text: • 7 emotions supported
+                        - text: • specified languages and dialects supported
+                - group [ref=e315]:
+                  - generic "Legacy Models" [ref=e316] [cursor=pointer]:
+                    - img [ref=e318]
+                    - paragraph [ref=e320]: Legacy Models
+                - heading "Navigate to header Music" [level=3] [ref=e321]:
+                  - link "Navigate to header" [ref=e322] [cursor=pointer]:
+                    - /url: "#music"
+                    - img [ref=e324]
+                  - generic [ref=e326] [cursor=pointer]: Music
+                - table [ref=e329]:
+                  - rowgroup [ref=e330]:
+                    - row "Models Description Features" [ref=e331]:
+                      - columnheader "Models" [ref=e332]:
+                        - strong [ref=e333]: Models
+                      - columnheader "Description" [ref=e334]:
+                        - strong [ref=e335]: Description
+                      - columnheader "Features" [ref=e336]:
+                        - strong [ref=e337]: Features
+                  - rowgroup [ref=e338]:
+                    - row "Music-2.6 • Cover Reborn. Bass Redefined. • Cover Reborn. Bass Redefined." [ref=e339]:
+                      - cell "Music-2.6" [ref=e340]:
+                        - link "Music-2.6" [ref=e341] [cursor=pointer]:
+                          - /url: https://platform.minimax.io/docs/api-reference/music-generation
+                      - cell "• Cover Reborn. Bass Redefined." [ref=e342]
+                      - cell "• Cover Reborn. Bass Redefined." [ref=e343]
+                    - row "Music-Cover • Generate cover versions from reference audio • One-step cover generation • Two-step cover with lyrics modification • Style transfer • Auto lyrics extraction" [ref=e344]:
+                      - cell "Music-Cover" [ref=e345]:
+                        - link "Music-Cover" [ref=e346] [cursor=pointer]:
+                          - /url: https://platform.minimax.io/docs/api-reference/music-generation
+                      - cell "• Generate cover versions from reference audio" [ref=e347]
+                      - cell "• One-step cover generation • Two-step cover with lyrics modification • Style transfer • Auto lyrics extraction" [ref=e348]:
+                        - text: • One-step cover generation
+                        - text: • Two-step cover with lyrics modification
+                        - text: • Style transfer
+                        - text: • Auto lyrics extraction
+                - group [ref=e349]:
+                  - generic "Legacy Models" [ref=e350] [cursor=pointer]:
+                    - img [ref=e352]
+                    - paragraph [ref=e354]: Legacy Models
+              - link "Prerequisites" [ref=e356] [cursor=pointer]:
+                - /url: /docs/guides/quickstart-preparation
+                - generic [ref=e357]: Prerequisites
+                - img [ref=e358]
+      - contentinfo [ref=e360]:
+        - generic [ref=e362]:
+          - generic [ref=e363]:
+            - link "MiniMax API Docs home page light logo" [ref=e364] [cursor=pointer]:
+              - /url: https://minimax.io
+              - generic [ref=e365]: MiniMax API Docs home page
+              - img "light logo" [ref=e366]
+            - generic [ref=e367]:
+              - link "discord" [ref=e368] [cursor=pointer]:
+                - /url: https://www.minimax.io/discord
+                - generic [ref=e369]: discord
+                - img [ref=e370]
+              - link "x" [ref=e371] [cursor=pointer]:
+                - /url: https://x.com/MiniMax_AI
+                - generic [ref=e372]: x
+                - img [ref=e373]
+              - link "linkedin" [ref=e374] [cursor=pointer]:
+                - /url: https://www.linkedin.com/company/minimax-ai
+                - generic [ref=e375]: linkedin
+                - img [ref=e376]
+              - link "github" [ref=e377] [cursor=pointer]:
+                - /url: https://github.com/MiniMax-AI
+                - generic [ref=e378]: github
+                - img [ref=e379]
+          - generic [ref=e380]:
+            - generic [ref=e382]:
+              - paragraph [ref=e383]: Research
+              - link "MiniMax M3" [ref=e384] [cursor=pointer]:
+                - /url: https://www.minimax.io/models/text/m3
+              - link "MiniMax M2-her" [ref=e385] [cursor=pointer]:
+                - /url: https://www.minimax.io/news/a-deep-dive-into-the-minimax-m2-her-2
+              - link "MiniMax M2.1" [ref=e386] [cursor=pointer]:
+                - /url: https://www.minimax.io/news/minimax-m21
+              - link "MiniMax Speech 2.8" [ref=e387] [cursor=pointer]:
+                - /url: https://www.minimax.io/news/minimax-speech-28
+              - link "MiniMax Hailuo 2.3" [ref=e388] [cursor=pointer]:
+                - /url: https://www.minimax.io/news/minimax-hailuo-23
+              - link "MiniMax Music 2.6" [ref=e389] [cursor=pointer]:
+                - /url: https://www.minimax.io/news/minimax-music-26
+            - generic [ref=e391]:
+              - paragraph [ref=e392]: Product
+              - link "Agent" [ref=e393] [cursor=pointer]:
+                - /url: https://agent.minimax.io
+              - link "Video Hailuo" [ref=e394] [cursor=pointer]:
+                - /url: https://hailuoai.com/video
+              - link "Audio" [ref=e395] [cursor=pointer]:
+                - /url: https://www.minimax.io/audio
+              - link "Talkie" [ref=e396] [cursor=pointer]:
+                - /url: https://www.talkie-ai.com/
+            - generic [ref=e398]:
+              - paragraph [ref=e399]: API
+              - link "Developer Docs" [ref=e400] [cursor=pointer]:
+                - /url: https://platform.minimax.io/docs/guides/models-intro
+              - link "Token Plan" [ref=e401] [cursor=pointer]:
+                - /url: https://platform.minimax.io/subscribe/token-plan
+              - link "Pricing" [ref=e402] [cursor=pointer]:
+                - /url: https://platform.minimax.io/docs/pricing/overview
+              - link "Console Login" [ref=e403] [cursor=pointer]:
+                - /url: https://platform.minimax.io/user-center/basic-information
+              - link "Developer Program" [ref=e404] [cursor=pointer]:
+                - /url: https://platform.minimax.io/contact-us
+            - generic [ref=e406]:
+              - paragraph [ref=e407]: Recommended
+              - link "Model Introduction" [ref=e408] [cursor=pointer]:
+                - /url: https://platform.minimax.io/docs/guides/models-intro
+              - link "Text Generation" [ref=e409] [cursor=pointer]:
+                - /url: https://platform.minimax.io/docs/guides/text-generation
+              - link "M3 for AI Coding Tools" [ref=e410] [cursor=pointer]:
+                - /url: https://platform.minimax.io/docs/guides/text-ai-coding-tools
+              - link "Text to Speech" [ref=e411] [cursor=pointer]:
+                - /url: https://platform.minimax.io/docs/guides/speech-t2a-websocket
+              - link "Video Generation" [ref=e412] [cursor=pointer]:
+                - /url: https://platform.minimax.io/docs/guides/video-generation
+  - alert [ref=e413]

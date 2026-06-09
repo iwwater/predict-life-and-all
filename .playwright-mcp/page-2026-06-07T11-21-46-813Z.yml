@@ -1,0 +1,28 @@
+- generic [ref=e3]:
+  - generic:
+    - generic:
+      - img
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "Mystic Hub · 玄枢" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e8]: Mystic Hub
+        - generic [ref=e9]: · 玄枢
+      - navigation [ref=e10]:
+        - link "首页" [ref=e11] [cursor=pointer]:
+          - /url: /
+        - link "今日" [ref=e12] [cursor=pointer]:
+          - /url: /daily
+        - link "排盘" [ref=e13] [cursor=pointer]:
+          - /url: /cast
+        - link "风水" [ref=e14] [cursor=pointer]:
+          - /url: /fengshui
+        - link "历史" [ref=e15] [cursor=pointer]:
+          - /url: /history
+        - link "关于" [ref=e16] [cursor=pointer]:
+          - /url: /about
+  - main [ref=e17]
+  - contentinfo [ref=e21]:
+    - generic [ref=e22]:
+      - paragraph [ref=e23]: 免责声明:本站所有解读为传统文化象征视角的参考,非科学预测,亦不构成医疗、法律、财务等专业意见。 重大决定请结合现实并咨询专业人士。
+      - paragraph [ref=e24]: 合规:全栈 MIT/BSD 许可,零 AGPL,可闭源商用。 你的 LLM API Key 仅存在浏览器本地,不会上传到本服务后端。

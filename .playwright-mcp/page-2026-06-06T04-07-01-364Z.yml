@@ -1,0 +1,108 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "Mystic Hub · 玄枢" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e8]: Mystic Hub
+        - generic [ref=e9]: · 玄枢
+      - navigation [ref=e10]:
+        - link "首页" [ref=e11] [cursor=pointer]:
+          - /url: /
+        - link "排盘" [ref=e12] [cursor=pointer]:
+          - /url: /cast
+        - link "历史" [ref=e13] [cursor=pointer]:
+          - /url: /history
+        - link "关于" [ref=e14] [cursor=pointer]:
+          - /url: /about
+  - main [ref=e15]:
+    - generic [ref=e226]:
+      - generic [ref=e227]:
+        - generic [ref=e228]:
+          - generic [ref=e229]: 命主
+          - generic [ref=e230]: 1990-5-15 8:30
+          - generic [ref=e231]: · male
+        - link "再排一次" [ref=e232] [cursor=pointer]:
+          - /url: /cast
+      - generic [ref=e233]:
+        - button "八宅 · 东" [ref=e234] [cursor=pointer]:
+          - text: 八宅
+          - generic [ref=e235]: · 东
+        - button "玄空 · 东" [ref=e236] [cursor=pointer]:
+          - text: 玄空
+          - generic [ref=e237]: · 东
+      - generic [ref=e238]:
+        - generic [ref=e240]:
+          - generic [ref=e241]:
+            - generic [ref=e242]:
+              - heading "八宅 · 八方罗盘" [level=3] [ref=e243]
+              - generic [ref=e244]:
+                - generic [ref=e245]: 离 命
+                - generic [ref=e246]: 东四命
+            - generic [ref=e247]:
+              - generic [ref=e249]:
+                - generic [ref=e250]:
+                  - generic [ref=e251]: 东南
+                  - generic [ref=e252]: 巽
+                - generic [ref=e253]: 伏位
+              - generic [ref=e254]:
+                - generic [ref=e255]:
+                  - generic [ref=e256]: 南
+                  - generic [ref=e257]: 离
+                - generic [ref=e258]: 五鬼
+              - generic [ref=e259]:
+                - generic [ref=e260]:
+                  - generic [ref=e261]: 西南
+                  - generic [ref=e262]: 坤
+                - generic [ref=e263]: 祸害
+              - generic [ref=e264]:
+                - generic [ref=e265]:
+                  - generic [ref=e266]: 东
+                  - generic [ref=e267]: 震
+                - generic [ref=e268]: 天医
+              - generic [ref=e269]:
+                - generic [ref=e270]: 命卦
+                - generic [ref=e271]: 离
+                - generic [ref=e272]: 东四
+              - generic [ref=e273]:
+                - generic [ref=e274]: 本命吉方
+                - generic [ref=e275]: 坎 离 震 巽
+              - generic [ref=e276]:
+                - generic [ref=e277]:
+                  - generic [ref=e278]: 西
+                  - generic [ref=e279]: 兑
+                - generic [ref=e280]: 六煞
+              - generic [ref=e281]:
+                - generic [ref=e282]:
+                  - generic [ref=e283]: 东北
+                  - generic [ref=e284]: 艮
+                - generic [ref=e285]: 延年
+              - generic [ref=e286]:
+                - generic [ref=e287]:
+                  - generic [ref=e288]: 北
+                  - generic [ref=e289]: 坎
+                - generic [ref=e290]: 生气
+              - generic [ref=e292]:
+                - generic [ref=e293]:
+                  - generic [ref=e294]: 西北
+                  - generic [ref=e295]: 乾
+                - generic [ref=e296]: 绝命
+          - generic [ref=e297]:
+            - generic [ref=e298]: "年柱: 庚午"
+            - generic [ref=e299]: "本命凶方: 乾 坤 艮 兑"
+        - generic [ref=e301]:
+          - generic [ref=e302]:
+            - generic [ref=e303]:
+              - heading "AI 解读" [level=3] [ref=e304]
+              - generic [ref=e305]: · 已完成
+            - button "重新解读" [ref=e306] [cursor=pointer]
+          - generic [ref=e307]:
+            - paragraph [ref=e308]:
+              - text: 【整体】(Mock 解读)—— 基于你提供的盘面,我看到一个倾向于内省与表达并存的能量结构。
+              - text: 【事业财运】盘面显示金气偏旺、根气偏弱,倾向于在协作中借力会更顺。
+              - text: 【建议】1) 多与人合作;2) 留意春夏之交的机会;3) 给自己留点独处时间复盘。
+            - paragraph [ref=e309]: (以上为传统文化象征视角的参考,非科学预测,重大决定请结合现实并咨询专业人士。)
+          - generic [ref=e311]: 以上为传统文化象征视角的参考,非科学预测,重大决定请结合现实并咨询专业人士。
+  - contentinfo [ref=e172]:
+    - generic [ref=e173]:
+      - paragraph [ref=e174]: 免责声明:本站所有解读为传统文化象征视角的参考,非科学预测,亦不构成医疗、法律、财务等专业意见。 重大决定请结合现实并咨询专业人士。
+      - paragraph [ref=e175]: 合规:全栈 MIT/BSD 许可,零 AGPL,可闭源商用。 你的 LLM API Key 仅存在浏览器本地,不会上传到本服务后端。

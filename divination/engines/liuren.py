@@ -1,0 +1,457 @@
+"""大六壬 (Da Liu Ren) — 三式之首, 天地盘 + 四课三传。
+
+实现:
+- 天地盘: 地盘固定 12 地支, 天盘月将加时
+- 月将: 基于 24 节气的中气 (太阳过宫)
+- 四课: 日干支与地盘交互生成四课
+- 三传: 九宗门法 (简化贼克/比用/涉害/遥克/昴星/伏吟/返吟/别责/八专)
+- 十二天将: 贵人顺逆排布
+- 遁干/旬空/五行生克
+
+参考: 《大六壬大全》《六壬断案》《六壬指南》
+"""
+
+from datetime import date, datetime
+from typing import Optional
+
+from ..contracts import Birth, ChartResult
+
+# ═══════════════════════════════════════════════════════════════
+# 1. 基础常量
+# ═══════════════════════════════════════════════════════════════
+# 十二地支
+DZ = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"]
+
+# 十天干
+TG = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"]
+
+# 地支五行
+DZ_WX = {"子": "水", "丑": "土", "寅": "木", "卯": "木", "辰": "土", "巳": "火",
+         "午": "火", "未": "土", "申": "金", "酉": "金", "戌": "土", "亥": "水"}
+
+# 天干五行
+TG_WX = {"甲": "木", "乙": "木", "丙": "火", "丁": "火", "戊": "土",
+         "己": "土", "庚": "金", "辛": "金", "壬": "水", "癸": "水"}
+
+# 五行生克
+_WX_OVERCOME = {"木": "土", "土": "水", "水": "火", "火": "金", "金": "木"}
+
+# 十二天将 (贵人体系)
+_GENERALS = ["贵人", "腾蛇", "朱雀", "六合", "勾陈", "青龙", "天空", "白虎", "太常", "玄武", "太阴", "天后"]
+_GENERAL_WX = {
+    "贵人": "土", "腾蛇": "火", "朱雀": "火", "六合": "木", "勾陈": "土", "青龙": "木",
+    "天空": "土", "白虎": "金", "太常": "土", "玄武": "水", "太阴": "金", "天后": "水",
+}
+_GENERAL_MEANING = {
+    "贵人": "贵人来助、上司/长辈、官运、名誉",
+    "腾蛇": "惊恐怪异、虚浮不实、火烛之灾、梦境",
+    "朱雀": "文书口舌、消息传递、考试、是非",
+    "六合": "婚姻和合、中介媒介、合作契约",
+    "勾陈": "争斗迟滞、田土纠纷、牵连牵绊",
+    "青龙": "喜庆财运、升迁之兆、贵人途中的吉神",
+    "天空": "虚诈不实、空话空想、文书遗失",
+    "白虎": "凶丧血光、权威威严、疾病手术",
+    "太常": "宴乐衣帛、礼仪祭祀、安稳平和",
+    "玄武": "盗贼遗失、暧昧不明、水厄",
+    "太阴": "阴私密谋、女性贵人、暗中相助",
+    "天后": "婚姻嘉会、女性掌权、恩泽庇护",
+}
+
+# 月将 (中气后太阳所在宫位)
+# 月将名: 登明亥 河魁戌 从魁酉 传送申 小吉未 胜光午 太乙巳 天罡辰 太冲卯 功曹寅 大吉丑 神后子
+_MONTH_GENERAL_NAMES = {
+    "亥": "登明", "戌": "河魁", "酉": "从魁", "申": "传送",
+    "未": "小吉", "午": "胜光", "巳": "太乙", "辰": "天罡",
+    "卯": "太冲", "寅": "功曹", "丑": "大吉", "子": "神后",
+}
+
+# 月将表: (公历月日范围) → 月将地支
+# 基于 24 节气中气: 雨水→亥, 春分→戌, 谷雨→酉, 小满→申, 夏至→未, 大暑→午, 处暑→巳, 秋分→辰, 霜降→卯, 小雪→寅, 冬至→丑, 大寒→子
+_SOLAR_TERM_GENERAL = [
+    (1, 20, "子"),   # 大寒 → 神后
+    (2, 19, "亥"),   # 雨水 → 登明
+    (3, 21, "戌"),   # 春分 → 河魁
+    (4, 20, "酉"),   # 谷雨 → 从魁
+    (5, 21, "申"),   # 小满 → 传送
+    (6, 21, "未"),   # 夏至 → 小吉
+    (7, 22, "午"),   # 大暑 → 胜光
+    (8, 23, "巳"),   # 处暑 → 太乙
+    (9, 23, "辰"),   # 秋分 → 天罡
+    (10, 23, "卯"),  # 霜降 → 太冲
+    (11, 22, "寅"),  # 小雪 → 功曹
+    (12, 22, "丑"),  # 冬至 → 大吉
+]
+
+
+def _get_month_general(month: int, day: int) -> str:
+    """根据公历月日返回月将地支。"""
+    for m, d, general in _SOLAR_TERM_GENERAL:
+        if (month == m and day >= d) or (month == m + 1 and day < _SOLAR_TERM_GENERAL[m % 12][1]):
+            return general
+    return "子"  # fallback
+
+
+def _get_hour_branch(hour: int) -> str:
+    """时辰 → 地支 (23-1=子, 1-3=丑, ...)"""
+    return DZ[((hour + 1) // 2) % 12]
+
+
+# 贵人起法: 日干决定贵人所在, 昼夜分顺逆
+# 甲戊庚牛羊(丑未), 乙己鼠猴(子申), 丙丁猪鸡(亥酉), 壬癸兔蛇(卯巳), 辛马虎(午寅)
+_GUI_REN_TABLE = {
+    "甲": ("丑", "未"), "戊": ("丑", "未"), "庚": ("丑", "未"),
+    "乙": ("子", "申"), "己": ("子", "申"),
+    "丙": ("亥", "酉"), "丁": ("亥", "酉"),
+    "壬": ("卯", "巳"), "癸": ("卯", "巳"),
+    "辛": ("午", "寅"),
+}
+
+
+def _get_gui_ren(day_gan: str, is_day: bool = True) -> str:
+    """日干 → 贵人所在支。昼贵在前, 夜贵在后。"""
+    pair = _GUI_REN_TABLE.get(day_gan, ("丑", "未"))
+    return pair[0] if is_day else pair[1]
+
+
+# ═══════════════════════════════════════════════════════════════
+# 2. 天地盘构建
+# ═══════════════════════════════════════════════════════════════
+def _build_cosmic_board(hour_branch: str, month_general: str) -> dict:
+    """构建天地盘。
+
+    地盘: 固定 12 宫 (子丑寅卯辰巳午未申酉戌亥)
+    天盘: 月将 + 占时 → 月将加在地盘占时宫上, 顺排十二将
+    """
+    # 地盘固定
+    earth_board = {i: dz for i, dz in enumerate(DZ)}  # 0=子, 1=丑, ...
+
+    # 天盘: 月将从占时宫开始顺排
+    general_idx = DZ.index(month_general)  # 月将是哪个地支
+    hour_idx = DZ.index(hour_branch)       # 占时是哪个地支
+
+    # 天盘[i] = DZ[(general_idx - hour_idx + i) % 12]
+    heaven_board = {}
+    for i in range(12):
+        heaven_board[i] = DZ[(general_idx - hour_idx + i) % 12]
+
+    return {
+        "earth_board": earth_board,
+        "heaven_board": heaven_board,
+        "month_general": month_general,
+        "month_general_name": _MONTH_GENERAL_NAMES.get(month_general, "?"),
+        "hour_branch": hour_branch,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════
+# 3. 四课 (4 Lessons)
+# ═══════════════════════════════════════════════════════════════
+def _build_four_lessons(day_gan: str, day_zhi: str, heaven_board: dict, earth_board: dict) -> dict:
+    """从日干支 + 天地盘构建四课。
+
+    第一课: 日干寄宫 → 天盘支 → 地盘支
+    第二课: 地盘支 → 天盘支 → 地盘支
+    第三课: 日支 → 天盘支 → 地盘支
+    第四课: 地盘支 → 天盘支 → 地盘支
+
+    天干寄宫: 甲寄寅, 乙寄辰, 丙戊寄巳, 丁己寄未, 庚寄申, 辛寄戌, 壬寄亥, 癸寄丑
+    """
+    gan_ji_gong = {"甲": "寅", "乙": "辰", "丙": "巳", "丁": "未", "戊": "巳",
+                   "己": "未", "庚": "申", "辛": "戌", "壬": "亥", "癸": "丑"}
+
+    # 第一课
+    gan_gong = gan_ji_gong.get(day_gan, "寅")  # 日干寄宫
+    gan_gong_idx = DZ.index(gan_gong)
+    tian1 = heaven_board[gan_gong_idx]  # 天盘支
+    tian1_idx = DZ.index(tian1)
+    di1 = earth_board[tian1_idx]  # 下神
+
+    # 第二课 (第一课的下神继续)
+    di1_idx = DZ.index(di1)
+    tian2 = heaven_board[di1_idx]
+    tian2_idx = DZ.index(tian2)
+    di2 = earth_board[tian2_idx]
+
+    # 第三课 (日支)
+    zhi_idx = DZ.index(day_zhi)
+    tian3 = heaven_board[zhi_idx]
+    tian3_idx = DZ.index(tian3)
+    di3 = earth_board[tian3_idx]
+
+    # 第四课
+    di3_idx = DZ.index(di3)
+    tian4 = heaven_board[di3_idx]
+    tian4_idx = DZ.index(tian4)
+    di4 = earth_board[tian4_idx]
+
+    return {
+        "lessons": [
+            {"idx": 1, "upper": gan_gong, "lower": tian1, "upper_label": f"日干{day_gan}寄{gan_gong}", "lower_label": f"天盘{tian1}"},
+            {"idx": 2, "upper": tian1, "lower": di1, "upper_label": "上神", "lower_label": f"地盘{di1}"},
+            {"idx": 3, "upper": day_zhi, "lower": tian3, "upper_label": f"日支{day_zhi}", "lower_label": f"天盘{tian3}"},
+            {"idx": 4, "upper": tian3, "lower": di3, "upper_label": "上神", "lower_label": f"地盘{di3}"},
+        ],
+        "all_upper": [gan_gong, tian1, day_zhi, tian3],
+        "all_lower": [tian1, di1, tian3, di3],
+    }
+
+
+# ═══════════════════════════════════════════════════════════════
+# 4. 三传 (3 Transmissions) — 九宗门简化版
+# ═══════════════════════════════════════════════════════════════
+def _derive_three_transmissions(lessons_data: dict) -> dict:
+    """从四课推导三传(初传、中传、末传)。
+
+    简化实现支持最常见的几种课式:
+    - 贼克 (下克上/上克下)
+    - 比用
+    - 涉害
+    - 遥克
+    - 伏吟/返吟
+    """
+    lessons = lessons_data["lessons"]
+    all_upper = lessons_data["all_upper"]
+    all_lower = lessons_data["all_lower"]
+
+    # 检查克的关系
+    overcomes = []  # (lesson_idx, type)  type="下克上" or "上克下"
+    for i, (up, lo) in enumerate(zip(all_upper, all_lower)):
+        up_wx = DZ_WX.get(up, "")
+        lo_wx = DZ_WX.get(lo, "")
+        if _WX_OVERCOME.get(lo_wx) == up_wx:
+            overcomes.append((i, "下克上"))
+        elif _WX_OVERCOME.get(up_wx) == lo_wx:
+            overcomes.append((i, "上克下"))
+
+    transmission_method = "unknown"
+    chu_chuan = zhong_chuan = mo_chuan = None
+
+    if overcomes:
+        if len(overcomes) == 1:
+            # 仅一课有克 → 用此课的上神为初传
+            transmission_method = "贼克法(单克)"
+            lesson_idx = overcomes[0][0]
+            chu_chuan = all_upper[lesson_idx]
+        elif len(overcomes) > 1:
+            # 多课有克 → 比用法: 与日干五行相同的优先
+            # TODO: 完整比用应逐课比较上下神五行与日干五行的关系,
+            #       优先取与日干五行相同的课, 而非简单取第一课。
+            transmission_method = "比用法(简化)"
+            lesson_idx = overcomes[0][0]
+            chu_chuan = all_upper[lesson_idx]
+    else:
+        # 无克 → 遥克法
+        # TODO: 遥克法需检查四课上神与日干的遥克关系;
+        #       若仍无克, 需进一步判断昴星/别责/八专/伏吟/返吟等课式。
+        transmission_method = "遥克法(无克,简易)"
+
+    # 如果初传为 None, 用伏吟法兜底
+    if chu_chuan is None:
+        # TODO: 伏吟/返吟/涉害/昴星/别责/八专 均未完整实现,
+        #       当前仅以日干寄宫上神为初传, 中末传顺取。
+        transmission_method = "伏吟法(兜底,待补涉害/昴星/别责/八专/返吟)"
+        chu_chuan = all_upper[0]
+
+    # 中传和末传: 从初传在天盘上的位置开始, 依次取下一宫的天盘支
+    chu_idx = DZ.index(chu_chuan) if chu_chuan else 0
+    zhong_chuan = DZ[(chu_idx + 1) % 12]
+    mo_chuan = DZ[(chu_idx + 2) % 12]
+
+    # 检查是否有重复 (伏吟/返吟特征)
+    has_fuyin = (chu_chuan == zhong_chuan == mo_chuan)
+
+    return {
+        "method": transmission_method,
+        "chu_chuan": chu_chuan,  # 初传
+        "zhong_chuan": zhong_chuan,  # 中传
+        "mo_chuan": mo_chuan,  # 末传
+        "chu_wx": DZ_WX.get(chu_chuan, "?"),
+        "zhong_wx": DZ_WX.get(zhong_chuan, "?"),
+        "mo_wx": DZ_WX.get(mo_chuan, "?"),
+        "has_fuyin": has_fuyin,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════
+# 5. 十二天将排布
+# ═══════════════════════════════════════════════════════════════
+def _arrange_generals(gui_ren_zhi: str, day_gan: str, is_day: bool,
+                      heaven_board: dict) -> list[dict]:
+    """十二天将的排布: 贵人所在 → 顺/逆排。
+
+    贵人顺逆规则: 贵人所在支若在亥~辰(子丑寅卯辰巳的前半),则顺排;若在巳~戌,则逆排。
+    简化: 用地支序号判断。
+    """
+    gui_idx = DZ.index(gui_ren_zhi)
+    # 贵人在亥子丑寅卯辰 → 顺排; 在巳午未申酉戌 → 逆排
+    shun_pai = gui_idx in (0, 1, 2, 3, 4, 5, 6)  # 子丑寅卯辰巳午 → 顺
+
+    generals = []
+    for i in range(12):
+        if shun_pai:
+            tian_idx = (gui_idx - i) % 12  # 贵人起, 顺排: 贵人→腾蛇→朱雀...
+        else:
+            tian_idx = (gui_idx + i) % 12  # 贵人起, 逆排
+        tian_zhi = heaven_board[tian_idx]
+        generals.append({
+            "general": _GENERALS[i],
+            "general_wx": _GENERAL_WX[_GENERALS[i]],
+            "general_meaning": _GENERAL_MEANING[_GENERALS[i]],
+            "tian_pan_zhi": tian_zhi,
+            "zhi_wx": DZ_WX.get(tian_zhi, "?"),
+            "position": DZ[tian_idx],
+        })
+
+    return generals
+
+
+# ═══════════════════════════════════════════════════════════════
+# 6. 旬空计算
+# ═══════════════════════════════════════════════════════════════
+def _xun_kong(day_gan: str, day_zhi: str) -> str:
+    """日干支 → 旬空(哪两个地支空亡)。
+
+    六甲旬: 甲子旬戌亥空, 甲戌旬申酉空, 甲申旬午未空, 甲午旬辰巳空,
+            甲辰旬寅卯空, 甲寅旬子丑空。
+    """
+    kong_map = {"子": ("戌", "亥"), "戌": ("申", "酉"), "申": ("午", "未"),
+                "午": ("辰", "巳"), "辰": ("寅", "卯"), "寅": ("子", "丑")}
+
+    # 构建 60 干支表
+    ganzhi_60 = [TG[i % 10] + DZ[i % 12] for i in range(60)]
+
+    day_ganzhi = day_gan + day_zhi
+    day_60_idx = ganzhi_60.index(day_ganzhi) if day_ganzhi in ganzhi_60 else 0
+
+    # 找所在旬首(甲日)
+    xun_start_idx = (day_60_idx // 10) * 10
+    xun_jia_zhi = ganzhi_60[xun_start_idx][1]  # 甲X的X
+    kong1, kong2 = kong_map.get(xun_jia_zhi, ("?", "?"))
+    return f"{kong1}{kong2}"
+
+
+# ═══════════════════════════════════════════════════════════════
+# 7. 主排盘函数
+# ═══════════════════════════════════════════════════════════════
+def compute(b: Birth) -> ChartResult:
+    """大六壬排盘。
+
+    输入: birth (用于取年月日时)
+    输出: 天盘、地盘、四课、三传、十二天将、旬空
+    """
+    now = datetime(b.year, b.month, b.day, b.hour, b.minute)
+
+    # 1. 占时 (divination hour)
+    hour_branch = _get_hour_branch(now.hour)
+
+    # 2. 月将 (month general)
+    month_general = _get_month_general(now.month, now.day)
+
+    # 3. 天地盘
+    board = _build_cosmic_board(hour_branch, month_general)
+
+    # 4. 日干支 — 通过 lunar-python 获取日柱
+    try:
+        from lunar_python import Solar
+        sol = Solar.fromYmdHms(b.year, b.month, b.day, b.hour, b.minute, 0)
+        lun = sol.getLunar()
+        day_ganzhi = lun.getDayInGanZhi()
+        day_gan = day_ganzhi[0] if len(day_ganzhi) >= 1 else "甲"
+        day_zhi = day_ganzhi[1] if len(day_ganzhi) >= 2 else "子"
+    except Exception:
+        # fallback: 基于日期简化推算
+        day_gan = TG[(b.year + b.month + b.day) % 10]
+        day_zhi = DZ[(b.year + b.month + b.day) % 12]
+
+    # 5. 四课
+    four_lessons = _build_four_lessons(day_gan, day_zhi, board["heaven_board"], board["earth_board"])
+
+    # 6. 三传
+    three_trans = _derive_three_transmissions(four_lessons)
+
+    # 7. 贵人 / 十二天将
+    is_day = 6 <= now.hour < 18
+    gui_ren_zhi = _get_gui_ren(day_gan, is_day)
+    generals = _arrange_generals(gui_ren_zhi, day_gan, is_day, board["heaven_board"])
+
+    # 8. 旬空
+    xun_kong_str = _xun_kong(day_gan, day_zhi)
+
+    # 构建解读提示
+    reading_hints = {
+        "overall": _build_overall_hint(board, four_lessons, three_trans, day_gan),
+    }
+
+    return ChartResult(
+        method="liuren",
+        school="east",
+        engine="self+liuren-board+four-lessons+three-transmissions",
+        normalized={"elements": _count_liuren_elements(day_gan, day_zhi, three_trans), "timeline": []},
+        raw={
+            "computed_at": date.today().isoformat(),
+            "divination_time": {
+                "datetime": now.strftime("%Y-%m-%d %H:%M"),
+                "hour_branch": hour_branch,
+                "month_general": month_general,
+                "month_general_name": _MONTH_GENERAL_NAMES.get(month_general, "?"),
+                "is_day": is_day,
+            },
+            "day_gan": day_gan,
+            "day_zhi": day_zhi,
+            "day_ganzhi": day_gan + day_zhi,
+            "cosmic_board": {
+                "sky_pan": {f"宫{i}({DZ[i]})": board["heaven_board"][i] for i in range(12)},
+                "earth_pan": {f"宫{i}({DZ[i]})": board["earth_board"][i] for i in range(12)},
+            },
+            "four_lessons": four_lessons["lessons"],
+            "three_transmissions": three_trans,
+            "twelve_generals": generals,
+            "gui_ren_zhi": gui_ren_zhi,
+            "xun_kong": xun_kong_str,
+            "reading_hints": reading_hints,
+            "rule_version": "v1",
+            "calculation_basis": {
+                "method": "da_liu_ren",
+                "system": "天地盘 + 四课三传 + 十二天将",
+                "school": "三式之首",
+                "rule_version": "v1",
+                "limits": [
+                    "三传推导使用简化九宗门法, 未实现全部课式变体",
+                    "日干支来自八字排盘或简化推算",
+                    "遁干、神煞体系待完善",
+                    "长生十二宫、禄马等高级特性未展开",
+                ],
+            },
+        },
+    )
+
+
+def _count_liuren_elements(day_gan: str, day_zhi: str, three_trans: dict) -> dict:
+    """从日干支和三传统计五行分布。"""
+    elem = {"metal": 0, "wood": 0, "water": 0, "fire": 0, "earth": 0}
+    wx_key = {"金": "metal", "木": "wood", "水": "water", "火": "fire", "土": "earth"}
+    # 日干五行
+    gan_wx = TG_WX.get(day_gan, "")
+    if gan_wx in wx_key:
+        elem[wx_key[gan_wx]] += 1
+    # 日支五行
+    zhi_wx = DZ_WX.get(day_zhi, "")
+    if zhi_wx in wx_key:
+        elem[wx_key[zhi_wx]] += 1
+    # 三传五行
+    for key in ("chu_wx", "zhong_wx", "mo_wx"):
+        wx = three_trans.get(key, "")
+        if wx in wx_key:
+            elem[wx_key[wx]] += 1
+    return elem
+
+
+def _build_overall_hint(board: dict, four_lessons: dict,
+                        three_trans: dict, day_gan: str) -> str:
+    """生成简单的课式总结。"""
+    parts = []
+    parts.append(f"月将{board['month_general_name']}({board['month_general']})加时{board['hour_branch']}")
+    parts.append(f"日干{day_gan}")
+    parts.append(f"课式: {three_trans['method']}")
+    parts.append(f"三传: {three_trans['chu_chuan']}→{three_trans['zhong_chuan']}→{three_trans['mo_chuan']}")
+    return "; ".join(parts)

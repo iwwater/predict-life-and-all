@@ -1,0 +1,104 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "Mystic Hub · 玄枢" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e8]: Mystic Hub
+        - generic [ref=e9]: · 玄枢
+      - navigation [ref=e10]:
+        - link "首页" [ref=e11] [cursor=pointer]:
+          - /url: /
+        - link "排盘" [ref=e12] [cursor=pointer]:
+          - /url: /cast
+        - link "历史" [ref=e13] [cursor=pointer]:
+          - /url: /history
+        - link "关于" [ref=e14] [cursor=pointer]:
+          - /url: /about
+  - main [ref=e15]:
+    - generic [ref=e160]:
+      - generic [ref=e161]:
+        - generic [ref=e162]:
+          - generic [ref=e164]: 你的灵魂
+          - generic [ref=e165]: 1990-5-15 8:30
+          - generic [ref=e166]: · male
+        - generic [ref=e167]:
+          - button "☆ 收藏" [ref=e168] [cursor=pointer]
+          - group "反馈" [ref=e169]:
+            - button "准" [ref=e170] [cursor=pointer]
+            - button "不准" [ref=e171] [cursor=pointer]
+            - button "待观察" [ref=e172] [cursor=pointer]
+          - button "生成分享卡" [ref=e173] [cursor=pointer]
+          - link "再排一次" [ref=e174] [cursor=pointer]:
+            - /url: /cast
+      - button "塔罗 · 西 · 按问题选择牌阵，而不是只抽几张" [ref=e176] [cursor=pointer]:
+        - generic [ref=e177]: 塔罗
+        - generic [ref=e178]: · 西
+        - generic [ref=e179]: · 按问题选择牌阵，而不是只抽几张
+      - generic [ref=e180]:
+        - generic [ref=e181]:
+          - generic [ref=e182]:
+            - generic [ref=e183]:
+              - generic [ref=e184]:
+                - heading "塔罗 · 身心灵三张" [level=3] [ref=e185]
+                - generic [ref=e186]:
+                  - generic [ref=e187]: 3 张
+                  - generic [ref=e188]: tarot_guidance
+              - generic [ref=e189]:
+                - generic [ref=e190]:
+                  - generic [ref=e191]:
+                    - generic [ref=e192]: 身体/现实
+                    - generic [ref=e193]: 星币9
+                    - generic [ref=e194]: 正位
+                  - generic [ref=e195]: 现实层面的状态
+                - generic [ref=e196]:
+                  - generic [ref=e197]:
+                    - generic [ref=e198]: 情绪/心
+                    - generic [ref=e199]: 星币6
+                    - generic [ref=e200]: 逆位
+                  - generic [ref=e201]: 感受与关系层面
+                - generic [ref=e202]:
+                  - generic [ref=e203]:
+                    - generic [ref=e204]: 精神/建议
+                    - generic [ref=e205]: 高塔
+                    - generic [ref=e206]: 正位
+                  - generic [ref=e207]: 更高层面的提醒
+            - generic [ref=e208]:
+              - generic [ref=e209]: 牌位与牌面
+              - list [ref=e210]:
+                - listitem [ref=e211]:
+                  - generic [ref=e212]: 身体/现实
+                  - generic [ref=e213]: 星币9
+                  - generic [ref=e214]: 正位 · 正向能量
+                  - generic [ref=e215]: 现实、金钱、身体与资源 · 9
+                - listitem [ref=e216]:
+                  - generic [ref=e217]: 情绪/心
+                  - generic [ref=e218]: 星币6
+                  - generic [ref=e219]: 逆位 · 受阻/反向
+                  - generic [ref=e220]: 现实、金钱、身体与资源 · 6
+                - listitem [ref=e221]:
+                  - generic [ref=e222]: 精神/建议
+                  - generic [ref=e223]: 高塔
+                  - generic [ref=e224]: 正位 · 正向能量
+                  - generic [ref=e225]: 突变、崩塌、醒悟
+              - generic [ref=e226]: "起法: 78-card Waite-style deck, sample without replacement, upright/reversed orientation；seed: 7"
+          - generic [ref=e227]:
+            - generic [ref=e228]: 本次采用的起法
+            - generic [ref=e229]: "方法: tarot · 模式: tarot_spread · 对象: tarot_guidance"
+            - generic [ref=e230]: "抽牌规则: 78-card Waite-style deck, sample without replacement, upright/reversed orientation"
+        - generic [ref=e232]:
+          - generic [ref=e233]:
+            - generic [ref=e234]:
+              - heading "AI 解读" [level=3] [ref=e235]
+              - generic [ref=e236]: · 已完成
+            - button "重新解读" [ref=e237] [cursor=pointer]
+          - generic [ref=e238]:
+            - paragraph [ref=e239]:
+              - text: 【整体】(Mock 解读)—— 基于你提供的盘面,我看到一个倾向于内省与表达并存的能量结构。
+              - text: 【事业财运】盘面显示金气偏旺、根气偏弱,倾向于在协作中借力会更顺。
+              - text: 【建议】1) 多与人合作;2) 留意春夏之交的机会;3) 给自己留点独处时间复盘。
+            - paragraph [ref=e240]: (以上为传统文化象征视角的参考,非科学预测,重大决定请结合现实并咨询专业人士。)
+          - generic [ref=e242]: 以上为传统文化象征视角的参考,非科学预测,重大决定请结合现实并咨询专业人士。
+  - contentinfo [ref=e19]:
+    - generic [ref=e20]:
+      - paragraph [ref=e21]: 免责声明:本站所有解读为传统文化象征视角的参考,非科学预测,亦不构成医疗、法律、财务等专业意见。 重大决定请结合现实并咨询专业人士。
+      - paragraph [ref=e22]: 合规:全栈 MIT/BSD 许可,零 AGPL,可闭源商用。 你的 LLM API Key 仅存在浏览器本地,不会上传到本服务后端。

@@ -1,0 +1,275 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - link "中华典藏 中华典藏" [ref=e5] [cursor=pointer]:
+          - /url: https://www.diancang.xyz/
+          - img "中华典藏" [ref=e6]
+          - text: 中华典藏
+        - text: 
+      - list [ref=e8]:
+        - listitem [ref=e9]:
+          - link "留言" [ref=e10] [cursor=pointer]:
+            - /url: https://bbs.diancang.xyz/
+        - listitem [ref=e11]:
+          - link "专题" [ref=e12] [cursor=pointer]:
+            - /url: https://www.diancang.xyz/s/
+        - listitem [ref=e13]:
+          - link "书单" [ref=e14] [cursor=pointer]:
+            - /url: https://www.diancang.xyz/shudan/
+        - listitem [ref=e15]:
+          - link "风云榜" [ref=e16] [cursor=pointer]:
+            - /url: https://www.diancang.xyz/top/
+        - listitem [ref=e17]:
+          - link "登陆" [ref=e18] [cursor=pointer]:
+            - /url: https://www.diancang.xyz/e/member/login/
+        - listitem [ref=e19]:
+          - link "注册" [ref=e20] [cursor=pointer]:
+            - /url: https://www.diancang.xyz/e/member/register/
+  - generic [ref=e21]:
+    - generic [ref=e22]:
+      - generic [ref=e25]:
+        - textbox "请输入书名或作者" [ref=e26]
+        - button "" [ref=e28] [cursor=pointer]:
+          - generic [ref=e29]: 
+      - generic [ref=e30]:
+        - link "首页" [ref=e32] [cursor=pointer]:
+          - /url: https://www.diancang.xyz/
+        - button "分类" [ref=e34] [cursor=pointer]: 分类
+        - link "文章" [ref=e37] [cursor=pointer]:
+          - /url: https://www.diancang.xyz/guoxuezhishi/
+    - generic [ref=e38]:
+      - generic [ref=e40]:
+        - list [ref=e42]:
+          - listitem [ref=e43]:
+            - link "首页" [ref=e44] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/
+          - listitem [ref=e45]:
+            - text: /
+            - link "玄学五术" [ref=e46] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/
+          - listitem [ref=e47]:
+            - text: /
+            - link "子平真诠" [ref=e48] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/
+        - heading "子平真诠 作者:沈孝瞻" [level=1] [ref=e50]:
+          - text: 子平真诠
+          - generic [ref=e51]:
+            - text: "作者:"
+            - link "沈孝瞻" [ref=e52] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/renwu/shenxiaozhan/
+        - generic [ref=e53]:
+          - img "子平真诠" [ref=e55]
+          - paragraph [ref=e56]: 《子平真诠》是中国传统命理学著作，为清代乾隆进士沈孝瞻先生所著，全书共四十八章，现据考为明代《耕寸集》命理笔记。《子平真诠》是传统子平命理学“前三本”（子平真诠，渊海子平，三命通会）中分量最少，但是理论最为精辟，论述最为恰到好处的著作。
+          - generic [ref=e57]:
+            - link "开始阅读" [ref=e58] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53619.html
+              - button "开始阅读" [ref=e59]
+            - link "TXT下载" [ref=e60] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/e/DownSys/DownSoft/?classid=23&id=2483&pathid=0
+              - button "TXT下载" [ref=e61]
+            - link "加入书架" [ref=e62] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/e/member/fava/add/?classid=23&id=2483
+              - button "加入书架" [ref=e63]
+        - generic [ref=e64]:
+          - link "清代" [ref=e65] [cursor=pointer]:
+            - /url: https://www.diancang.xyz/tags-10-0.html
+          - link "命理学" [ref=e66] [cursor=pointer]:
+            - /url: https://www.diancang.xyz/tags-75-0.html
+        - generic [ref=e67]:
+          - navigation:
+            - strong [ref=e68]: 章节列表
+            - strong [ref=e69]:
+              - link "升序↑" [ref=e70] [cursor=pointer]:
+                - /url: javascript:void(0);
+        - list [ref=e71]:
+          - listitem [ref=e72]:
+            - link "序" [ref=e73] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53619.html
+          - listitem [ref=e74]:
+            - link "凡例" [ref=e75] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53620.html
+          - listitem [ref=e76]:
+            - link "一．论十干十二支" [ref=e77] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53621.html
+          - listitem [ref=e78]:
+            - link "二、论阴阳生克" [ref=e79] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53622.html
+          - listitem [ref=e80]:
+            - link "三、论阴阳生死" [ref=e81] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53623.html
+          - listitem [ref=e82]:
+            - link "四、论十干配合性情" [ref=e83] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53624.html
+          - listitem [ref=e84]:
+            - link "五、论十干合而不合" [ref=e85] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53625.html
+          - listitem [ref=e86]:
+            - link "六、论十干得时不旺失时不弱" [ref=e87] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53626.html
+          - listitem [ref=e88]:
+            - link "七、论刑冲会合解法" [ref=e89] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53627.html
+          - listitem [ref=e90]:
+            - link "八、论用神" [ref=e91] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53628.html
+          - listitem [ref=e92]:
+            - link "九、论用神成败救应" [ref=e93] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53629.html
+          - listitem [ref=e94]:
+            - link "十、论用神变化" [ref=e95] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53630.html
+          - listitem [ref=e96]:
+            - link "十一、论用神纯杂" [ref=e97] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53631.html
+          - listitem [ref=e98]:
+            - link "十二、 论用神格局高低" [ref=e99] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53632.html
+          - listitem [ref=e100]:
+            - link "十三、论用神因成得败因败得成" [ref=e101] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53633.html
+          - listitem [ref=e102]:
+            - link "十四、论用神配气候得失" [ref=e103] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53634.html
+          - listitem [ref=e104]:
+            - link "十五、论相神紧要" [ref=e105] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53635.html
+          - listitem [ref=e106]:
+            - link "十六、论杂气如何取用" [ref=e107] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53636.html
+          - listitem [ref=e108]:
+            - link "十七、论墓库刑冲之说" [ref=e109] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53637.html
+          - listitem [ref=e110]:
+            - link "十八、论四吉神能破格" [ref=e111] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53638.html
+          - listitem [ref=e112]:
+            - link "十九、论四凶神能成格" [ref=e113] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53639.html
+          - listitem [ref=e114]:
+            - link "二十、论生克先后分吉凶" [ref=e115] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53640.html
+          - listitem [ref=e116]:
+            - link "二十一、论星辰无关格局" [ref=e117] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53641.html
+          - listitem [ref=e118]:
+            - link "二十二、论外格用舍" [ref=e119] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53642.html
+          - listitem [ref=e120]:
+            - link "二十三、论宫分用神配六亲" [ref=e121] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53643.html
+          - listitem [ref=e122]:
+            - link "二十四、论妻子" [ref=e123] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53644.html
+          - listitem [ref=e124]:
+            - link "二十五、论行运" [ref=e125] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53645.html
+          - listitem [ref=e126]:
+            - link "二十六、论行运成格变格" [ref=e127] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53646.html
+          - listitem [ref=e128]:
+            - link "二十七、论喜忌干支有别" [ref=e129] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53647.html
+          - listitem [ref=e130]:
+            - link "二十八、论支中喜忌逢运透清" [ref=e131] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53648.html
+          - listitem [ref=e132]:
+            - link "二十九、论时说拘泥格局" [ref=e133] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53649.html
+          - listitem [ref=e134]:
+            - link "三十、论时说以讹传讹" [ref=e135] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53650.html
+          - listitem [ref=e136]:
+            - link "三十一、论正官" [ref=e137] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53651.html
+          - listitem [ref=e138]:
+            - link "三十二、论正官取运" [ref=e139] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53652.html
+          - listitem [ref=e140]:
+            - link "三十三、论财" [ref=e141] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53653.html
+          - listitem [ref=e142]:
+            - link "三十四、论财取运" [ref=e143] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53654.html
+          - listitem [ref=e144]:
+            - link "三十五、论印绶" [ref=e145] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53655.html
+          - listitem [ref=e146]:
+            - link "三十六、论印绶取运" [ref=e147] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53656.html
+          - listitem [ref=e148]:
+            - link "三十七、论食神" [ref=e149] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53657.html
+          - listitem [ref=e150]:
+            - link "三十八、论食神取运" [ref=e151] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53658.html
+          - listitem [ref=e152]:
+            - link "三十九、论偏官" [ref=e153] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53659.html
+          - listitem [ref=e154]:
+            - link "四十、论偏官取运" [ref=e155] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53660.html
+          - listitem [ref=e156]:
+            - link "四十一、论伤官" [ref=e157] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53661.html
+          - listitem [ref=e158]:
+            - link "四十二、论伤官取运" [ref=e159] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53662.html
+          - listitem [ref=e160]:
+            - link "四十三、论阳刃" [ref=e161] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53663.html
+          - listitem [ref=e162]:
+            - link "四十四、论阳刃取运" [ref=e163] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53664.html
+          - listitem [ref=e164]:
+            - link "四十五、论建禄月劫" [ref=e165] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53665.html
+          - listitem [ref=e166]:
+            - link "四十六、论建禄月劫取运" [ref=e167] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53666.html
+          - listitem [ref=e168]:
+            - link "四十七、论杂格" [ref=e169] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53667.html
+          - listitem [ref=e170]:
+            - link "四十八(附) 论杂格取运" [ref=e171] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquan/53668.html
+          - listitem [ref=e172]:
+            - link "子平真诠评注" [ref=e173] [cursor=pointer]:
+              - /url: https://www.diancang.xyz/xuanxuewushu/zipingzhenquanpingzhu/
+      - generic [ref=e174]:
+        - generic [ref=e175]:
+          - generic [ref=e176]: 沈孝瞻其它作品
+          - list
+        - generic [ref=e177]:
+          - generic [ref=e178]: 猜你喜欢的作品
+          - list [ref=e179]:
+            - listitem [ref=e180]:
+              - link "金箓设醮仪" [ref=e181] [cursor=pointer]:
+                - /url: https://www.diancang.xyz/xuanxuewushu/10539/
+            - listitem [ref=e182]:
+              - link "正一醮墓仪" [ref=e183] [cursor=pointer]:
+                - /url: https://www.diancang.xyz/xuanxuewushu/8483/
+            - listitem [ref=e184]:
+              - link "上清长生宝鉴图" [ref=e185] [cursor=pointer]:
+                - /url: https://www.diancang.xyz/xuanxuewushu/9879/
+            - listitem [ref=e186]:
+              - link "服气精义论" [ref=e187] [cursor=pointer]:
+                - /url: https://www.diancang.xyz/xuanxuewushu/fuqijingyilun/
+            - listitem [ref=e188]:
+              - link "婴儿论" [ref=e189] [cursor=pointer]:
+                - /url: https://www.diancang.xyz/xuanxuewushu/yingerlun/
+            - listitem [ref=e190]:
+              - link "巢氏病源补养宣导法" [ref=e191] [cursor=pointer]:
+                - /url: https://www.diancang.xyz/xuanxuewushu/10724/
+            - listitem [ref=e192]:
+              - link "丁甘仁医案" [ref=e193] [cursor=pointer]:
+                - /url: https://www.diancang.xyz/xuanxuewushu/11154/
+            - listitem [ref=e194]:
+              - link "洞玄灵宝斋说光烛戒罚灯祝愿仪" [ref=e195] [cursor=pointer]:
+                - /url: https://www.diancang.xyz/xuanxuewushu/dongxuanlingbaozhaishuoguangzhujiefadengzhuyuanyi/
+            - listitem [ref=e196]:
+              - link "医验随笔" [ref=e197] [cursor=pointer]:
+                - /url: https://www.diancang.xyz/xuanxuewushu/13876/
+            - listitem [ref=e198]:
+              - link "玄和子十二月卦金诀" [ref=e199] [cursor=pointer]:
+                - /url: https://www.diancang.xyz/xuanxuewushu/14494/

@@ -1,0 +1,386 @@
+- generic [active] [ref=e1]:
+  - blockquote [ref=e2]:
+    - heading [level=2] [ref=e3]: Documentation Index
+    - paragraph [ref=e4]:
+      - text: "Fetch the complete documentation index at:"
+      - link [ref=e5] [cursor=pointer]:
+        - /url: /docs/llms.txt
+        - text: /docs/llms.txt
+    - paragraph [ref=e6]: Use this file to discover all available pages before exploring further.
+  - generic [ref=e7]:
+    - link "Skip to main content" [ref=e8] [cursor=pointer]:
+      - /url: "#content-area"
+    - generic [ref=e10]:
+      - banner [ref=e11]:
+        - generic [ref=e13]:
+          - paragraph [ref=e15]:
+            - text: 🎉 MiniMax-M3 is now available! A Frontier Model at your fingertips for Coding & Agent. ➔
+            - link "Try Now" [ref=e16] [cursor=pointer]:
+              - /url: https://platform.minimax.io/docs/guides/models-intro
+            - text: .
+          - button "Dismiss banner" [ref=e17] [cursor=pointer]:
+            - img [ref=e18]
+        - generic [ref=e23]:
+          - generic [ref=e26]:
+            - link "MiniMax API Docs home page light logo" [ref=e28] [cursor=pointer]:
+              - /url: https://minimax.io
+              - generic [ref=e29]: MiniMax API Docs home page
+              - img "light logo" [ref=e30]
+            - button "Open search" [ref=e32] [cursor=pointer]:
+              - generic [ref=e33]:
+                - img [ref=e34]
+                - generic [ref=e37]: Search...
+              - generic [ref=e38]: Ctrl K
+            - generic [ref=e39]:
+              - navigation "Main" [ref=e40]:
+                - list [ref=e41]:
+                  - listitem [ref=e42]:
+                    - link "Documentation" [ref=e43] [cursor=pointer]:
+                      - /url: https://platform.minimax.io/docs
+                  - listitem [ref=e44]:
+                    - link "Pricing" [ref=e45] [cursor=pointer]:
+                      - /url: https://platform.minimax.io/docs/pricing/overview
+                  - listitem [ref=e46]:
+                    - link "Console" [ref=e47] [cursor=pointer]:
+                      - /url: https://platform.minimax.io/login
+              - link "Sign Up" [ref=e48] [cursor=pointer]:
+                - /url: /login
+                - text: Sign Up
+                - img [ref=e50]
+          - generic [ref=e53]:
+            - link "Developer Guides" [ref=e54] [cursor=pointer]:
+              - /url: /docs/guides/models-intro
+              - text: Developer Guides
+            - link "API" [ref=e56] [cursor=pointer]:
+              - /url: /docs/api-reference/api-overview
+              - text: API
+            - link "Token Plan" [ref=e58] [cursor=pointer]:
+              - /url: /docs/token-plan/intro
+              - text: Token Plan
+            - link "Pricing" [ref=e60] [cursor=pointer]:
+              - /url: /docs/pricing/overview
+              - text: Pricing
+            - link "Release Notes" [ref=e62] [cursor=pointer]:
+              - /url: /docs/release-notes/models
+              - text: Release Notes
+            - link "Developer Program" [ref=e64] [cursor=pointer]:
+              - /url: https://platform.minimax.io/contact-us
+              - text: Developer Program
+      - generic [ref=e66]:
+        - navigation "Pages" [ref=e67]:
+          - generic [ref=e70]:
+            - generic [ref=e71]:
+              - heading "Get started" [level=3] [ref=e73]
+              - list [ref=e74]:
+                - listitem [ref=e75]:
+                  - link "Models" [ref=e76] [cursor=pointer]:
+                    - /url: /docs/guides/models-intro
+                    - generic [ref=e79]: Models
+                - listitem [ref=e80]:
+                  - button "Quick Start" [ref=e81] [cursor=pointer]:
+                    - generic [ref=e82]: Quick Start
+                    - img [ref=e84]
+            - generic [ref=e86]:
+              - heading "Use Guides" [level=3] [ref=e88]
+              - list [ref=e89]:
+                - listitem [ref=e90]:
+                  - button "Text" [ref=e91] [cursor=pointer]:
+                    - generic [ref=e92]: Text
+                    - img [ref=e94]
+                - listitem [ref=e96]:
+                  - button "Video" [ref=e97] [cursor=pointer]:
+                    - generic [ref=e98]: Video
+                    - img [ref=e100]
+                - listitem [ref=e102]:
+                  - button "Speech" [ref=e103] [cursor=pointer]:
+                    - generic [ref=e104]: Speech
+                    - img [ref=e106]
+                - listitem [ref=e108]:
+                  - button "Image" [expanded] [ref=e109] [cursor=pointer]:
+                    - generic [ref=e110]: Image
+                    - img [ref=e112]
+                  - list [ref=e114]:
+                    - listitem [ref=e115]:
+                      - link "Image Generation Guide" [ref=e116] [cursor=pointer]:
+                        - /url: /docs/guides/image-generation
+                        - generic [ref=e119]: Image Generation Guide
+                - listitem [ref=e120]:
+                  - button "Music" [ref=e121] [cursor=pointer]:
+                    - generic [ref=e122]: Music
+                    - img [ref=e124]
+                - listitem [ref=e126]:
+                  - button "MCP" [ref=e127] [cursor=pointer]:
+                    - generic [ref=e128]: MCP
+                    - img [ref=e130]
+                - listitem [ref=e132]:
+                  - button "Local Deployment" [ref=e133] [cursor=pointer]:
+                    - generic [ref=e134]: Local Deployment
+                    - img [ref=e136]
+            - generic [ref=e138]:
+              - heading "FAQs" [level=3] [ref=e140]
+              - list [ref=e141]:
+                - listitem [ref=e142]:
+                  - link "About APIs" [ref=e143] [cursor=pointer]:
+                    - /url: /docs/faq/about-apis
+                    - generic [ref=e146]: About APIs
+                - listitem [ref=e147]:
+                  - link "About Account" [ref=e148] [cursor=pointer]:
+                    - /url: /docs/faq/about-account
+                    - generic [ref=e151]: About Account
+                - listitem [ref=e152]:
+                  - link "Contact Us" [ref=e153] [cursor=pointer]:
+                    - /url: /docs/faq/contact-us
+                    - generic [ref=e156]: Contact Us
+            - generic [ref=e157]:
+              - heading "Terms & Policy" [level=3] [ref=e159]
+              - list [ref=e160]:
+                - listitem [ref=e161]:
+                  - link "Terms of Service" [ref=e162] [cursor=pointer]:
+                    - /url: https://platform.minimax.io/protocol/terms-of-service
+                    - generic [ref=e163]:
+                      - generic [ref=e165]: Terms of Service
+                      - img [ref=e167]
+                - listitem [ref=e169]:
+                  - link "Privacy Policy" [ref=e170] [cursor=pointer]:
+                    - /url: https://platform.minimax.io/protocol/privacy-policy
+                    - generic [ref=e171]:
+                      - generic [ref=e173]: Privacy Policy
+                      - img [ref=e175]
+        - main [ref=e177]:
+          - generic [ref=e178]:
+            - navigation "On this page" [ref=e182]:
+              - heading "On this page" [level=2] [ref=e183]:
+                - button "On this page" [ref=e184] [cursor=pointer]:
+                  - img [ref=e185]
+                  - generic [ref=e186]: On this page
+              - list [ref=e188]:
+                - listitem [ref=e189]:
+                  - link "Generate Images from Text" [ref=e190] [cursor=pointer]:
+                    - /url: "#generate-images-from-text"
+                - listitem [ref=e191]:
+                  - link "Generate Images with Reference Images" [ref=e192] [cursor=pointer]:
+                    - /url: "#generate-images-with-reference-images"
+                - listitem [ref=e193]:
+                  - link "Recommended Reading" [ref=e194] [cursor=pointer]:
+                    - /url: "#recommended-reading"
+            - generic [ref=e195]:
+              - generic [ref=e196]:
+                - generic [ref=e197]:
+                  - generic [ref=e198]: Image
+                  - generic [ref=e199]:
+                    - heading "Image Generation Guide" [level=1] [ref=e200]
+                    - generic [ref=e201]:
+                      - button "Copy page" [ref=e202] [cursor=pointer]:
+                        - generic [ref=e203]:
+                          - img [ref=e204]
+                          - generic [ref=e207]: Copy page
+                      - button "More actions" [ref=e208] [cursor=pointer]:
+                        - img [ref=e209]
+                - paragraph [ref=e212]:
+                  - text: "The Image Generation service provides two core capabilities:"
+                  - strong [ref=e213]: Text-to-Image
+                  - text: and
+                  - strong [ref=e214]: Image-to-Image
+                  - text: .
+              - generic [ref=e215]:
+                - heading "Navigate to header Generate Images from Text" [level=2] [ref=e216]:
+                  - link "Navigate to header" [ref=e217] [cursor=pointer]:
+                    - /url: "#generate-images-from-text"
+                    - img [ref=e219]
+                  - generic [ref=e221] [cursor=pointer]: Generate Images from Text
+                - generic [ref=e222]: Create images directly from detailed text descriptions (prompts) that specify the desired content.
+                - generic [ref=e223]:
+                  - button "Copy the contents from the code block" [ref=e226] [cursor=pointer]:
+                    - img [ref=e227]
+                  - code [ref=e233]:
+                    - generic [ref=e234]: import base64
+                    - generic [ref=e235]: import requests
+                    - generic [ref=e236]: import os
+                    - generic [ref=e237]: url = "https://api.minimax.io/v1/image_generation"
+                    - generic [ref=e238]: api_key = os.environ["MINIMAX_API_KEY"]
+                    - generic [ref=e239]: "headers = {\"Authorization\": f\"Bearer {api_key}\"}"
+                    - generic [ref=e240]: "payload = {"
+                    - generic [ref=e241]: "\"model\": \"image-01\","
+                    - generic [ref=e242]: "\"prompt\": \"men Dressing in white t shirt, full-body stand front view image :25, outdoor, Venice beach sign, full-body image, Los Angeles, Fashion photography of 90s, documentary, Film grain, photorealistic\","
+                    - generic [ref=e243]: "\"aspect_ratio\": \"16:9\","
+                    - generic [ref=e244]: "\"response_format\": \"base64\","
+                    - generic [ref=e245]: "}"
+                    - generic [ref=e246]: response = requests.post(url, headers=headers, json=payload)
+                    - generic [ref=e247]: response.raise_for_status()
+                    - generic [ref=e248]: images = response.json()["data"]["image_base64"]
+                    - generic [ref=e249]: "for i in range(len(images)):"
+                    - generic [ref=e250]: "with open(f\"output-{i}.jpeg\", \"wb\") as f:"
+                    - generic [ref=e251]: f.write(base64.b64decode(images[i]))
+                - generic [ref=e252]: The generated picture：
+                - img "图片描述" [ref=e255]
+                - heading "Navigate to header Generate Images with Reference Images" [level=2] [ref=e256]:
+                  - link "Navigate to header" [ref=e257] [cursor=pointer]:
+                    - /url: "#generate-images-with-reference-images"
+                    - img [ref=e259]
+                  - generic [ref=e261] [cursor=pointer]: Generate Images with Reference Images
+                - generic [ref=e262]:
+                  - text: This feature allows you to supply one or more reference images (including online image URLs) that contain a clear subject. Combined with a text prompt, the service generates a new image that preserves the subject’s key characteristics.
+                  - text: This is particularly useful for scenarios that require consistent visual identity, such as generating images of the same virtual character in different contexts.
+                - generic [ref=e263]:
+                  - button "Copy the contents from the code block" [ref=e266] [cursor=pointer]:
+                    - img [ref=e267]
+                  - code [ref=e273]:
+                    - generic [ref=e274]: import base64
+                    - generic [ref=e275]: import requests
+                    - generic [ref=e276]: import os
+                    - generic [ref=e277]: url = "https://api.minimax.io/v1/image_generation"
+                    - generic [ref=e278]: api_key = os.environ["MINIMAX_API_KEY"]
+                    - generic [ref=e279]: "headers = {\"Authorization\": f\"Bearer {api_key}\"}"
+                    - generic [ref=e280]: "payload = {"
+                    - generic [ref=e281]: "\"model\": \"image-01\","
+                    - generic [ref=e282]: "\"prompt\": \"A girl stands by the library window, gazing into the distance\","
+                    - generic [ref=e283]: "\"aspect_ratio\": \"16:9\","
+                    - generic [ref=e284]: "\"subject_reference\": ["
+                    - generic [ref=e285]: "{"
+                    - generic [ref=e286]: "\"type\": \"character\","
+                    - generic [ref=e287]: "\"image_file\": \"https://cdn.hailuoai.com/prod/2025-08-12-17/video_cover/1754990600020238321-411603868533342214-cover.jpg\","
+                    - generic [ref=e288]: "}"
+                    - generic [ref=e289]: "],"
+                    - generic [ref=e290]: "\"response_format\": \"base64\","
+                    - generic [ref=e291]: "}"
+                    - generic [ref=e292]: response = requests.post(url, headers=headers, json=payload)
+                    - generic [ref=e293]: response.raise_for_status()
+                    - generic [ref=e294]: images = response.json()["data"]["image_base64"]
+                    - generic [ref=e295]: "for i in range(len(images)):"
+                    - generic [ref=e296]: "with open(f\"output-{i}.jpeg\", \"wb\") as f:"
+                    - generic [ref=e297]: f.write(base64.b64decode(images[i]))
+                - generic [ref=e298]: The generated picture：
+                - img "图片描述" [ref=e301]
+                - heading "Navigate to header Recommended Reading" [level=2] [ref=e302]:
+                  - link "Navigate to header" [ref=e303] [cursor=pointer]:
+                    - /url: "#recommended-reading"
+                    - img [ref=e305]
+                  - generic [ref=e307] [cursor=pointer]: Recommended Reading
+                - generic [ref=e308]:
+                  - link [ref=e309] [cursor=pointer]:
+                    - link [ref=e311]:
+                      - /url: /docs/api-reference/image-generation-t2i
+                      - img [ref=e313]
+                      - img [ref=e317]
+                      - generic [ref=e318]:
+                        - heading [level=2] [ref=e319]: Text to Image Generation
+                        - generic [ref=e321]: Use this API to generate images from text input.
+                        - button [ref=e323]:
+                          - text: Click here
+                          - img [ref=e324]
+                  - link [ref=e326] [cursor=pointer]:
+                    - link [ref=e328]:
+                      - /url: /docs/api-reference/image-generation-i2i
+                      - img [ref=e330]
+                      - img [ref=e334]
+                      - generic [ref=e335]:
+                        - heading [level=2] [ref=e336]: Image-to-Image Generation
+                        - generic [ref=e338]: Use this API to generate images from image input.
+                        - button [ref=e340]:
+                          - text: Click here
+                          - img [ref=e341]
+                  - link [ref=e343] [cursor=pointer]:
+                    - link [ref=e345]:
+                      - /url: /docs/guides/pricing-paygo#image
+                      - img [ref=e347]
+                      - img [ref=e351]
+                      - generic [ref=e352]:
+                        - heading [level=2] [ref=e353]: Pricing
+                        - generic [ref=e355]: Detailed information on model pricing and API packages.
+                        - button [ref=e357]:
+                          - text: Click here
+                          - img [ref=e358]
+                  - link [ref=e360] [cursor=pointer]:
+                    - link [ref=e362]:
+                      - /url: /docs/guides/rate-limits#3-rate-limits-for-our-api
+                      - img [ref=e364]
+                      - img [ref=e368]
+                      - generic [ref=e369]:
+                        - heading [level=2] [ref=e370]: Rate Limits
+                        - generic [ref=e372]: Rate limits are restrictions that our API imposes on the number of times a user or client can access our services within a specified period of time.
+                        - button [ref=e374]:
+                          - text: Click here
+                          - img [ref=e375]
+              - generic [ref=e377]:
+                - link "System Voice ID List" [ref=e378] [cursor=pointer]:
+                  - /url: /docs/faq/system-voice-id
+                  - img [ref=e379]
+                  - generic [ref=e381]: System Voice ID List
+                - link "Music Generation" [ref=e382] [cursor=pointer]:
+                  - /url: /docs/guides/music-generation
+                  - generic [ref=e383]: Music Generation
+                  - img [ref=e384]
+      - contentinfo [ref=e386]:
+        - generic [ref=e388]:
+          - generic [ref=e389]:
+            - link "MiniMax API Docs home page light logo" [ref=e390] [cursor=pointer]:
+              - /url: https://minimax.io
+              - generic [ref=e391]: MiniMax API Docs home page
+              - img "light logo" [ref=e392]
+            - generic [ref=e393]:
+              - link "discord" [ref=e394] [cursor=pointer]:
+                - /url: https://www.minimax.io/discord
+                - generic [ref=e395]: discord
+                - img [ref=e396]
+              - link "x" [ref=e397] [cursor=pointer]:
+                - /url: https://x.com/MiniMax_AI
+                - generic [ref=e398]: x
+                - img [ref=e399]
+              - link "linkedin" [ref=e400] [cursor=pointer]:
+                - /url: https://www.linkedin.com/company/minimax-ai
+                - generic [ref=e401]: linkedin
+                - img [ref=e402]
+              - link "github" [ref=e403] [cursor=pointer]:
+                - /url: https://github.com/MiniMax-AI
+                - generic [ref=e404]: github
+                - img [ref=e405]
+          - generic [ref=e406]:
+            - generic [ref=e408]:
+              - paragraph [ref=e409]: Research
+              - link "MiniMax M3" [ref=e410] [cursor=pointer]:
+                - /url: https://www.minimax.io/models/text/m3
+              - link "MiniMax M2-her" [ref=e411] [cursor=pointer]:
+                - /url: https://www.minimax.io/news/a-deep-dive-into-the-minimax-m2-her-2
+              - link "MiniMax M2.1" [ref=e412] [cursor=pointer]:
+                - /url: https://www.minimax.io/news/minimax-m21
+              - link "MiniMax Speech 2.8" [ref=e413] [cursor=pointer]:
+                - /url: https://www.minimax.io/news/minimax-speech-28
+              - link "MiniMax Hailuo 2.3" [ref=e414] [cursor=pointer]:
+                - /url: https://www.minimax.io/news/minimax-hailuo-23
+              - link "MiniMax Music 2.6" [ref=e415] [cursor=pointer]:
+                - /url: https://www.minimax.io/news/minimax-music-26
+            - generic [ref=e417]:
+              - paragraph [ref=e418]: Product
+              - link "Agent" [ref=e419] [cursor=pointer]:
+                - /url: https://agent.minimax.io
+              - link "Video Hailuo" [ref=e420] [cursor=pointer]:
+                - /url: https://hailuoai.com/video
+              - link "Audio" [ref=e421] [cursor=pointer]:
+                - /url: https://www.minimax.io/audio
+              - link "Talkie" [ref=e422] [cursor=pointer]:
+                - /url: https://www.talkie-ai.com/
+            - generic [ref=e424]:
+              - paragraph [ref=e425]: API
+              - link "Developer Docs" [ref=e426] [cursor=pointer]:
+                - /url: https://platform.minimax.io/docs/guides/models-intro
+              - link "Token Plan" [ref=e427] [cursor=pointer]:
+                - /url: https://platform.minimax.io/subscribe/token-plan
+              - link "Pricing" [ref=e428] [cursor=pointer]:
+                - /url: https://platform.minimax.io/docs/pricing/overview
+              - link "Console Login" [ref=e429] [cursor=pointer]:
+                - /url: https://platform.minimax.io/user-center/basic-information
+              - link "Developer Program" [ref=e430] [cursor=pointer]:
+                - /url: https://platform.minimax.io/contact-us
+            - generic [ref=e432]:
+              - paragraph [ref=e433]: Recommended
+              - link "Model Introduction" [ref=e434] [cursor=pointer]:
+                - /url: https://platform.minimax.io/docs/guides/models-intro
+              - link "Text Generation" [ref=e435] [cursor=pointer]:
+                - /url: https://platform.minimax.io/docs/guides/text-generation
+              - link "M3 for AI Coding Tools" [ref=e436] [cursor=pointer]:
+                - /url: https://platform.minimax.io/docs/guides/text-ai-coding-tools
+              - link "Text to Speech" [ref=e437] [cursor=pointer]:
+                - /url: https://platform.minimax.io/docs/guides/speech-t2a-websocket
+              - link "Video Generation" [ref=e438] [cursor=pointer]:
+                - /url: https://platform.minimax.io/docs/guides/video-generation
+  - alert [ref=e439]

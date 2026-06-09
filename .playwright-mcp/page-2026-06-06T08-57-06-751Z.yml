@@ -1,0 +1,81 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "Mystic Hub · 玄枢" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e8]: Mystic Hub
+        - generic [ref=e9]: · 玄枢
+      - navigation [ref=e10]:
+        - link "首页" [ref=e11] [cursor=pointer]:
+          - /url: /
+        - link "今日" [ref=e12] [cursor=pointer]:
+          - /url: /daily
+        - link "排盘" [ref=e13] [cursor=pointer]:
+          - /url: /cast
+        - link "历史" [ref=e14] [cursor=pointer]:
+          - /url: /history
+        - link "关于" [ref=e15] [cursor=pointer]:
+          - /url: /about
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - generic [ref=e18]:
+        - generic [ref=e19]:
+          - generic [ref=e21]: 你的灵魂
+          - generic [ref=e22]: 1990-5-15 8:30
+          - generic [ref=e23]: · male
+          - generic [ref=e24]: 「用单张塔罗给我今天的一条建议。」
+        - generic [ref=e25]:
+          - button "☆ 收藏" [ref=e26] [cursor=pointer]
+          - group "反馈" [ref=e27]:
+            - button "准" [ref=e28] [cursor=pointer]
+            - button "不准" [ref=e29] [cursor=pointer]
+            - button "待观察" [ref=e30] [cursor=pointer]
+          - button "生成分享卡" [ref=e31] [cursor=pointer]
+          - link "再排一次" [ref=e32] [cursor=pointer]:
+            - /url: /cast
+      - button "塔罗 · 西 · 按问题选择牌阵，而不是只抽几张" [ref=e34] [cursor=pointer]:
+        - generic [ref=e35]: 塔罗
+        - generic [ref=e36]: · 西
+        - generic [ref=e37]: · 按问题选择牌阵，而不是只抽几张
+      - generic [ref=e38]:
+        - generic [ref=e39]:
+          - generic [ref=e40]:
+            - generic [ref=e41]:
+              - generic [ref=e42]:
+                - heading "塔罗 · 单张指引" [level=3] [ref=e43]
+                - generic [ref=e44]:
+                  - generic [ref=e45]: 1 张
+                  - generic [ref=e46]: tarot_guidance
+              - generic [ref=e48]:
+                - generic [ref=e49]:
+                  - generic [ref=e50]: 当下指引
+                  - generic [ref=e51]: 星币国王
+                  - generic [ref=e52]: 正位
+                - generic [ref=e53]: 回应当前最需要看见的重点
+            - generic [ref=e54]:
+              - generic [ref=e55]: 牌位与牌面
+              - list [ref=e56]:
+                - listitem [ref=e57]:
+                  - generic [ref=e58]: 当下指引
+                  - generic [ref=e59]: 星币国王
+                  - generic [ref=e60]: 正位 · 正向能量
+                  - generic [ref=e61]: 现实、金钱、身体与资源 · 国王
+              - generic [ref=e62]: "起法: 78-card Waite-style deck, sample without replacement, upright/reversed orientation；seed: 1780734481946121800-用单张塔罗给我今天的一条建议。"
+          - generic [ref=e63]:
+            - generic [ref=e65]: 本次采用的起法
+            - generic [ref=e66]: "方法: tarot · 模式: tarot_spread · 对象: tarot_guidance"
+            - generic [ref=e67]: "抽牌规则: 78-card Waite-style deck, sample without replacement, upright/reversed orientation"
+            - generic [ref=e68]:
+              - generic [ref=e69]: 塔罗专项 · 牌位模板 + 牌阵推荐
+              - generic [ref=e71]: 当下指引 星币国王 正位
+        - generic [ref=e73]:
+          - generic [ref=e74]:
+            - generic [ref=e75]:
+              - heading "AI 解读" [level=3] [ref=e76]
+              - generic [ref=e77]: 解读生成中
+            - button "生成中" [disabled] [ref=e79]
+          - generic [ref=e81]: 以上为传统文化象征视角的参考,非科学预测,重大决定请结合现实并咨询专业人士。
+  - contentinfo [ref=e82]:
+    - generic [ref=e83]:
+      - paragraph [ref=e84]: 免责声明:本站所有解读为传统文化象征视角的参考,非科学预测,亦不构成医疗、法律、财务等专业意见。 重大决定请结合现实并咨询专业人士。
+      - paragraph [ref=e85]: 合规:全栈 MIT/BSD 许可,零 AGPL,可闭源商用。 你的 LLM API Key 仅存在浏览器本地,不会上传到本服务后端。

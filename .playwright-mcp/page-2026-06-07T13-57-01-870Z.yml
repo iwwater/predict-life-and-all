@@ -1,0 +1,165 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e4]:
+      - list [ref=e5]:
+        - listitem [ref=e6]:
+          - link "首页" [ref=e7] [cursor=pointer]:
+            - /url: //www.bilibili.com
+            - img [ref=e8]
+            - generic [ref=e10]:
+              - generic [ref=e11]: 首页
+              - img [ref=e12]
+        - listitem [ref=e15]:
+          - link "番剧" [ref=e16] [cursor=pointer]:
+            - /url: //www.bilibili.com/anime/
+        - listitem [ref=e17]:
+          - link "直播" [ref=e18] [cursor=pointer]:
+            - /url: //live.bilibili.com
+        - listitem [ref=e19]:
+          - link "游戏中心" [ref=e20] [cursor=pointer]:
+            - /url: //game.bilibili.com/platform
+        - listitem [ref=e21]:
+          - link "会员购" [ref=e22] [cursor=pointer]:
+            - /url: //show.bilibili.com/platform/home.html?msource=pc_web
+        - listitem [ref=e23]:
+          - link "漫画" [ref=e24] [cursor=pointer]:
+            - /url: //manga.bilibili.com?from=bill_top_mnav
+        - listitem [ref=e25]:
+          - link "赛事" [ref=e26] [cursor=pointer]:
+            - /url: //www.bilibili.com/match/home/
+        - listitem [ref=e27]:
+          - link "高考季 图片 高考季" [ref=e29] [cursor=pointer]:
+            - /url: https://www.bilibili.com/blackboard/era/bkW0rNd9znQuejB0.html
+            - generic [ref=e30]:
+              - paragraph [ref=e31]: 高考季
+              - paragraph [ref=e32]:
+                - img "图片" [ref=e33]
+              - paragraph [ref=e34]: 高考季
+        - listitem [ref=e35]:
+          - link "下载客户端" [ref=e36] [cursor=pointer]:
+            - /url: //app.bilibili.com
+            - img [ref=e37]
+            - generic [ref=e40]: 下载客户端
+      - generic [ref=e44]:
+        - textbox "瘦金体入门" [ref=e46]
+        - img [ref=e48] [cursor=pointer]
+      - list [ref=e50]:
+        - listitem [ref=e51] [cursor=pointer]:
+          - listitem [ref=e52]:
+            - generic [ref=e54]: 登录
+        - listitem [ref=e55] [cursor=pointer]:
+          - listitem [ref=e57]:
+            - link "大会员" [ref=e58]:
+              - /url: //account.bilibili.com/big
+              - img [ref=e59]
+              - generic [ref=e63]: 大会员
+        - listitem [ref=e64] [cursor=pointer]:
+          - generic [ref=e65]:
+            - img [ref=e66]
+            - generic [ref=e69]: 消息
+        - listitem [ref=e70] [cursor=pointer]:
+          - generic [ref=e71]:
+            - img [ref=e72]
+            - generic [ref=e78]: 动态
+        - listitem [ref=e79] [cursor=pointer]:
+          - generic [ref=e80]:
+            - img [ref=e81]
+            - generic [ref=e84]: 收藏
+        - listitem [ref=e85] [cursor=pointer]:
+          - generic [ref=e86]:
+            - img [ref=e87]
+            - generic [ref=e89]: 历史
+        - listitem [ref=e90] [cursor=pointer]:
+          - generic [ref=e91]:
+            - img [ref=e92]
+            - generic [ref=e96]: 创作中心
+        - listitem [ref=e97] [cursor=pointer]:
+          - listitem [ref=e98]:
+            - generic [ref=e100]:
+              - img [ref=e101]
+              - generic [ref=e104]: 投稿
+  - generic [ref=e105]:
+    - generic [ref=e107]:
+      - generic [ref=e108]:
+        - generic [ref=e111]:
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - img
+        - generic [ref=e112]:
+          - generic [ref=e113]:
+            - generic [ref=e114]: 剑桥图灵子
+            - link "" [ref=e115] [cursor=pointer]:
+              - /url: //www.bilibili.com/blackboard/help.html/?spm_id_from=333.1387.0.0#/?qid=59e2cffdaa69465486497bb35a5ac295
+              - generic [ref=e116]: 
+          - generic "安心舍App创始人，剑桥本硕、普林斯顿博士。前苹果、桥水基金人工智能科学家，师承全真龙门派马恺济，深耕东西方玄学，精通大六壬奇门紫微四柱八字" [ref=e119]
+      - generic [ref=e121]:
+        - generic [ref=e126] [cursor=pointer]:
+          - generic [ref=e127]: 
+          - text: 关注
+        - link "发消息" [ref=e128] [cursor=pointer]:
+          - /url: //message.bilibili.com/#/whisper/mid3546775822534944
+        - generic [ref=e132]: 
+    - generic [ref=e134]:
+      - generic [ref=e135]:
+        - generic [ref=e136]:
+          - link " 主页" [ref=e137] [cursor=pointer]:
+            - /url: /3546775822534944
+            - generic [ref=e138]: 
+            - generic [ref=e139]: 主页
+          - link " 动态" [ref=e140] [cursor=pointer]:
+            - /url: /3546775822534944/dynamic
+            - generic [ref=e141]: 
+            - generic [ref=e142]: 动态
+          - link " 投稿 81" [ref=e143] [cursor=pointer]:
+            - /url: /3546775822534944/upload
+            - generic [ref=e144]: 
+            - generic [ref=e145]: 投稿
+            - generic [ref=e146]: "81"
+          - link " 合集和系列 3" [ref=e147] [cursor=pointer]:
+            - /url: /3546775822534944/lists
+            - generic [ref=e148]: 
+            - generic [ref=e149]: 合集和系列
+            - generic [ref=e150]: "3"
+          - link " 收藏 1" [ref=e151] [cursor=pointer]:
+            - /url: /3546775822534944/favlist
+            - generic [ref=e152]: 
+            - generic [ref=e153]: 收藏
+            - generic [ref=e154]: "1"
+          - link " 追番追剧" [ref=e155] [cursor=pointer]:
+            - /url: /3546775822534944/bangumi
+            - generic [ref=e156]: 
+            - generic [ref=e157]: 追番追剧
+        - generic [ref=e158]:
+          - textbox "" [ref=e159]:
+            - /placeholder: 搜索视频、动态
+          - generic [ref=e160]:
+            - text: 
+            - generic [ref=e161] [cursor=pointer]: 
+      - generic [ref=e163]:
+        - link "关注数 151" [ref=e164] [cursor=pointer]:
+          - /url: /3546775822534944/relation/follow
+          - generic [ref=e165]: 关注数
+          - generic "151" [ref=e166]
+        - generic [ref=e167] [cursor=pointer]:
+          - generic [ref=e168]: 粉丝数
+          - generic "128,924" [ref=e169]: 12.9万
+    - main [ref=e170]:
+      - generic [ref=e171]:
+        - generic [ref=e173]:
+          - generic [ref=e174] [cursor=pointer]:
+            - generic [ref=e175]: 视频
+            - generic [ref=e176]: "66"
+          - generic [ref=e177] [cursor=pointer]:
+            - generic [ref=e178]: 图文
+            - generic [ref=e179]: "15"
+          - generic [ref=e180] [cursor=pointer]:
+            - generic [ref=e181]: 音频
+            - generic [ref=e182]: "0"
+        - generic [ref=e186]:
+          - img [ref=e188]
+          - generic [ref=e189]: 拼命加载中...
+      - generic [ref=e190]: 

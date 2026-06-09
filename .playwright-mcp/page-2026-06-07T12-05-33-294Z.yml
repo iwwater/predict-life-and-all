@@ -1,0 +1,261 @@
+- generic [ref=e3]:
+  - generic:
+    - generic:
+      - img
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "Mystic Hub · 玄枢" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e8]: Mystic Hub
+        - generic [ref=e9]: · 玄枢
+      - navigation [ref=e10]:
+        - link "首页" [ref=e11] [cursor=pointer]:
+          - /url: /
+        - link "今日" [ref=e12] [cursor=pointer]:
+          - /url: /daily
+        - link "排盘" [ref=e13] [cursor=pointer]:
+          - /url: /cast
+        - link "风水" [ref=e14] [cursor=pointer]:
+          - /url: /fengshui
+        - link "历史" [ref=e15] [cursor=pointer]:
+          - /url: /history
+        - link "关于" [ref=e16] [cursor=pointer]:
+          - /url: /about
+  - main [ref=e17]:
+    - generic [ref=e25]:
+      - generic [ref=e26]:
+        - generic [ref=e27]:
+          - generic [ref=e29]: 你的灵魂
+          - generic [ref=e30]: 1990-5-15 8:30
+          - generic [ref=e31]: · male
+        - generic [ref=e32]:
+          - button "☆ 收藏" [ref=e33] [cursor=pointer]
+          - group "反馈" [ref=e34]:
+            - button "准" [ref=e35] [cursor=pointer]
+            - button "不准" [ref=e36] [cursor=pointer]
+            - button "待观察" [ref=e37] [cursor=pointer]
+          - button "生成分享卡" [ref=e38] [cursor=pointer]
+          - link "再排一次" [ref=e39] [cursor=pointer]:
+            - /url: /cast
+      - generic [ref=e40]:
+        - button "八字 · 东 · 四柱命盘，看命局、大运、流年" [ref=e41] [cursor=pointer]:
+          - generic [ref=e42]: 八字
+          - generic [ref=e43]: · 东
+          - generic [ref=e44]: · 四柱命盘，看命局、大运、流年
+        - button "西方占星 · 西 · 西方本命盘，太阳月亮上升与行星" [ref=e45] [cursor=pointer]:
+          - generic [ref=e46]: 西方占星
+          - generic [ref=e47]: · 西
+          - generic [ref=e48]: · 西方本命盘，太阳月亮上升与行星
+      - generic [ref=e49]:
+        - generic [ref=e50]:
+          - generic [ref=e51]:
+            - generic [ref=e52]:
+              - generic [ref=e53]:
+                - heading "四柱· 四根柱子·八字" [level=3] [ref=e54]:
+                  - generic [ref=e55]:
+                    - text: 四柱
+                    - generic [ref=e56]: · 四根柱子
+                  - text: ·八字
+                - generic [ref=e57]:
+                  - generic [ref=e58]: 你的主心骨
+                  - text: 庚
+              - generic [ref=e59]:
+                - generic [ref=e60]:
+                  - generic [ref=e62]:
+                    - text: 年柱
+                    - generic [ref=e63]: · 出生那年
+                  - generic [ref=e64]: 庚
+                  - generic [ref=e65]: 午
+                  - generic [ref=e66]: 藏:丁/己
+                  - generic [ref=e67]: 比肩
+                  - generic [ref=e68]: 沐浴
+                - generic [ref=e69]:
+                  - generic [ref=e71]:
+                    - text: 月柱
+                    - generic [ref=e72]: · 出生那月
+                  - generic [ref=e73]: 辛
+                  - generic [ref=e74]: 巳
+                  - generic [ref=e75]: 藏:丙/庚/戊
+                  - generic [ref=e76]: 劫财
+                  - generic [ref=e77]: 长生
+                - generic [ref=e78]:
+                  - generic [ref=e80]:
+                    - text: 日柱
+                    - generic [ref=e81]: · 你自己
+                  - generic [ref=e82]: 庚
+                  - generic [ref=e83]: 辰
+                  - generic [ref=e84]: 藏:戊/乙/癸
+                  - generic [ref=e85]: 日主
+                  - generic [ref=e86]: 养
+                - generic [ref=e87]:
+                  - generic [ref=e89]:
+                    - text: 时柱
+                    - generic [ref=e90]: · 出生那时
+                  - generic [ref=e91]: 庚
+                  - generic [ref=e92]: 辰
+                  - generic [ref=e93]: 藏:戊/乙/癸
+                  - generic [ref=e94]: 比肩
+                  - generic [ref=e95]: 养
+            - generic [ref=e96]:
+              - generic [ref=e98]:
+                - generic [ref=e99]: 庚 的五行
+                - img [ref=e100]:
+                  - generic [ref=e110] [cursor=pointer]:
+                    - generic [ref=e114]: 木
+                    - generic [ref=e115]: "0.4"
+                  - generic [ref=e116] [cursor=pointer]:
+                    - generic [ref=e120]: 火
+                    - generic [ref=e121]: "0"
+                  - generic [ref=e122] [cursor=pointer]:
+                    - generic [ref=e126]: 土
+                    - generic [ref=e127]: "0"
+                  - generic [ref=e128] [cursor=pointer]:
+                    - generic [ref=e132]: 金
+                    - generic [ref=e133]: "4.2"
+                  - generic [ref=e134] [cursor=pointer]:
+                    - generic [ref=e138]: 水
+                    - generic [ref=e139]: "0"
+              - generic [ref=e140]:
+                - heading "大运· 十年大运·十年换一次" [level=3] [ref=e141]:
+                  - generic [ref=e142]:
+                    - text: 大运
+                    - generic [ref=e143]: · 十年大运
+                  - text: ·十年换一次
+                - list [ref=e144]:
+                  - listitem [ref=e145]:
+                    - generic [ref=e146]: 大运·壬午
+                    - generic [ref=e147]: 1997-2006
+                  - listitem [ref=e148]:
+                    - generic [ref=e149]: 大运·癸未
+                    - generic [ref=e150]: 2007-2016
+                  - listitem [ref=e151]:
+                    - generic [ref=e152]: 大运·甲申
+                    - generic [ref=e153]: 2017-2026
+                  - listitem [ref=e154]:
+                    - generic [ref=e155]: 大运·乙酉
+                    - generic [ref=e156]: 2027-2036
+                  - listitem [ref=e157]:
+                    - generic [ref=e158]: 大运·丙戌
+                    - generic [ref=e159]: 2037-2046
+                  - listitem [ref=e160]:
+                    - generic [ref=e161]: 大运·丁亥
+                    - generic [ref=e162]: 2047-2056
+                  - listitem [ref=e163]:
+                    - generic [ref=e164]: 大运·戊子
+                    - generic [ref=e165]: 2057-2066
+                  - listitem [ref=e166]:
+                    - generic [ref=e167]: 大运·己丑
+                    - generic [ref=e168]: 2067-2076
+            - generic [ref=e169]:
+              - heading "日主身强评分" [level=3] [ref=e170]
+              - generic [ref=e174]: 49/100
+              - generic [ref=e175]:
+                - generic [ref=e176]: 比劫3
+                - generic [ref=e177]: 印星2
+                - generic [ref=e178]: 食伤0
+                - generic [ref=e179]: 官杀2
+                - generic [ref=e180]: 财0
+                - generic [ref=e181]: 月令分5
+            - generic [ref=e182]:
+              - heading "流年 丙午 与原局互动" [level=3] [ref=e183]
+              - generic [ref=e184]: 流年丙与month柱辛天干合
+            - generic [ref=e185]:
+              - heading "十二长生· 强弱阶段·庚阳顺" [level=3] [ref=e186]:
+                - generic [ref=e187]:
+                  - text: 十二长生
+                  - generic [ref=e188]: · 强弱阶段
+                - text: ·庚阳顺
+              - generic [ref=e189]:
+                - generic [ref=e190]:
+                  - generic [ref=e191]: year
+                  - generic [ref=e192]: 午→沐浴
+                - generic [ref=e193]:
+                  - generic [ref=e194]: month
+                  - generic [ref=e195]: 巳→长生
+                - generic [ref=e196]:
+                  - generic [ref=e197]: day
+                  - generic [ref=e198]: 辰→养
+                - generic [ref=e199]:
+                  - generic [ref=e200]: hour
+                  - generic [ref=e201]: 辰→养
+            - generic [ref=e202]:
+              - heading "当前运势" [level=3] [ref=e203]
+              - generic [ref=e204]: 大运 甲申(2017-2026) · 2026年丙午
+              - generic [ref=e205]: "阶段评分: 70"
+            - generic [ref=e206]:
+              - generic [ref=e207]:
+                - generic [ref=e208]: 排盘算法
+                - generic [ref=e209]: lunar-python+strength-v1
+              - generic [ref=e210]:
+                - generic [ref=e211]: 学派
+                - generic [ref=e212]: 东方·命
+          - generic [ref=e213]:
+            - generic [ref=e214]:
+              - generic [ref=e215]: 本次采用的起法
+              - generic [ref=e216]: vv1
+            - generic [ref=e217]: "方法: bazi · 模式: natal · 对象: self_life"
+            - generic [ref=e218]: "输入: birth (year/month/day/hour/minute, optional gender/calendar)"
+            - generic [ref=e219]: "历法来源: lunar-python"
+            - group [ref=e220]:
+              - generic "不可判断范围 / 限制 (3)" [ref=e221] [cursor=pointer]
+            - generic [ref=e222]:
+              - generic [ref=e223]: 八字专项 · 身强 / 当前大运 / 流年 / 12 长生
+              - generic [ref=e224]: "日主身强评分: 49 / 100"
+              - generic [ref=e225]: 同党 = 比劫 3 + 印星 2; 异党 = 食伤 0 / 官杀 2 / 财 0; 月令分 5
+              - generic [ref=e226]: "当前大运: 甲申 (2017-2026, 虚岁 37) · 阶段分 70"
+              - generic [ref=e227]: "流年: 2026年丙午"
+              - generic [ref=e228]:
+                - generic [ref=e229]: "流年 丙午 与原局互动:"
+                - list [ref=e230]:
+                  - listitem [ref=e231]:
+                    - text: 流年丙与month柱辛天干合
+                    - generic [ref=e232]: (天干合)
+              - generic [ref=e233]:
+                - generic [ref=e234]: "12 长生 (庚 阳顺):"
+                - generic [ref=e235]:
+                  - generic [ref=e236]:
+                    - generic [ref=e237]: year · 庚午
+                    - generic [ref=e238]: 午 → 沐浴
+                  - generic [ref=e239]:
+                    - generic [ref=e240]: month · 辛巳
+                    - generic [ref=e241]: 巳 → 长生
+                  - generic [ref=e242]:
+                    - generic [ref=e243]: day · 庚辰
+                    - generic [ref=e244]: 辰 → 养
+                  - generic [ref=e245]:
+                    - generic [ref=e246]: hour · 庚辰
+                    - generic [ref=e247]: 辰 → 养
+          - generic [ref=e248]:
+            - generic [ref=e249]:
+              - generic [ref=e250]:
+                - heading "运势走势·K 线图" [level=3] [ref=e251]
+                - generic [ref=e252]: 从大运地支五行推导出来的"运势强度"折线,看每十年起伏
+              - generic [ref=e253]:
+                - generic [ref=e254]: ●
+                - text: 升
+                - generic [ref=e255]: /
+                - generic [ref=e256]: ●
+                - text: 降
+            - generic [ref=e258]:
+              - generic [ref=e259]: 横轴 = 出生后每一年(流年)
+              - generic [ref=e260]: 纵轴 = 运势强度(0-100,数字越高那年越顺)
+              - generic [ref=e261]: 每根 K 线代表一个十年的"主调"
+        - generic [ref=e263]:
+          - generic [ref=e264]:
+            - generic [ref=e265]:
+              - heading "AI 解读" [level=3] [ref=e266]
+              - generic [ref=e267]: 解读生成中
+            - button "生成中" [disabled] [ref=e269]
+          - generic [ref=e272]:
+            - heading "整体印象" [level=2] [ref=e273]
+            - paragraph [ref=e274]: 此盘给人的整体印象，犹如一把未经打磨的玄铁重剑，锋芒内敛，分量十足。从八字来看，四柱纯阳，比肩林立，日主庚金坐辰土得生，身强之象，刚毅果决之气跃然纸上。然地支巳午半会火局，熔金之焰亦不弱，构成了外刚内烈、锻造成器的格局。西方占星盘则呈现出一幅更为复杂的景象：上升点落入巨蟹座，本应是柔和护家的外壳，但命主星月亮却落入双鱼座尾度，且与太阳、金星、火星、木星、土星等众多星体形成极为紧密的合相，如同一位身披柔软铠甲的战士，内心承载着整个宇宙的重量与绚烂。这种强烈的内外反差，是解读此盘的关键。八字重“魄”，星盘重“魂”，二者共同指向一个具有强大意志力与丰富内在世界的灵魂。
+            - heading "性格特质" [level=2] [ref=e275]
+            - paragraph [ref=e276]: 从传统八字论，庚金生于巳月，月干透辛金劫财，时辰又见庚辰比肩帮身，性格中带有强烈的自我意识和独立精神，不喜受人约束，行事直来直往，颇有侠义之风。《渊海子平》有云：“庚金带煞，刚健为最。”此命局正是此种刚健的直接体现。然土厚金埋，辰土虽为湿土能生金，但双辰并见，亦有思虑过甚、行动迟缓的倾向。七杀藏于巳火之中，官星仅在地支午火，意味着内心的压力与自我约束，多源自于对目标的执着。
+            - paragraph [ref=e277]: 西方占星层面，太阳、木星、土星等群星汇聚于白羊座，强化了直言不讳、敢为人先的开拓者特质。然而，这全部动力却又与双鱼座的月亮、金星、火星交融，使得执行方式并非全然白羊式的鲁莽。上升巨蟹更是赋予其对外界情绪与环境的高度敏感性，常常能察觉到旁人忽略的细节。这就形成了一个有趣的组合：外在表现得像个和事佬（上升巨蟹），内心却住着一个不容置疑的君王（日白羊），而灵魂深处则是一位充满慈悲与共情的诗人（月双鱼）。这种多层次的性格结构，容易导致内在的拉扯——在果断行动与情感牵扯之间反复思量。
+            - heading "事业与方向" [level=2] [ref=e278]
+            - paragraph [ref=e279]: 八字官杀为火，日主为金，事业格局属于“火炼真金”。这暗示非常适合在高压、具有挑战性的环境中工作，如同宝剑需经淬炼方能锋芒毕露。命局比劫重，不倾向与人合伙，更适合独自打磨专业技能，或以强势姿态领导团队。丙火七杀藏于月令，常有主导项目、开创新局的冲动和机会。当前，从八字动态看，已步入官杀大运
+          - generic [ref=e271]: 以上为传统文化象征视角的参考,非科学预测,重大决定请结合现实并咨询专业人士。
+  - contentinfo [ref=e21]:
+    - generic [ref=e22]:
+      - paragraph [ref=e23]: 免责声明:本站所有解读为传统文化象征视角的参考,非科学预测,亦不构成医疗、法律、财务等专业意见。 重大决定请结合现实并咨询专业人士。
+      - paragraph [ref=e24]: 合规:全栈 MIT/BSD 许可,零 AGPL,可闭源商用。 你的 LLM API Key 仅存在浏览器本地,不会上传到本服务后端。

@@ -1,0 +1,452 @@
+- generic [ref=e2]:
+  - generic [ref=e4]:
+    - list [ref=e5]:
+      - listitem [ref=e6]:
+        - link "首页" [ref=e7] [cursor=pointer]:
+          - /url: //www.bilibili.com
+          - img [ref=e8]
+          - generic [ref=e10]:
+            - text: 首页
+            - img [ref=e11]
+      - listitem [ref=e14]:
+        - link "番剧" [ref=e15] [cursor=pointer]:
+          - /url: //www.bilibili.com/anime/
+      - listitem [ref=e16]:
+        - link "直播" [ref=e17] [cursor=pointer]:
+          - /url: //live.bilibili.com/
+      - listitem [ref=e18]:
+        - link "游戏中心" [ref=e19] [cursor=pointer]:
+          - /url: //game.bilibili.com/
+      - listitem [ref=e20]:
+        - link "会员购" [ref=e21] [cursor=pointer]:
+          - /url: //show.bilibili.com/platform/home.html?msource=pc_web
+      - listitem [ref=e22]:
+        - link "漫画" [ref=e23] [cursor=pointer]:
+          - /url: //manga.bilibili.com?from=bill_top_mnav
+      - listitem [ref=e24]:
+        - link "赛事" [ref=e25] [cursor=pointer]:
+          - /url: //www.bilibili.com/v/game/match/
+    - list [ref=e26]:
+      - listitem [ref=e27] [cursor=pointer]:
+        - generic [ref=e28]:
+          - img [ref=e29]
+          - generic [ref=e32]: 投稿
+  - generic [ref=e33]:
+    - generic [ref=e34]:
+      - generic [ref=e35]:
+        - heading "我们训练了所有的玄学模型！！！" [level=1] [ref=e38]
+        - generic [ref=e40]:
+          - generic [ref=e41]:
+            - img [ref=e42]
+            - generic [ref=e43]: 13.7万
+          - generic [ref=e44]:
+            - img [ref=e45]
+            - generic [ref=e46]: "14"
+          - generic [ref=e48]: 2026-04-12 13:49:28
+          - generic [ref=e49]:
+            - img [ref=e50]
+            - generic [ref=e51]: 未经作者授权，禁止转载
+      - generic "哔哩哔哩播放器" [ref=e61]
+      - generic [ref=e71]:
+        - generic [ref=e73]:
+          - generic "点赞（Q）" [ref=e75] [cursor=pointer]:
+            - img [ref=e76]
+            - generic [ref=e78]: "8973"
+          - generic "投币（W）" [ref=e80] [cursor=pointer]:
+            - img [ref=e81]
+            - generic [ref=e83]: "489"
+          - generic "收藏（E）" [ref=e85] [cursor=pointer]:
+            - img [ref=e86]
+            - generic [ref=e88]: "8465"
+          - generic [ref=e91] [cursor=pointer]:
+            - img [ref=e92]
+            - generic [ref=e94]: "923"
+        - img [ref=e97] [cursor=pointer]
+      - generic [ref=e100]:
+        - generic "发现《探觸寂靜》" [ref=e103] [cursor=pointer]:
+          - img [ref=e104]
+          - generic [ref=e106]: 发现《探觸寂靜》
+          - img [ref=e107]
+        - link "科技猎手" [ref=e111] [cursor=pointer]:
+          - /url: https://m.bilibili.com/topic-detail?topic_id=3447&topic_name=%E7%A7%91%E6%8A%80%E7%8C%8E%E6%89%8B&spm_id_from=0.0.top.function_card.click
+          - img [ref=e112]
+          - generic [ref=e115]: 科技猎手
+          - img [ref=e116]
+        - link "人工智能" [ref=e120] [cursor=pointer]:
+          - /url: //search.bilibili.com/all?keyword=%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD&from_source=video_tag
+        - link "八字" [ref=e123] [cursor=pointer]:
+          - /url: //search.bilibili.com/all?keyword=%E5%85%AB%E5%AD%97&from_source=video_tag
+        - link "紫微" [ref=e126] [cursor=pointer]:
+          - /url: //search.bilibili.com/all?keyword=%E7%B4%AB%E5%BE%AE&from_source=video_tag
+        - link "塔罗" [ref=e129] [cursor=pointer]:
+          - /url: //search.bilibili.com/all?keyword=%E5%A1%94%E7%BD%97&from_source=video_tag
+        - link "紫薇" [ref=e132] [cursor=pointer]:
+          - /url: //search.bilibili.com/all?keyword=%E7%B4%AB%E8%96%87&from_source=video_tag
+        - link "玄学" [ref=e135] [cursor=pointer]:
+          - /url: //search.bilibili.com/all?keyword=%E7%8E%84%E5%AD%A6&from_source=video_tag
+        - link "星盘" [ref=e138] [cursor=pointer]:
+          - /url: //search.bilibili.com/all?keyword=%E6%98%9F%E7%9B%98&from_source=video_tag
+      - generic [ref=e139]:
+        - link:
+          - /url: javascript:void(0);
+    - generic:
+      - generic:
+        - generic [ref=e142]:
+          - link [ref=e145] [cursor=pointer]:
+            - /url: //space.bilibili.com/3546775822534944/?spm_id_from=333.788.upinfo.head.click
+          - generic [ref=e148]:
+            - generic [ref=e149]:
+              - link "剑桥图灵子" [ref=e150] [cursor=pointer]:
+                - /url: //space.bilibili.com/3546775822534944/?spm_id_from=333.788.upinfo.detail.click
+              - link " 发消息" [ref=e151] [cursor=pointer]:
+                - /url: //message.bilibili.com/?spm_id_from=333.788.upinfo.detail.click#whisper/mid3546775822534944
+                - generic [ref=e152]: 
+                - text: 发消息
+            - generic "安心舍App创始人，剑桥本硕、普林斯顿博士。前苹果、桥水基金人工智能科学家，师承全真龙门派马恺济，深耕东西方玄学，精通大六壬奇门紫微四柱八字" [ref=e153]
+        - generic [ref=e161]:
+          - link "问鼎赛季年度剧本「赤壁惊涛」玩法PV发布！ 三国谋定天下 15.2万 44" [ref=e163] [cursor=pointer]:
+            - /url: javascript:void(0);
+            - generic [ref=e164]:
+              - img [ref=e167]
+              - generic [ref=e170]:
+                - generic "问鼎赛季年度剧本「赤壁惊涛」玩法PV发布！" [ref=e171]
+                - generic [ref=e173]:
+                  - img [ref=e174]
+                  - generic [ref=e175]: 三国谋定天下
+                - generic [ref=e176]:
+                  - img [ref=e177]
+                  - text: 15.2万
+                  - img [ref=e178]
+                  - text: "44"
+          - img [ref=e180]
+        - generic [ref=e181]:
+          - generic [ref=e182]:
+            - generic [ref=e183]:
+              - generic [ref=e184]:
+                - generic [ref=e185]: 接下来播放
+                - generic [ref=e187] [cursor=pointer]: 自动连播
+              - generic [ref=e191]:
+                - link [ref=e195] [cursor=pointer]:
+                  - /url: /video/BV1Y95D6uEth/?spm_id_from=333.788.recommend_more_video.-1
+                - generic [ref=e196]:
+                  - link "我做了一个结合八字+紫微+老黄历+六爻的命理 AI Agent 「AI赛博算命」" [ref=e197] [cursor=pointer]:
+                    - /url: /video/BV1Y95D6uEth/?spm_id_from=333.788.recommend_more_video.-1
+                    - paragraph [ref=e198]: 我做了一个结合八字+紫微+老黄历+六爻的命理 AI Agent 「AI赛博算命」
+                  - link "道系青年Wilson_" [ref=e200] [cursor=pointer]:
+                    - /url: //space.bilibili.com/3706931598329938/
+                    - img [ref=e201]
+                    - generic [ref=e202]: 道系青年Wilson_
+                  - generic [ref=e203]:
+                    - img [ref=e204]
+                    - text: 4.2万
+                    - img [ref=e205]
+                    - text: "37"
+            - generic [ref=e207]:
+              - generic [ref=e209]:
+                - link [ref=e213] [cursor=pointer]:
+                  - /url: /video/BV1osCxBVEzL/?spm_id_from=333.788.recommend_more_video.0
+                - generic [ref=e214]:
+                  - link "张雪峰老师尤其小心2026丙午，未来堪忧啊！" [ref=e215] [cursor=pointer]:
+                    - /url: /video/BV1osCxBVEzL/?spm_id_from=333.788.recommend_more_video.0
+                    - paragraph [ref=e216]: 张雪峰老师尤其小心2026丙午，未来堪忧啊！
+                  - link "刘啸渊" [ref=e218] [cursor=pointer]:
+                    - /url: //space.bilibili.com/472886661/
+                    - img [ref=e219]
+                    - generic [ref=e220]: 刘啸渊
+                  - generic [ref=e221]:
+                    - img [ref=e222]
+                    - text: 281.6万
+                    - img [ref=e223]
+                    - text: "724"
+              - generic [ref=e225]:
+                - link [ref=e229] [cursor=pointer]:
+                  - /url: /video/BV1BXQABNE4y/?spm_id_from=333.788.recommend_more_video.1
+                - generic [ref=e230]:
+                  - link "我蒸馏了17个大佬给我打工（开源免费）" [ref=e231] [cursor=pointer]:
+                    - /url: /video/BV1BXQABNE4y/?spm_id_from=333.788.recommend_more_video.1
+                    - paragraph [ref=e232]: 我蒸馏了17个大佬给我打工（开源免费）
+                  - link "花叔v" [ref=e234] [cursor=pointer]:
+                    - /url: //space.bilibili.com/14097567/
+                    - img [ref=e235]
+                    - generic [ref=e236]: 花叔v
+                  - generic [ref=e237]:
+                    - img [ref=e238]
+                    - text: 34.8万
+                    - img [ref=e239]
+                    - text: "734"
+              - generic [ref=e241]:
+                - link [ref=e245] [cursor=pointer]:
+                  - /url: /video/BV1sPkBBpEpV/?spm_id_from=333.788.recommend_more_video.2
+                - generic [ref=e246]:
+                  - link "张雪峰老师尤其小心2026丙午，未来堪忧啊!" [ref=e247] [cursor=pointer]:
+                    - /url: /video/BV1sPkBBpEpV/?spm_id_from=333.788.recommend_more_video.2
+                    - paragraph [ref=e248]: 张雪峰老师尤其小心2026丙午，未来堪忧啊!
+                  - link "昱良国学文化" [ref=e250] [cursor=pointer]:
+                    - /url: //space.bilibili.com/1633225932/
+                    - img [ref=e251]
+                    - generic [ref=e252]: 昱良国学文化
+                  - generic [ref=e253]:
+                    - img [ref=e254]
+                    - text: 39.0万
+                    - img [ref=e255]
+                    - text: "258"
+              - generic [ref=e257]:
+                - link [ref=e261] [cursor=pointer]:
+                  - /url: /video/BV1BSPNeUEiq/?spm_id_from=333.788.recommend_more_video.3
+                - generic [ref=e262]:
+                  - link "“中国玄学”迎来伟大复兴！Deepseek暴打江湖术士，完全掌握命卜核心。" [ref=e263] [cursor=pointer]:
+                    - /url: /video/BV1BSPNeUEiq/?spm_id_from=333.788.recommend_more_video.3
+                    - paragraph [ref=e264]: “中国玄学”迎来伟大复兴！Deepseek暴打江湖术士，完全掌握命卜核心。
+                  - link "荀爽" [ref=e266] [cursor=pointer]:
+                    - /url: //space.bilibili.com/16869601/
+                    - img [ref=e267]
+                    - generic [ref=e268]: 荀爽
+                  - generic [ref=e269]:
+                    - img [ref=e270]
+                    - text: 41.2万
+                    - img [ref=e271]
+                    - text: "911"
+              - generic [ref=e273]:
+                - link [ref=e277] [cursor=pointer]:
+                  - /url: /video/BV1JmD6BgETQ/?spm_id_from=333.788.recommend_more_video.4
+                - generic [ref=e278]:
+                  - link "10 分钟，从0到「会写Skill」科普" [ref=e279] [cursor=pointer]:
+                    - /url: /video/BV1JmD6BgETQ/?spm_id_from=333.788.recommend_more_video.4
+                    - paragraph [ref=e280]: 10 分钟，从0到「会写Skill」科普
+                  - link "liliMozi" [ref=e282] [cursor=pointer]:
+                    - /url: //space.bilibili.com/3546922421848327/
+                    - img [ref=e283]
+                    - generic [ref=e284]: liliMozi
+                  - generic [ref=e285]:
+                    - img [ref=e286]
+                    - text: 15.2万
+                    - img [ref=e287]
+                    - text: "143"
+              - generic [ref=e289]:
+                - link [ref=e293] [cursor=pointer]:
+                  - /url: /video/BV1bhaVzHEfY/?spm_id_from=333.788.recommend_more_video.5
+                - generic [ref=e294]:
+                  - link "我们训练了一个命理AI" [ref=e295] [cursor=pointer]:
+                    - /url: /video/BV1bhaVzHEfY/?spm_id_from=333.788.recommend_more_video.5
+                    - paragraph [ref=e296]: 我们训练了一个命理AI
+                  - link "天乙神算" [ref=e298] [cursor=pointer]:
+                    - /url: //space.bilibili.com/3546382266796247/
+                    - img [ref=e299]
+                    - generic [ref=e300]: 天乙神算
+                  - generic [ref=e301]:
+                    - img [ref=e302]
+                    - text: 38.8万
+                    - img [ref=e303]
+                    - text: "61"
+              - generic [ref=e305]:
+                - link [ref=e309] [cursor=pointer]:
+                  - /url: /video/BV1BcXDBuE9b/?spm_id_from=333.788.recommend_more_video.6
+                - generic [ref=e310]:
+                  - link "我爬了B站120w个八字盘，做了个软件能瞬间找到自己同八字" [ref=e311] [cursor=pointer]:
+                    - /url: /video/BV1BcXDBuE9b/?spm_id_from=333.788.recommend_more_video.6
+                    - paragraph [ref=e312]: 我爬了B站120w个八字盘，做了个软件能瞬间找到自己同八字
+                  - link "爱喝枸杞普洱茶" [ref=e314] [cursor=pointer]:
+                    - /url: //space.bilibili.com/3546855161989416/
+                    - img [ref=e315]
+                    - generic [ref=e316]: 爱喝枸杞普洱茶
+                  - generic [ref=e317]:
+                    - img [ref=e318]
+                    - text: 1.8万
+                    - img [ref=e319]
+                    - text: "9"
+              - generic [ref=e321]:
+                - link [ref=e325] [cursor=pointer]:
+                  - /url: /video/BV1vW4UzLEwz/?spm_id_from=333.788.recommend_more_video.7
+                - generic [ref=e326]:
+                  - link "剑桥博士：八字玄学是大数据？！" [ref=e327] [cursor=pointer]:
+                    - /url: /video/BV1vW4UzLEwz/?spm_id_from=333.788.recommend_more_video.7
+                    - paragraph [ref=e328]: 剑桥博士：八字玄学是大数据？！
+                  - link "秦欢__" [ref=e330] [cursor=pointer]:
+                    - /url: //space.bilibili.com/3546661737466580/
+                    - img [ref=e331]
+                    - generic [ref=e332]: 秦欢__
+                  - generic [ref=e333]:
+                    - img [ref=e334]
+                    - text: 1.4万
+                    - img [ref=e335]
+                    - text: "24"
+              - generic [ref=e337]:
+                - link [ref=e341] [cursor=pointer]:
+                  - /url: /video/BV1CaQYBcEZR/?spm_id_from=333.788.recommend_more_video.8
+                - generic [ref=e342]:
+                  - link "张雪峰、大S面相总结：人到濒死的面相特征" [ref=e343] [cursor=pointer]:
+                    - /url: /video/BV1CaQYBcEZR/?spm_id_from=333.788.recommend_more_video.8
+                    - paragraph [ref=e344]: 张雪峰、大S面相总结：人到濒死的面相特征
+                  - link "面相手相女子识人" [ref=e346] [cursor=pointer]:
+                    - /url: //space.bilibili.com/109366045/
+                    - img [ref=e347]
+                    - generic [ref=e348]: 面相手相女子识人
+                  - generic [ref=e349]:
+                    - img [ref=e350]
+                    - text: 46.7万
+                    - img [ref=e351]
+                    - text: "441"
+              - generic [ref=e353]:
+                - link [ref=e357] [cursor=pointer]:
+                  - /url: /video/BV1mFPXetESx/?spm_id_from=333.788.recommend_more_video.9
+                - generic [ref=e358]:
+                  - link "教你用DeepSeek算命，准的离谱！" [ref=e359] [cursor=pointer]:
+                    - /url: /video/BV1mFPXetESx/?spm_id_from=333.788.recommend_more_video.9
+                    - paragraph [ref=e360]: 教你用DeepSeek算命，准的离谱！
+                  - link "马林思维" [ref=e362] [cursor=pointer]:
+                    - /url: //space.bilibili.com/111082383/
+                    - img [ref=e363]
+                    - generic [ref=e364]: 马林思维
+                  - generic [ref=e365]:
+                    - img [ref=e366]
+                    - text: 22.9万
+                    - img [ref=e367]
+                    - text: "361"
+              - generic [ref=e369]:
+                - link [ref=e373] [cursor=pointer]:
+                  - /url: /video/BV1PC4y1E769/?spm_id_from=333.788.recommend_more_video.10
+                - generic [ref=e374]:
+                  - link "【奇门遁甲】从0基础到进阶和实战课程（全集）" [ref=e375] [cursor=pointer]:
+                    - /url: /video/BV1PC4y1E769/?spm_id_from=333.788.recommend_more_video.10
+                    - paragraph [ref=e376]: 【奇门遁甲】从0基础到进阶和实战课程（全集）
+                  - link "庚壬贪狼" [ref=e378] [cursor=pointer]:
+                    - /url: //space.bilibili.com/391654721/
+                    - img [ref=e379]
+                    - generic [ref=e380]: 庚壬贪狼
+                  - generic [ref=e381]:
+                    - img [ref=e382]
+                    - text: 24.2万
+                    - img [ref=e383]
+                    - text: "340"
+              - generic [ref=e385]:
+                - link [ref=e389] [cursor=pointer]:
+                  - /url: /video/BV1jjq5BbE7P/?spm_id_from=333.788.recommend_more_video.11
+                - generic [ref=e390]:
+                  - link "我做了个人生报告，一眼看出你什么时候走大运!「AI赛博命理」" [ref=e391] [cursor=pointer]:
+                    - /url: /video/BV1jjq5BbE7P/?spm_id_from=333.788.recommend_more_video.11
+                    - paragraph [ref=e392]: 我做了个人生报告，一眼看出你什么时候走大运!「AI赛博命理」
+                  - link "剑桥图灵子" [ref=e394] [cursor=pointer]:
+                    - /url: //space.bilibili.com/3546775822534944/
+                    - img [ref=e395]
+                    - generic [ref=e396]: 剑桥图灵子
+                  - generic [ref=e397]:
+                    - img [ref=e398]
+                    - text: 48.0万
+                    - img [ref=e399]
+                    - text: "201"
+              - generic [ref=e401]:
+                - link [ref=e405] [cursor=pointer]:
+                  - /url: /video/BV1na4y1Q7ze/?spm_id_from=333.788.recommend_more_video.12
+                - generic [ref=e406]:
+                  - link "梅花入门教程 | 建议收藏，全程无废话，手把手教你学梅花易数" [ref=e407] [cursor=pointer]:
+                    - /url: /video/BV1na4y1Q7ze/?spm_id_from=333.788.recommend_more_video.12
+                    - paragraph [ref=e408]: 梅花入门教程 | 建议收藏，全程无废话，手把手教你学梅花易数
+                  - link "云野卦馆" [ref=e410] [cursor=pointer]:
+                    - /url: //space.bilibili.com/1520606423/
+                    - img [ref=e411]
+                    - generic [ref=e412]: 云野卦馆
+                  - generic [ref=e413]:
+                    - img [ref=e414]
+                    - text: 114.2万
+                    - img [ref=e415]
+                    - text: "6003"
+              - generic [ref=e417]:
+                - link [ref=e421] [cursor=pointer]:
+                  - /url: /video/BV1xKgSzZEjF/?spm_id_from=333.788.recommend_more_video.13
+                - generic [ref=e422]:
+                  - link "手把手教你DeepSeek算命提问方法应用指南！" [ref=e423] [cursor=pointer]:
+                    - /url: /video/BV1xKgSzZEjF/?spm_id_from=333.788.recommend_more_video.13
+                    - paragraph [ref=e424]: 手把手教你DeepSeek算命提问方法应用指南！
+                  - link "灵机子哦" [ref=e426] [cursor=pointer]:
+                    - /url: //space.bilibili.com/1792202874/
+                    - img [ref=e427]
+                    - generic [ref=e428]: 灵机子哦
+                  - generic [ref=e429]:
+                    - img [ref=e430]
+                    - text: 44.9万
+                    - img [ref=e431]
+                    - text: "333"
+              - generic [ref=e433]:
+                - link [ref=e437] [cursor=pointer]:
+                  - /url: /video/BV1U4ZrYUEwb/?spm_id_from=333.788.recommend_more_video.14
+                - generic [ref=e438]:
+                  - link "当DeepSeek帮我算命33次之后……" [ref=e439] [cursor=pointer]:
+                    - /url: /video/BV1U4ZrYUEwb/?spm_id_from=333.788.recommend_more_video.14
+                    - paragraph [ref=e440]: 当DeepSeek帮我算命33次之后……
+                  - link "大笛当前" [ref=e442] [cursor=pointer]:
+                    - /url: //space.bilibili.com/108723738/
+                    - img [ref=e443]
+                    - generic [ref=e444]: 大笛当前
+                  - generic [ref=e445]:
+                    - img [ref=e446]
+                    - text: 4.9万
+                    - img [ref=e447]
+                    - text: "31"
+              - generic [ref=e449]:
+                - link [ref=e453] [cursor=pointer]:
+                  - /url: /video/BV1RN4y1p7sk/?spm_id_from=333.788.recommend_more_video.15
+                - generic [ref=e454]:
+                  - link "可视化奇门遁甲" [ref=e455] [cursor=pointer]:
+                    - /url: /video/BV1RN4y1p7sk/?spm_id_from=333.788.recommend_more_video.15
+                    - paragraph [ref=e456]: 可视化奇门遁甲
+                  - link "XCALLWMEJ" [ref=e458] [cursor=pointer]:
+                    - /url: //space.bilibili.com/30476215/
+                    - img [ref=e459]
+                    - generic [ref=e460]: XCALLWMEJ
+                  - generic [ref=e461]:
+                    - img [ref=e462]
+                    - text: 17.0万
+                    - img [ref=e463]
+                    - text: "33"
+              - generic [ref=e465]:
+                - link [ref=e469] [cursor=pointer]:
+                  - /url: /video/BV1rrQGBeEen/?spm_id_from=333.788.recommend_more_video.16
+                - generic [ref=e470]:
+                  - link "普通人真可以用Ai赚钱了" [ref=e471] [cursor=pointer]:
+                    - /url: /video/BV1rrQGBeEen/?spm_id_from=333.788.recommend_more_video.16
+                    - paragraph [ref=e472]: 普通人真可以用Ai赚钱了
+                  - link "老强说" [ref=e474] [cursor=pointer]:
+                    - /url: //space.bilibili.com/404192584/
+                    - img [ref=e475]
+                    - generic [ref=e476]: 老强说
+                  - generic [ref=e477]:
+                    - img [ref=e478]
+                    - text: 39.8万
+                    - img [ref=e479]
+                    - text: "755"
+              - generic [ref=e481]:
+                - link [ref=e485] [cursor=pointer]:
+                  - /url: /video/BV1CpGRzuEso/?spm_id_from=333.788.recommend_more_video.17
+                - generic [ref=e486]:
+                  - link "相由心生很好的例子" [ref=e487] [cursor=pointer]:
+                    - /url: /video/BV1CpGRzuEso/?spm_id_from=333.788.recommend_more_video.17
+                    - paragraph [ref=e488]: 相由心生很好的例子
+                  - link "上善品相" [ref=e490] [cursor=pointer]:
+                    - /url: //space.bilibili.com/3546698647341899/
+                    - img [ref=e491]
+                    - generic [ref=e492]: 上善品相
+                  - generic [ref=e493]:
+                    - img [ref=e494]
+                    - text: 46.1万
+                    - img [ref=e495]
+                    - text: "180"
+              - generic [ref=e497]:
+                - link [ref=e501] [cursor=pointer]:
+                  - /url: /video/BV18wHpe4EjB/?spm_id_from=333.788.recommend_more_video.18
+                - generic [ref=e502]:
+                  - link "这种死人相面相，一定要远离" [ref=e503] [cursor=pointer]:
+                    - /url: /video/BV18wHpe4EjB/?spm_id_from=333.788.recommend_more_video.18
+                    - paragraph [ref=e504]: 这种死人相面相，一定要远离
+                  - link "千相相事" [ref=e506] [cursor=pointer]:
+                    - /url: //space.bilibili.com/1054362724/
+                    - img [ref=e507]
+                    - generic [ref=e508]: 千相相事
+                  - generic [ref=e509]:
+                    - img [ref=e510]
+                    - text: 286.9万
+                    - img [ref=e511]
+                    - text: "1494"
+            - generic [ref=e512] [cursor=pointer]: 展开
+          - link "全新终极猎手-白月魁上线！投稿瓜分万元奖金" [ref=e514] [cursor=pointer]:
+            - /url: javascript:void(0);
+            - generic [ref=e515]: 全新终极猎手-白月魁上线！投稿瓜分万元奖金

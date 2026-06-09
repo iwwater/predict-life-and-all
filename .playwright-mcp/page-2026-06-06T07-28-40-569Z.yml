@@ -1,0 +1,149 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "Mystic Hub · 玄枢" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e8]: Mystic Hub
+        - generic [ref=e9]: · 玄枢
+      - navigation [ref=e10]:
+        - link "首页" [ref=e11] [cursor=pointer]:
+          - /url: /
+        - link "排盘" [ref=e12] [cursor=pointer]:
+          - /url: /cast
+        - link "历史" [ref=e13] [cursor=pointer]:
+          - /url: /history
+        - link "关于" [ref=e14] [cursor=pointer]:
+          - /url: /about
+  - main [ref=e15]:
+    - generic [ref=e138]:
+      - generic [ref=e139]:
+        - generic [ref=e140]:
+          - generic [ref=e142]: 你的灵魂
+          - generic [ref=e143]: 1990-5-15 8:30
+          - generic [ref=e144]: · male
+        - link "再排一次" [ref=e145] [cursor=pointer]:
+          - /url: /cast
+      - generic [ref=e146]:
+        - button "八字 · 东 · 四柱命盘，看命局、大运、流年" [ref=e147] [cursor=pointer]:
+          - generic [ref=e148]: 八字
+          - generic [ref=e149]: · 东
+          - generic [ref=e150]: · 四柱命盘，看命局、大运、流年
+        - button "西方占星 · 西 · 西方本命盘，太阳月亮上升与行星" [ref=e151] [cursor=pointer]:
+          - generic [ref=e152]: 西方占星
+          - generic [ref=e153]: · 西
+          - generic [ref=e154]: · 西方本命盘，太阳月亮上升与行星
+      - generic [ref=e155]:
+        - generic [ref=e156]:
+          - generic [ref=e290]:
+            - generic [ref=e291]:
+              - generic [ref=e292]:
+                - heading "西方占星 · 圆形星盘" [level=3] [ref=e293]
+                - generic [ref=e295]:
+                  - generic [ref=e296]: 你给人的第一印象
+                  - text: 巨蟹
+              - img [ref=e298]:
+                - generic [ref=e304]: ♈
+                - generic [ref=e307]: ♉
+                - generic [ref=e310]: ♊
+                - generic [ref=e312]: ♋
+                - generic [ref=e315]: ♌
+                - generic [ref=e318]: ♍
+                - generic [ref=e320]: ♎
+                - generic [ref=e323]: ♏
+                - generic [ref=e326]: ♐
+                - generic [ref=e328]: ♑
+                - generic [ref=e331]: ♒
+                - generic [ref=e334]: ♓
+                - generic [ref=e367]: 太阳
+                - generic [ref=e370]: 月亮
+                - generic [ref=e373]: 水星
+                - generic [ref=e376]: 金星
+                - generic [ref=e379]: 火星
+                - generic [ref=e382]: 木星
+                - generic [ref=e385]: 土星
+                - generic [ref=e386]: skyfield+self
+                - generic [ref=e387]: ASC 巨蟹
+            - generic [ref=e388]:
+              - generic [ref=e389]:
+                - generic [ref=e390]:
+                  - text: 相位
+                  - generic [ref=e391]: · 行星间角度
+                - text: ·行星之间角度关系
+              - generic [ref=e392]:
+                - generic [ref=e393]:
+                  - generic [ref=e395]: 太阳
+                  - generic [ref=e396]: ↔
+                  - generic [ref=e397]: 月亮
+                  - generic [ref=e398]: 合相
+                - generic [ref=e399]:
+                  - generic [ref=e401]: 太阳
+                  - generic [ref=e402]: ↔
+                  - generic [ref=e403]: 水星
+                  - generic [ref=e404]: 合相
+                - generic [ref=e405]:
+                  - generic [ref=e407]: 太阳
+                  - generic [ref=e408]: ↔
+                  - generic [ref=e409]: 金星
+                  - generic [ref=e410]: 合相
+                - generic [ref=e411]:
+                  - generic [ref=e413]: 太阳
+                  - generic [ref=e414]: ↔
+                  - generic [ref=e415]: 火星
+                  - generic [ref=e416]: 合相
+                - generic [ref=e417]:
+                  - generic [ref=e419]: 太阳
+                  - generic [ref=e420]: ↔
+                  - generic [ref=e421]: 木星
+                  - generic [ref=e422]: 合相
+                - generic [ref=e423]:
+                  - generic [ref=e425]: 太阳
+                  - generic [ref=e426]: ↔
+                  - generic [ref=e427]: 土星
+                  - generic [ref=e428]: 合相
+                - generic [ref=e429]:
+                  - generic [ref=e431]: 月亮
+                  - generic [ref=e432]: ↔
+                  - generic [ref=e433]: 水星
+                  - generic [ref=e434]: 合相
+                - generic [ref=e435]:
+                  - generic [ref=e437]: 月亮
+                  - generic [ref=e438]: ↔
+                  - generic [ref=e439]: 金星
+                  - generic [ref=e440]: 合相
+                - generic [ref=e441]:
+                  - generic [ref=e443]: 月亮
+                  - generic [ref=e444]: ↔
+                  - generic [ref=e445]: 火星
+                  - generic [ref=e446]: 合相
+          - generic [ref=e264]:
+            - generic [ref=e265]:
+              - generic [ref=e266]:
+                - heading "运势走势·K 线图" [level=3] [ref=e267]
+                - generic [ref=e268]: 从大运地支五行推导出来的"运势强度"折线,看每十年起伏
+              - generic [ref=e269]:
+                - generic [ref=e270]: ●
+                - text: 升
+                - generic [ref=e271]: /
+                - generic [ref=e272]: ●
+                - text: 降
+            - generic [ref=e274]:
+              - generic [ref=e275]: 横轴 = 出生后每一年(流年)
+              - generic [ref=e276]: 纵轴 = 运势强度(0-100,数字越高那年越顺)
+              - generic [ref=e277]: 每根 K 线代表一个十年的"主调"
+        - generic [ref=e279]:
+          - generic [ref=e280]:
+            - generic [ref=e281]:
+              - heading "AI 解读" [level=3] [ref=e282]
+              - generic [ref=e283]: · 已完成
+            - button "重新解读" [ref=e284] [cursor=pointer]
+          - generic [ref=e285]:
+            - paragraph [ref=e286]:
+              - text: 【整体】(Mock 解读)—— 基于你提供的盘面,我看到一个倾向于内省与表达并存的能量结构。
+              - text: 【事业财运】盘面显示金气偏旺、根气偏弱,倾向于在协作中借力会更顺。
+              - text: 【建议】1) 多与人合作;2) 留意春夏之交的机会;3) 给自己留点独处时间复盘。
+            - paragraph [ref=e287]: (以上为传统文化象征视角的参考,非科学预测,重大决定请结合现实并咨询专业人士。)
+          - generic [ref=e289]: 以上为传统文化象征视角的参考,非科学预测,重大决定请结合现实并咨询专业人士。
+  - contentinfo [ref=e19]:
+    - generic [ref=e20]:
+      - paragraph [ref=e21]: 免责声明:本站所有解读为传统文化象征视角的参考,非科学预测,亦不构成医疗、法律、财务等专业意见。 重大决定请结合现实并咨询专业人士。
+      - paragraph [ref=e22]: 合规:全栈 MIT/BSD 许可,零 AGPL,可闭源商用。 你的 LLM API Key 仅存在浏览器本地,不会上传到本服务后端。

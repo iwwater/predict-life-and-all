@@ -1,0 +1,77 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "Mystic Hub · 玄枢" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e8]: Mystic Hub
+        - generic [ref=e9]: · 玄枢
+      - navigation [ref=e10]:
+        - link "首页" [ref=e11] [cursor=pointer]:
+          - /url: /
+        - link "今日" [ref=e12] [cursor=pointer]:
+          - /url: /daily
+        - link "排盘" [ref=e13] [cursor=pointer]:
+          - /url: /cast
+        - link "历史" [ref=e14] [cursor=pointer]:
+          - /url: /history
+        - link "关于" [ref=e15] [cursor=pointer]:
+          - /url: /about
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - generic [ref=e18]:
+        - heading "关于 Mystic Hub" [level=2] [ref=e19]
+        - paragraph [ref=e20]: Mystic Hub 是一个面向研究 / 兴趣 / 自我反思的玄学工具。 集成十二种术数(命 / 卜 / 风水 / 西方),统一排盘接口 + 多 LLM 流式解读。 全栈 MIT/BSD 许可,零 AGPL,可闭源商用。
+      - generic [ref=e21]:
+        - heading "免责声明(全文)" [level=3] [ref=e22]
+        - list [ref=e23]:
+          - listitem [ref=e24]:
+            - text: 本站所有排盘与解读,以传统文化象征视角呈现,
+            - strong [ref=e25]: 非科学预测
+            - text: 。
+          - listitem [ref=e26]: 不构成医疗诊断、法律意见、投资建议或任何专业判断。
+          - listitem [ref=e27]: 重大决定(健康 / 法律 / 财务 / 关系)请结合现实并咨询专业人士。
+          - listitem [ref=e28]: 危机话题(如自杀 / 自残)会被自动转介至心理援助热线,不进行盘面解读。
+          - listitem [ref=e29]: 不放大焦虑:解读措辞克制(用"倾向"避免"注定"),凶用"需留意"不用"大凶"。
+      - generic [ref=e30]:
+        - heading "LLM 解读设置" [level=3] [ref=e31]
+        - generic [ref=e32]:
+          - generic [ref=e33]:
+            - heading "LLM 解读设置" [level=3] [ref=e34]
+            - button "重置" [ref=e35] [cursor=pointer]
+          - generic [ref=e36]:
+            - generic [ref=e37]: 服务
+            - generic [ref=e38]:
+              - button "openai" [ref=e39] [cursor=pointer]
+              - button "claude" [ref=e40] [cursor=pointer]
+              - button "gemini" [ref=e41] [cursor=pointer]
+              - button "deepseek" [ref=e42] [cursor=pointer]
+              - button "custom" [ref=e43] [cursor=pointer]
+            - generic [ref=e44]: OpenAI (GPT-4o / GPT-4o-mini)
+          - generic [ref=e45]:
+            - generic [ref=e46]: API Key
+            - generic [ref=e47]: 你在 OpenAI 后台拿到的"通行证",形如 sk-…
+            - generic [ref=e48]:
+              - textbox "sk-..." [ref=e49]
+              - button "显示" [ref=e50] [cursor=pointer]
+            - generic [ref=e51]: Key 仅保存在浏览器本地(IndexedDB),不会上传到本服务后端。
+          - generic [ref=e52]:
+            - generic [ref=e53]:
+              - generic [ref=e54]: Base URL
+              - generic [ref=e55]: 这个 LLM 服务的后台地址,通常不用改
+              - textbox "https://api.openai.com/v1" [ref=e56]
+            - generic [ref=e57]:
+              - generic [ref=e58]: 模型
+              - generic [ref=e59]: 想用哪个具体的模型(越大的越聪明也越贵)
+              - textbox "gpt-4o-mini" [ref=e60]
+          - generic [ref=e62]:
+            - text: 浏览器直连各 provider 时,请确保你的网络环境可访问对应 API。 若 provider 不支持浏览器 CORS,可考虑在本服务后端通过
+            - code [ref=e63]: /api/interpret
+            - text: 走 MockClient(只回显占位文本,无 LLM), 或自备反向代理。
+      - generic [ref=e64]:
+        - generic [ref=e65]: "技术栈: FastAPI · lunar-python · py-iztro · skyfield · React 18 + Vite + Tailwind · Zustand · marked"
+        - generic [ref=e66]: "合规: 12 个 engine / 中西合参 / 危机 block / 绝对化用语软化,详见源码。"
+        - generic [ref=e67]: "开源自托管: 全部依赖 MIT/BSD,无 AGPL。"
+  - contentinfo [ref=e68]:
+    - generic [ref=e69]:
+      - paragraph [ref=e70]: 免责声明:本站所有解读为传统文化象征视角的参考,非科学预测,亦不构成医疗、法律、财务等专业意见。 重大决定请结合现实并咨询专业人士。
+      - paragraph [ref=e71]: 合规:全栈 MIT/BSD 许可,零 AGPL,可闭源商用。 你的 LLM API Key 仅存在浏览器本地,不会上传到本服务后端。
