@@ -115,6 +115,14 @@ class DivinationSignal(BaseModel):
         le=1,
         description="该信号在本术法内的置信度 0-1",
     )
+    time_scope: Optional[str] = Field(
+        None,
+        description="时间范围: short_term/medium_term/long_term",
+    )
+    advice: Optional[str] = Field(
+        None,
+        description="该信号衍生的行动建议",
+    )
 
 
 # ── 共识/冲突模型 ────────────────────────────────────────────────────────────
@@ -143,8 +151,14 @@ class ConflictItem(BaseModel):
     """多术法冲突主题。
 
     BE-014: 正向术法/负向术法/中性术法/冲突解释
+    VAL-008: severity — low/medium/high
+    VAL-009: resolution — 冲突调和文本
     """
     domain: str
+    severity: Literal["low", "medium", "high"] = Field(
+        "medium",
+        description="冲突严重程度",
+    )
     positive_methods: list[str] = Field(
         default_factory=list,
         description="给出正向信号的术法",
@@ -160,6 +174,10 @@ class ConflictItem(BaseModel):
     conflict_explanation: str = Field(
         ...,
         description="冲突解释 — 说明分歧可能的原因",
+    )
+    resolution: str = Field(
+        "",
+        description="调和建议 — e.g. '长期可行，但短期不宜急进'",
     )
 
 
@@ -182,7 +200,11 @@ class ValidationResult(BaseModel):
         50.0,
         ge=0,
         le=100,
-        description="整体置信度",
+        description="整体置信度数值",
+    )
+    confidence_level: Literal["low", "medium", "medium_high", "high"] = Field(
+        "medium",
+        description="整体置信等级 (VAL-011)",
     )
     risks: list[str] = Field(
         default_factory=list,

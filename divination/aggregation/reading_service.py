@@ -28,8 +28,9 @@ from .schema import (
     ReadingResult,
 )
 from .selector import get_method_names, select_methods
-from .synthesizer import DISCLAIMER, generate
-from .validator import validate
+from .synthesizer import DISCLAIMER, synthesize_report
+from .validator import validate_signals
+from .weights import get_weights
 
 log = logging.getLogger("mystic-hub.reading")
 
@@ -86,11 +87,13 @@ async def run_reading(request: ReadingRequest) -> ReadingResult:
     # Step 5: 标准化
     signals = normalize_all(charts)
 
-    # Step 6: 交叉验证
-    validation = validate(signals, intent, method_entries)
+    # Step 6: 计算 weights 并交叉验证
+    weights = get_weights(goal, method_entries)
+    validation = validate_signals(signals, weights, method_entries)
 
     # Step 7: 报告生成
-    report = generate(
+    intent["question"] = request.question  # 供 synthesizer 生成 headline
+    report = synthesize_report(
         signals=signals,
         validation=validation,
         intent=intent,
