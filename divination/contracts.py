@@ -13,6 +13,7 @@ Method = Literal[
     "chenggu",
     "bazhai",
     "xuankong",
+    "fengshui",
     "western",
     "vedic",
     "tarot",

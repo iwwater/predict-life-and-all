@@ -2,7 +2,7 @@
 from .contracts import Birth, ChartResult
 from .engines import (
     bazi, bazi_v2, ziwei, qimen, western, vedic,
-    liuyao, meihua, chenggu, bazhai, xuankong, tarot, numerology,
+    liuyao, meihua, chenggu, bazhai, xuankong, fengshui, tarot, numerology,
     lenormand, liuren, tieban, synastry,
     cross_validator, hour_calibrator,
 )
@@ -25,6 +25,7 @@ _ENGINES = {
     "chenggu":    chenggu.compute,
     "bazhai":     bazhai.compute,
     "xuankong":   xuankong.compute,
+    "fengshui":   fengshui.compute,
     "tarot":      tarot.compute,
     "numerology": numerology.compute,
     "lenormand":  lenormand.compute,

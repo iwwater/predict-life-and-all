@@ -106,6 +106,14 @@ METHOD_META = {
         "subjects": ["self_life"], "modes": ["life_path"], "default_mode": "life_path",
         "required_inputs": {"life_path": ["birth"]}, "recommended_for": ["生命灵数", "人生方向参考"],
     },
+    "fengshui": {
+        "school": "east", "name_zh": "风水", "name_en": "Feng Shui Composite",
+        "group": "风水", "needs": ["birth", "space"], "engine": "self+bazhai+xuankong",
+        "subjects": ["home_fengshui", "self_life", "decision"],
+        "modes": ["fengshui_composite"], "default_mode": "fengshui_composite",
+        "required_inputs": {"fengshui_composite": ["birth", "space"]},
+        "recommended_for": ["综合风水评估", "八宅+玄空合参", "住宅吉凶综合判断"],
+    },
     "lenormand": {
         "school": "west", "name_zh": "雷诺曼", "name_en": "Lenormand",
         "group": "西方", "needs": ["question", "spread"], "engine": "random+lenormand-36",

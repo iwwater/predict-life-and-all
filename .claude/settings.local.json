@@ -77,7 +77,20 @@
       "Read(//c/Users/BAi/.config/gh/**)",
       "PowerShell(Expand-Archive *)",
       "PowerShell($ghPath = \\(Get-ChildItem -Path \"$env:TEMP\\\\gh\" -Recurse -Filter \"gh.exe\" | Select-Object -First 1\\).FullName; Write-Output \"gh path: $ghPath\")",
-      "PowerShell(gh auth *)"
+      "PowerShell(gh auth *)",
+      "PowerShell(& \"$env:TEMP\\\\gh\\\\bin\\\\gh.exe\" repo create \"predict-life-and-all\" --public --source . --remote origin --push 2>&1)",
+      "Bash(git commit *)",
+      "PowerShell(& \"$env:TEMP\\\\gh\\\\bin\\\\gh.exe\" repo create \"predict-life-and-all\" --public --source . --remote origin 2>&1)",
+      "Bash(git push *)",
+      "Bash(curl -s http://localhost:8000/api/reading/health)",
+      "Bash(curl -s -X POST http://localhost:8000/api/reading -H \"Content-Type: application/json\" -d '{\"question\":\"我该换工作吗？\",\"birth\":{\"year\":1990,\"month\":6,\"day\":15,\"hour\":8}}')",
+      "Bash(curl -s -X POST http://localhost:8000/api/reading -H \"Content-Type: application/json\" -d @-)",
+      "Bash(curl -s -X POST http://localhost:8000/api/compute -H \"Content-Type: application/json\" -d '{\"method\":\"bazi_v2\",\"birth\":{\"year\":1990,\"month\":6,\"day\":15,\"hour\":8}}')",
+      "PowerShell(Stop-Process *)",
+      "Bash(.venv/Scripts/python.exe -c ' *)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/test_intent.py tests/test_selector.py -v --tb=short)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/test_intent.py tests/test_selector.py -v --tb=line)",
+      "Bash(git add *)"
     ]
   }
 }
