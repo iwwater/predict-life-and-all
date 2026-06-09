@@ -22,6 +22,7 @@ from divination.contracts import Birth
 
 from .intent import classify_intent
 from .normalizer import normalize_all
+from .safety import check_input_safety, sanitize_for_log, sanitize_birth_for_log
 from .schema import (
     BirthModel,
     ReadingRequest,
@@ -47,6 +48,43 @@ async def run_reading(request: ReadingRequest) -> ReadingResult:
     t0 = time.perf_counter()
     session_id = uuid.uuid4().hex[:12]
     errors: list[dict[str, Any]] = []
+
+    # SAFE-005: 安全检查 — 危机检测和敏感领域降级
+    safety = check_input_safety(request.question)
+    safety_flags: list[str] = []
+    safety_downgrades = safety.get("downgrades", [])
+
+    if safety.get("crisis"):
+        # SAFE-005: 危机响应 — 不进行术法计算
+        from .schema import ReadingReport as RR, ValidationResult as VR
+        crisis_report = RR(
+            free=f"【安全提示】\n\n{safety['crisis_message']}",
+            standard=f"【安全提示】\n\n{safety['crisis_message']}",
+            premium=f"【安全提示】\n\n{safety['crisis_message']}",
+        )
+        return ReadingResult(
+            session_id=session_id,
+            intent={"goal": "crisis", "goal_label": "安全响应", "goal_confidence": 1.0, "goal_source": "safety"},
+            methods_used=[],
+            signals=[],
+            consensus=[],
+            conflicts=[],
+            validation=VR(overall_score=0, confidence=0, confidence_level="low"),
+            report=crisis_report,
+            disclaimer=safety["crisis_message"],
+            elapsed_ms=0,
+            errors=[],
+            safety_flags=["crisis_blocked"],
+            safety_downgrades=[],
+            is_unlocked_standard=True,
+            is_unlocked_premium=True,
+        )
+
+    if safety_downgrades:
+        safety_flags.append("content_downgraded")
+
+    # SAFE-010: 日志脱敏
+    safe_question = sanitize_for_log(request.question)
 
     # Step 1: 意图分类 (INT-001, INT-014)
     intent = classify_intent(
@@ -115,6 +153,10 @@ async def run_reading(request: ReadingRequest) -> ReadingResult:
         disclaimer=DISCLAIMER,
         elapsed_ms=dt_ms,
         errors=errors,
+        safety_flags=safety_flags,
+        safety_downgrades=safety_downgrades,
+        is_unlocked_standard=True,   # PAY-005: 默认解锁标准版
+        is_unlocked_premium=False,   # PAY-005: 高级版需要解锁
     )
 
 

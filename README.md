@@ -6,6 +6,8 @@
 8 个 GitHub 仓库 + 1 份 `divination/` 排盘引擎骨架融合而成的单体 Super App:
 
 - **后端**: FastAPI 单体,核心引擎层即 `divination/` 骨架(`lunar-python` + `py-iztro` + 自实现奇门 + `skyfield` + 自算西方数学)
+- **聚合层**: 12 法统一调度、信号标准化、加权交叉验证、三档报告生成、LLM Prompt 构建
+- **安全层**: 危机词拦截、医疗/法律/投资敏感领域降级、绝对化表达过滤、日志脱敏
 - **前端**: React 18 + Vite 5 + TypeScript + Tailwind 3,响应式 Web
 - **AI 解读**: 用户在前端自备 OpenAI / Claude / Gemini / DeepSeek Key,后端只暴露 Prompt 模板
 - **覆盖**: 12 大占卜法 —— 八字、紫微、奇门、六爻、梅花、称骨、八宅、玄空飞星、西方占星、吠陀占星、塔罗、数字命理
@@ -69,18 +71,31 @@ predict-life-and-all/
 │   │   ├── xuankong.py      # 玄空飞星 + 洛书
 │   │   ├── tarot.py         # 塔罗牌阵(随机 + 占位解)
 │   │   └── numerology.py    # 毕达哥拉斯数字命理
-│   └── interpret/                      # 解读编排
-│       ├── prompts.py        # 12 法系统提示 + 盘面序列化
-│       ├── guardrails.py     # 危机/医疗/法律/财务转介 + 绝对化软化
-│       ├── client.py         # LLMClient 抽象 + MockClient + AnthropicClient
-│       └── reader.py         # 编排入口
+│   ├── interpret/                      # 解读编排
+│   │   ├── prompts.py        # 12 法系统提示 + 盘面序列化
+│   │   ├── guardrails.py     # 危机/医疗/法律/财务转介 + 绝对化软化
+│   │   ├── client.py         # LLMClient 抽象 + MockClient + AnthropicClient
+│   │   └── reader.py         # 编排入口
+│   └── aggregation/                    # 12 法聚合层
+│       ├── __init__.py       # 聚合模块公共接口
+│       ├── schema.py         # ReadingRequest / ReadingResult / ReadingReport 等数据模型
+│       ├── intent.py         # 问题意图分类器 (12 种 goal 类型)
+│       ├── selector.py       # 术法选择逻辑 (三层权重体系)
+│       ├── weights.py        # 各术法在各领域的权重配置
+│       ├── normalizer.py     # 输出标准化为统一信号 (28 个 SIGNAL_KEYS)
+│       ├── validator.py      # 加权交叉验证引擎 (consensus + conflicts)
+│       ├── synthesizer.py    # 三档报告生成 (free/standard/premium)
+│       ├── reading_service.py # 主编排服务 (run_reading)
+│       ├── safety.py         # 安全检查 (危机拦截/降级/过滤/脱敏)
+│       └── llm_prompt.py     # LLM Prompt 构建器 + Mock 报告
 │
 ├── server/                              # FastAPI HTTP 层
 │   ├── main.py                          # FastAPI app
-│   ├── api/                             # 5 个端点
+│   ├── api/                             # 6 个端点
 │   │   ├── methods.py     GET  /api/methods
 │   │   ├── chart.py       POST /api/compute
-│   │   ├── interpret.py   POST /api/interpret      (SSE 流式 NDJSON)
+│   │   ├── reading.py     POST /api/reading         (12 法合参主入口)
+│   │   ├── interpret.py   POST /api/interpret       (SSE 流式 NDJSON)
 │   │   ├── prompts.py     GET  /api/prompts/{method}
 │   │   └── cases.py       GET  /api/cases
 │   ├── llm/prompts/                    # 5 类系统提示模板
@@ -89,15 +104,21 @@ predict-life-and-all/
 │
 ├── apps/web/                            # React + Vite 前端
 │   ├── src/
-│   │   ├── pages/                       # 6 个页面
+│   │   ├── pages/                       # 10 个页面
 │   │   │   ├── Home.tsx                 # 首页(12 法分类卡片)
-│   │   │   ├── Cast.tsx                 # 排盘入口(出生信息 + 12 法多选 + 各法额外参数)
+│   │   │   ├── Cast.tsx                 # 排盘入口(出生信息 + 12 法多选)
 │   │   │   ├── Result.tsx               # 结果页(盘面 Tab + 流式解读面板)
+│   │   │   ├── Reading.tsx              # 12 法合参页(输入问题 → 自动聚合解读)
+│   │   │   ├── ReadingHistory.tsx       # 聚合解读历史(保存/重新打开/删除)
 │   │   │   ├── MethodInfo.tsx           # 单法说明
-│   │   │   ├── History.tsx              # 本地历史
-│   │   │   └── About.tsx                # 完整免责声明
+│   │   │   ├── History.tsx              # 排盘历史
+│   │   │   ├── About.tsx                # 完整免责声明
+│   │   │   ├── Compatibility.tsx        # 合盘分析
+│   │   │   └── ...
 │   │   ├── components/
 │   │   │   ├── Layout.tsx               # 导航/页脚
+│   │   │   ├── ReadingForm.tsx          # 聚合解读表单(goal/问题/出生/深度)
+│   │   │   ├── ReadingReportView.tsx    # 聚合报告展示(共识/冲突/风险/三档)
 │   │   │   ├── Settings.tsx             # LLM Key 管理(浏览器本地)
 │   │   │   ├── Interpretation.tsx       # 流式解读面板
 │   │   │   ├── BaziKline.tsx            # 八字 K 线 canvas
@@ -105,18 +126,27 @@ predict-life-and-all/
 │   │   │   ├── ui.tsx                   # 公共 UI(SchoolChip / EmptyBox / SkeletonBlock)
 │   │   │   └── charts/                  # 12 个盘面 SVG 组件 + ChartRenderer
 │   │   ├── lib/
-│   │   │   ├── types.ts                 # ChartResult TS 类型
-│   │   │   ├── api.ts                   # 后端调用 + SSE 解析
+│   │   │   ├── types.ts                 # 完整 TS 类型(含 ReadingResult 等)
+│   │   │   ├── api.ts                   # 后端调用 + fetchReading()
 │   │   │   ├── llm-client.ts            # 浏览器直连 OpenAI/Claude/Gemini/DeepSeek
 │   │   │   ├── kline.ts                 # K 线绘制算法
 │   │   │   └── markdown.ts              # 解读文本渲染
 │   │   └── store/
 │   │       ├── keys.ts                  # Zustand:LLM Key
-│   │       └── history.ts               # Zustand:历史(localStorage persist)
+│   │       ├── history.ts               # Zustand:排盘历史(localStorage persist)
+│   │       └── readingHistory.ts        # 聚合解读历史(localStorage, 最多 50 条)
 │   └── tailwind.config.js               # 设计 token(语义化色板)
 │
 ├── tests/
-│   └── test_api.py                      # 端到端冒烟:12 法 + 解读 + 危机 block
+│   ├── test_api.py              # API 端点测试 (13 测试)
+│   ├── test_reading_service.py  # reading_service 集成测试 (14 测试)
+│   ├── test_intent.py           # 意图分类器测试
+│   ├── test_selector.py         # 术法选择器测试
+│   ├── test_normalizer.py       # 信号标准化测试
+│   ├── test_validator.py        # 交叉验证引擎测试
+│   ├── test_synthesizer.py      # 报告生成器测试
+│   ├── test_safety.py           # 安全合规模块测试 (45 测试)
+│   └── test_llm_prompt.py       # LLM Prompt 构建器测试 (30 测试)
 │
 ├── docker-compose.yml
 ├── Dockerfile.server
@@ -207,6 +237,62 @@ predict-life-and-all/
 
 **`blocked=true` 时**(危机话题命中):只返回一条转介文案,不出解读,前端不渲染任何盘面吉凶。
 
+### `POST /api/reading` — 12 法合参主入口
+
+只需一个问题,系统自动调度 12 种术法,并行排盘,标准化为统一信号,加权交叉验证,生成三档报告。
+
+```json
+// 请求
+{
+  "question": "我该换工作吗？",
+  "goal": null,
+  "birth": {
+    "year": 1990, "month": 6, "day": 15, "hour": 8, "minute": 30,
+    "gender": "male", "calendar": "gregorian",
+    "lat": 31.23, "lng": 121.47, "tz": "Asia/Shanghai"
+  },
+  "target_birth": null,
+  "space": null,
+  "depth": "standard",
+  "language": "zh"
+}
+
+// 响应 = ReadingResult
+{
+  "session_id": "abc123def456",
+  "intent": { "goal": "career", "goal_label": "事业工作", "goal_confidence": 0.9 },
+  "methods_used": ["bazi_v2","ziwei","qimen",...],       // 始终 12 法
+  "signals": [                                             // 统一信号列表
+    { "method": "bazi_v2", "domain": "career", "signal_key": "day_master_strong",
+      "polarity": "positive", "strength": 0.75, "confidence": 0.80 }
+  ],
+  "consensus": [                                           // 多法共识
+    { "theme": "事业运势上升期", "supporting_methods": ["bazi_v2","ziwei","qimen"] }
+  ],
+  "conflicts": [                                           // 术法分歧
+    { "severity": "medium", "conflict_explanation": "六爻显示不宜变动" }
+  ],
+  "validation": {
+    "overall_score": 72, "confidence_level": "medium_high",
+    "risks": ["仓促决策可能导致后悔"],
+    "action_advice": ["观望1-2个月", "提升专业技能"]
+  },
+  "report": {
+    "free": "事业运势呈上升趋势,综合评分72分…",           // ≤500字
+    "standard": "## 事业工作综合分析报告…",                // 结构化
+    "premium": "## 深度事业报告…"                           // 详细 + 时间窗口
+  },
+  "disclaimer": "以上内容基于传统文化与符号象征视角…",
+  "elapsed_ms": 1234
+}
+```
+
+**安全机制**:
+- 危机词检测(自杀/自残等) → 立即阻断,返回心理援助热线
+- 医疗/法律/投资关键词 → 降级提示,不给出具体建议
+- 绝对化表达过滤 → 自动软化为建议性语言
+- 日志脱敏 → 不记录完整出生信息
+
 ### `GET /api/prompts/{method}` `GET /api/cases`
 
 查看每法的系统提示模板,以及 8 个名人排盘示例。
@@ -268,27 +354,43 @@ predict-life-and-all/
 ## 启动方式汇总
 
 ```bash
-# 后端
+# ── 后端 ──
+uv run uvicorn server.main:app --reload --port 8000
+# 或
 .\.venv\Scripts\python.exe -m uvicorn server.main:app --port 8000
 
-# 前端
-cd apps/web && npm run dev      # http://127.0.0.1:5173,自动代理 /api → :8000
+# ── 前端 ──
+cd apps/web
+npm install
+npm run dev                      # http://localhost:5173, 自动代理 /api → :8000
 
-# 端到端测试
-.\.venv\Scripts\python.exe tests\test_api.py
-# 或 pytest
-.\.venv\Scripts\python.exe -m pytest tests/test_api.py -v -s
+# ── 测试 ──
+# 全部测试 (408+)
+.\.venv\Scripts\python.exe -m pytest tests/ -v
+
+# 仅聚合模块测试
+.\.venv\Scripts\python.exe -m pytest tests/test_safety.py tests/test_llm_prompt.py tests/test_reading_service.py tests/test_api.py -v
+
+# 前端 TypeScript 检查
+cd apps/web && npx tsc --noEmit
 ```
 
 ---
 
-## v0.1 不在范围(明确剔除)
+## v0.2 已实现 (v0.1 → 升级)
+
+- ✅ 12 法聚合解读 (`/api/reading`) — 统一调度、加权交叉验证、三档报告
+- ✅ 安全合规模块 — 危机拦截、敏感领域降级、绝对化过滤、日志脱敏
+- ✅ LLM Prompt 构建器 — 合规规则注入、Mock 模式、安全校验
+- ✅ 报告历史 — localStorage 保存/重新打开/删除 (最多 50 条)
+- ✅ 前端聚合解读页 — ReadingForm + ReadingReportView + ReadingHistory
+
+## v0.2 明确剔除(不在范围)
 
 - 用户系统 / 登录 / 支付 / 订阅 / Stripe
 - 原生 App(只做 Web 响应式)
 - 命理师市场 / 1v1 咨询 / 社交分享 / 邀请裂变
 - 服务端 LLM Key 托管
-- Placidus 宫位、塔罗之外更多牌阵
 - 多语言 i18n(中英先做)
 - 命理准确性的科学论证
 

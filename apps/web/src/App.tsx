@@ -17,6 +17,8 @@ const Daily = lazy(() => import("./pages/Daily").then((m) => ({ default: m.Daily
 const FengShui = lazy(() => import("./pages/FengShui").then((m) => ({ default: m.FengShui })));
 const Almanac = lazy(() => import("./pages/Almanac").then((m) => ({ default: m.Almanac })));
 const Compatibility = lazy(() => import("./pages/Compatibility").then((m) => ({ default: m.Compatibility })));
+const Reading = lazy(() => import("./pages/Reading").then((m) => ({ default: m.Reading })));
+const ReadingHistory = lazy(() => import("./pages/ReadingHistory").then((m) => ({ default: m.ReadingHistory })));
 const NotFound = lazy(() => import("./pages/NotFound").then((m) => ({ default: m.NotFound })));
 const DateSelect = lazy(() => import("./pages/DateSelect").then((m) => ({ default: m.DateSelect })));
 const Knowledge = lazy(() => import("./pages/Knowledge").then((m) => ({ default: m.Knowledge })));
@@ -53,6 +55,8 @@ export function App() {
                 <Route path="/compatibility" element={<Compatibility />} />
                 <Route path="/dateselect" element={<DateSelect />} />
                 <Route path="/knowledge" element={<Knowledge />} />
+                <Route path="/reading" element={<Reading />} />
+                <Route path="/reading-history" element={<ReadingHistory />} />
                 <Route path="/about" element={<About />} />
                 <Route path="*" element={<NotFound />} />
               </Route>

@@ -51,6 +51,14 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       ],
     },
     {
+      label: "聚合解读",
+      accent: COLOR.gold,
+      items: [
+        { to: "/reading", label: "12法合参", icon: "🔮" },
+        { to: "/reading-history", label: "报告历史", icon: "📋" },
+      ],
+    },
+    {
       label: t("section.east"),
       accent: COLOR.jade,
       items: [

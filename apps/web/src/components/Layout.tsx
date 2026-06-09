@@ -15,7 +15,7 @@ export function Layout() {
 
   // Starfield + GoldDust 只在首页/排盘/结果显示
   useEffect(() => {
-    setShowStars(["/", "/cast", "/result"].some(
+    setShowStars(["/", "/cast", "/result", "/reading"].some(
       (p) => location.pathname === p || location.pathname.startsWith(p + "/")
     ));
   }, [location.pathname]);
@@ -151,6 +151,9 @@ function Breadcrumb({ pathname }: { pathname: string }) {
   } else if (pathname.startsWith("/cast")) {
     crumbs.push({ label: t("nav.home"), to: "/" });
     crumbs.push({ label: t("nav.cast") });
+  } else if (pathname.startsWith("/reading")) {
+    crumbs.push({ label: t("nav.home"), to: "/" });
+    crumbs.push({ label: "12法合参" });
   } else if (pathname.startsWith("/compatibility")) {
     crumbs.push({ label: t("nav.home"), to: "/" });
     crumbs.push({ label: t("nav.compatibility") });
@@ -170,6 +173,9 @@ function Breadcrumb({ pathname }: { pathname: string }) {
   } else if (pathname.startsWith("/history")) {
     crumbs.push({ label: t("nav.home"), to: "/" });
     crumbs.push({ label: t("nav.history") });
+  } else if (pathname.startsWith("/reading-history")) {
+    crumbs.push({ label: t("nav.home"), to: "/" });
+    crumbs.push({ label: "报告历史" });
   } else if (pathname.startsWith("/about")) {
     crumbs.push({ label: t("nav.home"), to: "/" });
     crumbs.push({ label: t("nav.about") });

@@ -380,3 +380,15 @@ export async function fetchAlmanac(date?: string): Promise<AlmanacPayload> {
 export async function fetchAlmanacMonth(year: number, month: number): Promise<AlmanacMonthPayload> {
   return jsonFetch<AlmanacMonthPayload>(`${BASE}/almanac/month?year=${year}&month=${month}`);
 }
+
+// ── Reading API ────────────────────────────────────────────────────────────
+
+import type { ReadingResult, ReadingAPIRequest } from "./types";
+
+/** POST /api/reading — 12 术法聚合解读。 */
+export async function fetchReading(req: ReadingAPIRequest): Promise<ReadingResult> {
+  return jsonFetch<ReadingResult>(`${BASE}/reading`, {
+    method: "POST",
+    body: JSON.stringify(req),
+  });
+}

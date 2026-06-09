@@ -109,8 +109,8 @@ export function Home() {
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link to="/cast" className="btn-primary gold-sweep-host text-sm px-6 py-3">
-                {t("home.cta.cast")}
+              <Link to="/reading" className="btn-primary gold-sweep-host text-sm px-6 py-3">
+                🔮 开始提问（12 法合参）
               </Link>
               <Link to="/compatibility" className="btn-ghost tap text-sm px-5 py-3"
                 style={{ borderColor: COLOR.goldDim, color: COLOR.goldBright }}>

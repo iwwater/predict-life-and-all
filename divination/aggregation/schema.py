@@ -286,3 +286,21 @@ class ReadingResult(BaseModel):
         default_factory=list,
         description="各术法计算错误（如有），不影响整体流程",
     )
+    # ── PAY-005: 付费状态字段 ──
+    is_unlocked_standard: bool = Field(
+        False,
+        description="标准版是否已解锁",
+    )
+    is_unlocked_premium: bool = Field(
+        False,
+        description="高级版是否已解锁",
+    )
+    # ── SAFE-002~004: 安全降级标记 ──
+    safety_flags: list[str] = Field(
+        default_factory=list,
+        description="安全标记: medical_downgrade, investment_downgrade, legal_downgrade",
+    )
+    safety_downgrades: list[str] = Field(
+        default_factory=list,
+        description="降级提示消息列表",
+    )

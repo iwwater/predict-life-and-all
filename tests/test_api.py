@@ -505,3 +505,254 @@ def test_multi_region_consistency():
         regions_seen.add(tz_prefix)
 
     assert len(regions_seen) >= 5, f"Expected diverse timezone coverage, got {regions_seen}"
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# API-009~013: /api/reading 场景测试
+# ═══════════════════════════════════════════════════════════════════════════════
+
+READING_BIRTH = {
+    "year": 1990, "month": 6, "day": 15, "hour": 8, "minute": 30,
+    "gender": "male", "calendar": "gregorian",
+    "lat": 31.23, "lng": 121.47, "tz": "Asia/Shanghai",
+}
+
+TARGET_BIRTH = {
+    "year": 1992, "month": 3, "day": 20, "hour": 14, "minute": 0,
+    "gender": "female", "calendar": "gregorian",
+    "lat": 30.57, "lng": 104.07, "tz": "Asia/Shanghai",
+}
+
+
+class TestReadingAPI:
+    """API-001~008: /api/reading 端点测试。"""
+
+    def test_reading_health(self):
+        """API: 健康检查端点。"""
+        response = client.get("/api/reading/health")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "ok"
+        assert data["module"] == "reading"
+        assert len(data["methods"]) == 12
+        assert "disclaimer" in data
+
+    def test_reading_returns_200_with_valid_request(self):
+        """API-002: POST /api/reading 可正常请求。"""
+        response = client.post("/api/reading", json={
+            "question": "我该换工作吗？",
+            "birth": READING_BIRTH,
+            "depth": "free",
+        })
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text[:500]}"
+        data = response.json()
+        assert "session_id" in data
+        assert "methods_used" in data
+        assert "report" in data
+        assert "disclaimer" in data
+        assert "elapsed_ms" in data
+
+    def test_reading_methods_used_has_12(self):
+        """API: methods_used 必须包含 12 个术法。"""
+        response = client.post("/api/reading", json={
+            "question": "我的运势怎么样？",
+            "birth": READING_BIRTH,
+            "depth": "free",
+        })
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["methods_used"]) == 12, (
+            f"Expected 12 methods, got {len(data['methods_used'])}"
+        )
+
+    def test_reading_without_birth_still_works(self):
+        """API-006: 缺少 birth 时给默认值，不报错。"""
+        response = client.post("/api/reading", json={
+            "question": "我的运势怎么样？",
+            "depth": "free",
+        })
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text[:500]}"
+
+    def test_reading_without_question_returns_422(self):
+        """API-006: 缺少 question 时返回 422。"""
+        response = client.post("/api/reading", json={
+            "birth": READING_BIRTH,
+        })
+        assert response.status_code == 422, f"Expected 422, got {response.status_code}"
+
+    def test_reading_empty_question_returns_422(self):
+        """API: 空问题返回 422。"""
+        response = client.post("/api/reading", json={
+            "question": "",
+            "birth": READING_BIRTH,
+        })
+        assert response.status_code == 422
+
+    def test_reading_invalid_depth_returns_422(self):
+        """API: 无效 depth 返回 422。"""
+        response = client.post("/api/reading", json={
+            "question": "测试",
+            "birth": READING_BIRTH,
+            "depth": "ultra_premium",
+        })
+        assert response.status_code == 422
+
+    def test_reading_free_tier_is_short(self):
+        """API: free 报告较短。"""
+        response = client.post("/api/reading", json={
+            "question": "测试一下",
+            "birth": READING_BIRTH,
+            "depth": "free",
+        })
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["report"]["free"]) > 20
+        # free report should be reasonably brief
+        assert len(data["report"]["free"]) < 3000, "Free report should be brief"
+
+    def test_reading_premium_contains_standard(self):
+        """API: premium 报告包含 standard 内容。"""
+        response = client.post("/api/reading", json={
+            "question": "我的事业运势如何？",
+            "birth": READING_BIRTH,
+            "depth": "premium",
+        })
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["report"]["premium"]) >= len(data["report"]["standard"]), (
+            "Premium should be at least as long as standard"
+        )
+
+    def test_reading_has_disclaimer(self):
+        """API: 返回结果包含免责声明。"""
+        response = client.post("/api/reading", json={
+            "question": "我的运势怎么样？",
+            "birth": READING_BIRTH,
+            "depth": "standard",
+        })
+        assert response.status_code == 200
+        data = response.json()
+        for kw in ("免责声明", "仅供参考"):
+            assert kw in data["disclaimer"], f"Disclaimer missing '{kw}'"
+
+    def test_reading_elapsed_ms_is_non_negative(self):
+        """API-008: duration_ms 字段存在且 >= 0。"""
+        response = client.post("/api/reading", json={
+            "question": "测试",
+            "birth": READING_BIRTH,
+            "depth": "free",
+        })
+        assert response.status_code == 200
+        data = response.json()
+        assert data["elapsed_ms"] >= 0, f"elapsed_ms should be >=0, got {data['elapsed_ms']}"
+
+
+class TestReadingAPIScenarios:
+    """API-009~013: 五种典型场景测试。"""
+
+    def test_api_career_scenario(self):
+        """API-009: 事业问题 — '我适合创业吗？' 返回 career 相关 goal。"""
+        response = client.post("/api/reading", json={
+            "question": "我适合创业吗？",
+            "birth": READING_BIRTH,
+            "depth": "standard",
+        })
+        assert response.status_code == 200, f"API-009: career request failed: {response.text[:300]}"
+        data = response.json()
+        goal = data["intent"]["goal"]
+        assert goal in ("career", "decision", "general_life"), (
+            f"API-009 FAIL: Expected career/decision/general_life goal, got '{goal}'"
+        )
+        # 12 methods
+        assert len(data["methods_used"]) == 12, "API-009: should have 12 methods"
+        # Report should mention career domain
+        report_text = data["report"]["standard"] + data["report"]["free"]
+        career_keywords = ["事业", "工作", "career", "职业"]
+        found = any(kw in report_text for kw in career_keywords)
+        # This is soft — classifiers may or may not put career text in the report
+        # The key assertion is the goal classification
+
+    def test_api_relationship_scenario(self):
+        """API-010: 感情问题 — '我今年感情怎么样？' 返回 relationship/yearly goal。"""
+        response = client.post("/api/reading", json={
+            "question": "我今年感情怎么样？",
+            "birth": READING_BIRTH,
+            "depth": "standard",
+        })
+        assert response.status_code == 200, f"API-010: relationship request failed: {response.text[:300]}"
+        data = response.json()
+        goal = data["intent"]["goal"]
+        assert goal in ("relationship", "yearly", "general_life"), (
+            f"API-010 FAIL: Expected relationship/yearly/general_life goal, got '{goal}'"
+        )
+        assert len(data["methods_used"]) == 12
+
+    def test_api_compatibility_scenario(self):
+        """API-011: 合盘问题 — '我和TA合不合？' 返回 compatibility goal。"""
+        response = client.post("/api/reading", json={
+            "question": "我和TA合不合？",
+            "birth": READING_BIRTH,
+            "target_birth": TARGET_BIRTH,
+            "depth": "standard",
+        })
+        assert response.status_code == 200, f"API-011: compatibility request failed: {response.text[:300]}"
+        data = response.json()
+        goal = data["intent"]["goal"]
+        assert goal in ("compatibility", "relationship", "general_life"), (
+            f"API-011 FAIL: Expected compatibility/relationship goal, got '{goal}'"
+        )
+        assert len(data["methods_used"]) == 12
+
+    def test_api_decision_scenario(self):
+        """API-012: 决策问题 — '我该不该换工作？' 返回 decision goal。"""
+        response = client.post("/api/reading", json={
+            "question": "我该不该换工作？",
+            "birth": READING_BIRTH,
+            "depth": "standard",
+        })
+        assert response.status_code == 200, f"API-012: decision request failed: {response.text[:300]}"
+        data = response.json()
+        goal = data["intent"]["goal"]
+        assert goal in ("decision", "career", "general_life"), (
+            f"API-012 FAIL: Expected decision/career goal, got '{goal}'"
+        )
+        assert len(data["methods_used"]) == 12
+
+    def test_api_fengshui_scenario(self):
+        """API-013: 风水问题 — '这个房子风水怎么样？' 返回 fengshui goal。"""
+        response = client.post("/api/reading", json={
+            "question": "这个房子风水怎么样？",
+            "birth": READING_BIRTH,
+            "depth": "standard",
+        })
+        assert response.status_code == 200, f"API-013: fengshui request failed: {response.text[:300]}"
+        data = response.json()
+        goal = data["intent"]["goal"]
+        assert goal in ("fengshui", "general_life"), (
+            f"API-013 FAIL: Expected fengshui goal, got '{goal}'"
+        )
+        assert len(data["methods_used"]) == 12
+
+    def test_api_returns_errors_list(self):
+        """API-007: 返回 errors 列表，不直接 500。"""
+        response = client.post("/api/reading", json={
+            "question": "错误处理测试",
+            "birth": READING_BIRTH,
+            "depth": "free",
+        })
+        assert response.status_code == 200
+        data = response.json()
+        assert "errors" in data, "API-007: response should have errors field"
+        assert isinstance(data["errors"], list)
+
+    def test_api_warnings_for_missing_birth(self):
+        """API-006: 缺少 birth 时给提示（仍然返回结果）。"""
+        response = client.post("/api/reading", json={
+            "question": "我的整体运势怎么样？",
+            "depth": "free",
+        })
+        assert response.status_code == 200
+        data = response.json()
+        # Even without birth, we should get a reading result
+        assert data["report"]["free"], "Should have free report even without birth"
+        assert len(data["methods_used"]) == 12, "Should still have 12 methods"

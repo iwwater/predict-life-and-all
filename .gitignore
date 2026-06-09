@@ -31,6 +31,22 @@ apps/web/.env.local
 de421.bsp
 *.bsp
 
+# Runtime logs
+*.log
+
+# Temp
+tmp/
+apps/web/tmp/
+
+# Playwright MCP (local dev tool)
+.playwright-mcp/
+
+# Screenshots (garbage)
+mystic-hub-*.png
+*result*.png
+radar-chart-*.png
+packyapi-*.png
+
 # OS
 .DS_Store
 Thumbs.db
@@ -39,3 +55,9 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# ChatGPT garbage screenshots in data/
+data/ChatGPT*

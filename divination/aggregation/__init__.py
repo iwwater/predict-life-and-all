@@ -33,6 +33,23 @@ from .selector import (
     get_tier_for_method,
     select_methods,
 )
+from .safety import (
+    DISCLAIMER as SAFETY_DISCLAIMER,
+    PRIVACY_NOTICE,
+    CRISIS_KEYWORDS,
+    CRISIS_RESPONSE,
+    check_input_safety,
+    check_output_safety,
+    sanitize_for_log,
+    sanitize_birth_for_log,
+)
+from .llm_prompt import (
+    build_reading_prompt,
+    generate_mock_report,
+    check_llm_output,
+    llm_fallback_report,
+    DEFAULT_COMPLIANCE_RULES,
+)
 from .synthesizer import DISCLAIMER, generate
 from .validator import validate
 
@@ -56,6 +73,21 @@ __all__ = [
     "normalize_all",
     # ── 验证 ──
     "validate",
+    # ── 安全 ──
+    "check_input_safety",
+    "check_output_safety",
+    "sanitize_for_log",
+    "sanitize_birth_for_log",
+    "CRISIS_KEYWORDS",
+    "CRISIS_RESPONSE",
+    "PRIVACY_NOTICE",
+    "SAFETY_DISCLAIMER",
+    # ── LLM Prompt ──
+    "build_reading_prompt",
+    "generate_mock_report",
+    "check_llm_output",
+    "llm_fallback_report",
+    "DEFAULT_COMPLIANCE_RULES",
     # ── 报告 ──
     "generate",
     "DISCLAIMER",
