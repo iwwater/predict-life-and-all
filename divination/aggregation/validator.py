@@ -21,7 +21,7 @@ from .schema import (
     DivinationSignal,
     ValidationResult,
 )
-from .weights import get_weight
+from .weights import get_weight_for_method
 
 
 def validate(
@@ -32,8 +32,9 @@ def validate(
     """对所有信号进行交叉验证。
 
     Args:
-        signals: 所有术法的统一信号列表
+        signals: 所有术法的统一信号列表 (strength 0-1, confidence 0-1)
         intent: 意图分类结果
+        method_entries: 术法 tier 信息 [{method, label, tier}, ...]
 
     Returns:
         ValidationResult
@@ -45,8 +46,9 @@ def validate(
             risks=["未产生有效信号，建议提供更详细的信息后重试"],
         )
 
-    primary_domain = intent.get("primary_domain", "self_life")
-    sub_domains = intent.get("sub_domains", [primary_domain])
+    # 兼容新旧 intent 格式
+    primary_domain = intent.get("goal", intent.get("primary_domain", "self_life"))
+    sub_domains = intent.get("sub_goals", intent.get("sub_domains", [primary_domain]))
 
     # Step 1: 按领域分组信号
     domain_signals: dict[str, list[DivinationSignal]] = defaultdict(list)
@@ -59,10 +61,12 @@ def validate(
     # Step 3: 检测冲突
     conflict_items = _detect_conflicts(domain_signals)
 
-    # Step 4: 计算综合评分（传入 tier 信息）
-    overall_score = _compute_overall_score(domain_signals, consensus_items, conflict_items, primary_domain, method_entries)
+    # Step 4: 计算综合评分 (strength now 0-1)
+    overall_score = _compute_overall_score(
+        domain_signals, consensus_items, conflict_items, primary_domain, method_entries
+    )
 
-    # Step 5: 计算置信度
+    # Step 5: 计算置信度 (confidence now 0-1)
     confidence = _compute_confidence(signals, consensus_items, conflict_items)
 
     # Step 6: 生成风险提示
@@ -95,7 +99,9 @@ def _build_tier_multiplier(method_entries: list[dict[str, Any]] | None) -> dict[
     if not method_entries:
         return {}
     return {
-        e["method"]: {"primary": 1.5, "secondary": 1.0, "reference": 0.6}.get(e.get("tier", "secondary"), 1.0)
+        e["method"]: {"primary": 1.5, "secondary": 1.0, "reference": 0.6}.get(
+            e.get("tier", "secondary"), 1.0
+        )
         for e in method_entries
     }
 
@@ -113,7 +119,6 @@ def _detect_consensus(
     consensus: list[ConsensusItem] = []
 
     for domain, signals in domain_signals.items():
-        # 按极性分组
         pos_methods: set[str] = set()
         neg_methods: set[str] = set()
         neutral_methods: set[str] = set()
@@ -138,7 +143,7 @@ def _detect_consensus(
             )
             consensus.append(cons)
 
-        # Negative consensus (only flag if relevant)
+        # Negative consensus
         if len(neg_methods) >= 3:
             theme = _get_domain_theme(domain, "negative")
             cons = ConsensusItem(
@@ -150,7 +155,7 @@ def _detect_consensus(
             )
             consensus.append(cons)
 
-    # 也检测跨领域共识
+    # 跨领域共识
     if len(consensus) >= 3:
         all_supporting = set()
         for c in consensus:
@@ -206,7 +211,6 @@ def _detect_conflicts(
             else:
                 neutral.add(s.method)
 
-        # 需要至少 2 v 2 才算真正的冲突
         if len(pos) >= 2 and len(neg) >= 2:
             conflicts.append(ConflictItem(
                 domain=domain,
@@ -223,7 +227,7 @@ def _detect_conflicts(
     return conflicts
 
 
-# ── 综合评分 ─────────────────────────────────────────────────────────────────
+# ── 综合评分 (strength 0-1, confidence 0-1) ──────────────────────────────────
 
 def _compute_overall_score(
     domain_signals: dict[str, list[DivinationSignal]],
@@ -239,33 +243,30 @@ def _compute_overall_score(
     if not domain_signals:
         return 50.0
 
-    # tier 权重映射
     tier_multiplier = _build_tier_multiplier(method_entries)
 
-    # 加权平均所有信号
     total_weight = 0.0
     weighted_score = 0.0
 
     for domain, signals in domain_signals.items():
         for s in signals:
-            base_w = get_weight(s.method, domain)
+            base_w = get_weight_for_method(s.method, "", method_entries or [])
             tier_mul = tier_multiplier.get(s.method, 1.0)
             w = base_w * tier_mul
-            score = s.strength if s.polarity == "positive" else (
-                100 - s.strength if s.polarity == "negative" else 50
-            )
-            weighted_score += score * w * s.confidence / 100
+            # Map polarity + strength (0-1) to 0-100 score
+            if s.polarity == "positive":
+                score = 50.0 + s.strength * 50.0
+            elif s.polarity == "negative":
+                score = 50.0 - s.strength * 50.0
+            else:
+                score = 50.0
+            weighted_score += score * w * s.confidence
             total_weight += w
 
     base = weighted_score / max(1, total_weight)
 
-    # 共识加分
     consensus_bonus = min(15, len(consensus) * 5)
-
-    # 冲突扣分
     conflict_penalty = min(15, len(conflicts) * 5)
-
-    # 方法数量加分
     methods_used = len(set(s.method for signals in domain_signals.values() for s in signals))
     method_bonus = min(10, methods_used * 0.8)
 
@@ -277,11 +278,11 @@ def _compute_confidence(
     consensus: list[ConsensusItem],
     conflicts: list[ConflictItem],
 ) -> float:
-    """计算整体置信度。"""
+    """计算整体置信度 0-100。"""
     if not signals:
         return 30.0
 
-    avg_confidence = sum(s.confidence for s in signals) / len(signals)
+    avg_confidence = sum(s.confidence for s in signals) / len(signals) * 100  # 0-1 → 0-100
     methods_count = len(set(s.method for s in signals))
 
     consensus_bonus = min(15, len(consensus) * 4)
@@ -298,21 +299,19 @@ def _identify_risks(
     """识别风险提示。"""
     risks: list[str] = []
 
-    # 强负面信号
+    # 强负面信号 (strength now 0-1, threshold > 0.7)
     strong_negatives = [
         s for s in signals
-        if s.polarity == "negative" and s.strength > 70
+        if s.polarity == "negative" and s.strength > 0.7
     ]
     if strong_negatives:
         domains = set(s.domain for s in strong_negatives)
         for d in domains:
             risks.append(f"{d}领域存在较强负面信号，建议谨慎对待")
 
-    # 冲突
     if conflicts:
         risks.append(f"发现{len(conflicts)}处术法间分歧({', '.join(c.domain for c in conflicts)})，相关结论仅供参考")
 
-    # 方法覆盖率
     methods_used = set(s.method for s in signals)
     if len(methods_used) < 6:
         risks.append(f"仅{len(methods_used)}种术法产生有效信号(共12法)，部分术法因数据不足未参与分析")
@@ -349,7 +348,6 @@ def _generate_action_advice(
     """生成行动建议。"""
     advice: list[str] = []
 
-    # 基于共识的建议
     for c in consensus[:3]:
         if c.weight_strength > 60:
             if "有利" in c.theme or "较好" in c.theme:
@@ -357,7 +355,6 @@ def _generate_action_advice(
             elif "挑战" in c.theme or "波折" in c.theme:
                 advice.append(f"建议在{c.domain}领域保持谨慎，多做准备")
 
-    # 通用建议
     if not advice:
         advice.append(f"建议重点关注{primary_domain}领域的发展")
 

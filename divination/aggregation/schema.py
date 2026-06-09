@@ -95,25 +95,25 @@ class DivinationSignal(BaseModel):
         ...,
         description="信号键, e.g. 'day_master_strong', 'career_favorable'",
     )
-    polarity: Literal["positive", "negative", "neutral"] = Field(
+    polarity: Literal["positive", "negative", "neutral", "mixed"] = Field(
         ...,
-        description="极性",
+        description="极性 — positive: 正向, negative: 负向, neutral: 中性, mixed: 混合",
     )
     strength: float = Field(
         ...,
         ge=0,
-        le=100,
-        description="信号强度 0-100",
+        le=1,
+        description="信号强度 0-1 (NOR-018)",
     )
     evidence: str = Field(
         "",
         description="盘面依据 — 来自原始排盘的具体证据",
     )
     confidence: float = Field(
-        50.0,
+        0.5,
         ge=0,
-        le=100,
-        description="该信号在本术法内的置信度 0-100",
+        le=1,
+        description="该信号在本术法内的置信度 0-1",
     )
 
 

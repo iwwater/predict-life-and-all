@@ -49,9 +49,9 @@ def generate(
     Returns:
         ReadingReport
     """
-    primary_domain = intent.get("primary_domain", "self_life")
-    primary_label = intent.get("primary_label", "综合")
-    confidence = intent.get("confidence", 0.5)
+    primary_domain = intent.get("goal", intent.get("primary_domain", "self_life"))
+    primary_label = intent.get("goal_label", intent.get("primary_label", "综合"))
+    confidence = intent.get("goal_confidence", intent.get("confidence", 0.5))
 
     # 按领域分组信号
     domain_signals: dict[str, list[DivinationSignal]] = {}
@@ -139,8 +139,8 @@ def _generate_standard(
     """生成标准结构化报告。"""
     lines: list[str] = []
 
-    primary_domain = intent.get("primary_domain", "self_life")
-    primary_label = intent.get("primary_label", "综合")
+    primary_domain = intent.get("goal", intent.get("primary_domain", "self_life"))
+    primary_label = intent.get("goal_label", intent.get("primary_label", "综合"))
 
     lines.append(f"# 综合命理分析报告")
     lines.append(f"**基于术法**: {'、'.join(methods_used)}")
@@ -151,8 +151,9 @@ def _generate_standard(
     # ── 意图分析 ──
     lines.append("## 意图分析")
     lines.append(f"- 主领域: {primary_label}")
-    lines.append(f"- 子领域: {', '.join(intent.get('sub_domains', [primary_domain]))}")
-    lines.append(f"- 分类置信度: {intent.get('confidence', 0.5):.0%}")
+    sub_goals = intent.get("sub_goals", intent.get("sub_domains", [primary_domain]))
+    lines.append(f"- 子领域: {', '.join(sub_goals)}")
+    lines.append(f"- 分类置信度: {intent.get('goal_confidence', intent.get('confidence', 0.5)):.0%}")
     lines.append("")
 
     # ── 术法共识 ──
