@@ -19,17 +19,39 @@ const Almanac = lazy(() => import("./pages/Almanac").then((m) => ({ default: m.A
 const Compatibility = lazy(() => import("./pages/Compatibility").then((m) => ({ default: m.Compatibility })));
 const Reading = lazy(() => import("./pages/Reading").then((m) => ({ default: m.Reading })));
 const ReadingHistory = lazy(() => import("./pages/ReadingHistory").then((m) => ({ default: m.ReadingHistory })));
+const ResultSample = lazy(() => import("./pages/ResultSample").then((m) => ({ default: m.ResultSample })));
 const NotFound = lazy(() => import("./pages/NotFound").then((m) => ({ default: m.NotFound })));
 const DateSelect = lazy(() => import("./pages/DateSelect").then((m) => ({ default: m.DateSelect })));
 const Knowledge = lazy(() => import("./pages/Knowledge").then((m) => ({ default: m.Knowledge })));
+
+// Method pages
+const TarotPage = lazy(() => import("./pages/methods/TarotPage").then((m) => ({ default: m.TarotPage })));
+const LiuyaoPage = lazy(() => import("./pages/methods/LiuyaoPage").then((m) => ({ default: m.LiuyaoPage })));
+const XuankongPage = lazy(() => import("./pages/methods/XuankongPage").then((m) => ({ default: m.XuankongPage })));
+const NumerologyPage = lazy(() => import("./pages/methods/NumerologyPage").then((m) => ({ default: m.NumerologyPage })));
+const BaziV2Page = lazy(() => import("./pages/methods/BaziV2Page").then((m) => ({ default: m.BaziV2Page })));
+const BaziPage = lazy(() => import("./pages/methods/BaziPage").then((m) => ({ default: m.BaziPage })));
+const ZiweiPage = lazy(() => import("./pages/methods/ZiweiPage").then((m) => ({ default: m.ZiweiPage })));
+const WesternPage = lazy(() => import("./pages/methods/WesternPage").then((m) => ({ default: m.WesternPage })));
+const VedicPage = lazy(() => import("./pages/methods/VedicPage").then((m) => ({ default: m.VedicPage })));
+const QimenPage = lazy(() => import("./pages/methods/QimenPage").then((m) => ({ default: m.QimenPage })));
+const ChengguPage = lazy(() => import("./pages/methods/ChengguPage").then((m) => ({ default: m.ChengguPage })));
+const LiurenPage = lazy(() => import("./pages/methods/LiurenPage").then((m) => ({ default: m.LiurenPage })));
+const TiebanPage = lazy(() => import("./pages/methods/TiebanPage").then((m) => ({ default: m.TiebanPage })));
+const MeihuaPage = lazy(() => import("./pages/methods/MeihuaPage").then((m) => ({ default: m.MeihuaPage })));
+const BazhaiPage = lazy(() => import("./pages/methods/BazhaiPage").then((m) => ({ default: m.BazhaiPage })));
+const LenormandPage = lazy(() => import("./pages/methods/LenormandPage").then((m) => ({ default: m.LenormandPage })));
+const XiaoliurenPage = lazy(() => import("./pages/methods/XiaoliurenPage").then((m) => ({ default: m.XiaoliurenPage })));
+
+// Aggregate
+const AggregatePage = lazy(() => import("./pages/AggregatePage").then((m) => ({ default: m.AggregatePage })));
 
 function PageLoader() {
   return (
     <div className="flex items-center justify-center min-h-[40vh]">
       <div className="space-y-3 text-center">
-        <div className="w-8 h-8 mx-auto rounded-full border-2 border-dashed spin-slow"
-          style={{ borderColor: "var(--gold-dim)" }} />
-        <div className="text-xs" style={{ color: "var(--muted)" }}>Loading...</div>
+        <span className="paper-pulse" style={{ width: "1.5rem", height: "1.5rem", display: "inline-block" }} />
+        <div style={{ fontSize: "0.72rem", color: "var(--ink-soft)" }}>Loading...</div>
       </div>
     </div>
   );
@@ -38,7 +60,7 @@ function PageLoader() {
 export function App() {
   return (
     <I18nProvider>
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
         <ErrorBoundary>
           <SEO />
           <Suspense fallback={<PageLoader />}>
@@ -58,6 +80,27 @@ export function App() {
                 <Route path="/reading" element={<Reading />} />
                 <Route path="/reading-history" element={<ReadingHistory />} />
                 <Route path="/about" element={<About />} />
+                {/* Method-specific pages */}
+                <Route path="/method/bazi" element={<BaziPage />} />
+                <Route path="/method/bazi-v2" element={<BaziV2Page />} />
+                <Route path="/method/ziwei" element={<ZiweiPage />} />
+                <Route path="/method/qimen" element={<QimenPage />} />
+                <Route path="/method/liuyao" element={<LiuyaoPage />} />
+                <Route path="/method/meihua" element={<MeihuaPage />} />
+                <Route path="/method/chenggu" element={<ChengguPage />} />
+                <Route path="/method/liuren" element={<LiurenPage />} />
+                <Route path="/method/tieban" element={<TiebanPage />} />
+                <Route path="/method/western" element={<WesternPage />} />
+                <Route path="/method/vedic" element={<VedicPage />} />
+                <Route path="/method/tarot" element={<TarotPage />} />
+                <Route path="/method/lenormand" element={<LenormandPage />} />
+                <Route path="/method/numerology" element={<NumerologyPage />} />
+                <Route path="/method/xuankong" element={<XuankongPage />} />
+                <Route path="/method/bazhai" element={<BazhaiPage />} />
+                <Route path="/method/xiaoliuren" element={<XiaoliurenPage />} />
+                {/* Aggregate */}
+                <Route path="/aggregate" element={<AggregatePage />} />
+                <Route path="/result-sample" element={<ResultSample />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Routes>

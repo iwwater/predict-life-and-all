@@ -1,20 +1,18 @@
-// 侧边栏导航: 中西合璧分类 + 移动端抽屉 + 华美装饰
+// 侧边栏导航:「古籍×仪器」风格 — 纸墨底,栏线分隔,无 emoji
 import { NavLink, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { COLOR } from "./ui";
-import { PlanetSymbols, YinYang } from "./MysticElements";
 import { useI18n } from "../lib/i18n";
 
 export interface NavItem {
   to: string;
   label: string;
-  icon: string;
 }
 
 export interface NavSection {
   label?: string;
   items: NavItem[];
-  accent?: string; // CSS color for section accent
+  accent?: string;
 }
 
 function isActiveLink(to: string, pathname: string, search: string): boolean {
@@ -47,140 +45,164 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   const SECTIONS: NavSection[] = [
     {
       items: [
-        { to: "/", label: t("nav.home"), icon: "🏠" },
+        { to: "/", label: t("nav.home") },
       ],
     },
     {
-      label: "聚合解读",
-      accent: COLOR.gold,
+      label: t("section.eastMantra"),
+      accent: COLOR.verdigris,
       items: [
-        { to: "/reading", label: "12法合参", icon: "🔮" },
-        { to: "/reading-history", label: "报告历史", icon: "📋" },
+        { to: "/method/bazi-v2", label: t("nav.baziV2") },
+        { to: "/method/bazi", label: t("nav.bazi") },
+        { to: "/method/ziwei", label: t("nav.ziwei") },
+        { to: "/method/qimen", label: "奇门遁甲" },
+        { to: "/method/liuren", label: t("nav.liuren") },
+        { to: "/method/liuyao", label: t("nav.liuyao") },
+        { to: "/method/meihua", label: t("nav.meihua") },
+        { to: "/method/xiaoliuren", label: t("nav.xiaoliuren") },
+        { to: "/method/chenggu", label: t("nav.chenggu") },
+        { to: "/method/tieban", label: t("nav.tieban") },
       ],
     },
     {
-      label: t("section.east"),
-      accent: COLOR.jade,
+      label: t("section.westOracle"),
+      accent: COLOR.indigo,
       items: [
-        { to: "/cast", label: t("nav.cast"), icon: "📜" },
-        { to: "/daily", label: t("nav.daily"), icon: "☀️" },
-        { to: "/almanac", label: t("nav.almanac"), icon: "📅" },
-        { to: "/dateselect", label: t("nav.dateselect"), icon: "🗓️" },
-        { to: "/fengshui", label: t("nav.fengshui"), icon: "🧭" },
+        { to: "/method/western", label: t("nav.western") },
+        { to: "/method/vedic", label: t("nav.vedic") },
+        { to: "/method/tarot", label: t("nav.tarot") },
+        { to: "/method/lenormand", label: t("nav.lenormand") },
+        { to: "/method/numerology", label: t("nav.numerology") },
       ],
     },
     {
-      label: t("section.west"),
-      accent: COLOR.azure,
+      label: t("section.fengshuiNav"),
+      accent: COLOR.cinnabar,
       items: [
-        { to: "/cast?methods=tarot&spread=celtic_cross", label: t("nav.tarot"), icon: "🃏" },
-        { to: "/cast?methods=western", label: t("nav.astrology"), icon: "✨" },
-        { to: "/cast?methods=numerology", label: t("nav.numerology"), icon: "🔢" },
+        { to: "/method/xuankong", label: t("nav.xuankong") },
+        { to: "/method/bazhai", label: t("nav.bazhai") },
+        { to: "/fengshui", label: t("nav.fengshui") },
       ],
     },
     {
-      label: t("section.compat"),
-      accent: COLOR.goldBright,
+      label: t("section.aggregateNav"),
+      accent: COLOR.cinnabar,
       items: [
-        { to: "/compatibility", label: t("nav.compatibility"), icon: "💞" },
+        { to: "/aggregate", label: t("nav.aggregate") },
+        { to: "/reading", label: "12法合参" },
+        { to: "/compatibility", label: t("nav.compatibility") },
+        { to: "/dateselect", label: t("nav.dateselect") },
+        { to: "/daily", label: t("nav.daily") },
+        { to: "/almanac", label: t("nav.almanac") },
       ],
     },
     {
       label: t("section.more"),
       items: [
-        { to: "/knowledge", label: t("nav.knowledge"), icon: "📖" },
-        { to: "/history", label: t("nav.history"), icon: "📋" },
-        { to: "/about", label: t("nav.about"), icon: "ℹ️" },
+        { to: "/knowledge", label: t("nav.knowledge") },
+        { to: "/history", label: t("nav.history") },
+        { to: "/about", label: t("nav.about") },
       ],
     },
   ];
 
+  // 路由变化时关闭移动端侧栏
   useEffect(() => {
     onClose();
   }, [location.pathname, location.search]);
 
   return (
     <>
-      {/* Mobile backdrop */}
+      {/* 移动端遮罩 */}
       {open && (
         <div
-          className="fixed inset-0 z-40 lg:hidden sidebar-backdrop-enter"
-          style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(3px)" }}
+          className="fixed inset-0 z-40 lg:hidden"
+          style={{ background: "rgba(0,0,0,0.35)" }}
           onClick={onClose}
         />
       )}
 
-      {/* Sidebar */}
+      {/* 侧边栏 */}
       <aside
         className={[
-          "fixed inset-y-0 left-0 z-50 w-[248px] flex flex-col border-r overflow-y-auto",
-          "transition-transform duration-300 ease-out",
+          "fixed inset-y-0 left-0 z-50 w-[232px] flex flex-col border-r overflow-y-auto",
+          "transition-transform duration-200 ease-out",
           "lg:translate-x-0",
           open ? "translate-x-0" : "-translate-x-full",
         ].join(" ")}
         style={{
-          background: `linear-gradient(180deg, ${COLOR.bgDeep} 0%, #0C1018 40%, ${COLOR.surface} 100%)`,
-          borderColor: COLOR.line,
+          background: "var(--paper-2)",
+          borderColor: "var(--rule)",
         }}
       >
-        {/* Subtle ambient glow at top */}
-        <div
-          className="absolute top-0 left-0 right-0 h-32 pointer-events-none"
-          style={{
-            background: `radial-gradient(ellipse at 50% 0%, rgba(201,162,75,0.06) 0%, transparent 70%)`,
-          }}
-        />
-
         {/* Logo */}
         <NavLink
           to="/"
-          className="relative flex items-center gap-2 px-5 h-16 shrink-0 tap group"
+          className="flex items-center gap-2.5 px-4 h-14 shrink-0"
           onClick={onClose}
-          style={{ borderBottom: `1px solid ${COLOR.lineSoft}` }}
+          style={{ borderBottom: "1px solid var(--rule)" }}
         >
-          {/* Logo glow ring */}
-          <span className="relative flex items-center justify-center w-7 h-7 shrink-0">
-            <span
-              className="absolute inset-0 rounded-full opacity-30"
-              style={{
-                background: `radial-gradient(circle, ${COLOR.gold} 0%, transparent 70%)`,
-                animation: "pulse 2s ease-in-out infinite",
-              }}
-            />
-            <span
-              className="inline-block w-2.5 h-2.5 rounded-full glow-breathe relative z-10"
-              style={{ background: COLOR.gold, boxShadow: `0 0 12px ${COLOR.gold}` }}
-            />
+          <span
+            style={{
+              display: "inline-block",
+              width: "0.7rem",
+              height: "0.7rem",
+              background: "var(--cinnabar)",
+              borderRadius: 1,
+              flexShrink: 0,
+            }}
+          />
+          <span style={{
+            fontFamily: "'Noto Serif SC', serif",
+            fontWeight: 700,
+            fontSize: "1rem",
+            letterSpacing: "0.06em",
+            color: "var(--ink)",
+          }}>
+            Mystic Hub
           </span>
-          <span className="font-display text-lg tracking-wider text-shimmer" style={{ color: COLOR.ink }}>
-            {t("app.name") === "玄枢" ? "Mystic Hub" : "Mystic Hub"}
-          </span>
-          <span className="text-[10px] uppercase tracking-[0.2em] opacity-60 group-hover:opacity-100 transition-opacity" style={{ color: COLOR.muted }}>
+          <span style={{
+            fontFamily: "'Noto Serif SC', serif",
+            fontSize: "0.7rem",
+            color: "var(--ink-soft)",
+            letterSpacing: "0.3em",
+          }}>
             {t("app.name")}
           </span>
         </NavLink>
 
-        {/* Nav sections */}
-        <nav className="relative flex-1 px-3 py-4 space-y-5">
+        {/* 导航区段 */}
+        <nav className="flex-1 px-3 py-4 space-y-4">
           {SECTIONS.map((section, si) => (
             <div key={si}>
               {section.label && (
-                <div className="flex items-center gap-2 px-3 mb-2">
+                <div className="flex items-center gap-1.5 px-2 mb-1.5">
                   {section.accent && (
                     <span
-                      className="inline-block w-1 h-1 rounded-full sidebar-accent-line"
-                      style={{ background: section.accent, boxShadow: `0 0 4px ${section.accent}` }}
+                      style={{
+                        display: "inline-block",
+                        width: 4,
+                        height: 4,
+                        background: section.accent,
+                        borderRadius: "50%",
+                        flexShrink: 0,
+                      }}
                     />
                   )}
                   <span
-                    className="text-[10px] uppercase tracking-[0.25em] font-semibold"
-                    style={{ color: section.accent || COLOR.goldDim }}
+                    style={{
+                      fontFamily: "'Noto Serif SC', serif",
+                      fontSize: "0.65rem",
+                      fontWeight: 600,
+                      letterSpacing: "0.25em",
+                      color: section.accent || "var(--ink-soft)",
+                    }}
                   >
                     {section.label}
                   </span>
                 </div>
               )}
-              <ul className="space-y-0.5">
+              <ul className="space-y-px">
                 {section.items.map((item, ii) => {
                   const active = isActiveLink(item.to, location.pathname, location.search);
                   return (
@@ -188,26 +210,17 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                       <NavLink
                         to={item.to}
                         onClick={onClose}
-                        className={[
-                          "flex items-center gap-2.5 px-3 py-2.5 rounded-md text-sm transition-all duration-200 tap",
-                          active ? "sidebar-link-active" : "sidebar-link",
-                        ].join(" ")}
+                        className="block px-2.5 py-2 rounded-sm text-sm transition-colors"
                         style={{
-                          color: active ? COLOR.goldBright : COLOR.inkSoft,
-                          background: active
-                            ? `linear-gradient(90deg, rgba(201,162,75,0.12) 0%, rgba(201,162,75,0.04) 100%)`
-                            : "transparent",
+                          fontFamily: "'Noto Serif SC', serif",
+                          color: active ? "var(--cinnabar)" : "var(--ink-soft)",
                           fontWeight: active ? 600 : 400,
+                          background: active ? "rgba(176, 58, 46, 0.06)" : "transparent",
+                          borderLeft: active ? "2px solid var(--cinnabar)" : "2px solid transparent",
+                          letterSpacing: "0.05em",
                         }}
                       >
-                        <span className="text-base w-5 text-center shrink-0">{item.icon}</span>
-                        <span>{item.label}</span>
-                        {active && (
-                          <span
-                            className="ml-auto inline-block w-1.5 h-1.5 rounded-full"
-                            style={{ background: COLOR.goldBright, boxShadow: `0 0 8px ${COLOR.gold}` }}
-                          />
-                        )}
+                        {item.label}
                       </NavLink>
                     </li>
                   );
@@ -217,25 +230,18 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           ))}
         </nav>
 
-        {/* Footer tagline with decorative top border */}
+        {/* 底部标识 */}
         <div
-          className="relative px-5 py-4 text-[9px] text-center shrink-0"
-          style={{ borderTop: `1px solid ${COLOR.lineSoft}` }}
+          className="px-4 py-3 text-center shrink-0"
+          style={{ borderTop: "1px solid var(--rule)" }}
         >
-          {/* 行星符号行 */}
-          <div className="flex justify-center mb-2">
-            <PlanetSymbols size={12} />
-          </div>
-          {/* Decorative diamond in footer */}
-          <div className="flex items-center justify-center gap-2 mb-1">
-            <span style={{ color: COLOR.goldDim, fontSize: "6px" }}>◆</span>
-            <YinYang size={18} />
-            <span style={{ color: COLOR.goldDim, fontSize: "6px" }}>◆</span>
-          </div>
-          <div className="flex items-center justify-center gap-2">
-            <span style={{ color: COLOR.goldDim, fontSize: "6px" }}>◆</span>
-            <span style={{ color: COLOR.muted }}>{t("app.tagline")}</span>
-            <span style={{ color: COLOR.goldDim, fontSize: "6px" }}>◆</span>
+          <div style={{
+            fontFamily: "'Noto Serif SC', serif",
+            fontSize: "0.6rem",
+            color: "var(--ink-soft)",
+            letterSpacing: "0.2em",
+          }}>
+            {t("app.tagline")}
           </div>
         </div>
       </aside>

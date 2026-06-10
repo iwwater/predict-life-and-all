@@ -1,24 +1,14 @@
-// 侧边栏 + 顶部精简栏 + 主内容区布局 + 奢华氛围
+// 古籍×仪器 布局:侧边栏 + 顶部栏 + 主内容 + 凡例式页脚
 import { Outlet, useLocation } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
-import { Starfield, GoldDust } from "./Interactions";
 import { Sidebar } from "./Sidebar";
 import { COLOR } from "./ui";
-import { StarArray, PlanetSymbols } from "./MysticElements";
 import { useI18n } from "../lib/i18n";
 
 export function Layout() {
   const location = useLocation();
-  const [showStars, setShowStars] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { t, lang, toggle: toggleLang } = useI18n();
-
-  // Starfield + GoldDust 只在首页/排盘/结果显示
-  useEffect(() => {
-    setShowStars(["/", "/cast", "/result", "/reading"].some(
-      (p) => location.pathname === p || location.pathname.startsWith(p + "/")
-    ));
-  }, [location.pathname]);
 
   // Close sidebar on Escape
   useEffect(() => {
@@ -32,108 +22,68 @@ export function Layout() {
   const toggleSidebar = useCallback(() => setSidebarOpen((v) => !v), []);
 
   return (
-    <div className="min-h-full flex">
-      {/* 星空背景 */}
-      {showStars && (
-        <div className="fixed inset-0 z-0 pointer-events-none" aria-hidden>
-          <Starfield count={55} />
-          {/* 金尘氛围粒子 */}
-          <GoldDust count={20} />
-          {/* 星辰阵列 (玄学元素) */}
-          <div className="absolute inset-0">
-            <StarArray count={9} size={20} />
-          </div>
-        </div>
-      )}
-
+    <div className="min-h-full flex paper-page">
       {/* 侧边栏 */}
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* 主区域 */}
-      <div className="flex-1 flex flex-col min-h-full lg:ml-[248px]">
-        {/* 顶部精简栏 */}
+      <div className="flex-1 flex flex-col min-h-full lg:ml-[232px]">
+        {/* 顶部栏 — 界格线底边, 无毛玻璃 */}
         <header
-          className="sticky top-0 z-30 backdrop-blur-md border-b h-12 flex items-center"
+          className="sticky top-0 z-30 flex items-center h-12"
           style={{
-            background: "rgba(8, 10, 15, 0.82)",
-            borderColor: COLOR.line,
-            boxShadow: `0 1px 0 0 ${COLOR.lineSoft}`,
+            background: "var(--paper)",
+            borderBottom: "1px solid var(--rule)",
           }}
         >
-          {/* 顶部栏底部微光 */}
-          <div
-            className="absolute bottom-0 left-0 right-0 h-px pointer-events-none"
-            style={{
-              background: `linear-gradient(90deg, transparent 0%, ${COLOR.goldDim}20 20%, ${COLOR.goldBright}30 50%, ${COLOR.goldDim}20 80%, transparent 100%)`,
-            }}
-          />
-
-          <div className="flex-1 flex items-center justify-between px-4 sm:px-6 relative">
+          <div className="flex-1 flex items-center justify-between px-4 sm:px-6">
             {/* 左侧:汉堡 + 面包屑 */}
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                className="lg:hidden flex items-center justify-center w-8 h-8 rounded-md tap transition-colors"
-                style={{ color: COLOR.inkSoft, background: "rgba(255,255,255,0.04)" }}
+                className="lg:hidden flex items-center justify-center w-8 h-8"
+                style={{ color: "var(--ink-soft)", fontFamily: "'Noto Serif SC', serif" }}
                 onClick={toggleSidebar}
                 aria-label={sidebarOpen ? "关闭侧栏" : "打开侧栏"}
               >
-                <span className="text-sm">{sidebarOpen ? "✕" : "☰"}</span>
+                <span style={{ fontSize: "1.1rem" }}>{sidebarOpen ? "✕" : "☰"}</span>
               </button>
               <Breadcrumb pathname={location.pathname} />
             </div>
 
-            {/* 右侧:语言切换 + 装饰性标识 + 行星符号 */}
-            <div className="flex items-center gap-2 text-xs" style={{ color: COLOR.muted }}>
-              <PlanetSymbols size={11} className="hidden lg:flex opacity-40" />
-              {/* 语言切换按钮 */}
+            {/* 右侧:语言切换 + 标识 */}
+            <div className="flex items-center gap-3 text-xs" style={{ color: "var(--ink-soft)" }}>
               <button
                 type="button"
                 onClick={toggleLang}
-                className="tap px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider transition-all"
-                style={{
-                  background: "rgba(201,162,75,0.10)",
-                  border: `1px solid ${COLOR.goldDim}60`,
-                  color: COLOR.goldBright,
-                }}
-                title={lang === "zh" ? "Switch to English" : "切换到中文"}
+                className="paper-tag"
+                style={{ cursor: "pointer", fontFamily: "'JetBrains Mono', monospace", fontSize: "0.65rem" }}
               >
-                {t("lang.switch")}
+                {lang === "zh" ? "EN" : "中"}
               </button>
-              <span
-                className="hidden sm:inline-block w-1.5 h-1.5 rounded-full glow-breathe"
-                style={{ background: COLOR.gold, boxShadow: `0 0 6px ${COLOR.gold}` }}
-              />
-              <span className="hidden sm:inline tracking-wide" style={{ color: COLOR.inkSoft }}>
+              <span className="hidden sm:inline" style={{ fontFamily: "'Noto Serif SC', serif", letterSpacing: "0.08em" }}>
                 {t("app.name")} · {t("app.tagline").split(" · ")[0]}
               </span>
             </div>
           </div>
         </header>
 
-        {/* 主内容 (带页面过渡) */}
-        <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 relative z-10 page-enter">
+        {/* 主内容 */}
+        <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 py-5 animate-fade-in">
           <Outlet />
         </main>
 
-        {/* Footer */}
+        {/* Footer — 凡例样式 */}
         <footer
-          className="border-t mt-auto relative z-10"
-          style={{
-            background: `linear-gradient(180deg, rgba(8,10,15,0.4) 0%, rgba(8,10,15,0.7) 100%)`,
-            borderColor: COLOR.line,
-          }}
+          className="mt-auto"
+          style={{ borderTop: "1px solid var(--rule)" }}
         >
-          {/* Footer 顶部金线 */}
-          <div
-            className="h-px"
-            style={{
-              background: `linear-gradient(90deg, transparent 10%, ${COLOR.goldDim}40 30%, ${COLOR.gold}50 50%, ${COLOR.goldDim}40 70%, transparent 90%)`,
-            }}
-          />
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 text-xs space-y-2" style={{ color: COLOR.muted }}>
-            <p>{t("app.disclaimer")}</p>
-            <p>{t("app.compliance")}</p>
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5">
+            <div className="paper-fanli">
+              <div className="paper-fanli-title">凡 例</div>
+              <p>{t("app.disclaimer")}</p>
+              <p style={{ marginTop: "0.5rem" }}>{t("app.compliance")}</p>
+            </div>
           </div>
         </footer>
       </div>
@@ -141,13 +91,28 @@ export function Layout() {
   );
 }
 
-// 面包屑:从路径推导 (bilingual)
+// 面包屑:从路径推导
 function Breadcrumb({ pathname }: { pathname: string }) {
   const { t, lang } = useI18n();
   const crumbs: { label: string; to?: string }[] = [];
 
   if (pathname === "/") {
     crumbs.push({ label: t("nav.home") });
+  } else if (pathname.startsWith("/method/")) {
+    crumbs.push({ label: t("nav.home"), to: "/" });
+    const m = pathname.replace("/method/", "");
+    const labels: Record<string, string> = {
+      bazi: t("nav.bazi"), "bazi-v2": t("nav.baziV2"), ziwei: t("nav.ziwei"), qimen: "奇门遁甲",
+      liuyao: t("nav.liuyao"), meihua: t("nav.meihua"), chenggu: t("nav.chenggu"),
+      liuren: t("nav.liuren"), tieban: t("nav.tieban"), xiaoliuren: t("nav.xiaoliuren"),
+      western: t("nav.western"), vedic: t("nav.vedic"),
+      tarot: t("nav.tarot"), lenormand: t("nav.lenormand"), numerology: t("nav.numerology"),
+      xuankong: t("nav.xuankong"), bazhai: t("nav.bazhai"),
+    };
+    crumbs.push({ label: labels[m] || m });
+  } else if (pathname.startsWith("/aggregate")) {
+    crumbs.push({ label: t("nav.home"), to: "/" });
+    crumbs.push({ label: t("nav.aggregate") });
   } else if (pathname.startsWith("/cast")) {
     crumbs.push({ label: t("nav.home"), to: "/" });
     crumbs.push({ label: t("nav.cast") });
@@ -161,6 +126,9 @@ function Breadcrumb({ pathname }: { pathname: string }) {
     crumbs.push({ label: t("nav.home"), to: "/" });
     crumbs.push({ label: t("nav.cast"), to: "/cast" });
     crumbs.push({ label: lang === "zh" ? "结果" : "Result" });
+  } else if (pathname.startsWith("/result-sample")) {
+    crumbs.push({ label: t("nav.home"), to: "/" });
+    crumbs.push({ label: lang === "zh" ? "风格样张" : "Style Sample" });
   } else if (pathname.startsWith("/daily")) {
     crumbs.push({ label: t("nav.home"), to: "/" });
     crumbs.push({ label: t("nav.daily") });
@@ -193,16 +161,16 @@ function Breadcrumb({ pathname }: { pathname: string }) {
   }
 
   return (
-    <nav className="flex items-center gap-1.5 text-xs" style={{ color: COLOR.muted }} aria-label="面包屑">
+    <nav className="flex items-center gap-1.5 text-xs" style={{ color: "var(--ink-soft)" }} aria-label="面包屑">
       {crumbs.map((c, i) => (
-        <span key={i} className="flex items-center gap-1.5">
-          {i > 0 && <span style={{ color: COLOR.line }}>/</span>}
+        <span key={i} className="flex items-center gap-1.5" style={{ fontFamily: "'Noto Serif SC', serif" }}>
+          {i > 0 && <span style={{ color: "var(--rule)" }}>/</span>}
           {c.to ? (
-            <a href={c.to} className="hover:underline transition-colors" style={{ color: COLOR.inkSoft }}>
+            <a href={c.to} className="paper-link" style={{ fontSize: "0.75rem", borderBottom: "none" }}>
               {c.label}
             </a>
           ) : (
-            <span style={{ color: COLOR.goldBright }}>{c.label}</span>
+            <span style={{ color: "var(--cinnabar)", fontWeight: 600 }}>{c.label}</span>
           )}
         </span>
       ))}

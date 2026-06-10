@@ -4,7 +4,7 @@ export type Method =
   | "bazi" | "bazi_v2" | "ziwei" | "qimen" | "liuyao" | "meihua" | "chenggu"
   | "bazhai" | "xuankong"
   | "western" | "vedic" | "tarot" | "numerology"
-  | "lenormand" | "liuren" | "tieban"
+  | "lenormand" | "liuren" | "tieban" | "xiaoliuren"
   | "cross_validator" | "hour_calibrator" | "compatibility";
 
 export type Subject =
@@ -119,6 +119,7 @@ export interface ReadingAPIRequest {
     construction_year?: number | null;
     address?: string | null;
   } | null;
+  method_options?: Record<string, any> | null;
   methods?: string[] | null;
   depth?: ReadingDepth;
   language?: "zh" | "en";

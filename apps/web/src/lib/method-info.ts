@@ -24,6 +24,7 @@ export const METHOD_PLAIN: Record<Method, MethodPlain> = {
   lenormand: { tagline: "36张具体象征牌，组合解读日常", bestFor: "Grand Tableau、日常决策、组合解读", sample: "今天的状况怎么看?", source: "Petit Lenormand 体系" },
   liuren: { tagline: "三式之首，天地盘四课三传断人事", bestFor: "人事决疑、天时地利、三式之首", sample: "这件事的因果走向如何?", source: "大六壬传统体系" },
   tieban: { tagline: "铁板条文，太玄数编码考刻分", bestFor: "铁板条文、六亲校验、神数定数", sample: "我的铁板神数条文是什么?", source: "铁板神数传统体系" },
+  xiaoliuren: { tagline: "掌诀速断，月日时三轮推六宫", bestFor: "小六壬掌诀、即时决疑、出行择时", sample: "今天出行顺利吗?", source: "小六壬掌诀体系" },
   cross_validator: { tagline: "多系统交叉验证·合参置信", bestFor: "多术数合参、置信度评估、交叉验证", sample: "八字和紫微结果一致吗?", source: "多系统ensemble方法" },
   hour_calibrator: { tagline: "时辰校准·解决排盘幻觉", bestFor: "出生时辰不确定、定盘校验", sample: "我不确定出生时辰，帮我校准?", source: "AI时辰校准算法" },
   compatibility: { tagline: "八字合婚·五行互补分析", bestFor: "婚配合盘、关系匹配度、五行互补", sample: "我们俩八字合不合?", source: "子平合婚体系" },
