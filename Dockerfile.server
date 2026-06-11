@@ -22,6 +22,8 @@ RUN pip install --upgrade pip \
         "iztro-py>=0.1.0" \
         "kinqimen>=0.1.0" \
         "skyfield>=1.48" \
+        "skyfield-data>=7.0.0" \
+        "jplephem>=2.21" \
         "fastapi>=0.110" \
         "uvicorn[standard]>=0.27" \
         "pydantic>=2.6" \
@@ -41,21 +43,16 @@ WORKDIR /app
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
-# Pre-fetch JPL DE421 ephemeris (~17 MB) so runtime never needs network
-# Skyfield's default URL; the file is public domain.
-RUN mkdir -p /app/data && \
-    curl -fsSL -o /app/data/de421.bsp \
-        https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de421.bsp \
-    && ls -lh /app/data/de421.bsp
+# Keep JPL DE421 ephemeris inside the image so runtime never needs network.
+COPY de421.bsp /app/de421.bsp
+RUN mkdir -p /app/data && cp /app/de421.bsp /app/data/de421.bsp
 
-# Skyfield looks for 'de421.bsp' in CWD or ~/.skyfield. Symlink the CWD copy
-# so engines/western.py + engines/vedic.py (which call load("de421.bsp"))
-# find it without code changes.
 ENV SKYFIELD_PATH=/app/data
 
 # Copy app code
 COPY divination/ /app/divination/
 COPY server/     /app/server/
+COPY skyfield_data/ /app/skyfield_data/
 
 EXPOSE 8000
 

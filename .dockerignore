@@ -15,6 +15,7 @@ build/
 .ruff_cache/
 .mypy_cache/
 *.bsp
+!de421.bsp
 
 # Node
 apps/web/node_modules/

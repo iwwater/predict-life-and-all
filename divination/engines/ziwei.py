@@ -1,22 +1,162 @@
-"""紫微斗数  ——  py-iztro (上游 iztro, MIT)。"""
-from py_iztro import Astro
+"""Zi Wei Dou Shu charting via the iztro Python ports."""
+
+from __future__ import annotations
+
+from datetime import date
+from typing import Any, Callable
+
 from ..contracts import Birth, ChartResult
 
-_astro = Astro()
+ENGINE_NAME = "py-iztro"
+RULE_VERSION = "v1"
+
+
+def _load_by_solar() -> Callable[[str, int, str], Any]:
+    try:
+        from py_iztro import Astro  # type: ignore
+
+        astro = Astro()
+        return lambda solar_date, time_index, gender: astro.by_solar(
+            solar_date, time_index, gender, True, "zh-CN"
+        )
+    except ModuleNotFoundError:
+        import iztro_py  # type: ignore
+
+        return lambda solar_date, time_index, gender: iztro_py.by_solar(
+            solar_date, time_index, gender, True, "zh-CN"
+        )
+
+
+_by_solar = _load_by_solar()
+
+
+def _time_index(hour: int) -> int:
+    """iztro uses 0 for early Zi, 1-11 for Chou-Hai, and 12 for late Zi."""
+    if hour == 23:
+        return 12
+    return max(0, min(11, (hour + 1) // 2))
+
+
+def _text(value: Any) -> str:
+    if value is None:
+        return ""
+    return str(value)
+
+
+def _star_names(stars: Any) -> list[str]:
+    return [_text(getattr(star, "name", star)) for star in (stars or [])]
+
+
+def _model_dict(value: Any) -> dict[str, Any]:
+    if value is None:
+        return {}
+    if isinstance(value, dict):
+        return value
+    if hasattr(value, "model_dump"):
+        return value.model_dump()
+    if hasattr(value, "dict"):
+        return value.dict()
+    return getattr(value, "__dict__", {}) or {}
+
+
+def _item_ganzhi(item: dict[str, Any]) -> str:
+    stem = item.get("heavenly_stem") or item.get("stem") or ""
+    branch = item.get("earthly_branch") or item.get("branch") or ""
+    return _text(item.get("ganzhi") or f"{stem}{branch}")
+
+
+def _horoscope(chart: Any, birth: Birth, time_index: int) -> dict[str, Any]:
+    query_date = f"{date.today().year}-{birth.month}-{birth.day}"
+    try:
+        raw = _model_dict(chart.horoscope(query_date, time_index))
+    except Exception:
+        raw = {}
+
+    result: dict[str, Any] = {}
+    for scope in ("decadal", "yearly", "monthly", "daily", "hourly"):
+        item = _model_dict(raw.get(scope))
+        mutagen = list(item.get("mutagen") or item.get("mutagens") or [])
+        result[scope] = {
+            "name": _text(item.get("name") or scope),
+            "index": item.get("index"),
+            "ganzhi": _item_ganzhi(item),
+            "heavenly_stem": _text(item.get("heavenly_stem")),
+            "earthly_branch": _text(item.get("earthly_branch")),
+            "palace_names": item.get("palace_names") or [],
+            "mutagen": [_text(x) for x in mutagen[:4]],
+        }
+
+    return result
+
+
+def _palaces(chart: Any) -> list[dict[str, Any]]:
+    palaces: list[dict[str, Any]] = []
+    for palace in getattr(chart, "palaces", []) or []:
+        palaces.append(
+            {
+                "name": _text(getattr(palace, "name", "")),
+                "index": getattr(palace, "index", None),
+                "is_body": bool(getattr(palace, "is_body_palace", False)),
+                "is_body_palace": bool(getattr(palace, "is_body_palace", False)),
+                "is_original_palace": bool(getattr(palace, "is_original_palace", False)),
+                "heavenly_stem": _text(getattr(palace, "heavenly_stem", "")),
+                "earthly_branch": _text(getattr(palace, "earthly_branch", "")),
+                "major_stars": _star_names(getattr(palace, "major_stars", [])),
+                "minor_stars": _star_names(getattr(palace, "minor_stars", [])),
+                "adjective_stars": _star_names(getattr(palace, "adjective_stars", [])),
+                "changsheng12": _text(getattr(palace, "changsheng12", "")),
+                "boshi12": _text(getattr(palace, "boshi12", "")),
+                "jiangqian12": _text(getattr(palace, "jiangqian12", "")),
+                "suiqian12": _text(getattr(palace, "suiqian12", "")),
+            }
+        )
+    return palaces
+
+
+def _palace_map(palaces: list[dict[str, Any]], key: str) -> dict[str, str]:
+    return {p["name"]: p[key] for p in palaces if p.get("name") and p.get(key)}
 
 
 def compute(b: Birth) -> ChartResult:
-    g = "男" if b.gender == "male" else "女"
-    # py-iztro 时辰用 0-12 序号；hour//2 近似
-    r = _astro.by_solar(f"{b.year}-{b.month}-{b.day}", b.hour // 2, g, True, "zh-CN")
-    palaces = [{
-        "name": p.name,
-        "is_body": p.is_body_palace,
-        "major_stars": [s.name for s in p.major_stars],
-    } for p in r.palaces]
+    gender = "男" if b.gender == "male" else "女"
+    solar_date = f"{b.year}-{b.month}-{b.day}"
+    time_index = _time_index(b.hour)
+    chart = _by_solar(solar_date, time_index, gender)
+    palaces = _palaces(chart)
+
+    raw = {
+        "rule_version": RULE_VERSION,
+        "engine": ENGINE_NAME,
+        "fallback": False,
+        "fallback_reason": "",
+        "calculation_basis": {
+            "method": "ziwei",
+            "mode": "natal",
+            "rule_version": RULE_VERSION,
+            "input_source": "iztro solar-date astrolabe; gender, date and Chinese hour index",
+            "solar_date": solar_date,
+            "time_index": time_index,
+            "gender": gender,
+            "limits": [
+                "Different Zi Wei schools may place auxiliary stars or transformations differently.",
+                "This output is a verifiable chart structure; interpretation should not invent missing stars.",
+            ],
+        },
+        "soul": _text(getattr(chart, "soul", "")),
+        "body": _text(getattr(chart, "body", "")),
+        "five_elements": _text(getattr(chart, "five_elements_class", "")),
+        "five_elements_class": _text(getattr(chart, "five_elements_class", "")),
+        "palaces": palaces,
+        "horoscope": _horoscope(chart, b, time_index),
+        "changsheng12_map": _palace_map(palaces, "changsheng12"),
+        "boshi12_map": _palace_map(palaces, "boshi12"),
+        "jiangqian12_map": _palace_map(palaces, "jiangqian12"),
+    }
+
     return ChartResult(
-        method="ziwei", school="east", engine="py-iztro",
+        method="ziwei",
+        school="east",
+        engine=ENGINE_NAME,
         normalized={"elements": {}, "timeline": []},
-        raw={"soul": r.soul, "body": r.body, "five_elements": r.five_elements_class,
-             "palaces": palaces},
+        raw=raw,
     )
