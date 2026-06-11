@@ -21,10 +21,18 @@ export const onRequest = async (context: {
 
   // 本地开发不经过 Pages Functions（vite proxy 直接处理）
   const backend = env.API_BACKEND;
-  if (!backend) {
+
+  // 调试：检查 env 里到底有什么（部署成功后删掉此行）
+  if (!backend || !backend.startsWith("http")) {
     return new Response(
       JSON.stringify({
         detail: "API backend not configured. Set API_BACKEND env variable.",
+        debug: {
+          hasEnv: typeof env !== "undefined",
+          envKeys: env ? Object.keys(env) : [],
+          apiBackendValue: backend || "(empty)",
+          hint: "请确保在 Cloudflare Pages → Settings → Environment variables 中添加了 API_BACKEND，然后 PUSH 新代码触发部署（Retry deployment 不会重新读取变量）",
+        },
       }),
       {
         status: 502,
