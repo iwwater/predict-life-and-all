@@ -1,4 +1,4 @@
-// 数字命理 · 完整版:生命灵数 + 核心数字 + 周期数字
+﻿// 数字命理 · 完整版:生命灵数 + 核心数字 + 周期数字
 // v2: 支持多个核心数字(Destiny/Soul Urge/Personality/Maturity)和流年流月
 import type { ChartResult } from "../../lib/types";
 import { COLOR } from "../ui";
@@ -93,7 +93,7 @@ function CoreNumberCard({ card }: { card: NumberCard }) {
       <div className="flex flex-wrap gap-1 mt-1.5">
         {m.keywords.map((kw) => (
           <span key={kw} className="text-[9px] px-1.5 py-0.5 rounded"
-            style={{ background: "rgba(255,255,255,0.04)", color: COLOR.inkSoft, border: "1px solid var(--line-soft)" }}>
+            style={{ background: "rgba(255,255,255,0.04)", color: COLOR.inkSoft, border: "1px solid var(--rule-soft)" }}>
             {kw}
           </span>
         ))}
@@ -136,7 +136,7 @@ export function NumerologyChart({ chart }: { chart: ChartResult }) {
           </div>
           <NumberGlow number={lifeLegacy ?? coreNumbers[0]?.number ?? 0} size="lg" />
           {isMasterLegacy && (
-            <div className="tag tag-west">
+            <div className="paper-tag paper-tag-west">
               <Jargon term="Master" mode="plain" />
             </div>
           )}
@@ -158,7 +158,7 @@ export function NumerologyChart({ chart }: { chart: ChartResult }) {
       {coreNumbers.length > 0 && (
         <div>
           <h3 className="text-sm mb-2" style={{ color: COLOR.goldBright }}>
-            📐 核心数字 ({coreNumbers.length})
+            ■ 核心数字 ({coreNumbers.length})
           </h3>
           <div className="grid sm:grid-cols-2 gap-3">
             {coreNumbers.map((cn) => (
@@ -172,13 +172,13 @@ export function NumerologyChart({ chart }: { chart: ChartResult }) {
       {cycleNumbers.length > 0 && (
         <div>
           <h3 className="text-sm mb-2" style={{ color: COLOR.goldBright }}>
-            🔄 周期运势
+            · 周期运势
           </h3>
           <div className="grid sm:grid-cols-2 gap-3">
             {cycleNumbers.map((cy) => {
               const m = cy.meaning;
               return (
-                <div key={cy.name_en} className="card"
+                <div key={cy.name_en} className="paper-frame"
                   style={{ borderColor: COLOR.line, background: "rgba(91,141,239,0.04)" }}>
                   <div className="text-xs font-semibold mb-1" style={{ color: COLOR.azure }}>
                     {cy.name}

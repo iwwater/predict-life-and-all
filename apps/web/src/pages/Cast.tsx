@@ -1,17 +1,15 @@
-// 排盘页: 4 步引导式 stepper
-//   1. 命主(出生信息)  2. 意图(想测什么)  3. 术数(选法)  4. 起法 + 提问(参数 + 提交)
-// Cut 交互感: 每步独立 panel, 顶部进度条 + 步骤徽标, 上一步/下一步切换有 reveal-up 动画
+// 排盘页:「古籍×仪器」4 步引导式 stepper
+// 保持所有业务逻辑,仅替换视觉为纸墨风格
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { fetchCases, fetchMethods, computeChartMulti, computeMultiWithValidation } from "../lib/api";
-import type { Birth, Case, Method, MethodMeta, Subject, TarotSpread } from "../lib/types";
+import { fetchMethods, computeChartMulti, computeMultiWithValidation } from "../lib/api";
+import type { Birth, Method, MethodMeta, Subject, TarotSpread } from "../lib/types";
 import { CITY_PRESETS, CITY_REGIONS, cityOptionLabel, findCityByLatLng } from "../lib/cities";
 import { DIRECTIONS_8 } from "../lib/compass";
 import { METHOD_PLAIN, SUBJECTS, TAROT_SPREADS } from "../lib/method-info";
-import { COLOR, SkeletonBlock } from "../components/ui";
+import { SkeletonBlock } from "../components/ui";
 import { useHistory, deriveTags } from "../store/history";
-import { Reveal, ProgressArc } from "../components/Interactions";
-import { StarArray } from "../components/MysticElements";
+import { ProgressArc } from "../components/Interactions";
 import { useI18n } from "../lib/i18n";
 
 interface FormState {
@@ -55,19 +53,6 @@ const DEFAULT: FormState = {
 
 type StepKey = "subject" | "birth" | "methods" | "params";
 
-const SUBJECT_GLYPH: Record<Subject, "self" | "annual" | "decision" | "relationship" | "career" | "wealth" | "lost" | "home" | "tarot" | "lenormand"> = {
-  self_life: "self",
-  annual_luck: "annual",
-  decision: "decision",
-  relationship: "relationship",
-  career: "career",
-  wealth: "wealth",
-  lost_item: "lost",
-  home_fengshui: "home",
-  tarot_guidance: "tarot",
-  lenormand_guidance: "lenormand",
-};
-
 export function Cast() {
   const { t, lang } = useI18n();
   const STEPS = [
@@ -79,7 +64,6 @@ export function Cast() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const [methods, setMethods] = useState<MethodMeta[]>([]);
-  const [cases, setCases] = useState<Case[]>([]);
   const [form, setForm] = useState<FormState>(DEFAULT);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -88,30 +72,16 @@ export function Cast() {
 
   useEffect(() => {
     fetchMethods().then(setMethods).catch(() => setMethods([]));
-    fetchCases().then(setCases).catch(() => setCases([]));
   }, []);
 
   useEffect(() => {
     const m = params.get("methods");
-    const fromCase = params.get("fromCase");
     const fromHistory = params.get("fromHistory");
     const subjectParam = params.get("subject");
     const spreadParam = params.get("spread");
     const seedParam = params.get("seed");
     if (m) setForm((f) => ({ ...f, selected: m.split(",") as Method[] }));
-    if (fromCase) {
-      const c = cases.find((x) => x.id === fromCase);
-      if (c) {
-        const city = findCityByLatLng(c.lat, c.lng);
-        setForm((f) => ({
-          ...f,
-          year: c.year, month: c.month, day: c.day,
-          hour: c.hour, minute: c.minute,
-          gender: c.gender,
-          city: city?.name || f.city,
-        }));
-      }
-    }
+    // fromCase removed — celebrity content purged per legal compliance
     if (fromHistory) {
       const it = useHistory.getState().items.find((x) => x.id === fromHistory);
       if (it) {
@@ -133,7 +103,6 @@ export function Cast() {
           fixSeed: false, seed: "",
         }));
         setShowMore(false);
-        // 加载历史后跳到末步, 方便改一两个参数就重排
         setStepIdx(STEPS.length - 1);
       }
     }
@@ -162,7 +131,7 @@ export function Cast() {
         seed: Number.isFinite(n) ? String(n) : seedParam,
       }));
     }
-  }, [params, cases]);
+  }, [params]);
 
   const cityInfo = useMemo(() => CITY_PRESETS.find((x) => x.name === form.city) || CITY_PRESETS[0], [form.city]);
   const sittingInfo = useMemo(() => DIRECTIONS_8.find((d) => d.code === form.sittingDir) || DIRECTIONS_8[2], [form.sittingDir]);
@@ -174,7 +143,6 @@ export function Cast() {
   const recommendedIds = subjectInfo.methods.slice(0, MAX_RECOMMENDED);
   const overflowIds = subjectInfo.methods.slice(MAX_RECOMMENDED);
   const moreIds = [...overflowIds, ...methods.map((m) => m.id).filter((id) => !subjectInfo.methods.includes(id))];
-  const recommendedSet = new Set(recommendedIds);
   const orderedMethods = [
     ...recommendedIds.map((id) => methods.find((m) => m.id === id)).filter(Boolean),
     ...moreIds.map((id) => methods.find((m) => m.id === id)).filter(Boolean),
@@ -213,7 +181,6 @@ export function Cast() {
       is_leap_month: false,
     };
 
-    // Check if selected methods benefit from multi-compute with cross-validation
     const validationMethods = ["bazi_v2", "bazi", "ziwei", "western"];
     const hasValidationEligible = form.selected.filter((m) => validationMethods.includes(m)).length >= 2;
 
@@ -222,12 +189,11 @@ export function Cast() {
       let enhancedData: Record<string, any> | undefined;
 
       if (hasValidationEligible) {
-        // Use the new multi-compute endpoint with cross-validation
         const result = await computeMultiWithValidation(
           form.selected as Method[],
           birth,
           form.subject,
-          true, // do_validate
+          true,
         );
         charts = result.charts || {};
         enhancedData = {
@@ -237,7 +203,6 @@ export function Cast() {
           fate_modification: result.fate_modification,
         };
       } else {
-        // Fall back to parallel single-method calls
         charts = await computeChartMulti(form.selected as Method[], birth, {
           subject: form.subject,
           modeByMethod: form.modeByMethod,
@@ -277,7 +242,6 @@ export function Cast() {
         }));
         navigate(`/result?ts=${Date.now()}`);
     } catch (err: any) {
-      // If multi endpoint fails, fall back to old approach
       if (hasValidationEligible && err.message?.includes("422")) {
         try {
           const charts = await computeChartMulti(form.selected as Method[], birth, {
@@ -336,13 +300,9 @@ export function Cast() {
     <form onSubmit={submit} className="space-y-5">
       {/* 顶部 stepper */}
       <Stepper stepIdx={stepIdx} onJump={(i) => setStepIdx(i)} />
-      {/* 星辰装饰 */}
-      <div className="absolute right-0 top-0 opacity-[0.08] pointer-events-none" aria-hidden>
-        <StarArray count={5} size={16} />
-      </div>
 
-      {/* 步骤 panel 切换: 每次变化用 reveal-up 重新入场 */}
-      <Reveal key={step.key} className="">
+      {/* 步骤 panel — 每次变化重新挂载 */}
+      <div key={step.key} className="animate-fade-in">
         {step.key === "subject" && (
           <StepSubject form={form} chooseSubject={chooseSubject} />
         )}
@@ -354,7 +314,6 @@ export function Cast() {
             form={form}
             subjectInfo={subjectInfo}
             orderedMethods={orderedMethods}
-            recommendedSet={recommendedSet}
             toggle={toggle}
             showMore={showMore}
             setShowMore={setShowMore}
@@ -370,18 +329,16 @@ export function Cast() {
             showTieban={showTieban}
           />
         )}
-      </Reveal>
+      </div>
 
       {error && (
-        <div className="p-3 rounded text-sm reveal-up" style={{ background: "rgba(200,85,61,0.10)", color: COLOR.danger, border: "1px solid rgba(200,85,61,0.35)" }}>
-          {error}
-        </div>
+        <div className="paper-error">{error}</div>
       )}
 
-      {/* 底部: 上一步 / 下一步 或 排盘 */}
-      <div className="sticky bottom-0 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 backdrop-blur-md flex items-center justify-between gap-3"
-        style={{ background: "rgba(8,10,15,0.78)", borderTop: "1px solid var(--line)" }}>
-        <div className="flex items-center gap-2 text-xs" style={{ color: COLOR.muted }}>
+      {/* 底部操作栏 */}
+      <div className="sticky bottom-0 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 flex items-center justify-between gap-3"
+        style={{ background: "var(--paper)", borderTop: "1px solid var(--rule)" }}>
+        <div className="flex items-center gap-2 text-xs" style={{ color: "var(--ink-soft)", fontFamily: "'Noto Serif SC', serif" }}>
           {submitting ? (
             <>
               <ProgressArc value={0.4} size={28} />
@@ -389,23 +346,23 @@ export function Cast() {
             </>
           ) : (
             <>
-              <span>{lang === "zh" ? "当前选" : "Selected"} <span style={{ color: COLOR.goldBright }}>{form.selected.length}</span> {lang === "zh" ? "法" : "methods"}</span>
+              <span>{lang === "zh" ? "已选" : "Selected"} <span style={{ color: "var(--cinnabar)", fontWeight: 600 }}>{form.selected.length}</span> {lang === "zh" ? "法" : "methods"}</span>
               <span>·</span>
               <span>{subjectInfo.label}</span>
             </>
           )}
         </div>
         <div className="flex items-center gap-2">
-          <button type="button" className="btn-ghost tap" onClick={() => setForm(DEFAULT)}>{t("cast.reset")}</button>
+          <button type="button" className="paper-btn-ghost" onClick={() => setForm(DEFAULT)}>{t("cast.reset")}</button>
           {stepIdx > 0 && (
-            <button type="button" className="btn-ghost tap" onClick={goPrev}>{t("cast.prev")}</button>
+            <button type="button" className="paper-btn-ghost" onClick={goPrev}>{t("cast.prev")}</button>
           )}
           {stepIdx < STEPS.length - 1 ? (
-            <button type="button" className="btn-primary gold-sweep-host" disabled={!canNext} onClick={goNext}>
+            <button type="button" className="paper-btn" disabled={!canNext} onClick={goNext}>
               {t("cast.next")}
             </button>
           ) : (
-            <button type="submit" className="btn-primary gold-sweep-host" disabled={submitting || !canSubmit}>
+            <button type="submit" className="paper-btn" disabled={submitting || !canSubmit}>
               {submitting ? t("cast.submitting") : `${t("cast.submit")} (${form.selected.length} ${lang === "zh" ? "法" : ""})`}
             </button>
           )}
@@ -433,39 +390,37 @@ function Stepper({ stepIdx, onJump }: { stepIdx: number; onJump: (i: number) => 
           const active = i === stepIdx;
           return (
             <button key={s.key} type="button" onClick={() => onJump(i)}
-              className="flex-1 min-w-0 text-left px-2 py-1.5 rounded transition tap"
+              className="flex-1 min-w-0 text-left px-2.5 py-1.5 rounded-sm transition-colors"
               style={{
-                color: active ? COLOR.goldBright : done ? COLOR.inkSoft : COLOR.muted,
-                background: active ? "rgba(201,162,75,0.10)" : "transparent",
-                border: `1px solid ${active ? COLOR.gold : done ? COLOR.line : "transparent"}`,
+                color: active ? "var(--cinnabar)" : done ? "var(--verdigris)" : "var(--ink-soft)",
+                background: active ? "rgba(176,58,46,0.05)" : "transparent",
+                border: `1px solid ${active ? "var(--cinnabar)" : done ? "var(--verdigris)" : "var(--rule)"}`,
+                fontFamily: "'Noto Serif SC', serif",
+                cursor: "pointer",
               }}>
               <div className="flex items-center gap-1.5">
                 <span
                   className="inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] shrink-0"
                   style={{
-                    background: done ? COLOR.jade : active ? COLOR.gold : "rgba(255,255,255,0.06)",
-                    color: done || active ? COLOR.bgDeep : COLOR.muted,
-                    border: `1px solid ${done ? COLOR.jade : active ? COLOR.gold : COLOR.line}`,
+                    background: done ? "var(--verdigris)" : active ? "var(--cinnabar)" : "transparent",
+                    color: done || active ? "#fff" : "var(--ink-soft)",
+                    fontFamily: "'JetBrains Mono', monospace",
                   }}
                 >
                   {done ? "✓" : i + 1}
                 </span>
-                <span className="text-xs font-display truncate">{s.label}</span>
+                <span className="text-xs" style={{ fontWeight: active ? 600 : 400 }}>{s.label}</span>
               </div>
-              <div className="text-[10px] mt-0.5 truncate" style={{ color: COLOR.muted }}>{s.hint}</div>
+              <div className="text-[10px] mt-0.5 truncate" style={{ color: "var(--ink-soft)" }}>{s.hint}</div>
             </button>
           );
         })}
       </div>
       {/* 进度条 */}
-      <div className="h-1 rounded-full overflow-hidden" style={{ background: "var(--line-soft)" }}>
+      <div className="paper-progress">
         <div
-          className="h-full rounded-full"
-          style={{
-            width: `${Math.round(pct * 100)}%`,
-            background: "linear-gradient(90deg, var(--gold-dim), var(--gold-bright))",
-            transition: "width 0.5s cubic-bezier(0.2, 0.7, 0.2, 1)",
-          }}
+          className="paper-progress-bar"
+          style={{ width: `${Math.round(pct * 100)}%` }}
         />
       </div>
     </div>
@@ -476,34 +431,35 @@ function Stepper({ stepIdx, onJump }: { stepIdx: number; onJump: (i: number) => 
 function StepSubject({ form, chooseSubject }: { form: FormState; chooseSubject: (s: Subject) => void }) {
   const { t, lang } = useI18n();
   return (
-    <section className="card card-highlight space-y-3">
+    <section className="paper-frame space-y-3">
       <header>
-        <h2 className="text-xl font-display" style={{ color: COLOR.goldBright }}>{t("cast.ask.subject")}</h2>
-        <p className="text-xs mt-1" style={{ color: COLOR.muted }}>{t("cast.ask.subject.desc")}</p>
+        <h2 className="paper-title"><span className="stamp" />{t("cast.ask.subject")}</h2>
+        <p style={{ fontSize: "0.78rem", color: "var(--ink-soft)", marginTop: "0.3rem" }}>{t("cast.ask.subject.desc")}</p>
       </header>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 reveal-stagger">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
         {SUBJECTS.map((s) => {
           const on = form.subject === s.key;
           return (
             <button key={s.key} type="button" onClick={() => chooseSubject(s.key)}
-              className="p-3 rounded border text-left transition lift-on-hover"
+              className="paper-grid-cell text-left"
               style={{
-                borderColor: on ? COLOR.gold : COLOR.line,
-                background: on ? "rgba(201,162,75,0.08)" : "rgba(255,255,255,0.02)",
-                boxShadow: on ? "0 0 0 1px var(--gold)" : "none",
+                borderColor: on ? "var(--cinnabar)" : "var(--rule)",
+                borderWidth: on ? 2 : 1,
+                background: on ? "rgba(176,58,46,0.04)" : "var(--paper)",
+                cursor: "pointer",
+                padding: "0.7rem",
               }}>
               <div className="flex items-center justify-between">
-                <div className="text-sm font-semibold flex items-center gap-1.5" style={{ color: on ? COLOR.goldBright : COLOR.ink }}>
-                  <span
-                    className="inline-block w-1.5 h-1.5 rounded-full"
-                    style={{ background: on ? COLOR.goldBright : COLOR.muted, boxShadow: on ? `0 0 8px ${COLOR.gold}` : "none" }}
-                  />
+                <span style={{ fontFamily: "'Noto Serif SC', serif", fontWeight: on ? 700 : 500, fontSize: "0.9rem", color: on ? "var(--cinnabar)" : "var(--ink)" }}>
                   {s.label}
-                </div>
-                <span className="text-[9px] opacity-60" style={{ color: COLOR.muted }}>{t("cast.step.subject")}</span>
+                </span>
               </div>
-              <div className="text-xs mt-1.5 leading-snug" style={{ color: COLOR.muted }}>{s.desc}</div>
-              {on && <div className="text-[10px] mt-1.5" style={{ color: COLOR.jade }}>{lang === "zh" ? "默认推惹" : "Recommended"} {s.methods.slice(0, 2).join(" · ")} …</div>}
+              <div style={{ fontSize: "0.75rem", color: "var(--ink-soft)", marginTop: "0.3rem", lineHeight: 1.5 }}>{s.desc}</div>
+              {on && (
+                <div style={{ fontSize: "0.68rem", color: "var(--verdigris)", marginTop: "0.3rem", fontFamily: "'JetBrains Mono', monospace" }}>
+                  {lang === "zh" ? "默认推荐" : "Recommended"} {s.methods.slice(0, 2).join(" · ")} …
+                </div>
+              )}
             </button>
           );
         })}
@@ -520,21 +476,21 @@ function StepBirth({ form, setForm, cityInfo }: {
 }) {
   const { t } = useI18n();
   return (
-    <section className="card card-highlight space-y-3">
+    <section className="paper-frame space-y-3">
       <header>
-        <h2 className="text-xl font-display" style={{ color: COLOR.goldBright }}>{t("cast.birth.title")}</h2>
-        <p className="text-xs mt-1" style={{ color: COLOR.muted }}>{t("cast.birth.desc")}</p>
+        <h2 className="paper-title"><span className="stamp" />{t("cast.birth.title")}</h2>
+        <p style={{ fontSize: "0.78rem", color: "var(--ink-soft)", marginTop: "0.3rem" }}>{t("cast.birth.desc")}</p>
       </header>
       <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
         {(["year", "month", "day", "hour", "minute"] as const).map((key) => (
           <div key={key}>
-            <label className="label">{{ year: t("cast.birth.year"), month: t("cast.birth.month"), day: t("cast.birth.day"), hour: t("cast.birth.hour"), minute: t("cast.birth.minute") }[key]}</label>
-            <input className="input" type="number" value={form[key]} onChange={(e) => setForm({ ...form, [key]: parseInt(e.target.value, 10) || 0 })} />
+            <label className="paper-label">{{ year: t("cast.birth.year"), month: t("cast.birth.month"), day: t("cast.birth.day"), hour: t("cast.birth.hour"), minute: t("cast.birth.minute") }[key]}</label>
+            <input className="paper-input" type="number" value={form[key]} onChange={(e) => setForm({ ...form, [key]: parseInt(e.target.value, 10) || 0 })} />
           </div>
         ))}
         <div>
-          <label className="label">{t("cast.birth.gender")}</label>
-          <select className="input" value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value as any })}>
+          <label className="paper-label">{t("cast.birth.gender")}</label>
+          <select className="paper-input" value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value as any })}>
             <option value="male">{t("cast.gender.male")}</option>
             <option value="female">{t("cast.gender.female")}</option>
             <option value="unspecified">{t("cast.gender.unspec")}</option>
@@ -542,8 +498,8 @@ function StepBirth({ form, setForm, cityInfo }: {
         </div>
       </div>
       <div className="mt-1">
-        <label className="label">{t("cast.birth.city")}</label>
-        <select className="input max-w-md" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })}>
+        <label className="paper-label">{t("cast.birth.city")}</label>
+        <select className="paper-input" style={{ maxWidth: "24rem" }} value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })}>
           {CITY_REGIONS.map((r) => (
             <optgroup key={r.key} label={r.label}>
               {CITY_PRESETS.filter((c) => c.region === r.key).map((c) => (
@@ -553,9 +509,7 @@ function StepBirth({ form, setForm, cityInfo }: {
           ))}
         </select>
         {cityInfo && (
-          <div className="text-[10px] mt-1 inline-flex items-center gap-2 px-2 py-1 rounded"
-            style={{ color: COLOR.muted, background: "rgba(255,255,255,0.03)", border: "1px solid var(--line-soft)" }}>
-            <span style={{ color: COLOR.jade }}>●</span>
+          <div className="paper-tag" style={{ marginTop: "0.35rem" }}>
             {cityInfo.name} · {cityInfo.lat.toFixed(2)}°N, {cityInfo.lng.toFixed(2)}°E · {cityInfo.tz}
           </div>
         )}
@@ -566,30 +520,35 @@ function StepBirth({ form, setForm, cityInfo }: {
 
 // === Step 3: 术数 ===
 function StepMethods({
-  form, subjectInfo, orderedMethods, recommendedSet, toggle, showMore, setShowMore,
+  form, subjectInfo, orderedMethods, toggle, showMore, setShowMore,
 }: {
   form: FormState;
   subjectInfo: typeof SUBJECTS[number];
   orderedMethods: MethodMeta[];
-  recommendedSet: Set<string>;
   toggle: (m: Method) => void;
   showMore: boolean;
   setShowMore: (v: boolean | ((p: boolean) => boolean)) => void;
 }) {
   const { t, lang } = useI18n();
+  const recommendedIds = subjectInfo.methods.slice(0, MAX_RECOMMENDED);
+  const recommended = orderedMethods.filter((m) => recommendedIds.includes(m.id));
+  const overflow = orderedMethods.filter((m) => !recommendedIds.includes(m.id));
+
   return (
-    <section className="card card-highlight space-y-3">
+    <section className="paper-frame space-y-3">
       <header className="flex items-center justify-between gap-2 flex-wrap">
         <div>
-          <h2 className="text-xl font-display" style={{ color: COLOR.goldBright }}>{t("cast.methods.title")}</h2>
-          <p className="text-xs mt-1" style={{ color: COLOR.muted }}>{lang === "zh" ? `已按「${subjectInfo.label}」默认推惹前 4 法,点按复选 / 取消。` : `Default 4 methods recommended for "${subjectInfo.label}". Click to toggle.`}</p>
+          <h2 className="paper-title"><span className="stamp" />{t("cast.methods.title")}</h2>
+          <p style={{ fontSize: "0.78rem", color: "var(--ink-soft)", marginTop: "0.3rem" }}>
+            {lang === "zh" ? `已按「${subjectInfo.label}」默认推荐前 ${MAX_RECOMMENDED} 法，点按复选/取消。` : `Default ${MAX_RECOMMENDED} methods recommended for "${subjectInfo.label}". Click to toggle.`}
+          </p>
         </div>
-        <span className="text-[10px] inline-flex items-center gap-1 px-2 py-1 rounded" style={{ background: "rgba(91,141,239,0.08)", color: COLOR.azure, border: "1px solid rgba(91,141,239,0.30)" }}>
+        <span className="paper-tag paper-tag-west" style={{ fontSize: "0.68rem" }}>
           {subjectInfo.label} · {subjectInfo.desc}
         </span>
       </header>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 reveal-stagger">
-        {orderedMethods.filter((m) => recommendedSet.has(m.id)).map((m) => {
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+        {recommended.map((m) => {
           const on = form.selected.includes(m.id);
           const plain = METHOD_PLAIN[m.id];
           return (
@@ -597,17 +556,16 @@ function StepMethods({
           );
         })}
       </div>
-      {orderedMethods.filter((m) => !recommendedSet.has(m.id)).length > 0 && (
+      {overflow.length > 0 && (
         <>
           <button type="button" onClick={() => setShowMore((v) => !v)}
-            className="text-xs flex items-center gap-1 tap"
-            style={{ color: COLOR.gold }}>
-            <span className="inline-block transition-transform" style={{ transform: showMore ? "rotate(90deg)" : "none" }}>▶</span>
-            {showMore ? t("cast.methods.less") : `${t("cast.methods.more")} (${orderedMethods.filter((m) => !recommendedSet.has(m.id)).length})`}
+            className="paper-link"
+            style={{ fontSize: "0.78rem", borderBottom: "none" }}>
+            {showMore ? t("cast.methods.less") : `${t("cast.methods.more")} (${overflow.length})`}
           </button>
           {showMore && (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 reveal-stagger">
-              {orderedMethods.filter((m) => !recommendedSet.has(m.id)).map((m) => {
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              {overflow.map((m) => {
                 const on = form.selected.includes(m.id);
                 const plain = METHOD_PLAIN[m.id];
                 return (
@@ -632,22 +590,27 @@ function MethodTile({ m, plain, on, toggle, modeByMethod }: {
   const { lang } = useI18n();
   return (
     <button key={m.id} type="button" onClick={() => toggle(m.id)}
-      className="p-3 rounded border text-left lift-on-hover tap relative overflow-hidden"
+      className="paper-grid-cell text-left"
       style={{
-        borderColor: on ? COLOR.gold : COLOR.line,
-        background: on ? "rgba(201,162,75,0.08)" : "rgba(255,255,255,0.02)",
-        boxShadow: on ? "0 0 0 1px var(--gold)" : "none",
+        borderColor: on ? "var(--cinnabar)" : "var(--rule)",
+        borderWidth: on ? 2 : 1,
+        background: on ? "rgba(176,58,46,0.04)" : "var(--paper)",
+        cursor: "pointer",
+        padding: "0.7rem",
       }}>
       <div className="flex items-center justify-between mb-1">
-        <div className="text-sm font-semibold" style={{ color: on ? COLOR.goldBright : COLOR.ink }}>{m.name_zh}</div>
-        <span className="inline-block w-2 h-2 rounded-full" style={{
-          background: on ? COLOR.jade : "rgba(255,255,255,0.10)",
-          boxShadow: on ? `0 0 8px ${COLOR.jade}` : "none",
+        <span style={{ fontFamily: "'Noto Serif SC', serif", fontWeight: on ? 700 : 500, fontSize: "0.9rem", color: on ? "var(--cinnabar)" : "var(--ink)" }}>
+          {m.name_zh}
+        </span>
+        <span style={{
+          display: "inline-block",
+          width: 8, height: 8, borderRadius: "50%",
+          background: on ? "var(--cinnabar)" : "var(--rule)",
         }} />
       </div>
-      <div className="text-xs leading-snug" style={{ color: COLOR.muted }}>{plain?.tagline}</div>
+      <div style={{ fontSize: "0.72rem", color: "var(--ink-soft)", lineHeight: 1.5 }}>{plain?.tagline}</div>
       {on && (
-        <div className="text-[10px] mt-1.5" style={{ color: COLOR.jade }}>
+        <div style={{ fontSize: "0.68rem", color: "var(--verdigris)", marginTop: "0.3rem", fontFamily: "'JetBrains Mono', monospace" }}>
           {lang === "zh" ? "起法" : "Mode"}: {modeByMethod[m.id] || m.default_mode}
         </div>
       )}
@@ -670,16 +633,16 @@ function StepParams({ form, setForm, showTarot, showSitting, showSeed, showTieba
   return (
     <div className="space-y-5">
       {hasAnyParam && (
-        <section className="card card-highlight space-y-4">
+        <section className="paper-frame space-y-4">
           <header>
-            <h2 className="text-xl font-display" style={{ color: COLOR.goldBright }}>{t("cast.params.title")}</h2>
-            <p className="text-xs mt-1" style={{ color: COLOR.muted }}>{t("cast.params.desc")}</p>
+            <h2 className="paper-title"><span className="stamp" />{t("cast.params.title")}</h2>
+            <p style={{ fontSize: "0.78rem", color: "var(--ink-soft)", marginTop: "0.3rem" }}>{t("cast.params.desc")}</p>
           </header>
           {showTieban && (
             <div className="grid sm:grid-cols-2 gap-3">
               <div>
-                <label className="label">{lang === "zh" ? "父生肖 (可选·用于条文校验)" : "Father Zodiac (optional)"}</label>
-                <select className="input" value={form.fatherZodiac} onChange={(e) => setForm({ ...form, fatherZodiac: e.target.value })}>
+                <label className="paper-label">{lang === "zh" ? "父生肖 (可选·用于条文校验)" : "Father Zodiac (optional)"}</label>
+                <select className="paper-input" value={form.fatherZodiac} onChange={(e) => setForm({ ...form, fatherZodiac: e.target.value })}>
                   <option value="">{lang === "zh" ? "不指定" : "Unspecified"}</option>
                   {["鼠","牛","虎","兔","龙","蛇","马","羊","猴","鸡","狗","猪"].map((z) => (
                     <option key={z} value={z}>{z}</option>
@@ -687,8 +650,8 @@ function StepParams({ form, setForm, showTarot, showSitting, showSeed, showTieba
                 </select>
               </div>
               <div>
-                <label className="label">{lang === "zh" ? "母生肖 (可选·用于条文校验)" : "Mother Zodiac (optional)"}</label>
-                <select className="input" value={form.motherZodiac} onChange={(e) => setForm({ ...form, motherZodiac: e.target.value })}>
+                <label className="paper-label">{lang === "zh" ? "母生肖 (可选·用于条文校验)" : "Mother Zodiac (optional)"}</label>
+                <select className="paper-input" value={form.motherZodiac} onChange={(e) => setForm({ ...form, motherZodiac: e.target.value })}>
                   <option value="">{lang === "zh" ? "不指定" : "Unspecified"}</option>
                   {["鼠","牛","虎","兔","龙","蛇","马","羊","猴","鸡","狗","猪"].map((z) => (
                     <option key={z} value={z}>{z}</option>
@@ -699,24 +662,32 @@ function StepParams({ form, setForm, showTarot, showSitting, showSeed, showTieba
           )}
           {showTarot && (
             <div>
-              <label className="label">{lang === "zh" ? "塔罗牌阵" : "Tarot Spread"}</label>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 reveal-stagger">
+              <label className="paper-label">{lang === "zh" ? "塔罗牌阵" : "Tarot Spread"}</label>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 {TAROT_SPREADS.map((sp) => {
                   const on = form.tarotSpread === sp.code;
                   const recommended = sp.subjects.includes(form.subject);
                   return (
                     <button key={sp.code} type="button" onClick={() => setForm({ ...form, tarotSpread: sp.code })}
-                      className="p-3 rounded border text-left lift-on-hover tap"
+                      className="paper-grid-cell text-left"
                       style={{
-                        borderColor: on ? COLOR.gold : recommended ? `${COLOR.jade}80` : COLOR.line,
-                        background: on ? "rgba(201,162,75,0.08)" : "rgba(255,255,255,0.02)",
-                        boxShadow: on ? "0 0 0 1px var(--gold)" : "none",
+                        borderColor: on ? "var(--cinnabar)" : recommended ? "var(--verdigris)" : "var(--rule)",
+                        borderWidth: on ? 2 : 1,
+                        background: on ? "rgba(176,58,46,0.04)" : "var(--paper)",
+                        cursor: "pointer",
+                        padding: "0.65rem",
                       }}>
                       <div className="flex items-center justify-between">
-                        <div className="text-sm font-semibold" style={{ color: on ? COLOR.goldBright : COLOR.ink }}>{sp.label}</div>
-                        {recommended && !on && <span className="text-[9px]" style={{ color: COLOR.jade }}>{lang === "zh" ? "推荐" : "Rec"}</span>}
+                        <span style={{ fontFamily: "'Noto Serif SC', serif", fontWeight: on ? 700 : 500, fontSize: "0.88rem", color: on ? "var(--cinnabar)" : "var(--ink)" }}>
+                          {sp.label}
+                        </span>
+                        {recommended && !on && (
+                          <span style={{ fontSize: "0.65rem", color: "var(--verdigris)", fontFamily: "'JetBrains Mono', monospace" }}>
+                            {lang === "zh" ? "推荐" : "Rec"}
+                          </span>
+                        )}
                       </div>
-                      <div className="text-xs mt-1" style={{ color: COLOR.muted }}>{sp.desc}</div>
+                      <div style={{ fontSize: "0.72rem", color: "var(--ink-soft)", marginTop: "0.2rem" }}>{sp.desc}</div>
                     </button>
                   );
                 })}
@@ -726,46 +697,44 @@ function StepParams({ form, setForm, showTarot, showSitting, showSeed, showTieba
           {showSitting && (
             <div className="grid sm:grid-cols-2 gap-3">
               <div>
-                <label className="label">{lang === "zh" ? "坐山/门向代表方位" : "Sitting/Facing Direction"}</label>
-                <select className="input" value={form.sittingDir} onChange={(e) => setForm({ ...form, sittingDir: e.target.value })}>
+                <label className="paper-label">{lang === "zh" ? "坐山/门向代表方位" : "Sitting/Facing Direction"}</label>
+                <select className="paper-input" value={form.sittingDir} onChange={(e) => setForm({ ...form, sittingDir: e.target.value })}>
                   {DIRECTIONS_8.map((d) => <option key={d.code} value={d.code}>{d.code} · {d.sans}山</option>)}
                 </select>
               </div>
               <div>
-                <label className="label">{lang === "zh" ? "建造/入伙年份" : "Construction Year"}</label>
-                <input className="input" type="number" value={form.constructionYear} onChange={(e) => setForm({ ...form, constructionYear: parseInt(e.target.value, 10) || form.year })} />
+                <label className="paper-label">{lang === "zh" ? "建造/入伙年份" : "Construction Year"}</label>
+                <input className="paper-input" type="number" value={form.constructionYear} onChange={(e) => setForm({ ...form, constructionYear: parseInt(e.target.value, 10) || form.year })} />
               </div>
             </div>
           )}
           {showSeed && (
             <div>
-              <label className="label">{lang === "zh" ? "固定种子" : "Fixed Seed"}</label>
+              <label className="paper-label">{lang === "zh" ? "固定种子" : "Fixed Seed"}</label>
               <div className="flex gap-3 items-center flex-wrap">
-                <label className="text-sm flex items-center gap-2 tap">
+                <label style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "0.83rem", color: "var(--ink)", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.4rem" }}>
                   <input type="checkbox" checked={form.fixSeed} onChange={(e) => setForm({ ...form, fixSeed: e.target.checked })} />
                   {lang === "zh" ? "固定本次随机/数字起法(可复现)" : "Lock random seed (reproducible)"}
                 </label>
-                {form.fixSeed && <input className="input max-w-[160px]" value={form.seed} onChange={(e) => setForm({ ...form, seed: e.target.value })} placeholder="例如 42" />}
+                {form.fixSeed && <input className="paper-input" style={{ maxWidth: 160 }} value={form.seed} onChange={(e) => setForm({ ...form, seed: e.target.value })} placeholder="例如 42" />}
               </div>
             </div>
           )}
         </section>
       )}
       {!hasAnyParam && (
-        <section className="card card-highlight text-xs" style={{ color: COLOR.muted }}>
-          {lang === "zh" ? "所选术数不需要额外起法参数,直接提问即可。" : "Selected methods need no extra parameters — just ask your question."}
+        <section className="paper-grid-cell" style={{ fontSize: "0.83rem", color: "var(--ink-soft)", padding: "1rem" }}>
+          {lang === "zh" ? "所选术数不需要额外起法参数，直接提问即可。" : "Selected methods need no extra parameters — just ask your question."}
         </section>
       )}
 
-      <section className="card card-highlight space-y-2">
-        <header>
-          <label className="label">{t("cast.question.label")}</label>
-        </header>
-        <textarea className="input min-h-[100px]" value={form.question} onChange={(e) => setForm({ ...form, question: e.target.value })}
+      <section className="paper-frame space-y-2">
+        <label className="paper-label">{t("cast.question.label")}</label>
+        <textarea className="paper-input" style={{ minHeight: 100 }} value={form.question} onChange={(e) => setForm({ ...form, question: e.target.value })}
           placeholder={sample} />
         <div className="flex items-center justify-between gap-2">
-          <div className="text-[10px]" style={{ color: COLOR.muted }}>{t("cast.question.help")}</div>
-          <div className="text-[10px]" style={{ color: form.question.length > 200 ? COLOR.goldBright : COLOR.muted }}>
+          <div style={{ fontSize: "0.68rem", color: "var(--ink-soft)" }}>{t("cast.question.help")}</div>
+          <div style={{ fontSize: "0.68rem", color: form.question.length > 200 ? "var(--cinnabar)" : "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace" }}>
             {form.question.length}/400
           </div>
         </div>

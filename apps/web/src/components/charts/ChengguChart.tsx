@@ -1,4 +1,4 @@
-// 称骨:秤视觉
+﻿// 称骨:秤视觉
 // 术语:骨重/批语
 import type { ChartResult } from "../../lib/types";
 import { COLOR } from "../ui";
@@ -12,7 +12,7 @@ function WeightBar({ label, liang, max }: { label: string; liang: number; max: n
         <span style={{ color: COLOR.inkSoft }}>{label}</span>
         <span style={{ color: COLOR.gold }}>{liang.toFixed(1)} <span className="text-[10px]" style={{ color: COLOR.muted }}>两</span></span>
       </div>
-      <div className="h-2 rounded-sm overflow-hidden" style={{ background: "rgba(8,10,15,0.5)" }}>
+      <div className="h-2 rounded-sm overflow-hidden" style={{ background: "var(--paper-2)" }}>
         <div className="h-full rounded-sm transition-all"
           style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${COLOR.goldDim}, ${COLOR.gold})` }} />
       </div>
@@ -26,11 +26,11 @@ export function ChengguChart({ chart }: { chart: ChartResult }) {
   const max = Math.max(1.5, ...weights);
   return (
     <div className="space-y-4">
-      <div className="card">
+      <div className="paper-frame">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <h3 className="text-lg" style={{ color: COLOR.goldBright }}>称骨算命</h3>
           <div className="flex gap-2 text-xs">
-            <span className="tag tag-east">
+            <span className="paper-tag paper-tag-east">
               <Jargon term="骨重" mode="plain" /> 总 {r.total_liang} 两 ({r.total_qian} 钱)
             </span>
           </div>
@@ -57,7 +57,7 @@ export function ChengguChart({ chart }: { chart: ChartResult }) {
         </div>
       </div>
 
-      <div className="card">
+      <div className="paper-frame">
         <div className="text-xs mb-2" style={{ color: COLOR.muted }}>
           <Jargon term="批语" mode="plain" />
         </div>

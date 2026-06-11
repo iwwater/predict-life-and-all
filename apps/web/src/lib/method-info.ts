@@ -28,6 +28,7 @@ export const METHOD_PLAIN: Record<Method, MethodPlain> = {
   cross_validator: { tagline: "多系统交叉验证·合参置信", bestFor: "多术数合参、置信度评估、交叉验证", sample: "八字和紫微结果一致吗?", source: "多系统ensemble方法" },
   hour_calibrator: { tagline: "时辰校准·解决排盘幻觉", bestFor: "出生时辰不确定、定盘校验", sample: "我不确定出生时辰，帮我校准?", source: "AI时辰校准算法" },
   compatibility: { tagline: "八字合婚·五行互补分析", bestFor: "婚配合盘、关系匹配度、五行互补", sample: "我们俩八字合不合?", source: "子平合婚体系" },
+  hepan: { tagline: "双人合盘·多维比对", bestFor: "四维评级、印证分歧、八字/紫微/西方", sample: "我们各方面匹配吗?", source: "多系统合盘" },
 };
 
 export const SUBJECTS: Array<{

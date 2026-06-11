@@ -1,4 +1,4 @@
-// 铁板神数: 四柱编码 → 条文集数 → 分类条文
+﻿// 铁板神数: 四柱编码 → 条文集数 → 分类条文
 import type { ChartResult } from "../../lib/types";
 import { COLOR, Stat } from "../ui";
 
@@ -28,14 +28,14 @@ export function TiebanChart({ chart }: { chart: ChartResult }) {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="card">
+      <div className="paper-frame">
         <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
           <h3 className="text-lg" style={{ color: COLOR.goldBright }}>
             铁板神数 · 条文
           </h3>
           <div className="flex gap-2 flex-wrap">
-            <span className="tag tag-east">五大神数</span>
-            <span className="tag" style={{ background: "rgba(201,162,75,0.10)", color: COLOR.gold }}>
+            <span className="paper-tag paper-tag-east">五大神数</span>
+            <span className="paper-tag" style={{ background: "rgba(201,162,75,0.10)", color: COLOR.gold }}>
               集数 {r.verse_set_number}
             </span>
           </div>
@@ -50,7 +50,7 @@ export function TiebanChart({ chart }: { chart: ChartResult }) {
       </div>
 
       {/* Four Pillars & Encoding Table */}
-      <div className="card">
+      <div className="paper-frame">
         <h4 className="text-sm mb-3" style={{ color: COLOR.gold }}>
           四柱编码
           <span className="text-[10px] ml-2 font-normal" style={{ color: COLOR.muted }}>
@@ -108,7 +108,7 @@ export function TiebanChart({ chart }: { chart: ChartResult }) {
       </div>
 
       {/* Verse Cards */}
-      <div className="card">
+      <div className="paper-frame">
         <h4 className="text-sm mb-3" style={{ color: COLOR.gold }}>
           匹配条文 ({verseResult.total_matched || 0} 条)
           <span className="text-[10px] ml-2 font-normal" style={{ color: COLOR.muted }}>
@@ -136,7 +136,7 @@ export function TiebanChart({ chart }: { chart: ChartResult }) {
                       key={i}
                       className="p-3 rounded-md text-sm leading-relaxed"
                       style={{
-                        background: "rgba(8,10,15,0.4)",
+                        background: "var(--paper-2)",
                         borderLeft: `3px solid ${COLOR.goldDim}`,
                       }}
                     >

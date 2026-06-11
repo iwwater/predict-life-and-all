@@ -1,4 +1,4 @@
-// 合盘报告: showing compatibility scoring with visual breakdown
+﻿// 合盘报告: showing compatibility scoring with visual breakdown
 import type { CompatibilityResult, MultiMethodCompatibilityResult } from "../lib/api";
 import { COLOR } from "./ui";
 
@@ -39,10 +39,10 @@ function ScoreRing({ score, size = 120 }: { score: number; size?: number }) {
     COLOR.danger;
 
   return (
-    <div className="relative inline-flex items-center justify-center score-glow"
+    <div className="relative inline-flex items-center justify-center "
       style={{ ["--glow-color" as string]: color }}>
       {/* 外圈慢旋装饰 */}
-      <svg width={size + 16} height={size + 16} className="absolute spin-slow-rev" style={{ opacity: 0.15 }}>
+      <svg width={size + 16} height={size + 16} className="absolute " style={{ opacity: 0.15 }}>
         <circle cx={(size + 16) / 2} cy={(size + 16) / 2} r={r + 6}
           fill="none" stroke={color} strokeWidth="0.4" strokeDasharray="3 8" />
       </svg>
@@ -58,7 +58,6 @@ function ScoreRing({ score, size = 120 }: { score: number; size?: number }) {
           strokeDashoffset={offset}
           style={{
             transition: "stroke-dashoffset 1.5s cubic-bezier(0.2, 0.7, 0.2, 1)",
-            filter: `drop-shadow(0 0 6px ${color}60)`,
           }}
         />
       </svg>
@@ -97,7 +96,7 @@ function VerdictBadge({ level, score }: { level?: string; score: number }) {
     >
       <span
         className="inline-block w-1.5 h-1.5 rounded-full"
-        style={{ background: color, boxShadow: `0 0 8px ${color}` }}
+        style={{ background: color }}
       />
       {lvl}
     </span>
@@ -137,7 +136,7 @@ export function CompatibilityReport({ result, personAName, personBName }: Props)
   return (
     <div className="space-y-5">
       {/* Score Hero */}
-      <div className="card card-glow card-highlight text-center relative overflow-hidden">
+      <div className="paper-frame text-center relative overflow-hidden">
         {/* Ambient glow */}
         <div className="absolute inset-0 pointer-events-none"
           style={{
@@ -148,7 +147,7 @@ export function CompatibilityReport({ result, personAName, personBName }: Props)
         {score >= 60 && (
           <div className="absolute inset-0 pointer-events-none opacity-30">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="absolute rounded-full crystal-sparkle"
+              <div key={i} className="absolute rounded-full "
                 style={{
                   width: "3px", height: "3px",
                   left: `${15 + i * 14}%`, top: `${20 + (i * 17) % 60}%`,
@@ -198,8 +197,8 @@ export function CompatibilityReport({ result, personAName, personBName }: Props)
 
       {/* Dimension Breakdown */}
       {Object.keys(breakdown).length > 0 && (
-        <div className="card card-highlight">
-          <h3 className="text-sm mb-3" style={{ color: COLOR.goldBright }}>📐 评分维度</h3>
+        <div className="paper-frame">
+          <h3 className="text-sm mb-3" style={{ color: COLOR.goldBright }}>■ 评分维度</h3>
           <div className="space-y-3">
             {Object.entries(breakdown).map(([key, data]: [string, any]) => {
               const max = data.max || 30;
@@ -257,9 +256,9 @@ export function CompatibilityReport({ result, personAName, personBName }: Props)
 
       {/* Synastry Cross-Aspects */}
       {synastryResult?.cross_aspects?.length > 0 && (
-        <div className="card card-highlight">
+        <div className="paper-frame">
           <h3 className="text-sm mb-2" style={{ color: COLOR.goldBright }}>
-            ✨ 跨盘相位 ({synastryResult.cross_aspects.length})
+            ◆ 跨盘相位 ({synastryResult.cross_aspects.length})
           </h3>
           <div className="space-y-1 max-h-64 overflow-y-auto">
             {synastryResult.cross_aspects.slice(0, 15).map((a: any, i: number) => {
@@ -295,8 +294,8 @@ export function CompatibilityReport({ result, personAName, personBName }: Props)
 
       {/* Synastry Overlays */}
       {synastryResult?.overlays && (
-        <div className="card card-highlight">
-          <h3 className="text-sm mb-2" style={{ color: COLOR.goldBright }}>🏠 宫位叠加</h3>
+        <div className="paper-frame">
+          <h3 className="text-sm mb-2" style={{ color: COLOR.goldBright }}>■ 宫位叠加</h3>
           <div className="grid sm:grid-cols-2 gap-3 text-xs">
             {(["a_in_b", "b_in_a"] as const).map((key) => {
               const overlays = synastryResult.overlays[key] || {};
@@ -322,7 +321,7 @@ export function CompatibilityReport({ result, personAName, personBName }: Props)
                           </span>
                           {isRomantic && (
                             <span className="text-[9px]" style={{ color: COLOR.gold }}>
-                              {overlay.house === 5 ? "💕" : overlay.house === 7 ? "💍" : "🔥"}
+                              {overlay.house === 5 ? "吉" : overlay.house === 7 ? "合" : "烈"}
                             </span>
                           )}
                         </div>
@@ -338,8 +337,8 @@ export function CompatibilityReport({ result, personAName, personBName }: Props)
 
       {/* Advice */}
       {((result as CompatibilityResult).advice?.length ?? 0) > 0 && (
-        <div className="card card-highlight">
-          <h3 className="text-sm mb-2" style={{ color: COLOR.goldBright }}>💡 建议</h3>
+        <div className="paper-frame">
+          <h3 className="text-sm mb-2" style={{ color: COLOR.goldBright }}>· 建议</h3>
           <ul className="space-y-1">
             {(result as CompatibilityResult).advice!.map((a, i) => (
               <li key={i} className="text-xs flex items-start gap-1.5" style={{ color: COLOR.inkSoft }}>

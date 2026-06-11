@@ -1,4 +1,4 @@
-// 八宅:八方罗盘图
+﻿// 八宅:八方罗盘图
 // 术语:命卦/东四命/西四命 + 八星(生气/延年/天医/伏位/五鬼/六煞/祸害/绝命)
 import type { ChartResult } from "../../lib/types";
 import { COLOR } from "../ui";
@@ -35,14 +35,14 @@ export function BazhaiChart({ chart }: { chart: ChartResult }) {
 
   return (
     <div className="space-y-4">
-      <div className="card">
+      <div className="paper-frame">
         <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <h3 className="text-lg" style={{ color: COLOR.goldBright }}>八宅 · 八方罗盘</h3>
           <div className="flex gap-2 text-xs">
-            <span className="tag tag-east">
+            <span className="paper-tag paper-tag-east">
               <Jargon term="命卦" mode="plain" /> {lifeGua}
             </span>
-            <span className="tag">
+            <span className="paper-tag">
               {isEast
                 ? <Jargon term="东四命" mode="plain" />
                 : <Jargon term="西四命" mode="plain" />}
@@ -68,7 +68,7 @@ export function BazhaiChart({ chart }: { chart: ChartResult }) {
             if (row === 1 && col === 2) {
               return (
                 <div key={i} className="rounded-md p-2 text-[11px] flex flex-col"
-                  style={{ background: "rgba(8,10,15,0.5)", border: `1px solid ${COLOR.line}` }}>
+                  style={{ background: "var(--paper-2)", border: `1px solid ${COLOR.line}` }}>
                   <div style={{ color: COLOR.muted }}>本命吉方</div>
                   <div className="mt-1" style={{ color: COLOR.ok }}>
                     {own.join(" ")}
@@ -134,7 +134,7 @@ export function BazhaiChart({ chart }: { chart: ChartResult }) {
 
       {/* House-Resident Match */}
       {r.house_resident_match && (
-        <div className="card">
+        <div className="paper-frame">
           <h4 className="text-sm mb-2" style={{ color: COLOR.gold }}>宅命相配</h4>
           <div className="flex items-center gap-3 flex-wrap text-sm">
             <span style={{ color: COLOR.gold }}>
@@ -152,7 +152,7 @@ export function BazhaiChart({ chart }: { chart: ChartResult }) {
 
       {/* 八星方位 from 大游年歌 */}
       {r.bazhai_stars && (
-        <div className="card">
+        <div className="paper-frame">
           <h4 className="text-sm mb-3" style={{ color: COLOR.gold }}>
             大游年 · 八星方位
             <span className="text-[10px] ml-2 font-normal" style={{ color: COLOR.muted }}>

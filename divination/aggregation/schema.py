@@ -68,6 +68,10 @@ class ReadingRequest(BaseModel):
         None,
         description="空间信息（风水相关术法使用）",
     )
+    method_options: Optional[dict[str, Any]] = Field(
+        None,
+        description="术法专属选项: liuyao_mode, meihua_mode, tarot_spread, tarot_mode 等",
+    )
     methods: Optional[list[str]] = Field(
         None,
         description="可指定术法子集；不传则默认使用全部 12 法 (M0-05)",

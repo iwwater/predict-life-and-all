@@ -1,4 +1,4 @@
-// 六爻:6 爻竖排(初→上),本卦 + 变卦并列
+﻿// 六爻:6 爻竖排(初→上),本卦 + 变卦并列
 // 术语:本卦/变卦/动爻/卦辞/世爻/应爻/纳甲/六神/初爻/上爻
 import type { ChartResult } from "../../lib/types";
 import { COLOR } from "../ui";
@@ -17,14 +17,14 @@ export function LiuyaoChart({ chart }: { chart: ChartResult }) {
 
   return (
     <div className="space-y-4">
-      <div className="card">
+      <div className="paper-frame">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <h3 className="text-lg" style={{ color: COLOR.goldBright }}>六爻 · {benName}{bianName ? ` → ${bianName}` : ""}</h3>
           <div className="flex gap-2 text-xs flex-wrap">
-            <span className="tag">
+            <span className="paper-tag">
               <Jargon term="动爻" mode="plain" /> {dong.join(",") || "—"}
             </span>
-            <span className="tag">{r.day_gz || ""} {r.hour_gz || ""}</span>
+            <span className="paper-tag">{r.day_gz || ""} {r.hour_gz || ""}</span>
           </div>
         </div>
 

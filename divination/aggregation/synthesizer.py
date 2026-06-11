@@ -1,16 +1,11 @@
-"""报告生成器 — 根据信号和验证结果生成三档报告。
+"""报告生成器 — 生成三档可读中文报告（不再用 emoji/英文 key/嵌套重复）。
 
 REP-001: synthesize_report() 返回 ReadingReport
-REP-002: 一句话结论 (headline) — free 报告第一段
-REP-003: 免费版 — headline + 评分 + 3条建议
-REP-004: 标准版 — 共识/冲突/风险/建议/12法摘要
-REP-005: 高级版 — 深度分析/时间窗口/风险拆解/追问上下文
-REP-006: 12法依据摘要 — 每个术法至少一条
-REP-007: 多法共识段落 — 根据 consensus 自动生成
-REP-008: 多法冲突段落 — 根据 conflicts 自动生成
-REP-009: 风险提醒 — 谨慎表达，禁止绝对化
-REP-010: 行动建议 — 可执行，不做强制命令
-REP-011: 免责声明 — 三档报告都必须包含
+REP-002: 一句话结论
+REP-003: 免费版 — 速览段落 + 核心建议
+REP-004: 标准版 — 叙事性领域分析 + 共识/分歧 + 风险/建议
+REP-005: 高级版 — 深度模式分析 + 时窗 + 追问方向（不嵌套标准版）
+REP-011: 三档均含免责声明
 """
 from __future__ import annotations
 
@@ -24,8 +19,7 @@ from .schema import (
     ValidationResult,
 )
 
-
-# ── 免责声明 (M0-04, REP-011) ─────────────────────────────────────────────────
+# ── 常量 ─────────────────────────────────────────────────────────────────────
 
 DISCLAIMER = (
     "【免责声明】以上内容为基于传统文化与符号象征视角的参考分析，仅供参考，"
@@ -33,6 +27,63 @@ DISCLAIMER = (
     "但不应替代专业意见。重大人生决策请结合现实情况，咨询相关专业人士。"
 )
 
+METHOD_ZH: dict[str, str] = {
+    "bazi_v2": "八字精算", "bazi": "八字", "ziwei": "紫微斗数",
+    "qimen": "奇门遁甲", "liuyao": "六爻", "meihua": "梅花易数",
+    "fengshui": "风水", "bazhai": "八宅明镜", "xuankong": "玄空飞星",
+    "western": "西方占星", "vedic": "吠陀占星",
+    "tarot": "塔罗", "numerology": "数字命理",
+    "lenormand": "雷诺曼", "liuren": "大六壬", "tieban": "铁板神数",
+}
+
+DOMAIN_ZH: dict[str, str] = {
+    "self_life": "本命格局", "career": "事业工作", "wealth": "财运",
+    "relationship": "感情姻缘", "health": "身心健康", "decision": "决策方向",
+    "timing": "时机运势", "home_fengshui": "住宅风水",
+    "general": "综合", "monthly": "月运", "yearly": "年运",
+}
+
+SIGNAL_ZH: dict[str, str] = {
+    "short_term_caution": "短期需谨慎",
+    "long_term_potential": "长期有潜力",
+    "decision_delay": "时机未到宜等待",
+    "environment_support": "环境有助益",
+    "general_reference": "一般性参考",
+    "noble_help": "贵人相助",
+    "career_pressure": "事业有压力",
+    "career_independence": "适合自主发展",
+    "marriage_stability": "婚姻稳定度高",
+    "relationship_attraction": "桃花运旺",
+    "timing_transition": "处于转换期",
+    "layout_risk": "布局有隐患",
+    "direction_benefit": "方位有助益",
+    "wealth_opportunity": "财运有机会",
+    "health_reflection": "健康需关注",
+}
+
+POLARITY_ZH: dict[str, str] = {
+    "positive": "吉", "negative": "凶", "neutral": "平", "mixed": "杂",
+}
+
+
+def _sig_name(s: DivinationSignal | dict) -> str:
+    """信号的中文显示名。"""
+    if isinstance(s, dict):
+        key = s.get("signal_key", "")
+    else:
+        key = s.signal_key
+    return SIGNAL_ZH.get(key, key)
+
+
+def _method_name(m: str) -> str:
+    return METHOD_ZH.get(m, m)
+
+
+def _domain_name(d: str) -> str:
+    return DOMAIN_ZH.get(d, d)
+
+
+# ── REP-001: 主入口 ───────────────────────────────────────────────────────────
 
 def synthesize_report(
     signals: list[DivinationSignal],
@@ -41,393 +92,381 @@ def synthesize_report(
     methods_used: list[str],
     depth: str = "standard",
 ) -> ReadingReport:
-    """REP-001: 返回 ReadingReport（三档报告）。
-
-    Args:
-        signals: 所有统一信号
-        validation: 交叉验证结果 (ValidationResult)
-        intent: 意图分类结果
-        methods_used: 使用的术法名称列表
-        depth: 报告深度 (free/standard/premium)
-    """
-    primary_domain = intent.get("goal", intent.get("primary_domain", "self_life"))
+    """返回三档报告（每档独立可读，不互相嵌套）。"""
     primary_label = intent.get("goal_label", intent.get("primary_label", "综合"))
     question = intent.get("question", "")
 
-    # Pre-compute reusable structures
-    domain_signals: dict[str, list[DivinationSignal]] = {}
+    # 按领域和方法分组
+    domain_sigs: dict[str, list[DivinationSignal]] = {}
+    method_sigs: dict[str, list[DivinationSignal]] = {}
     for s in signals:
-        domain_signals.setdefault(s.domain, []).append(s)
+        domain_sigs.setdefault(s.domain, []).append(s)
+        method_sigs.setdefault(s.method, []).append(s)
 
-    method_signals: dict[str, list[DivinationSignal]] = {}
-    for s in signals:
-        method_signals.setdefault(s.method, []).append(s)
+    headline = _headline(signals, validation, primary_label, question)
 
-    # Generate headline (REP-002)
-    headline = _generate_headline(signals, validation, primary_label, question)
-
-    # REP-003: Free report
-    free_report = _build_free(headline, validation, signals, methods_used)
-
-    # REP-004: Standard report
-    standard_report = _build_standard(
-        headline, domain_signals, method_signals, validation, intent, methods_used
-    )
-
-    # REP-005: Premium report
-    premium_report = _build_premium(
-        headline, domain_signals, method_signals, validation, intent, methods_used, standard_report
-    )
+    free_report = _build_free(headline, validation, signals, methods_used, question)
+    standard_report = _build_standard(headline, domain_sigs, method_sigs, validation, intent, methods_used, question)
+    premium_report = _build_premium(headline, domain_sigs, method_sigs, validation, intent, methods_used)
 
     return ReadingReport(free=free_report, standard=standard_report, premium=premium_report)
 
 
-# ── REP-002: 一句话结论 ───────────────────────────────────────────────────────
+# ── REP-002: Headline ──────────────────────────────────────────────────────────
 
-def _generate_headline(
+def _headline(
     signals: list[DivinationSignal],
     validation: ValidationResult,
     primary_label: str,
-    question: str = "",
+    question: str,
 ) -> str:
-    """REP-002: 生成一句话结论 — free 报告第一段。"""
     score = validation.overall_score
-    pos_count = sum(1 for s in signals if s.polarity == "positive")
-    neg_count = sum(1 for s in signals if s.polarity == "negative")
-    conf_level = validation.confidence_level
+    pos_n = sum(1 for s in signals if s.polarity == "positive")
+    neg_n = sum(1 for s in signals if s.polarity == "negative")
+    method_n = len(set(s.method for s in signals))
 
     if score >= 70:
-        tone = "整体趋势较为积极"
+        tone = "整体趋势积极向好"
     elif score >= 55:
-        tone = "整体处于平稳发展态势"
+        tone = "整体态势平稳"
     elif score >= 40:
-        tone = "需要关注一些潜在挑战"
+        tone = "需留意潜在波动"
     else:
-        tone = "建议谨慎对待，多做准备"
+        tone = "宜谨慎行事，多作准备"
 
-    methods_n = len(set(s.method for s in signals))
-
-    context = f"针对「{question}」的" if question else ""
+    ctx = f"就「{question}」所问，" if question else ""
     return (
-        f"基于{methods_n}种术法交叉验证的综合分析，{context}{tone}。"
-        f"正向信号{pos_count}条，负向信号{neg_count}条，"
-        f"综合评分{score}/100，置信度{conf_level}。"
+        f"{ctx}综{method_n}种术法交叉参详，{tone}。"
+        f"正向信号{pos_n}条，负向信号{neg_n}条，综合评分{score}分。"
     )
 
 
-# ── REP-003: 免费版报告 ───────────────────────────────────────────────────────
+# ── REP-003: 免费版 ───────────────────────────────────────────────────────────
 
 def _build_free(
     headline: str,
     validation: ValidationResult,
     signals: list[DivinationSignal],
     methods_used: list[str],
+    question: str,
 ) -> str:
-    """REP-003: 免费版 — headline + 评分 + 最多3条建议。"""
     lines: list[str] = []
 
-    # Headline
-    lines.append("## 命理综合分析 · 速览")
-    lines.append(f"> {headline}")
+    lines.append(headline)
     lines.append("")
 
-    # Score bar
+    # 一句话概括
     score = validation.overall_score
-    bar_len = 20
-    filled = int(score / 100 * bar_len)
-    bar = "█" * filled + "░" * (bar_len - filled)
-    lines.append(f"**综合评分**: {score}/100 `{bar}`")
-    lines.append(f"**可信等级**: {validation.confidence_level}")
+    pos_sigs = [s for s in signals if s.polarity == "positive"]
+    neg_sigs = [s for s in signals if s.polarity == "negative"]
+
+    if pos_sigs:
+        best = max(pos_sigs, key=lambda s: s.strength)
+        lines.append(f"最有利的方面是「{_sig_name(best)}」（{_method_name(best.method)}，{_domain_name(best.domain)}），可多加把握。")
+    if neg_sigs:
+        worst = max(neg_sigs, key=lambda s: s.strength)
+        lines.append(f"最需留意的方面是「{_sig_name(worst)}」（{_method_name(worst.method)}），建议谨慎对待。")
+
     lines.append("")
 
-    # Top consensus
-    if validation.consensus:
-        top = validation.consensus[0]
-        lines.append(f"**核心共识**: {top.theme}")
-        if validation.consensus[1:]:
-            lines.append(f"另{len(validation.consensus)-1}项共识可查看标准报告")
-    lines.append("")
+    # 核心建议
+    advice = validation.action_advice[:2] if validation.action_advice else []
+    if advice:
+        lines.append("核心建议：")
+        for a in advice:
+            lines.append(f"· {a}")
+        lines.append("")
 
-    # Top 3 suggestions
-    suggestions = validation.action_advice[:3] if validation.action_advice else ["建议查看标准报告获取详细分析"]
-    lines.append("### 核心建议")
-    for i, a in enumerate(suggestions, 1):
-        lines.append(f"{i}. {a}")
-    lines.append("")
-
-    # Disclaimer
     lines.append("---")
     lines.append(DISCLAIMER)
 
-    # Enforce ≤500 chars guideline
-    result = "\n".join(lines)
-    if len(result) > 600:
-        # Truncate suggestions to fit
-        result = "\n".join(lines[:8]) + "\n\n---\n" + DISCLAIMER
-
-    return result
+    return "\n".join(lines)
 
 
-# ── REP-004: 标准版报告 ───────────────────────────────────────────────────────
+# ── REP-004: 标准版 ───────────────────────────────────────────────────────────
 
 def _build_standard(
     headline: str,
-    domain_signals: dict[str, list[DivinationSignal]],
-    method_signals: dict[str, list[DivinationSignal]],
+    domain_sigs: dict[str, list[DivinationSignal]],
+    method_sigs: dict[str, list[DivinationSignal]],
     validation: ValidationResult,
     intent: dict[str, Any],
     methods_used: list[str],
+    question: str,
 ) -> str:
-    """REP-004: 标准版 — 共识/冲突/风险/建议/12法摘要。"""
     lines: list[str] = []
-
-    primary_domain = intent.get("goal", intent.get("primary_domain", "self_life"))
     primary_label = intent.get("goal_label", intent.get("primary_label", "综合"))
-    sub_goals = intent.get("sub_goals", intent.get("sub_domains", [primary_domain]))
 
-    # ── Header ──
-    lines.append("# 命理综合分析报告 (标准版)")
-    lines.append(f"> {headline}")
-    lines.append("")
-    lines.append(f"**分析领域**: {primary_label}")
-    lines.append(f"**参与术法**: {' · '.join(methods_used)}")
-    lines.append(f"**综合评分**: {validation.overall_score}/100 | **可信等级**: {validation.confidence_level}")
+    # ── 标题 ──
+    lines.append(f"命书 · {primary_label}")
+    lines.append(headline)
     lines.append("")
 
-    # ── Intent analysis ──
-    lines.append("## 意图分析")
-    lines.append(f"- 用户问题领域: {primary_label}")
-    lines.append(f"- 关联子领域: {', '.join(sub_goals[:5])}")
-    lines.append(f"- 分类置信度: {intent.get('goal_confidence', intent.get('confidence', 0.5)):.0%}")
-    lines.append("")
+    # ── 总体判断 ──
+    lines.append("【总体判断】")
+    score = validation.overall_score
 
-    # ── REP-007: 多法共识段落 ──
-    if validation.consensus:
-        lines.append("## 多术法共识")
-        for c in validation.consensus:
-            methods_str = "、".join(c.supporting_methods[:5])
-            if len(c.supporting_methods) > 5:
-                methods_str += f"等{len(c.supporting_methods)}法"
-            lines.append(f"### {c.theme}")
-            lines.append(f"- **支持术法**: {methods_str}")
-            lines.append(f"- **共识强度**: {c.weight_strength}/100")
-            lines.append(f"- **解读**: {c.explanation}")
-            lines.append("")
+    # 找最强正向和负向信号
+    pos_sigs = sorted(
+        [s for s in (list(domain_sigs.values()) if domain_sigs else []) for s in (list(domain_sigs.values())[0] if domain_sigs else [])],
+        key=lambda s: s.strength, reverse=True
+    )
+    pos_sigs = sorted(
+        [s for ss in domain_sigs.values() for s in ss if s.polarity == "positive"],
+        key=lambda s: s.strength, reverse=True,
+    )
+    neg_sigs = sorted(
+        [s for ss in domain_sigs.values() for s in ss if s.polarity == "negative"],
+        key=lambda s: s.strength, reverse=True,
+    )
+
+    # 综合描述
+    method_list = "、".join(_method_name(m) for m in methods_used[:6])
+    if len(methods_used) > 6:
+        method_list += f"等{len(methods_used)}种术法"
+    lines.append(f"本次合参共调用{method_list}，交叉验证后综合评分为{score}分。")
+
+    if pos_sigs and neg_sigs:
+        lines.append(
+            f"吉象主要体现在{_domain_name(pos_sigs[0].domain)}（{_sig_name(pos_sigs[0])}，"
+            f"{_method_name(pos_sigs[0].method)}），"
+            f"而{_domain_name(neg_sigs[0].domain)}方面（{_sig_name(neg_sigs[0])}）需多加留意。"
+        )
+    elif pos_sigs:
+        lines.append(f"整体以吉象为主，{_domain_name(pos_sigs[0].domain)}方面（{_sig_name(pos_sigs[0])}）信号最为明确。")
+    elif neg_sigs:
+        lines.append(f"当前需重点关注{_domain_name(neg_sigs[0].domain)}（{_sig_name(neg_sigs[0])}），宜谨慎行事。")
     else:
-        lines.append("## 多术法共识")
-        lines.append("本次分析未形成显著的多术法共识，各术法信号较为分散，建议提供更详细的出生信息以获得更聚焦的分析。")
-        lines.append("")
+        lines.append("各术法信号以中性为主，无明显偏吉或偏凶倾向，属平稳时期。")
 
-    # ── REP-008: 多法冲突段落 ──
-    if validation.conflicts:
-        lines.append("## 术法分歧（需关注）")
-        for c in validation.conflicts:
-            sev_icon = {"low": "🟡", "medium": "🟠", "high": "🔴"}.get(c.severity, "⚪")
-            lines.append(f"### {sev_icon} {c.domain} · 严重度: {c.severity}")
-            lines.append(f"- **正向术法**: {', '.join(c.positive_methods)}")
-            lines.append(f"- **负向术法**: {', '.join(c.negative_methods)}")
-            if c.neutral_methods:
-                lines.append(f"- **中性术法**: {', '.join(c.neutral_methods)}")
-            lines.append(f"- **原因分析**: {c.conflict_explanation}")
-            if c.resolution:
-                lines.append(f"- **调和思路**: {c.resolution}")
-            lines.append("")
-
-    # ── REP-006: 12法依据摘要 ──
-    lines.append("## 12术法依据摘要")
-    for method in methods_used:
-        sigs = method_signals.get(method, [])
-        if sigs:
-            top_sig = max(sigs, key=lambda s: s.strength)
-            emoji = {"positive": "✅", "negative": "⚠", "neutral": "➖", "mixed": "🔄"}.get(top_sig.polarity, "➖")
-            lines.append(f"- {emoji} **{method}**: {top_sig.signal_key} ({top_sig.polarity}, 强度{top_sig.strength:.0%}) — {top_sig.evidence or '无详细证据'}")
-        else:
-            lines.append(f"- ⬜ **{method}**: 未产生有效信号（可能因出生信息不完整）")
     lines.append("")
 
-    # ── REP-009: 风险提醒 ──
-    if validation.risks:
-        lines.append("## 风险提醒")
-        for r in validation.risks:
-            lines.append(f"- {r}")
+    # ── 共识分析 ──
+    if validation.consensus:
+        lines.append("【诸法共识】")
+        for c in validation.consensus[:3]:
+            supporters = "、".join(_method_name(m) for m in c.supporting_methods[:4])
+            if len(c.supporting_methods) > 4:
+                supporters += f"等{len(c.supporting_methods)}法"
+            lines.append(f"{c.theme}——{c.explanation}（{supporters}一致支持）")
         lines.append("")
-        lines.append("*以上风险提示基于术法信号的统计分析，仅供参考，不构成确定性判断。*")
+    else:
+        lines.append("【诸法共识】本次各术法信号较为分散，未形成显著共识，建议提供更详细的出生信息以便深入分析。")
         lines.append("")
 
-    # ── REP-010: 行动建议 ──
+    # ── 分歧分析 ──
+    if validation.conflicts:
+        lines.append("【术法分歧】")
+        for c in validation.conflicts[:3]:
+            pos_m = "、".join(_method_name(m) for m in c.positive_methods[:3])
+            neg_m = "、".join(_method_name(m) for m in c.negative_methods[:3])
+            lines.append(f"在{_domain_name(c.domain)}方面存在分歧：{c.conflict_explanation}")
+            lines.append(f"  · 正向信号来自{pos_m}，负向信号来自{neg_m}")
+            if c.resolution:
+                lines.append(f"  · 调和思路：{c.resolution}")
+        lines.append("")
+
+    # ── 分领域解析 ──
+    domain_order = ["self_life", "career", "wealth", "relationship", "decision", "timing", "home_fengshui", "health"]
+    written = False
+    for dom in domain_order:
+        sigs = domain_sigs.get(dom, [])
+        if not sigs:
+            continue
+        written = True
+        dom_name = _domain_name(dom)
+        lines.append(f"【{dom_name}】")
+
+        # 按方法分组描述
+        for s in sorted(sigs, key=lambda x: x.strength, reverse=True)[:3]:
+            polarity_mark = POLARITY_ZH.get(s.polarity, "平")
+            evidence = s.evidence if s.evidence else ""
+            lines.append(
+                f"  {polarity_mark} {_method_name(s.method)}显示：{_sig_name(s)}"
+                + (f"（{evidence}）" if evidence else "")
+            )
+
+        # 小结该领域
+        dom_pos = sum(1 for s in sigs if s.polarity == "positive")
+        dom_neg = sum(1 for s in sigs if s.polarity == "negative")
+        if dom_pos > dom_neg:
+            lines.append(f"  该领域总体偏吉（{dom_pos}吉/{dom_neg}凶），可积极把握。")
+        elif dom_neg > dom_pos:
+            lines.append(f"  该领域需谨慎对待（{dom_pos}吉/{dom_neg}凶），建议多做准备。")
+        else:
+            lines.append(f"  该领域信号中性（{dom_pos}吉/{dom_neg}凶），维持现状即可。")
+        lines.append("")
+
+    if not written:
+        lines.append("【信号概述】本次产生的信号覆盖领域较广，各术法均有输出。由于信号强度整体偏弱，建议补充出生信息后重新分析以获得更明确的指向。")
+        lines.append("")
+
+    # ── 风险与建议 ──
+    if validation.risks:
+        lines.append("【注意事项】")
+        for r in validation.risks[:5]:
+            lines.append(f"· {r}")
+        lines.append("")
+
     if validation.action_advice:
-        lines.append("## 行动建议")
-        for i, a in enumerate(validation.action_advice, 1):
+        lines.append("【行动参考】")
+        for i, a in enumerate(validation.action_advice[:5], 1):
             lines.append(f"{i}. {a}")
         lines.append("")
 
-    # ── Timing ──
-    if validation.timing:
-        lines.append("## 时间窗口")
-        lines.append(f"- {validation.timing.get('summary', '')}")
+    # ── 时机 ──
+    if validation.timing and validation.timing.get("summary"):
+        lines.append(f"【时令参考】{validation.timing['summary']}")
         lines.append("")
 
-    # ── Domain breakdown ──
-    lines.append("## 分领域信号详情")
-    domain_names = {
-        "self_life": "本命格局", "career": "事业工作", "wealth": "财运",
-        "relationship": "感情关系", "health": "健康自省", "decision": "决策方向",
-        "timing": "时机分析", "home_fengshui": "住宅风水",
-    }
-    for domain, name in domain_names.items():
-        sigs = domain_signals.get(domain, [])
-        if not sigs:
-            continue
-        lines.append(f"### {name}")
-        for s in sigs[:4]:
-            emoji = {"positive": "✅", "negative": "❌", "neutral": "➖", "mixed": "🔄"}.get(s.polarity, "➖")
-            lines.append(f"- {emoji} **{s.signal_key}** ({s.method}): 强度{s.strength:.0%} | {s.evidence}")
-        lines.append("")
-
-    # ── Disclaimer ──
     lines.append("---")
     lines.append(DISCLAIMER)
 
     return "\n".join(lines)
 
 
-# ── REP-005: 高级版报告 ───────────────────────────────────────────────────────
+# ── REP-005: 高级版 ───────────────────────────────────────────────────────────
 
 def _build_premium(
     headline: str,
-    domain_signals: dict[str, list[DivinationSignal]],
-    method_signals: dict[str, list[DivinationSignal]],
+    domain_sigs: dict[str, list[DivinationSignal]],
+    method_sigs: dict[str, list[DivinationSignal]],
     validation: ValidationResult,
     intent: dict[str, Any],
     methods_used: list[str],
-    standard_text: str,
 ) -> str:
-    """REP-005: 高级版 — 深度分析/时间窗口/风险拆解/追问上下文。"""
     lines: list[str] = []
+    primary_label = intent.get("goal_label", intent.get("primary_label", "综合"))
 
-    lines.append("# 命理深度分析报告 (Premium)")
-    lines.append(f"> {headline}")
-    lines.append("")
-    lines.append(f"**综合评分**: {validation.overall_score}/100 | **可信等级**: {validation.confidence_level}")
-    lines.append(f"**术法覆盖**: {len(methods_used)}/12 法")
+    lines.append(f"命书 · {primary_label}（深度卷）")
+    lines.append(headline)
     lines.append("")
 
-    # ── Signal heatmap ──
-    lines.append("## 信号强度热力图")
-    domain_heat: dict[str, dict[str, float]] = {}
-    for signals in domain_signals.values():
-        for s in signals:
-            domain_heat.setdefault(s.domain, {"pos": 0.0, "neg": 0.0, "neu": 0.0, "count": 0.0})
-            h = domain_heat[s.domain]
-            h["count"] += 1
-            if s.polarity == "positive":
-                h["pos"] += s.strength
-            elif s.polarity == "negative":
-                h["neg"] += s.strength
-            else:
-                h["neu"] += s.strength
+    # ── 全局模式分析 ──
+    lines.append("【全局模式】")
 
-    for domain, h in sorted(domain_heat.items(), key=lambda x: -x[1]["count"]):
-        total = max(1, h["pos"] + h["neg"] + h["neu"])
-        p_pos = int(h["pos"] / total * 20)
-        p_neg = int(h["neg"] / total * 20)
-        p_neu = int(h["neu"] / total * 20)
-        bar = "🟢" * p_pos + "🔴" * p_neg + "⚪" * p_neu
-        lines.append(f"- **{domain}** ({int(h['count'])}条): {bar}")
+    # 信号分布模式
+    total_signals = sum(len(v) for v in domain_sigs.values())
+    pos_count = sum(1 for ss in domain_sigs.values() for s in ss if s.polarity == "positive")
+    neg_count = sum(1 for ss in domain_sigs.values() for s in ss if s.polarity == "negative")
+    neu_count = total_signals - pos_count - neg_count
+
+    lines.append(
+        f"本次共产生{total_signals}条信号（吉{pos_count}、凶{neg_count}、平{neu_count}），"
+        f"覆盖{len(domain_sigs)}个领域、{len(methods_used)}种术法。"
+    )
+
+    # 术法贡献概要
+    ranked = sorted(method_sigs.items(), key=lambda x: sum(s.strength for s in x[1]), reverse=True)
+    top3 = ranked[:3]
+    if top3:
+        top3_desc = "；".join(
+            f"{_method_name(m)}贡献{len(ss)}条信号（偏向{'吉' if sum(1 for s in ss if s.polarity=='positive') > sum(1 for s in ss if s.polarity=='negative') else '中' if sum(1 for s in ss if s.polarity=='positive') == sum(1 for s in ss if s.polarity=='negative') else '凶'}）"
+            for m, ss in top3
+        )
+        lines.append(f"贡献最多的三种术法：{top3_desc}。")
+
+    # 是否有一致性
+    if pos_count > neg_count * 2:
+        lines.append("诸法整体偏向积极，吉象信号占据主导，可在把握机遇的同时留意个别负面提示。")
+    elif neg_count > pos_count * 2:
+        lines.append("负面信号占比偏高，建议当前阶段以守为主，待时机明朗后再行决策。")
+    else:
+        lines.append("吉凶信号分布较为均衡，说明当前处境有多个面向需要分别对待，不宜一概而论。")
 
     lines.append("")
 
-    # ── Method contribution ──
-    lines.append("## 各术法贡献度排名")
-    ranked = sorted(method_signals.items(), key=lambda x: -sum(s.strength for s in x[1]))
-    for method, sigs in ranked:
-        total_str = sum(s.strength for s in sigs)
-        avg_str = total_str / max(1, len(sigs))
-        trends = set(s.polarity for s in sigs)
-        trend_str = "/".join(sorted(trends))
-        lines.append(f"- **{method}**: {len(sigs)}条信号 | 强度均值{avg_str:.0%} | 倾向{trend_str}")
+    # ── 领域深度分析 ──
+    lines.append("【领域深度】")
+    domain_order = ["self_life", "career", "wealth", "relationship", "decision", "timing", "home_fengshui", "health"]
+
+    for dom in domain_order:
+        sigs = domain_sigs.get(dom, [])
+        if not sigs:
+            continue
+        dom_name = _domain_name(dom)
+        dom_pos = sum(s.strength for s in sigs if s.polarity == "positive")
+        dom_neg = sum(s.strength for s in sigs if s.polarity == "negative")
+
+        if dom_pos > dom_neg * 1.5:
+            tendency = "偏吉，诸法指向较为一致"
+        elif dom_neg > dom_pos * 1.5:
+            tendency = "偏凶，需重点关注"
+        elif dom_pos > dom_neg:
+            tendency = "略微偏吉，但有分歧需注意"
+        elif dom_neg > dom_pos:
+            tendency = "略微偏紧，但非全无机会"
+        else:
+            tendency = "中性平稳"
+
+        lines.append(f"· {dom_name}（{len(sigs)}条信号）：{tendency}。")
+        # 列出关键信号
+        for s in sorted(sigs, key=lambda x: x.strength, reverse=True)[:2]:
+            lines.append(f"  ― {_method_name(s.method)}：{_sig_name(s)}（{POLARITY_ZH.get(s.polarity, '平')}，强度{s.strength:.0%}）")
+
     lines.append("")
 
-    # ── Risk breakdown (REP-009 enhanced) ──
-    if validation.risks:
-        lines.append("## 风险深度拆解")
-        # Group risks by severity
-        high_risk = [c for c in validation.conflicts if c.severity == "high"]
-        med_risk = [c for c in validation.conflicts if c.severity == "medium"]
-
-        if high_risk:
-            lines.append("### 🔴 高风险维度")
-            for c in high_risk:
-                lines.append(f"- **{c.domain}**: {c.conflict_explanation}")
-                if c.resolution:
-                    lines.append(f"  → 调和思路: {c.resolution}")
-            lines.append("")
-
-        if med_risk:
-            lines.append("### 🟠 中度风险维度")
-            for c in med_risk:
-                lines.append(f"- **{c.domain}**: {c.conflict_explanation}")
-            lines.append("")
-
-        lines.append("### 风险提示清单")
-        for r in validation.risks:
-            lines.append(f"- {r}")
+    # ── 术法分歧深度分析 ──
+    if validation.conflicts:
+        lines.append("【分歧辨析】")
+        for c in validation.conflicts[:3]:
+            lines.append(f"{_domain_name(c.domain)}：{c.conflict_explanation}")
+            if c.resolution:
+                lines.append(f"  调和方向：{c.resolution}")
+            lines.append(f"  正向术法：{'、'.join(_method_name(m) for m in c.positive_methods[:4])}")
+            lines.append(f"  负向术法：{'、'.join(_method_name(m) for m in c.negative_methods[:4])}")
         lines.append("")
 
-    # ── Time window analysis ──
+    # ── 风险深度 ──
+    if validation.risks:
+        lines.append("【风险研判】")
+        for r in validation.risks:
+            # 替换风险文本中的英文 signal key 为中文
+            r_zh = r
+            for en_key, zh_key in SIGNAL_ZH.items():
+                r_zh = r_zh.replace(en_key, zh_key)
+            lines.append(f"· {r_zh}")
+        lines.append("")
+
+    # ── 时间窗 ──
     if validation.timing:
-        lines.append("## 时间窗口分析")
         t = validation.timing
+        lines.append("【时令参详】")
         short_n = t.get("short_term_signals", 0)
         med_n = t.get("medium_term_signals", 0)
         long_n = t.get("long_term_signals", 0)
-        lines.append(f"- 短期信号: {short_n}条")
-        lines.append(f"- 中期信号: {med_n}条")
-        lines.append(f"- 长期信号: {long_n}条")
-        lines.append(f"- **综合**: {t.get('summary', '')}")
-        lines.append("")
-
-        # Temporal recommendation
+        lines.append(f"短期信号{short_n}条，中期{med_n}条，长期{long_n}条。{t.get('summary', '')}")
         if short_n > long_n:
-            lines.append("> 信号以短期为主，建议关注近期 1-3 个月内的变化，及时调整策略。")
+            lines.append("信号以近期为主，建议关注未来1-3个月内的变化。")
         elif long_n > short_n:
-            lines.append("> 信号以长期为主，建议从长远视角规划，不必过于纠结短期波动。")
+            lines.append("信号偏向长周期，不必过于纠结短期波动，可从长计议。")
         lines.append("")
 
-    # ── Follow-up context ──
-    lines.append("## 追问上下文")
-    lines.append("以下为系统根据当前分析自动生成的追问方向，可帮助进一步聚焦：")
-    lines.append("")
-
-    # Generate follow-up from weak signals
-    weak_signals = [s for s in method_signals.values() for s in s if s.strength < 0.35]
-    if weak_signals:
-        weak_keys = list(set(s.signal_key for s in weak_signals))[:3]
-        for wk in weak_keys:
-            lines.append(f"- 关于「{wk}」的信号较弱，可以提供更详细的出生时间或具体问题进行深入分析")
+    # ── 追问方向 ──
+    lines.append("【可深入的方向】")
+    weak_domains = [
+        d for d in domain_order
+        if d in domain_sigs and sum(s.strength for s in domain_sigs[d]) / len(domain_sigs[d]) < 0.45
+    ][:3]
+    if weak_domains:
+        lines.append(f"以下领域信号偏弱，补充出生信息或具体问题可提高精度：{'、'.join(_domain_name(d) for d in weak_domains)}。")
 
     if validation.conflicts:
-        conflict_domains = list(set(c.domain for c in validation.conflicts))[:2]
-        lines.append(f"- 存在术法分歧的领域（{', '.join(conflict_domains)}），可针对具体决策场景追问细节")
-
-    if len(methods_used) < 12:
-        lines.append("- 部分术法未参与分析，补充完整的出生信息可激活更多术法")
+        conflict_domains = list(set(_domain_name(c.domain) for c in validation.conflicts[:2]))
+        lines.append(f"存在术法分歧的领域（{'、'.join(conflict_domains)}），可针对具体场景进一步追问。")
 
     lines.append("")
 
-    # ── Full standard report embedded ──
-    lines.append("## 详细分析报告")
-    lines.append(standard_text)
-
-    # ── Footer ──
-    lines.append("")
+    # ── 免责 ──
     lines.append("---")
-    lines.append("*本深度报告由 Mystic Hub 12术法聚合引擎生成，如需进一步解读可针对具体领域追问。*")
+    lines.append(DISCLAIMER)
+    lines.append("")
+    lines.append("*本深度报告由 Mystic Hub 多术法聚合引擎生成，可针对具体领域进一步追问。*")
 
     return "\n".join(lines)
 
 
-# ── 向后兼容 ─────────────────────────────────────────────────────────────────
+# ── 向后兼容 ──────────────────────────────────────────────────────────────────
 
 def generate(
     signals: list[DivinationSignal],
@@ -436,8 +475,4 @@ def generate(
     methods_used: list[str],
     depth: str = "standard",
 ) -> ReadingReport:
-    """向后兼容的 generate() 包装。
-
-    新代码请直接使用 synthesize_report()。
-    """
     return synthesize_report(signals, validation, intent, methods_used, depth)

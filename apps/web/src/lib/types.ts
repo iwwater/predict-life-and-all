@@ -4,7 +4,7 @@ export type Method =
   | "bazi" | "bazi_v2" | "ziwei" | "qimen" | "liuyao" | "meihua" | "chenggu"
   | "bazhai" | "xuankong"
   | "western" | "vedic" | "tarot" | "numerology"
-  | "lenormand" | "liuren" | "tieban" | "xiaoliuren"
+  | "lenormand" | "liuren" | "tieban" | "xiaoliuren" | "hepan"
   | "cross_validator" | "hour_calibrator" | "compatibility";
 
 export type Subject =
@@ -53,14 +53,7 @@ export interface ChartResult {
   elapsed_ms?: number;
 }
 
-export interface Case {
-  id: string; name_zh: string; name_en: string;
-  year: number; month: number; day: number;
-  hour: number; minute: number;
-  lat: number; lng: number; tz: string;
-  gender: "male" | "female";
-  note: string;
-}
+// Case interface removed — celebrity content purged per legal compliance
 
 export type InterpretEvent =
   | { type: "delta"; text: string }
@@ -80,6 +73,7 @@ export interface ComputeRequest {
     sitting?: string | null;
     construction_year?: number;
     method_inputs?: Record<string, any>;
+    partner?: Birth;
   };
 }
 

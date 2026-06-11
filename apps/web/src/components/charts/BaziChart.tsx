@@ -1,4 +1,4 @@
-// 八字四柱表(年/月/日/时,各列上干下支,大运时间轴 + 五行雷达)
+﻿// 八字四柱表(年/月/日/时,各列上干下支,大运时间轴 + 五行雷达)
 // 术语全用 <Jargon> 包起来,显示"术语·大白话"
 // v2: 增加藏干、十神、12长生、身强评分进度条、流年互动
 // v3: 支持交叉验证、桃花指数、改命建议展示
@@ -35,12 +35,12 @@ export function BaziChart({ chart, crossValidation, peachBlossom, fateModificati
   return (
     <div className="space-y-4">
       {/* 四柱表 */}
-      <div className="card">
+      <div className="paper-frame">
         <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <h3 className="text-lg" style={{ color: COLOR.goldBright }}>
             <Jargon term="四柱" />·八字
           </h3>
-          <span className="tag tag-east">
+          <span className="paper-tag paper-tag-east">
             <Jargon term="日主" mode="plain" /> {r.day_master || "—"}
           </span>
         </div>
@@ -54,7 +54,7 @@ export function BaziChart({ chart, crossValidation, peachBlossom, fateModificati
             return (
               <div key={c.key}
                 className="rounded-md p-3 text-center"
-                style={{ background: "rgba(8,10,15,0.5)", border: `1px solid ${COLOR.line}` }}>
+                style={{ background: "var(--paper-2)", border: `1px solid ${COLOR.line}` }}>
                 <div className="mb-2 text-[10px] uppercase tracking-widest"
                   style={{ color: COLOR.muted, position: "relative" }}>
                   <Jargon term={c.term} override={c.override} />
@@ -83,11 +83,11 @@ export function BaziChart({ chart, crossValidation, peachBlossom, fateModificati
       </div>
 
       <div className="grid sm:grid-cols-2 gap-4">
-        <div className="card flex justify-center">
+        <div className="paper-frame flex justify-center">
           <ElementsRadar elements={chart.normalized.elements || {}} variant="five"
             title={`${r.day_master || "—"} 的五行`} />
         </div>
-        <div className="card">
+        <div className="paper-frame">
           <h3 className="text-sm mb-3" style={{ color: COLOR.goldBright }}>
             <Jargon term="大运" />·十年换一次
           </h3>
@@ -175,7 +175,7 @@ export function BaziChart({ chart, crossValidation, peachBlossom, fateModificati
       {peachBlossom && typeof peachBlossom.index === "number" && (
         <div className="card space-y-2">
           <h3 className="text-sm" style={{ color: COLOR.goldBright }}>
-            🌸 桃花指数 · 感情运
+            · 桃花指数 · 感情运
           </h3>
           <div className="flex items-center gap-3">
             <div className="flex-1 h-2 rounded-full" style={{ background: COLOR.lineSoft, overflow: "hidden" }}>
@@ -204,7 +204,7 @@ export function BaziChart({ chart, crossValidation, peachBlossom, fateModificati
       {crossValidation && typeof crossValidation.ensemble_score === "number" && (
         <div className="card space-y-2">
           <h3 className="text-sm" style={{ color: COLOR.goldBright }}>
-            🔗 多系统交叉验证
+            · 多系统交叉验证
           </h3>
           <div className="flex items-center gap-3">
             <div className="flex-1 h-2 rounded-full" style={{ background: COLOR.lineSoft, overflow: "hidden" }}>
@@ -251,7 +251,7 @@ export function BaziChart({ chart, crossValidation, peachBlossom, fateModificati
       {fateModification && (fateModification.daily_practices?.length || fateModification.mutable_patterns?.length) && (
         <div className="card space-y-2">
           <h3 className="text-sm" style={{ color: COLOR.goldBright }}>
-            🌿 五行调理 · 改命建议
+            · 五行调理 · 改命建议
           </h3>
           {fateModification.element_balance?.advice && (
             <div className="text-xs" style={{ color: COLOR.inkSoft }}>

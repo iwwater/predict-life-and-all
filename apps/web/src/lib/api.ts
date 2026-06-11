@@ -1,6 +1,6 @@
 // 前后端 API 客户端(对齐 server/api/* 路径 `/api/*` —— 不是 `/api/v1/*`)
 import type {
-  Method, MethodMeta, ChartResult, Case,
+  Method, MethodMeta, ChartResult,
   ComputeRequest, InterpretEvent, Birth,
 } from "./types";
 
@@ -95,10 +95,7 @@ export async function fetchPrompt(method: Method | string): Promise<{ method: st
   return jsonFetch(`${BASE}/prompts/${method}`);
 }
 
-export async function fetchCases(): Promise<Case[]> {
-  const j = await jsonFetch<{ cases: Case[] }>(`${BASE}/cases`);
-  return j.cases || [];
-}
+// fetchCases removed — celebrity content purged per legal compliance
 
 export async function computeChart(req: ComputeRequest): Promise<ChartResult> {
   return jsonFetch<ChartResult>(`${BASE}/compute`, {

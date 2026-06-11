@@ -98,6 +98,21 @@ function Breadcrumb({ pathname }: { pathname: string }) {
 
   if (pathname === "/") {
     crumbs.push({ label: t("nav.home") });
+  } else if (pathname.startsWith("/m/")) {
+    crumbs.push({ label: t("nav.home"), to: "/" });
+    const m = pathname.replace("/m/", "");
+    const labels: Record<string, string> = {
+      bazi: t("nav.bazi"), ziwei: t("nav.ziwei"), qimen: "奇门遁甲",
+      liuyao: t("nav.liuyao"), meihua: t("nav.meihua"), chenggu: t("nav.chenggu"),
+      western: t("nav.western"), vedic: t("nav.vedic"),
+      tarot: t("nav.tarot"), numerology: t("nav.numerology"),
+      xuankong: t("nav.xuankong"), bazhai: t("nav.bazhai"),
+      hepan: lang === "zh" ? "合盘" : "Synastry",
+    };
+    crumbs.push({ label: labels[m] || m });
+  } else if (pathname.startsWith("/heshen")) {
+    crumbs.push({ label: t("nav.home"), to: "/" });
+    crumbs.push({ label: lang === "zh" ? "合参" : "Cross-Reference" });
   } else if (pathname.startsWith("/method/")) {
     crumbs.push({ label: t("nav.home"), to: "/" });
     const m = pathname.replace("/method/", "");

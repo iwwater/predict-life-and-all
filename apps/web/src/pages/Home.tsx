@@ -2,8 +2,8 @@
 // 依据:《前端视觉重设计规范》§3
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchMethods, fetchCases, fetchDaily, type DailyPayload } from "../lib/api";
-import type { MethodMeta, Case } from "../lib/types";
+import { fetchMethods, fetchDaily, type DailyPayload } from "../lib/api";
+import type { MethodMeta } from "../lib/types";
 import { SchoolChip } from "../components/ui";
 import { METHOD_PLAIN, SUBJECTS } from "../lib/method-info";
 import { useHistory } from "../store/history";
@@ -18,14 +18,12 @@ const SUBJECT_LABEL: Record<string, string> = SUBJECTS.reduce(
 export function Home() {
   const { t, lang } = useI18n();
   const [methods, setMethods] = useState<MethodMeta[]>([]);
-  const [cases, setCases] = useState<Case[]>([]);
   const [daily, setDaily] = useState<DailyPayload | null>(null);
   const items = useHistory((s) => s.items);
   const recent3 = items.slice(0, 3);
 
   useEffect(() => {
     fetchMethods().then(setMethods).catch(() => setMethods([]));
-    fetchCases().then(setCases).catch(() => setCases([]));
     const last = items.find((it) => it.birth?.year);
     const birth = last
       ? {
@@ -185,29 +183,7 @@ export function Home() {
       {/* 术数总览 */}
       <MethodOverview eastMethods={eastMethods} westMethods={westMethods} />
 
-      {/* 公开案例 */}
-      {cases.length > 0 && (
-        <section>
-          <div className="paper-eyebrow" style={{ marginBottom: "0.5rem" }}>
-            {lang === "zh" ? "公开案例" : "Public Cases"}
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-            {cases.map((c) => (
-              <Link key={c.id} to={`/cast?fromCase=${c.id}`} className="paper-grid-cell" style={{ textDecoration: "none", display: "block" }}>
-                <div style={{ fontWeight: 600, fontSize: "0.82rem", color: "var(--ink)", fontFamily: "'Noto Serif SC', serif" }}>
-                  {c.name_zh}
-                </div>
-                <div style={{ fontSize: "0.68rem", color: "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace" }}>
-                  {c.year}-{c.month}-{c.day}
-                </div>
-                <div style={{ fontSize: "0.68rem", color: "var(--ink-soft)", marginTop: "0.15rem" }} className="truncate">
-                  {c.note}
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* 公开案例已下架 — 法律合规:真实名人生辰/命运论断涉及个人信息保护法与民法典人格权 */}
 
       {/* 合规说明由全局 Footer 统一承载，此处不再重复 */}
     </div>
@@ -276,7 +252,7 @@ function MethodOverview({ eastMethods, westMethods }: { eastMethods: MethodMeta[
           return (
             <Link
               key={m.id}
-              to={`/method/${m.id}`}
+              to={`/m/${m.id}`}
               className="paper-grid-cell"
               style={{ textDecoration: "none", display: "block" }}
             >

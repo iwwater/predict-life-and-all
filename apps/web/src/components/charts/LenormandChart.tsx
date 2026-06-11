@@ -1,4 +1,4 @@
-// 雷诺曼: 卡牌阵型 + 组合解读 + 牌阵氛围分析
+﻿// 雷诺曼: 卡牌阵型 + 组合解读 + 牌阵氛围分析
 import type { ChartResult } from "../../lib/types";
 import { COLOR, Stat } from "../ui";
 
@@ -19,7 +19,7 @@ function LenormandCard({ card, index, total }: { card: any; index: number; total
     <div
       className="rounded-md p-3 flex flex-col gap-1.5 relative"
       style={{
-        background: isCenter ? `linear-gradient(135deg, rgba(201,162,75,0.08), rgba(8,10,15,0.6))` : "rgba(8,10,15,0.4)",
+        background: isCenter ? `linear-gradient(135deg, rgba(201,162,75,0.08), var(--paper-2))` : "var(--paper-2)",
         border: `1px solid ${isCenter ? COLOR.goldDim : COLOR.line}`,
       }}
     >
@@ -90,7 +90,7 @@ export function LenormandChart({ chart }: { chart: ChartResult }) {
   return (
     <div className="space-y-4">
       {/* Header card */}
-      <div className="card">
+      <div className="paper-frame">
         <div className="flex items-center justify-between mb-1 flex-wrap gap-2">
           <h3 className="text-lg" style={{ color: COLOR.goldBright }}>
             雷诺曼 · {spreadName}
@@ -102,7 +102,7 @@ export function LenormandChart({ chart }: { chart: ChartResult }) {
             >
               {tc.label}
             </span>
-            <span className="tag tag-west">{cards.length} 张 · 无逆位</span>
+            <span className="paper-tag paper-tag-west">{cards.length} 张 · 无逆位</span>
           </div>
         </div>
 
@@ -116,7 +116,7 @@ export function LenormandChart({ chart }: { chart: ChartResult }) {
       </div>
 
       {/* Card layout */}
-      <div className="card">
+      <div className="paper-frame">
         <h4 className="text-sm mb-4" style={{ color: COLOR.gold }}>
           牌面布局
         </h4>
@@ -129,7 +129,7 @@ export function LenormandChart({ chart }: { chart: ChartResult }) {
 
       {/* Pairs combination analysis — the soul of Lenormand */}
       {pairs.length > 0 && (
-        <div className="card">
+        <div className="paper-frame">
           <h4 className="text-sm mb-4" style={{ color: COLOR.gold }}>
             相邻牌组合解读
             <span className="text-[10px] ml-2 font-normal" style={{ color: COLOR.muted }}>
@@ -141,7 +141,7 @@ export function LenormandChart({ chart }: { chart: ChartResult }) {
               <div
                 key={i}
                 className="rounded-md p-3 text-sm leading-relaxed flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3"
-                style={{ background: "rgba(8,10,15,0.3)", border: `1px solid ${COLOR.lineSoft}` }}
+                style={{ background: "var(--paper-2)", border: `1px solid ${COLOR.lineSoft}` }}
               >
                 <div className="flex items-center gap-1.5 flex-shrink-0">
                   <span className="font-semibold" style={{ color: COLOR.goldDim }}>

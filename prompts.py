@@ -55,11 +55,23 @@ def _serialize(c: ChartResult) -> str:
                 f"天顶{r['midheaven']['sign'] if r.get('midheaven') else '?'}；行星{pl}；"
                 f"主要相位{[(a['a'],a['b'],a['aspect']) for a in r['aspects'][:6]]}")
     if m == "vedic":
-        pl = {k: f"{v['宫(Rashi)']}/{v['宿(Nakshatra)']}" for k, v in r["planets"].items()}
-        return f"【吠陀占星】(Lahiri岁差{r['ayanamsa']}°) 行星宫宿：{pl}"
+        pl = {k: f"{v['宫Rashi']}/{v['宿Nakshatra']}/D9{v['九分盘D9']}/{v['庙旺落陷']}"
+              for k, v in r["planets"].items()}
+        d = r.get("Vimshottari大运", {})
+        cur = d.get("当前大运") or {}
+        cur_sub = cur.get("副周期Antardasha", [])
+        cur_s = next((x['副星'] for x in cur_sub if x['起'] <= '2026-06' <= x['止']), "")
+        return (f"【吠陀占星】(Lahiri{r['ayanamsa']}°) 行星宫/宿/D9/庙陷：{pl}；"
+                f"当前大运 {cur.get('主星','')}({cur.get('起','')}~{cur.get('止','')})"
+                + (f"，副周期{cur_s}" if cur_s else ""))
     if m == "tarot":
-        cards = [f"{c2['位置']}:{c2['牌']}({c2['方位']},{c2['关键词']})" for c2 in r["牌面"]]
-        return f"【塔罗·{r['牌阵']}】{cards}"
+        cards = [f"{c2['位置']}={c2['牌']}({c2['方位']}:{c2['牌义']}"
+                 + (f",占星{c2['占星']}" if c2.get('占星') else "") + ")" for c2 in r["牌面"]]
+        an = r.get("牌组分析", {})
+        return (f"【塔罗·{r.get('牌阵名称', r['牌阵'])}】" + "；".join(cards)
+                + f"。牌组：大牌{an.get('大牌数')}/逆位{an.get('逆位数')}/宫廷{an.get('宫廷牌数')}，"
+                + f"提示：{an.get('整体提示',[])}。"
+                + f"\n  ※本阵解读要领（必须按此位置关系读，勿孤立断单张）：{r.get('解读要领','')}")
     if m == "numerology":
         return f"【数字命理】生命灵数{r['生命灵数']}（{r['释义']}）" + (f"，命运数{r.get('命运数')}" if r.get('命运数') else "")
     return f"【{m}】{r}"

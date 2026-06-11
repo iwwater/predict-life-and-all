@@ -1,4 +1,4 @@
-// 五行 / 元素强弱雷达图(各法 normalized.elements 通用)
+﻿// 五行 / 元素强弱雷达图(各法 normalized.elements 通用)
 // 增强: 5 个轴点可 hover, 命中轴放大约 1.15x + 显示数值 tooltip
 import { useState } from "react";
 import { COLOR } from "./ui";
@@ -139,7 +139,7 @@ export function ElementsRadar({ elements, variant = "five", size = 220, title }:
                 <g style={{ pointerEvents: "none" }}>
                   <rect
                     x={lx - 32} y={ly - 30} width={64} height={22} rx={4}
-                    fill="rgba(8,10,15,0.92)" stroke="var(--gold)" strokeWidth={0.6}
+                    fill="var(--paper-2)" stroke="var(--cinnabar)" strokeWidth={0.6}
                   />
                   <text
                     x={lx} y={ly - 16}

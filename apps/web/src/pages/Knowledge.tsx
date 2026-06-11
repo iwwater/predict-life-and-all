@@ -1,9 +1,6 @@
-// 玄学知识馆: 古典文献 · 五行详解 · 神煞大全 · 领域知识 · 职业五行
-// 用现有知识库数据(不调 API),搭配神秘学装饰
+// 玄学知识馆: 古典文献 · 五行详解 · 神煞大全 · 领域知识 · 职业五行（「古籍×仪器」纸墨风格）
 import { useState, useMemo } from "react";
-import { COLOR } from "../components/ui";
-import { Reveal } from "../components/Interactions";
-import { YinYang, WuXingRing, FlowerOfLife, MetatronCube, WUXING_COLORS, WUXING_GLYPHS, PlanetSymbols } from "../components/MysticElements";
+import { WUXING_COLORS, WUXING_GLYPHS } from "../components/MysticElements";
 
 // ── 五行详解 ──────────────────────────────────────────────────────
 const WUXING_DETAIL: Record<string, {
@@ -23,14 +20,14 @@ const WUXING_DETAIL: Record<string, {
     traits: ["滋润","下行","寒凉","智慧","洞察力"], generate:"金生水", control:"水克火", controlledBy:"土克水" },
 };
 
-const WUXING_KEYS = ["木", "火", "土", "金", "水"];
+const WUXING_KEYS = ["木","火","土","金","水"];
 
 // ── 神煞大全 ──────────────────────────────────────────────────────
 const SHENSHA_LIST = [
   { name:"天乙贵人", category:"贵人", desc:"最大的吉神，逢之主遇难有贵人相助，逢凶化吉。", condition:"甲戊见牛羊，乙己鼠猴乡，丙丁猪鸡位，壬癸兔蛇藏，庚辛逢虎马" },
   { name:"文昌贵人", category:"贵人", desc:"主学业、文书、科甲功名。", condition:"甲日见巳，乙日见午，丙日见申，丁日见酉，戊日见申，己日见酉，庚日见亥，辛日见子，壬日见寅，癸日见卯" },
-  { name:"天德贵人", category:"贵人", desc:"主一生吉利，荣华富贵。天德所在之月百事皆宜。", condition:"正月丁，二月申，三月壬，四月辛，五月亥，六月甲，七月癸，八月寅，九月丙，十月乙，十一月巳，十二月庚" },
-  { name:"月德贵人", category:"贵人", desc:"与天德并称，主福气深厚。月德入命，女命尤吉。", condition:"寅午戌月见丙，申子辰月见壬，亥卯未月见甲，巳酉丑月见庚" },
+  { name:"天德贵人", category:"贵人", desc:"主一生吉利，荣华富贵。", condition:"正月丁，二月申，三月壬，四月辛，五月亥，六月甲，七月癸，八月寅，九月丙，十月乙，十一月巳，十二月庚" },
+  { name:"月德贵人", category:"贵人", desc:"与天德并称，主福气深厚。", condition:"寅午戌月见丙，申子辰月见壬，亥卯未月见甲，巳酉丑月见庚" },
   { name:"将星", category:"事业", desc:"主权柄威势，有领导才能。", condition:"寅午戌见午，巳酉丑见酉，申子辰见子，亥卯未见卯" },
   { name:"华盖", category:"才华", desc:"主艺术才华、孤独清高，利学术研究。", condition:"寅午戌见戌，巳酉丑见丑，申子辰见辰，亥卯未见未" },
   { name:"桃花", category:"姻缘", desc:"主容貌秀丽、人缘好、异性缘佳。", condition:"寅午戌见卯，巳酉丑见午，申子辰见酉，亥卯未见子" },
@@ -76,118 +73,90 @@ const JIEQI_HEALTH = [
 
 type TabKey = "wuxing" | "shensha" | "classical" | "profession" | "wellness";
 
-const tabs: { key: TabKey; label: string; icon: string }[] = [
-  { key:"wuxing", label:"五行详解", icon:"☯️" },
-  { key:"shensha", label:"神煞大全", icon:"⭐" },
-  { key:"classical", label:"经典文摘", icon:"📜" },
-  { key:"profession", label:"职业适配", icon:"💼" },
-  { key:"wellness", label:"节气养生", icon:"🌿" },
+const tabs: { key: TabKey; label: string }[] = [
+  { key:"wuxing", label:"五行详解" },
+  { key:"shensha", label:"神煞大全" },
+  { key:"classical", label:"经典文摘" },
+  { key:"profession", label:"职业适配" },
+  { key:"wellness", label:"节气养生" },
 ];
 
 export function Knowledge() {
   const [tab, setTab] = useState<TabKey>("wuxing");
 
   return (
-    <div className="space-y-6">
-      {/* 神圣几何背景 */}
-      <div className="fixed right-0 bottom-0 pointer-events-none opacity-[0.04] z-0" aria-hidden>
-        <FlowerOfLife size={300} />
-      </div>
-      <div className="fixed -left-16 top-1/4 pointer-events-none opacity-[0.03] z-0" aria-hidden>
-        <MetatronCube size={240} />
-      </div>
-
-      <Reveal>
-        <header>
-          <h1 className="text-2xl font-display" style={{ color: COLOR.goldBright }}>玄学知识馆</h1>
-          <p className="text-sm mt-1" style={{ color: COLOR.muted }}>
-            五行生克 · 神煞大全 · 经典文摘 · 职业适配 · 节气体质 — 传统文化知识集
-          </p>
-        </header>
-      </Reveal>
+    <div className="space-y-5">
+      <header>
+        <h1 className="paper-title"><span className="stamp" />玄学知识馆</h1>
+        <p style={{ fontSize: "0.85rem", color: "var(--ink-soft)", marginTop: "0.3rem" }}>
+          五行生克 · 神煞大全 · 经典文摘 · 职业适配 · 节气体质 — 传统文化知识集
+        </p>
+      </header>
 
       {/* Tab 切换 */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-1.5">
         {tabs.map((t) => {
           const on = tab === t.key;
           return (
-            <button
-              key={t.key}
-              type="button"
-              onClick={() => setTab(t.key)}
-              className="px-4 py-2 rounded-lg text-sm font-semibold transition-all tap"
-              style={{
-                color: on ? COLOR.goldBright : COLOR.muted,
-                background: on ? "rgba(201,162,75,0.10)" : "transparent",
-                border: `1px solid ${on ? COLOR.gold : COLOR.lineSoft}`,
-              }}
-            >
-              {t.icon} {t.label}
+            <button key={t.key} type="button" onClick={() => setTab(t.key)}
+              className="paper-tag" style={{
+                fontSize: "0.82rem", fontWeight: 600, cursor: "pointer", padding: "0.35rem 0.85rem",
+                color: on ? "var(--cinnabar)" : "var(--ink-soft)",
+                borderColor: on ? "var(--cinnabar)" : "var(--rule)",
+              }}>
+              {t.label}
             </button>
           );
         })}
       </div>
 
-      {/* Tab 内容 */}
-      <Reveal key={tab}>
+      <div key={tab} className="animate-fade-in">
         {tab === "wuxing" && <WuxingTab />}
         {tab === "shensha" && <ShenshaTab />}
         {tab === "classical" && <ClassicalTab />}
         {tab === "profession" && <ProfessionTab />}
         {tab === "wellness" && <WellnessTab />}
-      </Reveal>
+      </div>
     </div>
   );
 }
 
-// ── 五行Tab ────────────────────────────────────────────────────────
 function WuxingTab() {
   const [selected, setSelected] = useState("木");
   const detail = WUXING_DETAIL[selected];
 
   return (
-    <div className="space-y-5">
-      {/* 五行环 */}
-      <div className="card card-highlight flex flex-col sm:flex-row items-center gap-6">
-        <div className="shrink-0">
-          <WuXingRing size={180} />
+    <div className="space-y-4">
+      <section className="paper-frame">
+        <h3 className="paper-eyebrow" style={{ color: "var(--cinnabar)" }}>五行相生相克</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2" style={{ marginTop: "0.5rem" }}>
+          {WUXING_KEYS.map((wx) => {
+            const on = selected === wx;
+            return (
+              <button key={wx} type="button" onClick={() => setSelected(wx)}
+                className="paper-grid-cell text-center" style={{
+                  padding: "0.6rem", cursor: "pointer",
+                  borderColor: on ? (WUXING_COLORS[wx] || "var(--cinnabar)") : "var(--rule)",
+                  background: on ? `${WUXING_COLORS[wx]}10` : "var(--paper)",
+                }}>
+                <div style={{ fontSize: "1.5rem" }}>{WUXING_GLYPHS[wx]}</div>
+                <div style={{ fontSize: "0.85rem", fontWeight: 600, fontFamily: "'Noto Serif SC', serif", color: on ? (WUXING_COLORS[wx] || "var(--cinnabar)") : "var(--ink-soft)", marginTop: "0.15rem" }}>{wx}</div>
+              </button>
+            );
+          })}
         </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-display mb-3" style={{ color: COLOR.goldBright }}>五行相生相克</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-            {WUXING_KEYS.map((wx) => {
-              const on = selected === wx;
-              return (
-                <button key={wx} type="button" onClick={() => setSelected(wx)}
-                  className="p-3 rounded-lg border text-center tap transition-all"
-                  style={{
-                    borderColor: on ? WUXING_COLORS[wx] : COLOR.line,
-                    background: on ? `${WUXING_COLORS[wx]}15` : "rgba(255,255,255,0.02)",
-                    boxShadow: on ? `0 0 12px ${WUXING_COLORS[wx]}30` : "none",
-                  }}
-                >
-                  <div className="text-2xl">{WUXING_GLYPHS[wx]}</div>
-                  <div className="text-sm font-semibold mt-1" style={{ color: on ? WUXING_COLORS[wx] : COLOR.inkSoft }}>
-                    {wx}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+      </section>
 
-      {/* 五行详情 */}
       {detail && (
-        <div className="card card-highlight">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-3xl">{WUXING_GLYPHS[selected]}</span>
+        <section className="paper-frame">
+          <div className="flex items-center gap-3" style={{ marginBottom: "0.75rem" }}>
+            <span style={{ fontSize: "2rem" }}>{WUXING_GLYPHS[selected]}</span>
             <div>
-              <h3 className="text-xl font-display" style={{ color: WUXING_COLORS[selected] }}>{detail.name}</h3>
-              <p className="text-xs" style={{ color: COLOR.muted }}>{detail.traits.join(" · ")}</p>
+              <h3 style={{ fontSize: "1.2rem", fontWeight: 700, fontFamily: "'Noto Serif SC', serif", color: WUXING_COLORS[selected] }}>{detail.name}</h3>
+              <p style={{ fontSize: "0.75rem", color: "var(--ink-soft)" }}>{detail.traits.join(" · ")}</p>
             </div>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2" style={{ fontSize: "0.8rem" }}>
             <DetailBlock label="方位" value={detail.direction} />
             <DetailBlock label="季节" value={detail.season} />
             <DetailBlock label="脏腑" value={detail.organ} />
@@ -197,33 +166,27 @@ function WuxingTab() {
             <DetailBlock label="行星" value={detail.planet} />
             <DetailBlock label="神兽" value={detail.animal} />
           </div>
-          <div className="grid sm:grid-cols-3 gap-2 mt-4 text-xs">
-            <div className="p-2 rounded" style={{ background:"rgba(79,179,160,0.08)", border:"1px solid rgba(79,179,160,0.20)", color:COLOR.jade }}>
-              {detail.generate}
-            </div>
-            <div className="p-2 rounded" style={{ background:"rgba(200,85,61,0.08)", border:"1px solid rgba(200,85,61,0.20)", color:COLOR.danger }}>
-              {detail.control}
-            </div>
-            <div className="p-2 rounded" style={{ background:"rgba(91,141,239,0.08)", border:"1px solid rgba(91,141,239,0.20)", color:COLOR.azure }}>
-              受制: {detail.controlledBy}
-            </div>
+          <div className="paper-hr" />
+          <div className="grid sm:grid-cols-3 gap-2" style={{ fontSize: "0.75rem" }}>
+            <div className="paper-grid-cell" style={{ padding: "0.4rem 0.6rem", color: "var(--verdigris)", borderColor: "rgba(90,112,88,0.25)" }}>{detail.generate}</div>
+            <div className="paper-grid-cell" style={{ padding: "0.4rem 0.6rem", color: "var(--cinnabar)", borderColor: "rgba(176,58,46,0.25)" }}>{detail.control}</div>
+            <div className="paper-grid-cell" style={{ padding: "0.4rem 0.6rem", color: "var(--indigo)", borderColor: "rgba(47,72,88,0.25)" }}>受制: {detail.controlledBy}</div>
           </div>
-        </div>
+        </section>
       )}
     </div>
   );
 }
 
-function DetailBlock({ label, value }: { label:string; value:string }) {
+function DetailBlock({ label, value }: { label: string; value: string }) {
   return (
-    <div className="p-2 rounded" style={{ background:"rgba(8,10,15,0.3)", border:"1px solid var(--line-soft)" }}>
-      <div className="text-[10px] uppercase tracking-widest" style={{ color:COLOR.muted }}>{label}</div>
-      <div className="text-sm font-semibold mt-0.5" style={{ color:COLOR.ink }}>{value}</div>
+    <div className="paper-grid-cell" style={{ padding: "0.4rem 0.6rem" }}>
+      <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.05em" }}>{label}</div>
+      <div style={{ fontSize: "0.82rem", fontWeight: 600, color: "var(--ink)", fontFamily: "'Noto Serif SC', serif", marginTop: "0.1rem" }}>{value}</div>
     </div>
   );
 }
 
-// ── 神煞Tab ─────────────────────────────────────────────────────────
 function ShenshaTab() {
   const categories = useMemo(() => {
     const cats = new Map<string, typeof SHENSHA_LIST>();
@@ -234,137 +197,111 @@ function ShenshaTab() {
     return Array.from(cats.entries());
   }, []);
 
+  const catGlyphs: Record<string, string> = {
+    贵人: "☰", 事业: "☲", 才华: "☴", 姻缘: "☱", 学业: "☵", 福气: "☷", 变动: "☳", 凶煞: "☶",
+  };
+
   return (
     <div className="space-y-4">
       {categories.map(([cat, items]) => (
-        <div key={cat} className="card card-highlight">
-          <h3 className="text-sm mb-3" style={{ color: COLOR.goldBright }}>
-            {cat === "贵人" ? "🌟" : cat === "姻缘" ? "💞" : cat === "事业" ? "🏆" : cat === "才华" ? "🎨" : cat === "学业" ? "📚" : cat === "福气" ? "🍀" : cat === "变动" ? "🏃" : "⚠️"} {cat}
+        <section key={cat} className="paper-frame">
+          <h3 className="paper-section">
+            <span className="num">{catGlyphs[cat] || "○"}</span>{cat}
           </h3>
-          <div className="grid sm:grid-cols-2 gap-3">
+          <div className="grid sm:grid-cols-2 gap-2">
             {items.map((s) => (
-              <div key={s.name} className="p-3 rounded-lg" style={{
-                background: cat === "凶煞" ? "rgba(200,85,61,0.05)" : "rgba(22,27,34,0.5)",
-                border: `1px solid ${cat === "凶煞" ? "rgba(200,85,61,0.20)" : "var(--line-soft)"}`,
+              <div key={s.name} className="paper-grid-cell" style={{
+                padding: "0.5rem 0.75rem",
+                borderColor: cat === "凶煞" ? "rgba(176,58,46,0.2)" : "var(--rule)",
               }}>
-                <div className="text-sm font-semibold mb-1" style={{
-                  color: cat === "凶煞" ? COLOR.danger : COLOR.ink,
-                }}>{s.name}</div>
-                <p className="text-xs leading-snug mb-1.5" style={{ color: COLOR.inkSoft }}>{s.desc}</p>
-                <div className="text-[10px]" style={{ color: COLOR.muted }}>
-                  <span style={{ color: COLOR.goldDim }}>查法:</span> {s.condition}
+                <div style={{ fontSize: "0.85rem", fontWeight: 600, color: cat === "凶煞" ? "var(--cinnabar)" : "var(--ink)", fontFamily: "'Noto Serif SC', serif", marginBottom: "0.2rem" }}>{s.name}</div>
+                <p style={{ fontSize: "0.72rem", color: "var(--ink-soft)", lineHeight: 1.5, marginBottom: "0.3rem" }}>{s.desc}</p>
+                <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>
+                  <span style={{ color: "var(--cinnabar)", opacity: 0.7 }}>查法:</span> {s.condition}
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </section>
       ))}
     </div>
   );
 }
 
-// ── 经典文摘Tab ─────────────────────────────────────────────────────
 function ClassicalTab() {
   return (
-    <div className="card card-highlight">
-      <div className="flex items-center gap-3 mb-4">
-        <YinYang size={36} />
-        <div>
-          <h3 className="text-lg font-display" style={{ color: COLOR.goldBright }}>古典文献精粹</h3>
-          <p className="text-xs" style={{ color: COLOR.muted }}>选自《渊海子平》《三命通会》《滴天髓》等经典，经现代解读重新阐释。</p>
-        </div>
-      </div>
-      <div className="grid sm:grid-cols-2 gap-3">
+    <section className="paper-frame">
+      <h3 className="paper-title"><span className="stamp" />古典文献精粹</h3>
+      <p className="paper-body" style={{ fontSize: "0.75rem" }}>选自《渊海子平》《三命通会》《滴天髓》等经典，经现代解读重新阐释。</p>
+      <div className="grid sm:grid-cols-2 gap-2" style={{ marginTop: "0.75rem" }}>
         {CLASSICAL_CITATIONS.map((item, i) => (
-          <div key={i} className="p-3 rounded-lg border relative overflow-hidden"
-            style={{ borderColor: COLOR.lineSoft, background: "rgba(22,27,34,0.3)" }}>
-            <div className="absolute top-0 left-0 w-1 h-full"
-              style={{ background: item.category === "命理" ? COLOR.jade :
-                               item.category === "格局" ? COLOR.gold :
-                               item.category === "财运" ? COLOR.goldBright :
-                               item.category === "五行" ? COLOR.azure :
-                               item.category === "姻缘" ? "rgba(235,135,165,0.6)" :
-                               COLOR.azure }} />
-            <div className="text-xs leading-relaxed pl-3" style={{ color: COLOR.inkSoft }}>
-              "{item.text}"
-            </div>
-            <div className="text-[10px] mt-2 pl-3" style={{ color: COLOR.goldDim }}>
+          <div key={i} className="paper-grid-cell" style={{ padding: "0.5rem 0.75rem", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, width: "3px", height: "100%", background: "var(--cinnabar)", opacity: 0.4 }} />
+            <div style={{ fontSize: "0.78rem", color: "var(--ink-soft)", lineHeight: 1.7, paddingLeft: "0.4rem" }}>"{item.text}"</div>
+            <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", marginTop: "0.35rem", paddingLeft: "0.4rem", fontFamily: "'Noto Serif SC', serif" }}>
               {item.source}
             </div>
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 }
 
-// ── 职业适配Tab ─────────────────────────────────────────────────────
 function ProfessionTab() {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {PROFESSION_ELEMENTS.map((pe) => (
-        <div key={pe.element} className="card card-highlight"
-          style={{ borderLeft: `3px solid ${WUXING_COLORS[pe.element] || COLOR.gold}` }}>
-          <div className="flex items-center gap-3 mb-3">
-            <span className="text-2xl">{WUXING_GLYPHS[pe.element]}</span>
+        <section key={pe.element} className="paper-frame" style={{ borderLeft: `3px solid ${WUXING_COLORS[pe.element] || "var(--cinnabar)"}` }}>
+          <div className="flex items-center gap-3" style={{ marginBottom: "0.5rem" }}>
+            <span style={{ fontSize: "1.5rem" }}>{WUXING_GLYPHS[pe.element]}</span>
             <div>
-              <h3 className="text-lg font-display" style={{ color: WUXING_COLORS[pe.element] }}>五行属{pe.element}</h3>
-              <p className="text-xs" style={{ color: COLOR.muted }}>{pe.reason}</p>
+              <h3 style={{ fontSize: "1rem", fontWeight: 700, fontFamily: "'Noto Serif SC', serif", color: WUXING_COLORS[pe.element] }}>五行属{pe.element}</h3>
+              <p style={{ fontSize: "0.72rem", color: "var(--ink-soft)" }}>{pe.reason}</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {pe.professions.map((p) => (
-              <span key={p} className="text-xs px-2.5 py-1 rounded-full"
-                style={{
-                  background: `${WUXING_COLORS[pe.element]}12`,
-                  border: `1px solid ${WUXING_COLORS[pe.element]}30`,
-                  color: WUXING_COLORS[pe.element],
-                }}
-              >
-                {p}
-              </span>
+              <span key={p} className="paper-tag" style={{
+                color: WUXING_COLORS[pe.element],
+                borderColor: `${WUXING_COLORS[pe.element]}40`,
+                fontSize: "0.72rem",
+              }}>{p}</span>
             ))}
           </div>
-        </div>
+        </section>
       ))}
-      <div className="text-[10px] mt-2" style={{ color: COLOR.muted, opacity: 0.6 }}>
-        以上职业分类基于五行属性象征推导，不代表科学职业测评。职业选择请结合个人实际。
-      </div>
+      <div style={{ fontSize: "0.65rem", color: "var(--ink-soft)", opacity: 0.6 }}>以上职业分类基于五行属性象征推导，不代表科学职业测评。</div>
     </div>
   );
 }
 
-// ── 节气养生Tab ─────────────────────────────────────────────────────
 function WellnessTab() {
   return (
-    <div className="card card-highlight">
-      <h3 className="text-lg font-display mb-4" style={{ color: COLOR.jade }}>🌿 四时养生要略</h3>
-      <p className="text-xs mb-4 leading-relaxed" style={{ color: COLOR.inkSoft }}>
+    <section className="paper-frame">
+      <h3 className="paper-title"><span className="stamp" />四时养生要略</h3>
+      <p className="paper-body" style={{ fontSize: "0.78rem" }}>
         《黄帝内经·四气调神大论》:"夫四时阴阳者，万物之根本也。所以圣人春夏养阳，秋冬养阴。"
-        以下为四季养生要义，结合五行与脏腑对应。
       </p>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2" style={{ marginTop: "0.75rem" }}>
         {JIEQI_HEALTH.map((jq) => (
-          <div key={jq.jieqi} className="p-4 rounded-lg border text-center"
-            style={{
-              borderColor: `${WUXING_COLORS[jq.element]}30`,
-              background: `${WUXING_COLORS[jq.element]}08`,
-            }}>
-            <div className="text-2xl mb-1">{WUXING_GLYPHS[jq.element]}</div>
-            <div className="text-sm font-semibold mb-2" style={{ color: WUXING_COLORS[jq.element] }}>
+          <div key={jq.jieqi} className="paper-grid-cell text-center" style={{
+            padding: "0.75rem", borderColor: `${WUXING_COLORS[jq.element]}30`,
+          }}>
+            <div style={{ fontSize: "1.5rem", marginBottom: "0.2rem" }}>{WUXING_GLYPHS[jq.element]}</div>
+            <div style={{ fontSize: "0.88rem", fontWeight: 700, fontFamily: "'Noto Serif SC', serif", color: WUXING_COLORS[jq.element], marginBottom: "0.3rem" }}>
               {jq.jieqi} · 属{jq.element}
             </div>
-            <p className="text-xs leading-snug" style={{ color: COLOR.inkSoft }}>{jq.tips}</p>
+            <p style={{ fontSize: "0.72rem", color: "var(--ink-soft)", lineHeight: 1.5 }}>{jq.tips}</p>
           </div>
         ))}
       </div>
-      <div className="mt-4 p-3 rounded-lg text-xs leading-relaxed"
-        style={{ background: "rgba(8,10,15,0.4)", border: "1px solid var(--line-soft)", color: COLOR.inkSoft }}>
-        <strong style={{ color: COLOR.goldBright }}>四季食疗原则：</strong>
+      <div className="paper-grid-cell" style={{ padding: "0.6rem 0.85rem", fontSize: "0.75rem", color: "var(--ink-soft)", marginTop: "0.75rem", lineHeight: 1.8 }}>
+        <strong style={{ color: "var(--cinnabar)" }}>四季食疗原则：</strong>
         春省酸增甘以养脾气（木旺克土），夏省苦增辛以养肺气（火旺克金），
         秋省辛增酸以养肝气（金旺克木），冬省咸增苦以养心气（水旺克火）。
         此五行相制之理，源自《千金要方》。
       </div>
-    </div>
+    </section>
   );
 }

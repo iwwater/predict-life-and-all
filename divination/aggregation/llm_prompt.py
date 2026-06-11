@@ -61,8 +61,12 @@ def build_reading_prompt(
     parts: list[str] = []
 
     # ── System prompt ──
-    parts.append("你是一个融合中西命理学的综合分析师。")
-    parts.append("你接收12种术法的交叉验证结果，生成自然流畅的综合报告。")
+    if depth == "standard":
+        parts.append("你是一位简洁务实的命理分析师。用通俗易懂的语言给出关键发现和实用建议。")
+        parts.append("不要冗长罗列术法细节，聚焦用户最关心的方面，给出能直接用的行动参考。")
+    else:
+        parts.append("你是一个融合中西命理学的综合分析师。")
+        parts.append("你接收12种术法的交叉验证结果，生成自然流畅的综合报告。")
     parts.append("")
     parts.append(DEFAULT_COMPLIANCE_RULES)
     parts.append("")
@@ -143,17 +147,26 @@ def build_reading_prompt(
         parts.append("")
 
     # ── Output instruction ──
-    parts.append("## 请你生成以下格式的报告")
-    parts.append("1. 一句话综合结论（含评分和置信度）")
-    parts.append("2. 各领域分析（不要逐术法罗列，而是按领域综合）")
-    if depth == "standard" or depth == "premium":
+    if depth == "standard":
+        parts.append("## 请你生成一份简洁实用的报告（控制在 800 字以内）")
+        parts.append("1. 一句话综合结论（用大白话，不要用专业术语）")
+        parts.append("2. 3 条关键发现（每条一句话，说清楚对用户的实际影响）")
+        parts.append("3. 3-5 条现在可以做的事（具体、可操作，不要泛泛而谈）")
+    elif depth == "premium":
+        parts.append("## 请你生成以下格式的报告")
+        parts.append("1. 一句话综合结论（含评分和置信度）")
+        parts.append("2. 各领域分析（不要逐术法罗列，而是按领域综合）")
         parts.append("3. 多法共识分析")
         parts.append("4. 术法分歧及调和建议")
         parts.append("5. 风险提示（谨慎表达，禁止绝对化）")
         parts.append("6. 行动建议（使用建议性语言，不做命令）")
-    if depth == "premium":
         parts.append("7. 时间窗口分析")
         parts.append("8. 深入追问的方向建议")
+    else:
+        # free: minimal
+        parts.append("## 请你生成一份简短摘要")
+        parts.append("1. 一句话总结")
+        parts.append("2. 1-2 条建议")
     parts.append(f"\n{DISCLAIMER}")
 
     return "\n".join(parts)

@@ -1,5 +1,6 @@
-// App 根: ErrorBoundary + I18n + SEO + Lazy Routes + 13 路由
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+// App 根: v2 重构 — 一法一专页，路由 /m/{method}
+// 依据: 前端重构指示v2-一法一专页
+import { BrowserRouter, Route, Routes, Navigate, useParams } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { I18nProvider } from "./lib/i18n";
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -8,7 +9,6 @@ import { Layout } from "./components/Layout";
 
 // Lazy-loaded pages for code-splitting
 const Home = lazy(() => import("./pages/Home").then((m) => ({ default: m.Home })));
-const Cast = lazy(() => import("./pages/Cast").then((m) => ({ default: m.Cast })));
 const Result = lazy(() => import("./pages/Result").then((m) => ({ default: m.Result })));
 const MethodInfo = lazy(() => import("./pages/MethodInfo").then((m) => ({ default: m.MethodInfo })));
 const History = lazy(() => import("./pages/History").then((m) => ({ default: m.History })));
@@ -24,27 +24,23 @@ const NotFound = lazy(() => import("./pages/NotFound").then((m) => ({ default: m
 const DateSelect = lazy(() => import("./pages/DateSelect").then((m) => ({ default: m.DateSelect })));
 const Knowledge = lazy(() => import("./pages/Knowledge").then((m) => ({ default: m.Knowledge })));
 
-// Method pages
+// Method pages — v2 routes /m/{method}
 const TarotPage = lazy(() => import("./pages/methods/TarotPage").then((m) => ({ default: m.TarotPage })));
 const LiuyaoPage = lazy(() => import("./pages/methods/LiuyaoPage").then((m) => ({ default: m.LiuyaoPage })));
 const XuankongPage = lazy(() => import("./pages/methods/XuankongPage").then((m) => ({ default: m.XuankongPage })));
 const NumerologyPage = lazy(() => import("./pages/methods/NumerologyPage").then((m) => ({ default: m.NumerologyPage })));
-const BaziV2Page = lazy(() => import("./pages/methods/BaziV2Page").then((m) => ({ default: m.BaziV2Page })));
 const BaziPage = lazy(() => import("./pages/methods/BaziPage").then((m) => ({ default: m.BaziPage })));
 const ZiweiPage = lazy(() => import("./pages/methods/ZiweiPage").then((m) => ({ default: m.ZiweiPage })));
 const WesternPage = lazy(() => import("./pages/methods/WesternPage").then((m) => ({ default: m.WesternPage })));
 const VedicPage = lazy(() => import("./pages/methods/VedicPage").then((m) => ({ default: m.VedicPage })));
 const QimenPage = lazy(() => import("./pages/methods/QimenPage").then((m) => ({ default: m.QimenPage })));
 const ChengguPage = lazy(() => import("./pages/methods/ChengguPage").then((m) => ({ default: m.ChengguPage })));
-const LiurenPage = lazy(() => import("./pages/methods/LiurenPage").then((m) => ({ default: m.LiurenPage })));
-const TiebanPage = lazy(() => import("./pages/methods/TiebanPage").then((m) => ({ default: m.TiebanPage })));
 const MeihuaPage = lazy(() => import("./pages/methods/MeihuaPage").then((m) => ({ default: m.MeihuaPage })));
 const BazhaiPage = lazy(() => import("./pages/methods/BazhaiPage").then((m) => ({ default: m.BazhaiPage })));
-const LenormandPage = lazy(() => import("./pages/methods/LenormandPage").then((m) => ({ default: m.LenormandPage })));
-const XiaoliurenPage = lazy(() => import("./pages/methods/XiaoliurenPage").then((m) => ({ default: m.XiaoliurenPage })));
 
-// Aggregate
-const AggregatePage = lazy(() => import("./pages/AggregatePage").then((m) => ({ default: m.AggregatePage })));
+// HePan & HeShen (合盘 + 合参)
+const HePanPage = lazy(() => import("./pages/HePanPage").then((m) => ({ default: m.HePanPage })));
+const HeShenPage = lazy(() => import("./pages/HeShenPage").then((m) => ({ default: m.HeShenPage })));
 
 function PageLoader() {
   return (
@@ -67,7 +63,34 @@ export function App() {
             <Routes>
               <Route element={<Layout />}>
                 <Route index element={<Home />} />
-                <Route path="/cast" element={<Cast />} />
+
+                {/* v2 一法一专页 — 核心路由 */}
+                {/* 命类 */}
+                <Route path="/m/bazi" element={<BaziPage />} />
+                <Route path="/m/ziwei" element={<ZiweiPage />} />
+                {/* 卜类 */}
+                <Route path="/m/qimen" element={<QimenPage />} />
+                <Route path="/m/liuyao" element={<LiuyaoPage />} />
+                <Route path="/m/meihua" element={<MeihuaPage />} />
+                <Route path="/m/chenggu" element={<ChengguPage />} />
+                {/* 相类 */}
+                <Route path="/m/hepan" element={<HePanPage />} />
+                <Route path="/m/tarot" element={<TarotPage />} />
+                <Route path="/m/western" element={<WesternPage />} />
+                <Route path="/m/vedic" element={<VedicPage />} />
+                <Route path="/m/numerology" element={<NumerologyPage />} />
+                {/* 山类 */}
+                <Route path="/m/bazhai" element={<BazhaiPage />} />
+                <Route path="/m/xuankong" element={<XuankongPage />} />
+
+                {/* 合参（用户主动发起） */}
+                <Route path="/heshen" element={<HeShenPage />} />
+
+                {/* 旧路由重定向 */}
+                <Route path="/cast" element={<Navigate to="/" replace />} />
+                <Route path="/aggregate" element={<Navigate to="/heshen" replace />} />
+
+                {/* 保留的二级页面 */}
                 <Route path="/result" element={<Result />} />
                 <Route path="/methods/:id" element={<MethodInfo />} />
                 <Route path="/fengshui" element={<FengShui />} />
@@ -80,26 +103,10 @@ export function App() {
                 <Route path="/reading" element={<Reading />} />
                 <Route path="/reading-history" element={<ReadingHistory />} />
                 <Route path="/about" element={<About />} />
-                {/* Method-specific pages */}
-                <Route path="/method/bazi" element={<BaziPage />} />
-                <Route path="/method/bazi-v2" element={<BaziV2Page />} />
-                <Route path="/method/ziwei" element={<ZiweiPage />} />
-                <Route path="/method/qimen" element={<QimenPage />} />
-                <Route path="/method/liuyao" element={<LiuyaoPage />} />
-                <Route path="/method/meihua" element={<MeihuaPage />} />
-                <Route path="/method/chenggu" element={<ChengguPage />} />
-                <Route path="/method/liuren" element={<LiurenPage />} />
-                <Route path="/method/tieban" element={<TiebanPage />} />
-                <Route path="/method/western" element={<WesternPage />} />
-                <Route path="/method/vedic" element={<VedicPage />} />
-                <Route path="/method/tarot" element={<TarotPage />} />
-                <Route path="/method/lenormand" element={<LenormandPage />} />
-                <Route path="/method/numerology" element={<NumerologyPage />} />
-                <Route path="/method/xuankong" element={<XuankongPage />} />
-                <Route path="/method/bazhai" element={<BazhaiPage />} />
-                <Route path="/method/xiaoliuren" element={<XiaoliurenPage />} />
-                {/* Aggregate */}
-                <Route path="/aggregate" element={<AggregatePage />} />
+
+                {/* 旧 /method/* 路由 — 301 重定向到 /m/* */}
+                <Route path="/method/:id" element={<MethodRedirect />} />
+
                 <Route path="/result-sample" element={<ResultSample />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
@@ -109,4 +116,11 @@ export function App() {
       </BrowserRouter>
     </I18nProvider>
   );
+}
+
+/** 旧 /method/{id} 重定向到 /m/{id} */
+function MethodRedirect() {
+  const { id } = useParams<{ id: string }>();
+  if (!id) return <Navigate to="/" replace />;
+  return <Navigate to={`/m/${id}`} replace />;
 }

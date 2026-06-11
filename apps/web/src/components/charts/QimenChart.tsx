@@ -1,4 +1,4 @@
-// 奇门遁甲 3×3 宫格(后天八卦方位)+ 顶部条
+﻿// 奇门遁甲 3×3 宫格(后天八卦方位)+ 顶部条
 // 术语密集:阴遁/阳遁/局/值符/值使/天盘/地盘/九星/八门/八神/节气/真太阳时
 import type { ChartResult } from "../../lib/types";
 import { COLOR } from "../ui";
@@ -27,20 +27,20 @@ export function QimenChart({ chart }: { chart: ChartResult }) {
 
   return (
     <div className="space-y-4">
-      <div className="card">
+      <div className="paper-frame">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
           <h3 className="text-lg" style={{ color: COLOR.goldBright }}>奇门遁甲</h3>
           <div className="flex flex-wrap gap-2 text-xs">
-            <span className="tag tag-east">
+            <span className="paper-tag paper-tag-east">
               <Jargon term={r.dun === "阴遁" ? "阴遁" : "阳遁"} mode="plain" /> {r.yuan || ""} {r.ju}<Jargon term="局" mode="plain" />
             </span>
-            <span className="tag">
+            <span className="paper-tag">
               <Jargon term="节气" mode="plain" /> {r.solar_term || ""}
             </span>
-            <span className="tag">
+            <span className="paper-tag">
               <Jargon term="值符" mode="plain" /> {zhifu.star} · {zhifu.star_gong}
             </span>
-            <span className="tag">
+            <span className="paper-tag">
               <Jargon term="值使" mode="plain" /> {zhifu.door} · {zhifu.door_gong}
             </span>
           </div>
@@ -58,7 +58,7 @@ export function QimenChart({ chart }: { chart: ChartResult }) {
               <div key={name}
                 className="rounded-md p-2 text-[11px] sm:text-xs flex flex-col"
                 style={{
-                  background: isZhi ? "rgba(201,162,75,0.10)" : "rgba(8,10,15,0.5)",
+                  background: isZhi ? "rgba(201,162,75,0.10)" : "var(--paper-2)",
                   border: `1px solid ${isZhi ? COLOR.gold : COLOR.line}`,
                   minHeight: 88,
                 }}

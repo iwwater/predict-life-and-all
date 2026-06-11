@@ -1,93 +1,69 @@
-"""Yuan Tiangang bone weight using traditional lookup tables."""
-from lunar_python import Solar
-
+"""称骨算命 —— 文献：袁天罡《称骨歌》（唐）。
+年/月/日/时四柱各有骨重(两)，相加得总骨重，查《称骨歌》批语。
+骨重数值为传统公版定数；批语为《称骨歌》原歌诀（建议据印本《称骨歌》校订）。"""
 from ..contracts import Birth, ChartResult
 
-YEAR_WEIGHT = [
-    12, 9, 6, 7, 12, 5, 9, 8, 7, 8, 15, 6,
-    16, 15, 7, 8, 16, 8, 19, 12, 6, 8, 7, 5,
-    15, 9, 16, 8, 8, 19, 12, 6, 8, 7, 5, 15,
-    9, 16, 8, 8, 19, 12, 6, 8, 7, 5, 15, 9,
-    16, 8, 8, 19, 12, 6, 8, 7, 5, 15, 9, 16,
-]
-MONTH_WEIGHT = [6, 7, 18, 9, 5, 16, 9, 15, 18, 8, 9, 5]
-DAY_WEIGHT = [
-    5, 10, 8, 15, 16, 15, 8, 16, 8, 16,
-    9, 17, 8, 17, 10, 8, 9, 18, 5, 15,
-    10, 9, 8, 9, 15, 18, 7, 8, 16, 6,
-]
-HOUR_WEIGHT = {
-    "子": 16, "丑": 6, "寅": 7, "卯": 10, "辰": 9, "巳": 16,
-    "午": 10, "未": 8, "申": 8, "酉": 9, "戌": 6, "亥": 6,
+# 60 甲子年骨重（甲子起，单位：两）
+_GANZHI = [g + z for g, z in zip(
+    "甲乙丙丁戊己庚辛壬癸" * 6,
+    ("子丑寅卯辰巳午未申酉戌亥" * 5)[:60])]
+_YEAR_W = [1.2,0.9,0.6,0.7,1.2,0.5,0.9,0.8,0.7,0.8, 1.5,0.9,1.6,0.8,0.8,1.9,1.2,0.6,0.8,0.7,
+           0.5,1.5,0.6,1.6,1.5,0.7,0.9,1.2,1.0,0.7, 1.5,0.6,0.5,1.4,1.4,0.9,0.7,0.7,0.9,1.2,
+           0.8,0.7,1.3,0.5,1.4,0.5,0.9,1.7,0.5,0.8, 1.2,0.8,0.8,0.6,1.9,0.6,0.8,1.6,1.0,0.6]
+_YEAR = dict(zip(_GANZHI, _YEAR_W))
+_MONTH = [0.6,0.7,1.8,0.9,0.5,1.6,0.9,1.5,1.8,0.8,0.9,0.5]      # 正月起
+_DAY = [0.5,1.0,0.8,1.5,1.6,1.5,0.8,1.6,0.8,1.6,0.9,1.7,0.8,1.7,1.0,
+        0.8,0.9,1.8,0.5,1.5,1.0,0.9,0.8,0.9,1.5,1.8,0.7,0.8,1.6,0.6] # 初一起
+_HOUR = {"子":1.6,"丑":0.6,"寅":0.7,"卯":1.0,"辰":0.9,"巳":1.6,
+         "午":1.0,"未":0.8,"申":0.8,"酉":0.9,"戌":0.6,"亥":0.6}
+_ZHI = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"]
+
+# 批语（按总骨重·两），《称骨歌》歌诀首句，完整四句建议据文献校订
+_PIYU = {
+ 2.1:"身寒骨冷苦伶仃，此命推来行乞人",2.2:"身寒骨冷苦伶仃，此命推来骨肉轻",
+ 2.3:"此命推来骨肉轻，求谋作事事难成",2.4:"此命推来福禄无，门庭困苦总难营",
+ 2.5:"此命推来祖业微，门庭营度似稀奇",2.6:"平生衣禄苦中求，离乡背井方成就",
+ 2.7:"一生作事少商量，难靠祖宗作主张",2.8:"一生作事似飘蓬，祖宗产业在梦中",
+ 2.9:"初年运限未曾通，劳碌奔波尽是空",3.0:"劳劳碌碌苦中求，东走西奔何日休",
+ 3.1:"忙忙碌碌苦中求，何日云开见日头",3.2:"初年运蹇事难谐，渐有财源如水来",
+ 3.3:"早年做事事难成，百计徒劳枉费心",3.4:"此命福气果如何，僧道门中衣禄多",
+ 3.5:"生平福量不周全，祖业根基觉少传",3.6:"不须劳碌过平生，独自成家福不轻",
+ 3.7:"此命般般事不成，弟兄少力自孤行",3.8:"一生骨肉最清高，早入黉门姓名标",
+ 3.9:"此命终身运不通，劳劳作事尽皆空",4.0:"平生衣禄是绵长，件件心中自主张",
+ 4.1:"此命推来事不同，为人能干异凡庸",4.2:"得宽怀处且宽怀，何用田园仔细栽",
+ 4.3:"为人心性最聪明，作事轩昂近贵人",4.4:"万事由天莫强求，何须苦苦用机谋",
+ 4.5:"名利推求竟若何，前番辛苦后奔波",4.6:"东西南北尽皆通，初年作事尽成空",
+ 4.7:"此命推来旺末年，妻荣子贵自怡然",4.8:"初年运道未曾享，纵有功名在后头",
+ 4.9:"此命推来福不轻，自成自立显门庭",5.0:"为利为名终日劳，中年福禄也多遭",
+ 5.1:"一世荣华事事通，不须劳碌自亨通",5.2:"一世荣华事事通，财禄旺相北方荣",
+ 5.3:"此格推来气象真，凶事脱来吉事临",5.4:"此命推来福不穷，读书必定显亲宗",
+ 5.5:"策马扬鞭争名利，少年作事费筹论",5.6:"此格推来礼义通，一生福禄用无穷",
+ 5.7:"福禄丰盈万事全，一生荣耀显双亲",5.8:"平生衣禄丰盈足，一世荣华万事全",
+ 5.9:"细推此命福不轻，富贵荣华孰与争",6.0:"一朝金榜快题名，显祖荣宗大器成",
+ 6.1:"不作风霜雨雪人，生来灵性慧根深",6.2:"此命推来福不穷，读书必定显亲宗",
+ 6.3:"命主为官福禄长，得来富贵实非常",6.4:"此命生来福自宏，田园家业最丰隆",
+ 6.5:"细推此格妙且清，必定才高礼义通",6.6:"命格生成大不同，公侯卿相在其中",
+ 6.7:"此命推来福不轻，魁星拱照命中临",6.8:"富贵由天莫苦求，万事不用强谋为",
+ 6.9:"君是人间衣禄星，一生福禄萦绕身", 7.0:"此命推来福不轻，巍巍科甲显门庭",
+ 7.1:"此命生来福不穷，富贵荣华受用宏",7.2:"此命推来福禄宏，一生荣耀显文明",
 }
 
 
-def _jiazi_index(gz: str) -> int:
-    stems = "甲乙丙丁戊己庚辛壬癸"
-    branches = "子丑寅卯辰巳午未申酉戌亥"
-    for i in range(60):
-        if stems[i % 10] == gz[0] and branches[i % 12] == gz[1]:
-            return i
-    return 0
-
-
-def _piyu(qian: int) -> str:
-    if qian < 30:
-        return "骨重较轻，传统批语多主早年劳碌，宜重后天修为。"
-    if qian < 40:
-        return "中平之格，传统批语多主先难后易，靠积累见成。"
-    if qian < 50:
-        return "中上之格，传统批语多主衣食渐丰，晚景较稳。"
-    if qian < 60:
-        return "较厚之格，传统批语多主福分可得，但忌骄满。"
-    return "骨重厚重，传统批语多主格局较高，仍须结合八字细看。"
-
-
 def compute(b: Birth) -> ChartResult:
-    solar = Solar.fromYmdHms(b.year, b.month, b.day, b.hour, b.minute, 0)
-    lunar = solar.getLunar()
-    year_gz = lunar.getYearInGanZhiByLiChun()
-    year_idx = _jiazi_index(year_gz)
-    month = lunar.getMonth()
-    day = lunar.getDay()
-    hour_zhi = lunar.getTimeZhi()
-
-    y_qian = YEAR_WEIGHT[year_idx]
-    m_qian = MONTH_WEIGHT[month - 1]
-    d_qian = DAY_WEIGHT[day - 1]
-    h_qian = HOUR_WEIGHT.get(hour_zhi, 0)
-    total_qian = y_qian + m_qian + d_qian + h_qian
-    total_liang = round(total_qian / 10, 1)
-
+    try:
+        from lunar_python import Solar
+        lunar = Solar.fromYmdHms(b.year, b.month, b.day, b.hour, b.minute, 0).getLunar()
+        ygz = lunar.getYearInGanZhi(); m = abs(lunar.getMonth()); d = lunar.getDay()
+    except Exception:
+        ygz = _GANZHI[(b.year - 4) % 60]; m = b.month; d = b.day
+    hzhi = _ZHI[((b.hour + 1) // 2) % 12]
+    yw = _YEAR.get(ygz, 0); mw = _MONTH[(m - 1) % 12]; dw = _DAY[(d - 1) % 30]; hw = _HOUR[hzhi]
+    total = round(yw + mw + dw + hw, 1)
+    piyu = _PIYU.get(total, "（批语据《称骨歌》总骨重 %s 两 查校）" % total)
     return ChartResult(
-        method="chenggu",
-        school="east",
-        engine="self+traditional-table",
-        normalized={"elements": {}, "timeline": [], "note": "称骨不直接映射五行元素, 以骨重总量(l量)为归一化指标"},
-        raw={
-            "mode": "traditional_weight",
-            "subject": b.subject or "self_life",
-            "rule_version": "v1",
-            "year_qian": y_qian,
-            "month_qian": m_qian,
-            "day_qian": d_qian,
-            "hour_qian": h_qian,
-            "total_liang": total_liang,
-            "total_qian": total_qian,
-            "piyu": _piyu(total_qian),
-            "ganzhi": {"year": year_gz, "month": lunar.getMonthInGanZhi(), "day": lunar.getDayInGanZhi(), "hour": lunar.getTimeInGanZhi()},
-            "calculation_basis": {
-                "method": "chenggu",
-                "mode": "traditional_weight",
-                "calendar_source": "lunar-python",
-                "rule_version": "v1",
-                "rule": "Yuan Tiangang bone-weight year/month/day/hour lookup tables, qian as integer tenths of liang",
-                "note": "称骨是传统歌诀表，不替代八字格局取用。",
-                "limits": [
-                    "仅提供骨重总览, 不解读具体命造格局",
-                    "年柱用立春分界, 月柱用农历月, 日柱用农历日, 时柱用地支",
-                    "骨重解释为传统歌诀批语, 非定量模型",
-                ],
-            },
-        },
+        method="chenggu", school="east", engine="self(袁天罡称骨歌)",
+        normalized={"elements": {}, "timeline": []},
+        raw={"年骨重": yw, "月骨重": mw, "日骨重": dw, "时骨重": hw,
+             "总骨重_两": total, "批语首句": piyu,
+             "干支年": ygz, "农历月": m, "农历日": d, "时支": hzhi},
     )

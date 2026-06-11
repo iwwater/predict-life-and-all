@@ -1,140 +1,70 @@
-"""Mei Hua Yi Shu with time, number, and external-omen modes."""
+"""梅花易数（时间起卦法） —— 自实现，文献：《梅花易数》（北宋·邵雍）。
+上卦=(年支数+月+日)%8，下卦=(年支数+月+日+时支数)%8，动爻=(同上和)%6（余0取末）。
+先天八卦数：乾1兑2离3震4巽5坎6艮7坤8。体用：动爻所在为用卦，另一为体卦。"""
 from ..contracts import Birth, ChartResult
+from .. import yijing
+from .. import wuxing as wx
 
-TRIGRAMS = {
-    1: ("乾", (1, 1, 1), "金"),
-    2: ("兑", (1, 1, 0), "金"),
-    3: ("离", (1, 0, 1), "火"),
-    4: ("震", (1, 0, 0), "木"),
-    5: ("巽", (0, 1, 1), "木"),
-    6: ("坎", (0, 1, 0), "水"),
-    7: ("艮", (0, 0, 1), "土"),
-    8: ("坤", (0, 0, 0), "土"),
-}
-SHENG = {("木", "火"), ("火", "土"), ("土", "金"), ("金", "水"), ("水", "木")}
-KE = {("木", "土"), ("土", "水"), ("水", "火"), ("火", "金"), ("金", "木")}
-
-TRIGRAM_TABLE = {
-    "乾": {"binary": [1, 1, 1], "wuxing": "金", "nature": "天/健"},
-    "兑": {"binary": [1, 1, 0], "wuxing": "金", "nature": "泽/悦"},
-    "离": {"binary": [1, 0, 1], "wuxing": "火", "nature": "火/明"},
-    "震": {"binary": [1, 0, 0], "wuxing": "木", "nature": "雷/动"},
-    "巽": {"binary": [0, 1, 1], "wuxing": "木", "nature": "风/入"},
-    "坎": {"binary": [0, 1, 0], "wuxing": "水", "nature": "水/陷"},
-    "艮": {"binary": [0, 0, 1], "wuxing": "土", "nature": "山/止"},
-    "坤": {"binary": [0, 0, 0], "wuxing": "土", "nature": "地/顺"},
-}
+_XIANTIAN = {1: "乾", 2: "兑", 3: "离", 4: "震", 5: "巽", 6: "坎", 7: "艮", 8: "坤"}
+_DIZHI = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"]
 
 
-def _n(n: int, mod: int) -> int:
-    return n % mod or mod
-
-
-def _combine(upper_bits, lower_bits) -> list[int]:
-    return list(lower_bits) + list(upper_bits)
-
-
-def _trigram_from_bits(bits) -> str:
-    for name, trigram in [(v[0], v[1]) for v in TRIGRAMS.values()]:
-        if tuple(bits) == tuple(trigram):
-            return name
-    return "乾"
-
-
-def _hu_gua(lines: list[int]) -> str:
-    lower = lines[1:4]
-    upper = lines[2:5]
-    return _trigram_from_bits(upper) + _trigram_from_bits(lower)
-
-
-def _relation(ti_wx: str, yong_wx: str) -> str:
-    if ti_wx == yong_wx:
-        return "比和"
-    if (ti_wx, yong_wx) in SHENG:
-        return "体生用"
-    if (yong_wx, ti_wx) in SHENG:
-        return "用生体"
-    if (ti_wx, yong_wx) in KE:
-        return "体克用"
-    if (yong_wx, ti_wx) in KE:
-        return "用克体"
-    return "平"
-
-
-def _numbers_for_mode(b: Birth) -> tuple[int, int, int, str]:
-    mode = b.mode or "time_qigua"
-    if mode == "number_qigua":
-        base = abs(int(b.seed if b.seed is not None else sum(ord(c) for c in (b.question or "")) or 1))
-        return _n(base, 8), _n(base // 8 + b.day, 8), _n(base + b.month + b.hour, 6), "number_qigua"
-    if mode == "external_omen":
-        base = sum(ord(c) for c in (b.question or "")) or (b.year + b.month + b.day)
-        return _n(base, 8), _n(base + b.hour, 8), _n(base + b.minute, 6), "external_omen"
-    # 时辰地支序数: 子=1, 丑=2, ... 亥=12
-    hour_branch_num = ((b.hour + 1) // 2) % 12 or 12  # 1-12
-    # 年地支数: 梅花易数以地支序数为准 (子=1...亥=12)
-    year_branch_num = (b.year % 12) or 12  # 年地支序数 1-12
-    return (_n(b.month + b.day + hour_branch_num, 8),
-            _n(year_branch_num + b.month + b.day + hour_branch_num, 8),
-            _n(b.month + b.day + hour_branch_num, 6),
-            "time_qigua")
+def _gua_lines(gua_name: str) -> list[int]:
+    return list(yijing._NAME2BITS[gua_name])
 
 
 def compute(b: Birth) -> ChartResult:
-    upper_n, lower_n, dong, actual_mode = _numbers_for_mode(b)
-    upper_name, upper_bits, upper_wx = TRIGRAMS[upper_n]
-    lower_name, lower_bits, lower_wx = TRIGRAMS[lower_n]
-    zhu_lines = _combine(upper_bits, lower_bits)
-    bian_lines = list(zhu_lines)
-    bian_lines[dong - 1] = 1 - bian_lines[dong - 1]
-    bian_name = _trigram_from_bits(bian_lines[3:]) + _trigram_from_bits(bian_lines[:3])
-    zhu_name = upper_name + lower_name
-    hu_name = _hu_gua(zhu_lines)
+    try:
+        from lunar_python import Solar
+        lunar = Solar.fromYmdHms(b.year, b.month, b.day, b.hour, b.minute, 0).getLunar()
+        yz = lunar.getYearZhi(); lmonth = abs(lunar.getMonth()); lday = lunar.getDay()
+    except Exception:
+        yz = _DIZHI[(b.year - 4) % 12]; lmonth = b.month; lday = b.day
+    yzn = _DIZHI.index(yz) + 1
+    hzn = (b.hour + 1) // 2 % 12 + 1               # 时支序 1..12（子=1）
+    s_up = yzn + lmonth + lday
+    s_all = s_up + hzn
+    up = _XIANTIAN[s_up % 8 or 8]
+    low = _XIANTIAN[s_all % 8 or 8]
+    moving = s_all % 6 or 6
 
-    if dong <= 3:
-        ti_name, ti_wx = upper_name, upper_wx
-        yong_name, yong_wx = lower_name, lower_wx
-    else:
-        ti_name, ti_wx = lower_name, lower_wx
-        yong_name, yong_wx = upper_name, upper_wx
-    relation = _relation(ti_wx, yong_wx)
+    lines = _gua_lines(low) + _gua_lines(up)        # 下卦在前三爻
+    ben = yijing.hexagram_name(lines)
+    # 互卦：234爻为下互，345爻为上互
+    hu_lines = lines[1:4] + lines[2:5]
+    hu = yijing.hexagram_name(hu_lines)
+    # 变卦：动爻变
+    bian_lines = [(1 - lines[i]) if (i + 1) == moving else lines[i] for i in range(6)]
+    bian = yijing.hexagram_name(bian_lines)
+    # 体用：动爻在下卦(1-3)则下卦为用，否则上卦为用
+    yong, ti = (low, up) if moving <= 3 else (up, low)
+
+
+    # ---- 体用生克断（《梅花易数》断卦总诀）----
+    ti_wx = yijing.TRIGRAM[tuple(_gua_lines(ti))][1]
+    yong_wx = yijing.TRIGRAM[tuple(_gua_lines(yong))][1]
+    hu_low_wx = yijing.TRIGRAM[tuple(hu_lines[0:3])][1]
+    hu_up_wx = yijing.TRIGRAM[tuple(hu_lines[3:6])][1]
+    rel = wx.relation(yong_wx, ti_wx)   # 用对体
+    # rel = relation(用,体)：生出=用生体, 克出=用克体, 生入=体生用, 克入=体克用
+    JIXIONG = {
+        "生出(泄)": ("吉", "用卦生体卦，得外力相助，事多顺遂"),
+        "比和": ("吉", "体用比和，谋望称意，事易成"),
+        "克出": ("凶", "用卦克体卦，受制受阻，谋事多逆"),
+        "生入(被生)": ("平偏耗", "体卦生用卦，耗泄气力，先劳后得或破费"),
+        "克入(被克)": ("吉可控", "体卦克用卦，体能制事，吉但费力"),
+    }
+    ji, shuo = JIXIONG[rel]
+    judgement = {
+        "体卦五行": f"{ti}({ti_wx})", "用卦五行": f"{yong}({yong_wx})",
+        "体用关系": rel, "总断": ji, "断语": shuo,
+        "互卦提示": f"互卦主事中过程（{hu['name']}，{hu_low_wx}/{hu_up_wx}）",
+        "变卦提示": f"变卦主结果（{bian['name']}）—看变卦对体卦生克定终局",
+    }
 
     return ChartResult(
-        method="meihua",
-        school="east",
-        engine="self+time-number-omen",
-        normalized={"elements": {"metal": 1 if ti_wx == "金" or yong_wx == "金" else 0,
-                              "wood": 1 if ti_wx == "木" or yong_wx == "木" else 0,
-                              "water": 1 if ti_wx == "水" or yong_wx == "水" else 0,
-                              "fire": 1 if ti_wx == "火" or yong_wx == "火" else 0,
-                              "earth": 1 if ti_wx == "土" or yong_wx == "土" else 0},
-                   "timeline": []},
-        raw={
-            "mode": actual_mode,
-            "subject": b.subject or "decision",
-            "rule_version": "v1",
-            "zhu_gua": zhu_name,
-            "hu_gua": hu_name,
-            "bian_gua": bian_name,
-            "ti_gua": ti_name,
-            "ti_wuxing": ti_wx,
-            "yong_gua": yong_name,
-            "yong_wuxing": yong_wx,
-            "dong_yao": dong,
-            "duan": f"体卦 {ti_name}{ti_wx}，用卦 {yong_name}{yong_wx}，关系为 {relation}。",
-            "numbers": {"upper": upper_n, "lower": lower_n, "moving": dong},
-            "trigram_table": TRIGRAM_TABLE,
-            "calculation_basis": {
-                "method": "meihua",
-                "mode": actual_mode,
-                "subject": b.subject or "decision",
-                "rule_version": "v1",
-                "input_source": "birth (year/month/day/hour/minute) + optional seed/question",
-                "rule": "上卦、下卦、动爻按所选起卦模式取数；动爻所在卦为用，另一卦为体。互卦 = 主卦 2-4 爻/3-5 爻。",
-                "limits": [
-                    "本实现不接互卦变爻、金口诀、纳甲, 仅到体用关系与生克",
-                    "动爻来源 priority: 手动起卦 > 数字起卦 > 外应起卦 > 时间起卦",
-                    "64 卦全名 = 上下卦组合 (本表 8 卦), 互卦由 2-4 爻/3-5 爻组合",
-                ],
-            },
-        },
+        method="meihua", school="east", engine="self(梅花易数)",
+        normalized={"elements": {}, "timeline": []},
+        raw={"主卦": ben, "互卦": hu, "变卦": bian, "动爻": moving,
+             "体卦": ti, "用卦": yong, "上卦": up, "下卦": low, "断": judgement},
     )

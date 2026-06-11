@@ -1,7 +1,5 @@
-// 错误边界: 捕获渲染异常, 显示神秘错误页
+// 错误边界: 捕获渲染异常，显示古籍风格错误页（「古籍×仪器」纸墨风格）
 import { Component, type ReactNode, type ErrorInfo } from "react";
-import { COLOR } from "./ui";
-import { YinYang } from "./MysticElements";
 
 interface Props { children: ReactNode; }
 interface State { hasError: boolean; error: Error | null; }
@@ -23,40 +21,55 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center relative">
-          <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-[0.05]">
-            <YinYang size={200} />
-          </div>
-          <div className="relative z-10 space-y-4 max-w-md mx-auto px-4">
-            <div className="text-6xl font-display text-shimmer" style={{ fontFamily: "'Cinzel', serif" }}>
-              ⚡
-            </div>
-            <h1 className="text-xl font-display" style={{ color: COLOR.goldBright }}>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+          <div className="max-w-md space-y-4" style={{ fontFamily: "'Noto Serif SC', serif" }}>
+            <div style={{
+              fontFamily: "'Cinzel', serif",
+              fontSize: "5rem",
+              color: "var(--rule)",
+              lineHeight: 1,
+            }}>!!</div>
+
+            <h1 style={{
+              fontSize: "1.15rem",
+              fontWeight: 700,
+              color: "var(--cinnabar)",
+              letterSpacing: "0.12em",
+            }}>
               卦象紊乱 · Chart Corruption
             </h1>
-            <p className="text-sm leading-relaxed" style={{ color: COLOR.inkSoft }}>
+
+            <p style={{ fontSize: "0.85rem", color: "var(--ink-soft)", lineHeight: 1.85 }}>
               排盘引擎遇到了意料之外的波动。这可能是临时性的星象干扰，请尝试刷新页面。
             </p>
-            <p className="text-xs leading-relaxed" style={{ color: COLOR.inkSoft }}>
+
+            <p style={{ fontSize: "0.72rem", color: "var(--ink-soft)", lineHeight: 1.6 }}>
               The casting engine encountered an unexpected fluctuation. This may be a temporary celestial disturbance. Please try refreshing the page.
             </p>
+
             {this.state.error && (
               <details className="text-left">
-                <summary className="text-[10px] cursor-pointer" style={{ color: COLOR.muted }}>
+                <summary style={{ fontSize: "0.62rem", color: "var(--ink-soft)", cursor: "pointer" }}>
                   Technical Details
                 </summary>
-                <pre className="mt-2 text-[10px] p-3 rounded overflow-auto max-h-40"
-                  style={{ background: "rgba(8,10,15,0.8)", color: COLOR.danger, border: "1px solid var(--line)" }}>
+                <pre className="paper-mono"
+                  style={{
+                    marginTop: "0.5rem", fontSize: "0.6rem", padding: "0.6rem",
+                    background: "var(--paper-2)", color: "var(--cinnabar)",
+                    border: "1px solid var(--rule)", overflow: "auto", maxHeight: "10rem",
+                  }}>
                   {this.state.error.message}
                 </pre>
               </details>
             )}
+
             <button
               type="button"
-              className="btn-primary gold-sweep-host text-sm px-6 py-3 mt-4"
+              className="paper-btn"
+              style={{ marginTop: "1rem" }}
               onClick={() => { this.setState({ hasError: false, error: null }); window.location.href = "/"; }}
             >
-              ✦ 返回首页 / Return Home
+              返回首页
             </button>
           </div>
         </div>

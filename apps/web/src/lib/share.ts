@@ -13,7 +13,7 @@ const METHOD_LABEL: Record<Method, string> = {
   western: "西方占星", vedic: "吠陀",
   tarot: "塔罗", numerology: "数字命理",
   lenormand: "雷诺曼", liuren: "大六壬", tieban: "铁板神数", xiaoliuren: "小六壬",
-  cross_validator: "交叉验证", hour_calibrator: "时辰校准", compatibility: "合婚",
+  cross_validator: "交叉验证", hour_calibrator: "时辰校准", compatibility: "合婚", hepan: "合盘",
 };
 
 const SUBJECT_LABEL: Record<Subject, string> = SUBJECTS.reduce(

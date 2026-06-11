@@ -54,6 +54,10 @@ class ReadingAPIRequest(BaseModel):
         None,
         description="空间信息（风水用）",
     )
+    method_options: Optional[dict[str, Any]] = Field(
+        None,
+        description="术法专属选项: liuyao_mode, meihua_mode, tarot_spread 等",
+    )
     methods: Optional[list[str]] = Field(
         None,
         min_length=1,
@@ -88,7 +92,7 @@ async def reading_endpoint(body: ReadingAPIRequest):
     返回 ReadingResult，其中 methods_used 保证包含全部 12 种术法。
     """
     t0 = time.perf_counter()
-    log.info("Reading request: %s", body.question[:80])
+    log.info("Reading request: %s methods=%s", body.question[:80], body.methods)
 
     # 转换为内部 Request
     request = ReadingRequest(
@@ -97,6 +101,7 @@ async def reading_endpoint(body: ReadingAPIRequest):
         birth=body.birth,
         target_birth=body.target_birth,
         space=body.space,
+        method_options=body.method_options,
         methods=body.methods,
         depth=body.depth,  # type: ignore[arg-type]
         language=body.language,  # type: ignore[arg-type]

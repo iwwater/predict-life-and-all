@@ -1,4 +1,4 @@
-// 玄空飞星:九宫格
+﻿// 玄空飞星:九宫格
 // 术语:运/坐/向/山星/向星/格局 全部用 <Jargon> 翻白话
 import type { ChartResult } from "../../lib/types";
 import { COLOR } from "../ui";
@@ -34,17 +34,17 @@ export function XuankongChart({ chart }: { chart: ChartResult }) {
 
   return (
     <div className="space-y-4">
-      <div className="card">
+      <div className="paper-frame">
         <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <h3 className="text-lg" style={{ color: COLOR.goldBright }}>玄空飞星</h3>
           <div className="flex gap-2 text-xs flex-wrap">
-            <span className="tag tag-east">
+            <span className="paper-tag paper-tag-east">
               <Jargon term="运" mode="plain" /> {r.period || "—"}
             </span>
-            <span className="tag">
+            <span className="paper-tag">
               <Jargon term="坐" mode="plain" /> {r.sitting} · <Jargon term="向" mode="plain" /> {r.facing}
             </span>
-            <span className="tag" style={{ color: patColor, borderColor: `${patColor}66` }}>
+            <span className="paper-tag" style={{ color: patColor, borderColor: `${patColor}66` }}>
               <Jargon term="格局" mode="plain" /> {patInfo.plain}
             </span>
           </div>
@@ -59,7 +59,7 @@ export function XuankongChart({ chart }: { chart: ChartResult }) {
               <div key={gua}
                 className="rounded-md p-2 text-xs flex flex-col"
                 style={{
-                  background: isCenter ? "rgba(201,162,75,0.08)" : "rgba(8,10,15,0.5)",
+                  background: isCenter ? "rgba(201,162,75,0.08)" : "var(--paper-2)",
                   border: `1px solid ${isCenter ? COLOR.gold : COLOR.line}`,
                   minHeight: 70,
                 }}

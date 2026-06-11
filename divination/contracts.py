@@ -1,30 +1,9 @@
-"""Shared data contracts for all divination engines."""
-from dataclasses import asdict, dataclass, field
+"""统一数据契约：中西方所有术数共用这一套请求/结果结构。"""
+from dataclasses import dataclass, field, asdict
 from typing import Any, Literal, Optional
 
 School = Literal["east", "west"]
-Method = Literal[
-    "bazi",
-    "bazi_v2",
-    "ziwei",
-    "qimen",
-    "liuyao",
-    "meihua",
-    "chenggu",
-    "bazhai",
-    "xuankong",
-    "fengshui",
-    "western",
-    "vedic",
-    "tarot",
-    "numerology",
-    "lenormand",
-    "liuren",
-    "tieban",
-    "cross_validator",
-    "hour_calibrator",
-    "compatibility",
-]
+Method = Literal["bazi", "ziwei", "qimen", "liuyao", "meihua", "chenggu", "bazhai", "xuankong", "hepan", "western", "vedic", "tarot", "numerology"]
 
 
 @dataclass
@@ -36,28 +15,19 @@ class Birth:
     minute: int = 0
     gender: Literal["male", "female", "unspecified"] = "unspecified"
     calendar: Literal["gregorian", "lunar"] = "gregorian"
-    lat: Optional[float] = None
-    lng: Optional[float] = None
+    lat: Optional[float] = None      # 纬度，西方排盘/真太阳时需要
+    lng: Optional[float] = None      # 经度
     tz: str = "Asia/Shanghai"
-    is_leap_month: bool = False
-    mode: Optional[str] = None
-    subject: Optional[str] = None
-    question: Optional[str] = None
-    seed: Optional[int | str] = None
-    spread: Optional[str] = None
-    sitting: Optional[str] = None
-    period: Optional[int] = None
-    construction_year: Optional[int] = None
-    tosses: Optional[list[Any]] = None
+    is_leap_month: bool = False      # 农历闰月
 
 
 @dataclass
 class ChartResult:
     method: Method
     school: School
-    engine: str
-    normalized: dict[str, Any] = field(default_factory=dict)
-    raw: dict[str, Any] = field(default_factory=dict)
+    engine: str                       # 实际用的库名+版本
+    normalized: dict[str, Any] = field(default_factory=dict)  # 跨法通用：五行/四元素强弱 + 时间轴
+    raw: dict[str, Any] = field(default_factory=dict)         # 各法专属细节
 
     def to_dict(self) -> dict:
         return asdict(self)

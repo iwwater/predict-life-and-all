@@ -1,4 +1,4 @@
-// 梅花易数:主 / 互 / 变 三卦 + 体用
+﻿// 梅花易数:主 / 互 / 变 三卦 + 体用
 // 术语:主卦/互卦/变卦/体卦/用卦
 import type { ChartResult } from "../../lib/types";
 import { COLOR } from "../ui";
@@ -34,10 +34,10 @@ export function MeihuaChart({ chart }: { chart: ChartResult }) {
   const r = chart.raw;
   return (
     <div className="space-y-4">
-      <div className="card">
+      <div className="paper-frame">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <h3 className="text-lg" style={{ color: COLOR.goldBright }}>梅花易数</h3>
-          <span className="tag tag-east">
+          <span className="paper-tag paper-tag-east">
             <Jargon term="动爻" mode="plain" /> {r.dong_yao}
           </span>
         </div>
@@ -68,7 +68,7 @@ export function MeihuaChart({ chart }: { chart: ChartResult }) {
         ]}
       />
 
-      <div className="card">
+      <div className="paper-frame">
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
             <span style={{ color: COLOR.muted }}><Jargon term="体卦" mode="plain" /> </span>
@@ -81,7 +81,7 @@ export function MeihuaChart({ chart }: { chart: ChartResult }) {
             <span className="text-[10px] ml-1" style={{ color: COLOR.muted }}>· 有动爻那一卦 = 问的事</span>
           </div>
         </div>
-        <div className="mt-3 p-3 rounded-md" style={{ background: "rgba(8,10,15,0.5)" }}>
+        <div className="mt-3 p-3 rounded-md" style={{ background: "var(--paper-2)" }}>
           <div className="text-xs" style={{ color: COLOR.muted }}>总断</div>
           <div className="text-sm mt-1" style={{ color: COLOR.ink }}>{r.duan || "—"}</div>
         </div>

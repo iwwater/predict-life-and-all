@@ -40,7 +40,7 @@ interface SidebarProps {
 
 export function Sidebar({ open, onClose }: SidebarProps) {
   const location = useLocation();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
 
   const SECTIONS: NavSection[] = [
     {
@@ -49,49 +49,50 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       ],
     },
     {
-      label: t("section.eastMantra"),
+      label: lang === "zh" ? "命" : "Destiny",
       accent: COLOR.verdigris,
       items: [
-        { to: "/method/bazi-v2", label: t("nav.baziV2") },
-        { to: "/method/bazi", label: t("nav.bazi") },
-        { to: "/method/ziwei", label: t("nav.ziwei") },
-        { to: "/method/qimen", label: "奇门遁甲" },
-        { to: "/method/liuren", label: t("nav.liuren") },
-        { to: "/method/liuyao", label: t("nav.liuyao") },
-        { to: "/method/meihua", label: t("nav.meihua") },
-        { to: "/method/xiaoliuren", label: t("nav.xiaoliuren") },
-        { to: "/method/chenggu", label: t("nav.chenggu") },
-        { to: "/method/tieban", label: t("nav.tieban") },
+        { to: "/m/bazi", label: t("nav.bazi") },
+        { to: "/m/ziwei", label: t("nav.ziwei") },
       ],
     },
     {
-      label: t("section.westOracle"),
+      label: lang === "zh" ? "卜" : "Divination",
       accent: COLOR.indigo,
       items: [
-        { to: "/method/western", label: t("nav.western") },
-        { to: "/method/vedic", label: t("nav.vedic") },
-        { to: "/method/tarot", label: t("nav.tarot") },
-        { to: "/method/lenormand", label: t("nav.lenormand") },
-        { to: "/method/numerology", label: t("nav.numerology") },
+        { to: "/m/qimen", label: "奇门遁甲" },
+        { to: "/m/liuyao", label: t("nav.liuyao") },
+        { to: "/m/meihua", label: t("nav.meihua") },
+        { to: "/m/chenggu", label: t("nav.chenggu") },
       ],
     },
     {
-      label: t("section.fengshuiNav"),
+      label: lang === "zh" ? "相" : "Physiognomy",
       accent: COLOR.cinnabar,
       items: [
-        { to: "/method/xuankong", label: t("nav.xuankong") },
-        { to: "/method/bazhai", label: t("nav.bazhai") },
+        { to: "/m/hepan", label: lang === "zh" ? "合盘" : "Synastry" },
+        { to: "/m/tarot", label: t("nav.tarot") },
+        { to: "/m/western", label: t("nav.western") },
+        { to: "/m/vedic", label: t("nav.vedic") },
+        { to: "/m/numerology", label: t("nav.numerology") },
+      ],
+    },
+    {
+      label: lang === "zh" ? "山" : "Feng Shui",
+      accent: COLOR.verdigris,
+      items: [
+        { to: "/m/bazhai", label: t("nav.bazhai") },
+        { to: "/m/xuankong", label: t("nav.xuankong") },
         { to: "/fengshui", label: t("nav.fengshui") },
       ],
     },
     {
-      label: t("section.aggregateNav"),
+      label: lang === "zh" ? "合参" : "Cross-Ref",
       accent: COLOR.cinnabar,
       items: [
-        { to: "/aggregate", label: t("nav.aggregate") },
+        { to: "/heshen", label: lang === "zh" ? "合参" : "Cross-Ref" },
         { to: "/reading", label: "12法合参" },
         { to: "/compatibility", label: t("nav.compatibility") },
-        { to: "/dateselect", label: t("nav.dateselect") },
         { to: "/daily", label: t("nav.daily") },
         { to: "/almanac", label: t("nav.almanac") },
       ],
@@ -101,6 +102,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       items: [
         { to: "/knowledge", label: t("nav.knowledge") },
         { to: "/history", label: t("nav.history") },
+        { to: "/dateselect", label: t("nav.dateselect") },
         { to: "/about", label: t("nav.about") },
       ],
     },

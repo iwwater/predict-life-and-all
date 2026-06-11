@@ -1,4 +1,4 @@
-// 紫微斗数: 十二宫盘 + 星曜着色 + 四化标注 + 长生/博士/将前 + 运程
+﻿// 紫微斗数: 十二宫盘 + 星曜着色 + 四化标注 + 长生/博士/将前 + 运程
 // 专业级斗数盘面渲染
 import type React from "react";
 import type { ChartResult } from "../../lib/types";
@@ -92,25 +92,25 @@ export function ZiweiChart({ chart }: { chart: ChartResult }) {
   return (
     <div className="space-y-4">
       {/* ── Header ── */}
-      <div className="card">
+      <div className="paper-frame">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
           <h3 className="text-lg" style={{ color: COLOR.goldBright }}>
             紫微斗数 · 十二宫
           </h3>
           <div className="flex gap-2 flex-wrap">
-            <span className="tag tag-east">
+            <span className="paper-tag paper-tag-east">
               命主 {displayText(r.soul)}
             </span>
-            <span className="tag tag-east">
+            <span className="paper-tag paper-tag-east">
               身主 {displayText(r.body)}
             </span>
             {r.five_elements_class && (
-              <span className="tag" style={{ background: "rgba(201,162,75,0.10)", color: COLOR.gold }}>
+              <span className="paper-tag" style={{ background: "rgba(201,162,75,0.10)", color: COLOR.gold }}>
                 五行局 {displayText(r.five_elements_class)}
               </span>
             )}
             {r.gender && (
-              <span className="tag" style={{ color: COLOR.inkSoft }}>
+              <span className="paper-tag" style={{ color: COLOR.inkSoft }}>
                 {displayText(r.gender)}
               </span>
             )}
@@ -145,7 +145,7 @@ export function ZiweiChart({ chart }: { chart: ChartResult }) {
       </div>
 
       {/* ── 12-Palace Grid ── */}
-      <div className="card">
+      <div className="paper-frame">
         <div className="grid grid-cols-4 grid-rows-4 gap-1.5 max-w-xl mx-auto" style={{ aspectRatio: "1 / 1" }}>
           {/* Top row: 巳 午 未 申 */}
           {BRANCH_ORDER.slice(0, 4).map((branch) => (
@@ -208,7 +208,7 @@ export function ZiweiChart({ chart }: { chart: ChartResult }) {
 
       {/* ── 十二长生 / 博士 / 将前 ── */}
       {(palaces.some((p) => p.changsheng12 || p.boshi12 || p.jiangqian12)) && (
-        <div className="card">
+        <div className="paper-frame">
           <h4 className="text-sm mb-3" style={{ color: COLOR.gold }}>
             神煞附宫
             <span className="text-[10px] ml-2 font-normal" style={{ color: COLOR.muted }}>
@@ -224,7 +224,7 @@ export function ZiweiChart({ chart }: { chart: ChartResult }) {
               if (!cs && !bs && !js) return null;
               return (
                 <div key={key} className="rounded p-1.5"
-                  style={{ background: "rgba(8,10,15,0.3)", border: `1px solid ${COLOR.lineSoft}` }}>
+                  style={{ background: "var(--paper-2)", border: `1px solid ${COLOR.lineSoft}` }}>
                   <div style={{ color: COLOR.gold }}>{palaceTitle(p)}</div>
                   {cs && <div style={{ color: COLOR.azure }}>{cs}</div>}
                   {bs && <div style={{ color: COLOR.inkSoft }}>{bs}</div>}
@@ -251,7 +251,7 @@ export function ZiweiChart({ chart }: { chart: ChartResult }) {
 function CenterCell({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="rounded-md flex flex-col items-center justify-center p-2 text-center"
-      style={{ background: "rgba(8,10,15,0.7)", border: `1px solid ${COLOR.goldDim}` }}>
+      style={{ background: "var(--paper-2)", border: `1px solid ${COLOR.goldDim}` }}>
       <div className="text-[10px] uppercase tracking-widest" style={{ color: COLOR.muted }}>{title}</div>
       <div className="text-xs mt-1 space-y-0.5">{children}</div>
     </div>
@@ -272,7 +272,7 @@ function PalaceCell({ branch, palace, isMing }: { branch: string; palace?: Palac
   if (isBody) { borderColor = COLOR.azure; borderStyle = "solid"; }
 
   // Background
-  let bg = "rgba(8,10,15,0.45)";
+  let bg = "var(--paper-2)";
   if (isMing) bg = "rgba(201,162,75,0.10)";
   else if (isBody) bg = "rgba(91,141,239,0.06)";
 

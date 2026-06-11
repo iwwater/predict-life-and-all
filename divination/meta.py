@@ -159,6 +159,14 @@ METHOD_META = {
         "required_inputs": {"compatibility": ["chart1", "chart2"]},
         "recommended_for": ["婚配合盘", "关系匹配度", "五行互补分析"],
     },
+    "hepan": {
+        "school": "east", "name_zh": "合盘", "name_en": "Synastry",
+        "group": "合", "needs": ["two_births"], "engine": "self+multi-method",
+        "subjects": ["relationship"],
+        "modes": ["bazi", "ziwei", "western"], "default_mode": "bazi",
+        "required_inputs": {"bazi": ["chart1", "chart2"]},
+        "recommended_for": ["多法合盘", "四维评级", "印证分歧", "关键相位"],
+    },
     "synastry": {
         "school": "west", "name_zh": "西方合盘", "name_en": "Western Synastry",
         "group": "合", "needs": ["two_births"], "engine": "skyfield+synastry+composite",

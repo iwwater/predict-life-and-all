@@ -1,4 +1,4 @@
-import type { ChartResult } from "../../lib/types";
+﻿import type { ChartResult } from "../../lib/types";
 import { COLOR } from "../ui";
 
 interface Card {
@@ -49,14 +49,14 @@ export function TarotChart({ chart }: { chart: ChartResult }) {
 
   return (
     <div className="space-y-4">
-      <div className="card">
+      <div className="paper-frame">
         <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <h3 className="text-lg" style={{ color: COLOR.goldBright }}>
             塔罗 · {r.spread_name || r.spread}
           </h3>
           <div className="flex gap-2 flex-wrap text-xs">
-            <span className="tag tag-west">{cards.length} 张</span>
-            <span className="tag">{r.subject || "tarot"}</span>
+            <span className="paper-tag paper-tag-west">{cards.length} 张</span>
+            <span className="paper-tag">{r.subject || "tarot"}</span>
           </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 justify-items-center">

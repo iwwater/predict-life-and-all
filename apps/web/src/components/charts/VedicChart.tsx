@@ -1,4 +1,4 @@
-// 吠陀占星: 北印度方盘 + 行星细节 + Nakshatra + Dasha + Yoga
+﻿// 吠陀占星: 北印度方盘 + 行星细节 + Nakshatra + Dasha + Yoga
 // 专业级 Jyotish 盘面渲染
 import type { ChartResult } from "../../lib/types";
 import { COLOR, Stat } from "../ui";
@@ -78,18 +78,18 @@ export function VedicChart({ chart }: { chart: ChartResult }) {
   return (
     <div className="space-y-4">
       {/* ── Header ── */}
-      <div className="card">
+      <div className="paper-frame">
         <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
           <h3 className="text-lg" style={{ color: COLOR.goldBright }}>
             吠陀占星 · Jyotish 出生盘
           </h3>
           <div className="flex gap-2 text-xs flex-wrap">
-            <span className="tag" style={{ background: "rgba(201,162,75,0.10)", color: COLOR.gold }}>
+            <span className="paper-tag" style={{ background: "rgba(201,162,75,0.10)", color: COLOR.gold }}>
               Lahiri Ayanamsa {typeof ayanamsa === "number" ? ayanamsa.toFixed(2) + "°" : ""}
             </span>
-            <span className="tag tag-west">恒星黄道</span>
+            <span className="paper-tag paper-tag-west">恒星黄道</span>
             {asc && (
-              <span className="tag" style={{ background: "rgba(91,141,239,0.10)", color: COLOR.azure }}>
+              <span className="paper-tag" style={{ background: "rgba(91,141,239,0.10)", color: COLOR.azure }}>
                 Lagna {asc.sign}
               </span>
             )}
@@ -105,7 +105,7 @@ export function VedicChart({ chart }: { chart: ChartResult }) {
       </div>
 
       {/* ── North Indian Chart (Diamond Layout) ── */}
-      <div className="card flex flex-col items-center">
+      <div className="paper-frame flex flex-col items-center">
         <h4 className="text-sm mb-4 self-start" style={{ color: COLOR.gold }}>
           北印度方盘 · 宫位落星
         </h4>
@@ -129,7 +129,7 @@ export function VedicChart({ chart }: { chart: ChartResult }) {
             return (
               <div key={i} className="rounded p-1.5 text-[10px] sm:text-xs flex flex-col"
                 style={{
-                  background: isLagna ? "rgba(91,141,239,0.06)" : "rgba(8,10,15,0.45)",
+                  background: isLagna ? "rgba(91,141,239,0.06)" : "var(--paper-2)",
                   border: `1px solid ${isLagna ? COLOR.azure + "40" : COLOR.line}`,
                   minHeight: 52,
                 }}>
@@ -166,7 +166,7 @@ export function VedicChart({ chart }: { chart: ChartResult }) {
       </div>
 
       {/* ── Planet Detail Table ── */}
-      <div className="card">
+      <div className="paper-frame">
         <h4 className="text-sm mb-3" style={{ color: COLOR.gold }}>
           行星明细
           <span className="text-[10px] ml-2 font-normal" style={{ color: COLOR.muted }}>
@@ -250,14 +250,14 @@ export function VedicChart({ chart }: { chart: ChartResult }) {
         </div>
 
         {/* Element distribution */}
-        <div className="card flex justify-center items-center">
+        <div className="paper-frame flex justify-center items-center">
           <ElementsRadar elements={chart.normalized.elements || {}} variant="four" title="四元素分布" />
         </div>
       </div>
 
       {/* ── Vimshottari Dasha ── */}
       {dashaTimeline.length > 0 && (
-        <div className="card">
+        <div className="paper-frame">
           <h4 className="text-sm mb-3" style={{ color: COLOR.gold }}>
             Vimshottari Dasha · 120 年大运
             <span className="text-[10px] ml-2 font-normal" style={{ color: COLOR.muted }}>
@@ -334,7 +334,7 @@ export function VedicChart({ chart }: { chart: ChartResult }) {
 
       {/* ── Yogas ── */}
       {yogas.length > 0 && (
-        <div className="card">
+        <div className="paper-frame">
           <h4 className="text-sm mb-3" style={{ color: COLOR.gold }}>
             Yoga 检测
             <span className="text-[10px] ml-2 font-normal" style={{ color: COLOR.muted }}>
@@ -349,7 +349,7 @@ export function VedicChart({ chart }: { chart: ChartResult }) {
                 : COLOR.muted;
               return (
                 <div key={i} className="rounded-md p-3 text-sm"
-                  style={{ background: "rgba(8,10,15,0.3)", border: `1px solid ${COLOR.lineSoft}` }}>
+                  style={{ background: "var(--paper-2)", border: `1px solid ${COLOR.lineSoft}` }}>
                   <div className="flex items-baseline gap-2 mb-1">
                     <span style={{ color: COLOR.goldBright, fontWeight: 600 }}>{y.name}</span>
                     <span className="text-[10px] px-1.5 py-0.5 rounded"
@@ -369,7 +369,7 @@ export function VedicChart({ chart }: { chart: ChartResult }) {
 
       {/* ── Rahu/Ketu ── */}
       {nodes.rahu && (
-        <div className="card">
+        <div className="paper-frame">
           <h4 className="text-sm mb-3" style={{ color: COLOR.gold }}>月交点 · Rahu & Ketu</h4>
           <div className="grid grid-cols-2 gap-4 text-xs">
             {(["rahu", "ketu"] as const).map((node) => {

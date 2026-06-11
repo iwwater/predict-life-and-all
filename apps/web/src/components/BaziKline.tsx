@@ -1,4 +1,4 @@
-// 八字 K 线图(Canvas):从 normalized.timeline 渲染 OHLC
+﻿// 八字 K 线图(Canvas):从 normalized.timeline 渲染 OHLC
 import { useEffect, useRef } from "react";
 import type { ChartResult } from "../lib/types";
 import { COLOR } from "./ui";
@@ -130,7 +130,7 @@ export function BaziKline({ chart }: { chart: ChartResult }) {
   }, [chart]);
 
   return (
-    <div className="card">
+    <div className="paper-frame">
       <div className="flex items-baseline justify-between flex-wrap gap-2 mb-2">
         <div>
           <h3 className="text-lg" style={{ color: COLOR.goldBright }}>
@@ -140,7 +140,7 @@ export function BaziKline({ chart }: { chart: ChartResult }) {
             从大运地支五行推导出来的"运势强度"折线,看每十年起伏
           </div>
         </div>
-        <div className="tag tag-east" style={{ color: COLOR.gold }}>
+        <div className="paper-tag paper-tag-east" style={{ color: COLOR.gold }}>
           <span style={{ color: COLOR.gold }}>●</span> 升 <span className="mx-1">/</span> <span style={{ color: COLOR.danger }}>●</span> 降
         </div>
       </div>

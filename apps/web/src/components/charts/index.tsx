@@ -44,6 +44,6 @@ export function ChartRenderer({ chart, crossValidation, peachBlossom, fateModifi
     case "lenormand":  return <LenormandChart chart={chart} />;
     case "liuren":     return <LiurenChart chart={chart} />;
     case "tieban":     return <TiebanChart chart={chart} />;
-    default: return <div className="card">未知占卜法: {m}</div>;
+    default: return <div className="paper-empty">未知占卜法: {m}</div>;
   }
 }

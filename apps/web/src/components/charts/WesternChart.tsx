@@ -1,4 +1,4 @@
-// 西方占星: 圆形星盘 + 宫位线 + 相位网格 + 元素/模式统计
+﻿// 西方占星: 圆形星盘 + 宫位线 + 相位网格 + 元素/模式统计
 // 专业级星盘渲染: ASC 在左 (东方地平线)、MC 在上、星座环逆时针
 import type { ChartResult } from "../../lib/types";
 import { COLOR, Stat } from "../ui";
@@ -138,18 +138,18 @@ export function WesternChart({ chart }: { chart: ChartResult }) {
   return (
     <div className="space-y-4">
       {/* ── Header ── */}
-      <div className="card">
+      <div className="paper-frame">
         <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
           <h3 className="text-lg" style={{ color: COLOR.goldBright }}>
             西方占星 · 本命星盘
           </h3>
           <div className="flex gap-2 text-xs flex-wrap">
             {asc && (
-              <span className="tag" style={{ background: "rgba(91,141,239,0.10)", color: COLOR.azure }}>
+              <span className="paper-tag" style={{ background: "rgba(91,141,239,0.10)", color: COLOR.azure }}>
                 ASC {asc.sign} {degreeText(asc.degree)}
               </span>
             )}
-            <span className="tag tag-west">{r.rule_version === "v2" ? "十大行星" : "古典七星"}</span>
+            <span className="paper-tag paper-tag-west">{r.rule_version === "v2" ? "十大行星" : "古典七星"}</span>
           </div>
         </div>
 
@@ -162,7 +162,7 @@ export function WesternChart({ chart }: { chart: ChartResult }) {
       </div>
 
       {/* ── Circular Chart ── */}
-      <div className="card flex flex-col items-center">
+      <div className="paper-frame flex flex-col items-center">
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-label="西方占星星盘">
           {/* Outer rim */}
           <circle cx={cx} cy={cy} r={R} fill="none" stroke={COLOR.line} strokeWidth={1.5} />
@@ -261,7 +261,7 @@ export function WesternChart({ chart }: { chart: ChartResult }) {
             return (
               <g key={name}>
                 <circle cx={p[0]} cy={p[1]} r={10.5}
-                  fill="rgba(8,10,15,0.92)" stroke={COLOR.gold} strokeWidth={1.3} />
+                  fill="var(--paper-2)" stroke={COLOR.gold} strokeWidth={1.3} />
                 <text x={p[0]} y={p[1] + 1} textAnchor="middle" dominantBaseline="central"
                   fill={COLOR.ink} fontSize={15} fontWeight={600}>
                   {glyph}
@@ -294,7 +294,7 @@ export function WesternChart({ chart }: { chart: ChartResult }) {
 
       {/* ── Elements & Modality ── */}
       <div className="grid sm:grid-cols-2 gap-4">
-        <div className="card flex justify-center items-center">
+        <div className="paper-frame flex justify-center items-center">
           <ElementsRadar elements={chart.normalized.elements || {}} variant="four" title="四元素分布" />
         </div>
         <div className="card space-y-3">
@@ -326,7 +326,7 @@ export function WesternChart({ chart }: { chart: ChartResult }) {
       </div>
 
       {/* ── Planet Detail Table ── */}
-      <div className="card">
+      <div className="paper-frame">
         <h4 className="text-sm mb-3" style={{ color: COLOR.gold }}>
           行星明细
         </h4>
@@ -366,7 +366,7 @@ export function WesternChart({ chart }: { chart: ChartResult }) {
       </div>
 
       {/* ── Aspect Grid ── */}
-      <div className="card">
+      <div className="paper-frame">
         <h4 className="text-sm mb-3" style={{ color: COLOR.gold }}>
           相位表
           <span className="text-[10px] ml-2 font-normal" style={{ color: COLOR.muted }}>— 行星间的角度关系与容许度</span>
@@ -405,7 +405,7 @@ export function WesternChart({ chart }: { chart: ChartResult }) {
 
       {/* ── House Table ── */}
       {houses.length > 0 && (
-        <div className="card">
+        <div className="paper-frame">
           <h4 className="text-sm mb-3" style={{ color: COLOR.gold }}>十二宫位 · 整宫制</h4>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 text-xs">
             {houses.map((h: any) => {
@@ -414,7 +414,7 @@ export function WesternChart({ chart }: { chart: ChartResult }) {
               return (
                 <div key={h.house} className="rounded p-2 text-center"
                   style={{
-                    background: isAscHouse ? "rgba(91,141,239,0.06)" : "rgba(8,10,15,0.3)",
+                    background: isAscHouse ? "rgba(91,141,239,0.06)" : "var(--paper-2)",
                     border: `1px solid ${isAscHouse ? COLOR.azure + "30" : COLOR.lineSoft}`,
                   }}>
                   <div style={{ color: isAscHouse ? COLOR.azure : COLOR.gold }} className="text-[10px]">
@@ -433,27 +433,27 @@ export function WesternChart({ chart }: { chart: ChartResult }) {
       {/* ── v2: 分布分析 ── */}
       {r.distribution && (
         <div className="card space-y-2">
-          <h4 className="text-sm" style={{ color: COLOR.goldBright }}>📊 星盘分布分析</h4>
+          <h4 className="text-sm" style={{ color: COLOR.goldBright }}>· 星盘分布分析</h4>
           {r.distribution.interpretation && (
             <div className="text-xs leading-relaxed" style={{ color: COLOR.inkSoft }}>
               {r.distribution.interpretation}
             </div>
           )}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-            <div className="rounded p-2" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid var(--line-soft)" }}>
+            <div className="rounded p-2" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid var(--rule-soft)" }}>
               <div className="text-[10px] mb-1" style={{ color: COLOR.muted }}>主导元素</div>
               <span style={{ color: COLOR.goldBright }}>
                 {r.distribution.dominant_element || "均衡"}
               </span>
             </div>
-            <div className="rounded p-2" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid var(--line-soft)" }}>
+            <div className="rounded p-2" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid var(--rule-soft)" }}>
               <div className="text-[10px] mb-1" style={{ color: COLOR.muted }}>主导模式</div>
               <span style={{ color: COLOR.jade }}>
                 {r.distribution.dominant_modality || "均衡"}
               </span>
             </div>
             {r.distribution.missing_elements?.length > 0 && (
-              <div className="rounded p-2" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid var(--line-soft)" }}>
+              <div className="rounded p-2" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid var(--rule-soft)" }}>
                 <div className="text-[10px] mb-1" style={{ color: COLOR.muted }}>缺失元素</div>
                 <span style={{ color: COLOR.danger }}>
                   {r.distribution.missing_elements.join(", ")}
@@ -467,7 +467,7 @@ export function WesternChart({ chart }: { chart: ChartResult }) {
       {/* ── v2: 上升守护星 ── */}
       {r.ascendant_ruler?.ruler_position && (
         <div className="card space-y-1.5">
-          <h4 className="text-sm" style={{ color: COLOR.goldBright }}>🌟 上升守护星</h4>
+          <h4 className="text-sm" style={{ color: COLOR.goldBright }}>· 上升守护星</h4>
           <div className="text-xs" style={{ color: COLOR.inkSoft }}>
             上升星座的守护星是 <span style={{ color: COLOR.gold }}>{r.ascendant_ruler.ruler_position.planet}</span>
             {r.ascendant_ruler.ruler_classical && r.ascendant_ruler.ruler !== r.ascendant_ruler.ruler_classical && (
@@ -485,7 +485,7 @@ export function WesternChart({ chart }: { chart: ChartResult }) {
       {/* ── v2: 相位汇总 ── */}
       {r.aspect_summary && (
         <div className="card space-y-2">
-          <h4 className="text-sm" style={{ color: COLOR.goldBright }}>🔗 相位分布</h4>
+          <h4 className="text-sm" style={{ color: COLOR.goldBright }}>· 相位分布</h4>
           <div className="flex items-center gap-3 text-xs flex-wrap">
             <span style={{ color: COLOR.inkSoft }}>
               总计 <span style={{ color: COLOR.ink }}>{r.aspect_summary.total}</span> 个相位
@@ -512,12 +512,12 @@ export function WesternChart({ chart }: { chart: ChartResult }) {
 
       {/* ── v2: 宫主星 ── */}
       {r.house_rulers && Object.keys(r.house_rulers).length > 0 && (
-        <div className="card">
-          <h4 className="text-sm mb-2" style={{ color: COLOR.goldBright }}>🏛 宫主星飞星</h4>
+        <div className="paper-frame">
+          <h4 className="text-sm mb-2" style={{ color: COLOR.goldBright }}>· 宫主星飞星</h4>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-1.5 text-xs">
             {Object.entries(r.house_rulers as Record<string, any>).map(([houseName, hr]) => (
               <div key={houseName} className="rounded p-1.5 text-center"
-                style={{ background: "rgba(8,10,15,0.4)", border: "1px solid var(--line-soft)" }}>
+                style={{ background: "var(--paper-2)", border: "1px solid var(--rule-soft)" }}>
                 <div className="text-[10px]" style={{ color: COLOR.muted }}>{houseName}</div>
                 <div style={{ color: COLOR.gold }}>{hr.ruler}</div>
                 {hr.ruler_in_house ? (

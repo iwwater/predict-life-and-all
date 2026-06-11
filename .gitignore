@@ -42,10 +42,14 @@ apps/web/tmp/
 .playwright-mcp/
 
 # Screenshots (garbage)
-mystic-hub-*.png
-*result*.png
-radar-chart-*.png
-packyapi-*.png
+*.png
+*.jpg
+*.jpeg
+*.zip
+
+# Playwright / debug snapshots
+*.yml
+page-*.md
 
 # OS
 .DS_Store

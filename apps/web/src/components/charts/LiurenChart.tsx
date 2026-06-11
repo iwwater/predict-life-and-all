@@ -1,4 +1,4 @@
-// 大六壬: 天地盘 + 四课三传 + 十二天将 + 课式分析
+﻿// 大六壬: 天地盘 + 四课三传 + 十二天将 + 课式分析
 import type { ChartResult } from "../../lib/types";
 import { COLOR, Stat } from "../ui";
 
@@ -24,7 +24,7 @@ function BranchCell({ zhi, label, wuxing }: { zhi: string; label?: string; wuxin
   const wx = wuxing || "";
   const wxColor = WX_COLOR[wx] || COLOR.muted;
   return (
-    <div className="text-center p-1.5 rounded" style={{ background: "rgba(8,10,15,0.35)" }}>
+    <div className="text-center p-1.5 rounded" style={{ background: "var(--paper-2)" }}>
       {label && (
         <div className="text-[8px] uppercase tracking-wide" style={{ color: COLOR.muted }}>
           {label}
@@ -73,14 +73,14 @@ export function LiurenChart({ chart }: { chart: ChartResult }) {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="card">
+      <div className="paper-frame">
         <div className="flex items-center justify-between mb-1 flex-wrap gap-2">
           <h3 className="text-lg" style={{ color: COLOR.goldBright }}>
             大六壬 · 天地盘
           </h3>
           <div className="flex gap-2 flex-wrap">
-            <span className="tag tag-east">三式之首</span>
-            <span className="tag" style={{ background: "rgba(91,141,239,0.10)", color: COLOR.azure }}>
+            <span className="paper-tag paper-tag-east">三式之首</span>
+            <span className="paper-tag" style={{ background: "rgba(91,141,239,0.10)", color: COLOR.azure }}>
               日{divTime.is_day ? "昼" : "夜"}占
             </span>
           </div>
@@ -108,7 +108,7 @@ export function LiurenChart({ chart }: { chart: ChartResult }) {
       </div>
 
       {/* Cosmic Board (天地盘) */}
-      <div className="card">
+      <div className="paper-frame">
         <h4 className="text-sm mb-3" style={{ color: COLOR.gold }}>
           天地盘
           <span className="text-[10px] ml-2 font-normal" style={{ color: COLOR.muted }}>
@@ -120,7 +120,7 @@ export function LiurenChart({ chart }: { chart: ChartResult }) {
             <div
               key={zhi}
               className="rounded-md p-2 text-center"
-              style={{ background: "rgba(8,10,15,0.4)", border: `1px solid ${COLOR.lineSoft}` }}
+              style={{ background: "var(--paper-2)", border: `1px solid ${COLOR.lineSoft}` }}
             >
               <div className="text-[9px] uppercase tracking-wide mb-1" style={{ color: COLOR.muted }}>
                 {zhi}宫
@@ -140,7 +140,7 @@ export function LiurenChart({ chart }: { chart: ChartResult }) {
       </div>
 
       {/* Four Lessons (四课) */}
-      <div className="card">
+      <div className="paper-frame">
         <h4 className="text-sm mb-3" style={{ color: COLOR.gold }}>
           四课
           <span className="text-[10px] ml-2 font-normal" style={{ color: COLOR.muted }}>
@@ -152,7 +152,7 @@ export function LiurenChart({ chart }: { chart: ChartResult }) {
             <div
               key={i}
               className="rounded-md p-3 text-center"
-              style={{ background: "rgba(8,10,15,0.4)", border: `1px solid ${COLOR.lineSoft}` }}
+              style={{ background: "var(--paper-2)", border: `1px solid ${COLOR.lineSoft}` }}
             >
               <div className="text-[9px] uppercase tracking-widest mb-2" style={{ color: COLOR.muted }}>
                 第{l.idx}课
@@ -182,7 +182,7 @@ export function LiurenChart({ chart }: { chart: ChartResult }) {
       </div>
 
       {/* Three Transmissions (三传) */}
-      <div className="card">
+      <div className="paper-frame">
         <h4 className="text-sm mb-3" style={{ color: COLOR.gold }}>
           三传
           <span className="text-[10px] ml-2 font-normal" style={{ color: COLOR.muted }}>
@@ -202,7 +202,7 @@ export function LiurenChart({ chart }: { chart: ChartResult }) {
             <div key={key} className="flex-1 flex flex-col items-center">
               <div
                 className="w-full rounded-md p-3 text-center"
-                style={{ background: idx === 0 ? "rgba(201,162,75,0.08)" : "rgba(8,10,15,0.3)", border: `1px solid ${idx === 0 ? COLOR.goldDim : COLOR.lineSoft}` }}
+                style={{ background: idx === 0 ? "rgba(201,162,75,0.08)" : "var(--paper-2)", border: `1px solid ${idx === 0 ? COLOR.goldDim : COLOR.lineSoft}` }}
               >
                 <div className="text-[9px] uppercase tracking-widest mb-1" style={{ color: COLOR.muted }}>
                   {methodLabel[key] || key}
@@ -238,7 +238,7 @@ export function LiurenChart({ chart }: { chart: ChartResult }) {
       </div>
 
       {/* Twelve Generals (十二天将) */}
-      <div className="card">
+      <div className="paper-frame">
         <h4 className="text-sm mb-3" style={{ color: COLOR.gold }}>
           十二天将 · 贵人起{divTime.is_day ? "昼" : "夜"}顺逆排布
         </h4>
