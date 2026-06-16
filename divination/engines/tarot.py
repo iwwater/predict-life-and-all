@@ -4,30 +4,31 @@
 import random
 from ..contracts import Birth, ChartResult
 
-# 大阿卡纳 22：(名, 正位, 逆位, 占星对应)
+# 大阿卡纳 22：(名, 正位, 逆位, 占星对应, Fool's Journey阶段, 叙事位置)
+# Fool's Journey 五幕: 觉醒(0-6) → 试炼(7-12) → 超越(13-17) → 启示(18-20) → 回归(21)
 _MAJOR = [
-    ("0 愚者", "新开始·冒险·纯真自由", "鲁莽·逃避·准备不足", "天王星/风"),
-    ("I 魔术师", "行动·创造·掌握资源", "操纵·拖延·潜力未发挥", "水星"),
-    ("II 女祭司", "直觉·潜意识·静观", "压抑直觉·秘密·表里不一", "月亮"),
-    ("III 皇后", "丰饶·滋养·感官·母性", "依赖·停滞·过度付出", "金星"),
-    ("IV 皇帝", "权威·秩序·稳定·掌控", "专横·僵化·失控", "白羊"),
-    ("V 教皇", "传统·信仰·体制·指引", "教条·叛逆·形式主义", "金牛"),
-    ("VI 恋人", "爱·结合·价值抉择", "失衡·诱惑·错误选择", "双子"),
-    ("VII 战车", "意志·进取·克服·胜利", "失控·受阻·方向不明", "巨蟹"),
-    ("VIII 力量", "勇气·耐心·以柔克刚", "自疑·失控·硬碰硬", "狮子"),
-    ("IX 隐士", "内省·寻道·独处沉淀", "孤立·逃避·迷失方向", "处女"),
-    ("X 命运之轮", "转机·循环·顺势机遇", "厄运·失序·抗拒变化", "木星"),
-    ("XI 正义", "公正·因果·权衡责任", "不公·偏颇·推诿", "天秤"),
-    ("XII 倒吊人", "换位·暂停·主动牺牲", "徒劳·执着·拖延", "海王星/水"),
-    ("XIII 死神", "终结·蜕变·破旧立新", "抗拒改变·停滞·留恋", "天蝎"),
-    ("XIV 节制", "调和·中道·耐心融合", "失衡·过度·冲突", "射手"),
-    ("XV 恶魔", "束缚·欲望·执迷·依赖", "觉察·解脱·斩断", "摩羯"),
-    ("XVI 塔", "突变·崩解·真相觉醒", "拖延崩塌·避祸·渐变", "火星"),
-    ("XVII 星星", "希望·灵感·疗愈·信念", "失望·枯竭·怀疑", "水瓶"),
-    ("XVIII 月亮", "幻象·不安·潜意识浮现", "释疑·走出迷雾·明朗", "双鱼"),
-    ("XIX 太阳", "成功·喜悦·活力·光明", "暂晦·延迟·虚浮", "太阳"),
-    ("XX 审判", "觉醒·召唤·复兴·清算", "自责·迟疑·拒绝面对", "冥王星"),
-    ("XXI 世界", "圆满·完成·整合·达成", "未竟·拖延·缺憾", "土星"),
+    ("0 愚者", "新开始·冒险·纯真自由", "鲁莽·逃避·准备不足", "天王星/风",  "觉醒",   "起点·纯真出发·无限可能"),
+    ("I 魔术师", "行动·创造·掌握资源", "操纵·拖延·潜力未发挥", "水星",     "觉醒",   "显化·意志·将愿景化为行动"),
+    ("II 女祭司", "直觉·潜意识·静观", "压抑直觉·秘密·表里不一", "月亮",    "觉醒",   "内观·聆听深层智慧·月之暗面"),
+    ("III 皇后", "丰饶·滋养·感官·母性", "依赖·停滞·过度付出", "金星",     "觉醒",   "丰盛·接收·感官与情感富足"),
+    ("IV 皇帝", "权威·秩序·稳定·掌控", "专横·僵化·失控", "白羊",        "觉醒",   "建构·建立结构与个人力量"),
+    ("V 教皇", "传统·信仰·体制·指引", "教条·叛逆·形式主义", "金牛",     "觉醒",   "传承·寻找导师·体制内外的指引"),
+    ("VI 恋人", "爱·结合·价值抉择", "失衡·诱惑·错误选择", "双子",       "觉醒",   "抉择·十字路口·爱与价值的整合"),
+    ("VII 战车", "意志·进取·克服·胜利", "失控·受阻·方向不明", "巨蟹",    "试炼",   "征服·以意志驾驭·凯旋"),
+    ("VIII 力量", "勇气·耐心·以柔克刚", "自疑·失控·硬碰硬", "狮子",    "试炼",   "内在力量·狮子吼·以柔克刚"),
+    ("IX 隐士", "内省·寻道·独处沉淀", "孤立·逃避·迷失方向", "处女",    "试炼",   "灯塔·向内之光·独行求道"),
+    ("X 命运之轮", "转机·循环·顺势机遇", "厄运·失序·抗拒变化", "木星",   "试炼",   "天意·三轮运转·因果显现"),
+    ("XI 正义", "公正·因果·权衡责任", "不公·偏颇·推诿", "天秤",         "试炼",   "法则·因果业报·真相大白"),
+    ("XII 倒吊人", "换位·暂停·主动牺牲", "徒劳·执着·拖延", "海王星/水", "试炼",   "悬置·臣服·以退为进"),
+    ("XIII 死神", "终结·蜕变·破旧立新", "抗拒改变·停滞·留恋", "天蝎",   "超越",   "凤凰浴火·蜕变·结束即是开始"),
+    ("XIV 节制", "调和·中道·耐心融合", "失衡·过度·冲突", "射手",        "超越",   "中道·整合两极·炼金术"),
+    ("XV 恶魔", "束缚·欲望·执迷·依赖", "觉察·解脱·斩断", "摩羯",        "超越",   "沉沦·物质枷锁·认识即解脱"),
+    ("XVI 塔", "突变·崩解·真相觉醒", "拖延崩塌·避祸·渐变", "火星",      "超越",   "天崩·拆毁幻相·假我的塔"),
+    ("XVII 星星", "希望·灵感·疗愈·信念", "失望·枯竭·怀疑", "水瓶",      "启示",   "北斗·星际之水·灵魂的希望"),
+    ("XVIII 月亮", "幻象·不安·潜意识浮现", "释疑·走出迷雾·明朗", "双鱼",  "启示",   "夜海·最深的恐惧与幻象·穿越黑暗"),
+    ("XIX 太阳", "成功·喜悦·活力·光明", "暂晦·延迟·虚浮", "太阳",       "启示",   "高峰·纯然的喜悦·真实不虚"),
+    ("XX 审判", "觉醒·召唤·复兴·清算", "自责·迟疑·拒绝面对", "冥王星", "回归",   "号角·灵魂审判·业力清算与复兴"),
+    ("XXI 世界", "圆满·完成·整合·达成", "未竟·拖延·缺憾", "土星",        "回归",   "圆满·轮回完成·新的开始"),
 ]
 # 小阿卡纳花色：元素 + 主题
 _SUITS = {"权杖": ("火", "行动·事业·激情"), "圣杯": ("水", "情感·关系·直觉"),
@@ -124,19 +125,25 @@ _SPREADS = {
 
 def _build_deck():
     deck = []
-    for name, up, rev, astro in _MAJOR:
-        deck.append({"类别": "大阿卡纳", "牌": name, "正位": up, "逆位": rev, "占星": astro})
+    for name, up, rev, astro, journey_stage, narrative in _MAJOR:
+        deck.append({
+            "类别": "大阿卡纳", "牌": name, "正位": up, "逆位": rev,
+            "占星": astro, "旅程阶段": journey_stage, "叙事位置": narrative,
+        })
     for suit, (elem, theme) in _SUITS.items():
         for r in _RANKS:
             up, rev = _MINOR[suit][r]
-            deck.append({"类别": f"{suit}({elem})", "牌": f"{suit}{r}", "花色": suit,
-                         "元素": elem, "阶": r, "正位": up, "逆位": rev})
+            deck.append({
+                "类别": f"{suit}({elem})", "牌": f"{suit}{r}", "花色": suit,
+                "元素": elem, "阶": r, "正位": up, "逆位": rev,
+                "旅程阶段": f"小牌·{theme.split('·')[0]}", "叙事位置": theme,
+            })
     return deck
 
 
 def _analyze(drawn):
     n = len(drawn)
-    major = sum(1 for c in drawn if c["类别"] == "大阿卡纳")
+    major = [c for c in drawn if c["类别"] == "大阿卡纳"]
     rev = sum(1 for c in drawn if c["方位"] == "逆位")
     suits = {}
     courts = 0
@@ -145,26 +152,57 @@ def _analyze(drawn):
             suits[c["花色"]] = suits.get(c["花色"], 0) + 1
         if c.get("阶") in _COURT:
             courts += 1
+
+    # Fool's Journey 分析
+    journey_stages = {}
+    for c in major:
+        stage = c.get("旅程阶段", "未知")
+        journey_stages[stage] = journey_stages.get(stage, 0) + 1
+    dominant_stage = max(journey_stages, key=journey_stages.get) if journey_stages else None
+
     notes = []
-    if major / n >= 0.5:
+    if len(major) / n >= 0.5:
         notes.append("大牌占比高：事关命运层面的重要课题，非日常小事")
     if rev / n >= 0.5:
         notes.append("逆位偏多：能量偏向内在、受阻或尚未显化，宜向内调整")
+    if dominant_stage:
+        notes.append(f"旅程阶段集中在「{dominant_stage}」：{_JOURNEY_STAGE_MEANING.get(dominant_stage, '')}")
+    if journey_stages.get("超越") and journey_stages.get("启示"):
+        notes.append("经历「超越」并走向「启示」：正在穿越重大转折，蜕变将近")
     if suits:
         dom = max(suits, key=suits.get)
         if suits[dom] >= 2:
             notes.append(f"{dom}牌集中：议题偏向「{_SUITS[dom][1]}」")
     if courts >= 2:
         notes.append("宫廷牌多：事件涉及多个人物/关系互动")
-    return {"大牌数": major, "逆位数": rev, "花色分布": suits, "宫廷牌数": courts, "整体提示": notes}
+
+    return {
+        "大牌数": len(major), "逆位数": rev, "花色分布": suits, "宫廷牌数": courts,
+        "旅程阶段分布": journey_stages, "主导旅程阶段": dominant_stage,
+        "整体提示": notes,
+    }
+
+
+_JOURNEY_STAGE_MEANING = {
+    "觉醒": "从愚者出发，学习显化与接收，逐步建构自我意识",
+    "试炼": "面对挑战与障碍，在意志、内省与天意中寻找方向",
+    "超越": "经历瓦解与重生，穿透物质幻相，进入灵魂暗夜",
+    "启示": "接引星辰之光，穿越最深的恐惧与幻象，接近真相",
+    "回归": "完成轮回功课，审判与圆满，新生已在门口",
+}
 
 
 # ── Pre-built lookup tables for external consumers (e.g. daily tarot) ──
 ALL_CARDS: list[str] = []
 ALL_KEYWORDS: dict[str, dict] = {}
-for name, up, rev, astro in _MAJOR:
+for name, up, rev, astro, journey_stage, narrative in _MAJOR:
     ALL_CARDS.append(name)
-    ALL_KEYWORDS[name] = {"upright": up, "reversed": rev, "image_hint": f"大阿卡纳·{astro}"}
+    ALL_KEYWORDS[name] = {
+        "upright": up, "reversed": rev,
+        "image_hint": f"大阿卡纳·{astro}",
+        "journey_stage": journey_stage,
+        "narrative_position": narrative,
+    }
 for suit, (elem, theme) in _SUITS.items():
     for r in _RANKS:
         card_name = f"{suit}{r}"
@@ -173,10 +211,21 @@ for suit, (elem, theme) in _SUITS.items():
         ALL_KEYWORDS[card_name] = {"upright": up, "reversed": rev, "image_hint": f"{suit}({elem})·{r}"}
 
 SPREADS = _SPREADS
-ALIASES: dict[str, str] = {}
+ALIASES: dict[str, str] = {
+    "three_time": "three",
+    "three_mind": "mind_body_spirit",
+    "choice_two": "decision",
+    "relationship_cross": "relationship",
+    "career_path": "situation",
+    "celtic_cross": "celtic",
+}
 
 def compute(b: Birth, spread: str = "three", seed: int | None = None,
             question: str | None = None) -> ChartResult:
+    spread = getattr(b, "spread", None) or spread
+    spread = ALIASES.get(spread, spread)
+    seed = getattr(b, "seed", None) if getattr(b, "seed", None) is not None else seed
+    question = getattr(b, "question", None) or question
     rng = random.Random(seed)
     deck = _build_deck()
     rng.shuffle(deck)
@@ -190,10 +239,19 @@ def compute(b: Birth, spread: str = "three", seed: int | None = None,
         card["方位"] = "逆位" if reversed_ else "正位"
         card["牌义"] = card["逆位"] if reversed_ else card["正位"]
         drawn.append(card)
+    drawn_major = [c for c in drawn if c["类别"] == "大阿卡纳"]
+    analysis = _analyze(drawn)
     return ChartResult(
-        method="tarot", school="west", engine="self(RWS塔罗·深化)",
+        method="tarot", school="west", engine="self(RWS塔罗·深化)+FoolsJourney",
         normalized={"elements": {}, "timeline": []},
         raw={"牌阵": spread, "牌阵名称": sp["名称"], "牌阵说明": positions,
              "适用": sp["fit"], "解读要领": sp["guide"], "问题": question,
-             "牌面": drawn, "牌组分析": _analyze(drawn)},
+             "牌面": drawn,
+             "牌组分析": analysis,
+             "fools_journey": {
+                 "major_arcana_stages": {c["牌"]: c["旅程阶段"] for c in drawn_major},
+                 "dominant_stage": analysis.get("主导旅程阶段"),
+                 "stage_meaning": _JOURNEY_STAGE_MEANING,
+             } if drawn_major else None,
+             },
     )

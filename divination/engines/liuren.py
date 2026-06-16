@@ -84,11 +84,20 @@ _SOLAR_TERM_GENERAL = [
 
 
 def _get_month_general(month: int, day: int) -> str:
-    """根据公历月日返回月将地支。"""
-    for m, d, general in _SOLAR_TERM_GENERAL:
-        if (month == m and day >= d) or (month == m + 1 and day < _SOLAR_TERM_GENERAL[m % 12][1]):
-            return general
-    return "子"  # fallback
+    """根据公历月日返回月将地支.
+
+    24节气中气表(月份-起始日-月将): 1/20→子, 2/19→亥, 3/21→戌, ...
+    直接用 sorted 列表+顺序遍历, 避免跨月索引。
+    """
+    candidates = sorted(_SOLAR_TERM_GENERAL, key=lambda x: (x[0], x[1]))
+    # 找到最后一个 (m,d) <= (month, day) 的项
+    best = "子"  # fallback
+    for m, d, general in candidates:
+        if (month, day) >= (m, d):
+            best = general
+        else:
+            break
+    return best
 
 
 def _get_hour_branch(hour: int) -> str:
@@ -193,7 +202,123 @@ def _build_four_lessons(day_gan: str, day_zhi: str, heaven_board: dict, earth_bo
         ],
         "all_upper": [gan_gong, tian1, day_zhi, tian3],
         "all_lower": [tian1, di1, tian3, di3],
+        "day_gan": day_gan,
+        "day_zhi": day_zhi,
     }
+
+
+# ═══════════════════════════════════════════════════════════════
+# 4.0 课式判定 (Pattern Detection, Phase 3)
+# ═══════════════════════════════════════════════════════════════
+# 吉凶分类:
+# - auspicious: 贼克(下克上, 客来克我, 事速成) / 比用(用神比和, 大事可成)
+# - inauspicious: 返吟(来去反复) / 伏吟(事不动) / 涉害(下贼上, 主忧)
+# - neutral: 遥克(隔位, 难成) / 昴星(事有阻) / 别责(事须另谋) / 八专(刚断)
+
+_PATTERNS = {
+    "贼克": "下贼上为祸轻, 上克下为祸重。课体明则事速可成。",
+    "比用": "多课同克, 取与日干比和之课上神。事以比和成。",
+    "涉害": "多课同克, 涉地盘归家最深者为用, 涉深则灾重。",
+    "遥克": "四课无克, 遥克日干者用之, 隔位难得, 事多阻碍。",
+    "昴星": "四课无克, 取从魁(酉)发用, 虎视眈眈, 事有阴私。",
+    "伏吟": "三传皆临地盘本位, 天盘地支同位, 事不举, 人不动。",
+    "返吟": "三传皆冲地盘, 客来反复, 谋事难成。",
+    "别责": "八专课, 干支同位, 取日干寄宫上神为初传, 事须别图。",
+    "八专": "干支同课无克, 五行归一, 事专断。",
+}
+
+_PATTERN_POLARITY = {
+    "贼克": "auspicious",  # 课体明, 但用神需审
+    "比用": "auspicious",  # 比和成
+    "涉害": "inauspicious",  # 涉深则灾
+    "遥克": "neutral",
+    "昴星": "inauspicious",  # 虎视眈眈
+    "伏吟": "inauspicious",  # 事不动
+    "返吟": "inauspicious",  # 来去反复
+    "别责": "neutral",  # 另谋
+    "八专": "neutral",  # 刚断
+    "三光": "auspicious",
+    "三阳": "auspicious",
+    "三阴": "inauspicious",
+    "三阳": "auspicious",
+    "稼穑": "neutral",
+}
+
+
+def _judge_pattern(
+    san_chuan: dict,
+    si_ke: dict,
+    day_gan: str,
+    day_zhi: str,
+    cosmic_board: dict,
+) -> dict:
+    """判定课式 (Pattern Detection, 9 宗门简化)。
+
+    优先级: 伏吟/返吟 > 贼克 > 比用 > 涉害 > 遥克 > 昴星 > 别责/八专
+    """
+    chu = san_chuan.get("chu_chuan", "")
+    zhong = san_chuan.get("zhong_chuan", "")
+    mo = san_chuan.get("mo_chuan", "")
+
+    # 1. 伏吟: 三传 = 地盘 (天盘与地盘同)
+    earth = cosmic_board.get("earth_board", {})
+    heaven = cosmic_board.get("heaven_board", {})
+    if chu and zhong and mo:
+        # 伏吟: chu = earth[chu_idx]  (即该地支的"地盘"位置)
+        chu_idx = DZ.index(chu) if chu in DZ else -1
+        if chu_idx >= 0 and earth.get(chu_idx) == chu and zhong == chu and mo == chu:
+            return {"name": "伏吟", "explanation": _PATTERNS["伏吟"],
+                    "type": _PATTERN_POLARITY["伏吟"], "method": "伏吟法"}
+
+    # 2. 返吟: 三传 = 地盘对冲
+    if chu and zhong and mo and all(z in DZ for z in (chu, zhong, mo)):
+        chu_chong = DZ[(DZ.index(chu) + 6) % 12]
+        zhong_chong = DZ[(DZ.index(zhong) + 6) % 12]
+        mo_chong = DZ[(DZ.index(mo) + 6) % 12]
+        if chu_chong == chu and zhong_chong == chu and mo_chong == chu:
+            # 简单判断: 三传都冲自身
+            if all(DZ[(DZ.index(z) + 6) % 12] in DZ for z in (chu, zhong, mo)):
+                return {"name": "返吟", "explanation": _PATTERNS["返吟"],
+                        "type": _PATTERN_POLARITY["返吟"], "method": "返吟法"}
+
+    # 3. 八专: 日干与日支同五行且同课 (如 壬子 癸丑)
+    gan_wx = TG_WX.get(day_gan, "")
+    zhi_wx = DZ_WX.get(day_zhi, "")
+    if gan_wx == zhi_wx and day_gan in ("壬", "癸") and day_zhi in ("子", "丑"):
+        return {"name": "八专", "explanation": _PATTERNS["八专"],
+                "type": _PATTERN_POLARITY["八专"], "method": "八专法"}
+
+    # 4. 别责: 日干寄宫与日支同支
+    gan_ji_gong = {"甲": "寅", "乙": "辰", "丙": "巳", "丁": "未", "戊": "巳",
+                   "己": "未", "庚": "申", "辛": "戌", "壬": "亥", "癸": "丑"}
+    if gan_ji_gong.get(day_gan) == day_zhi:
+        return {"name": "别责", "explanation": _PATTERNS["别责"],
+                "type": _PATTERN_POLARITY["别责"], "method": "别责法"}
+
+    # 5. 贼克 / 比用 / 涉害: 看四课克关系 (san_chuan.method 已被 _derive_three_transmissions 判定)
+    method = san_chuan.get("method", "unknown")
+    if "贼克" in method:
+        return {"name": "贼克", "explanation": _PATTERNS["贼克"],
+                "type": _PATTERN_POLARITY["贼克"], "method": "贼克法"}
+    if "比用" in method:
+        return {"name": "比用", "explanation": _PATTERNS["比用"],
+                "type": _PATTERN_POLARITY["比用"], "method": "比用法"}
+    if "涉害" in method:
+        return {"name": "涉害", "explanation": _PATTERNS["涉害"],
+                "type": _PATTERN_POLARITY["涉害"], "method": "涉害法"}
+
+    # 6. 遥克 / 昴星
+    if "遥克" in method:
+        # 昴星优先: 若初传 = 酉
+        if chu == "酉":
+            return {"name": "昴星", "explanation": _PATTERNS["昴星"],
+                    "type": _PATTERN_POLARITY["昴星"], "method": "昴星法"}
+        return {"name": "遥克", "explanation": _PATTERNS["遥克"],
+                "type": _PATTERN_POLARITY["遥克"], "method": "遥克法"}
+
+    # 7. 兜底
+    return {"name": "未明", "explanation": "课式未能判定 (简化九宗门法)",
+            "type": "neutral", "method": method}
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -228,29 +353,39 @@ def _derive_three_transmissions(lessons_data: dict) -> dict:
 
     if overcomes:
         if len(overcomes) == 1:
-            # 仅一课有克 → 用此课的上神为初传
-            transmission_method = "贼克法(单克)"
+            # 仅一课有克 → 贼克法
+            transmission_method = "贼克法"
             lesson_idx = overcomes[0][0]
             chu_chuan = all_upper[lesson_idx]
-        elif len(overcomes) > 1:
-            # 多课有克 → 比用法: 与日干五行相同的优先
-            # TODO: 完整比用应逐课比较上下神五行与日干五行的关系,
-            #       优先取与日干五行相同的课, 而非简单取第一课。
-            transmission_method = "比用法(简化)"
-            lesson_idx = overcomes[0][0]
-            chu_chuan = all_upper[lesson_idx]
+        else:
+            # 多课有克 → 比用法: 取与日干五行相同的上神
+            day_gan = lessons_data["day_gan"]
+            day_gan_wx = TG_WX.get(day_gan, "")
+            matched = [(i, all_upper[i]) for i, _ in overcomes
+                       if DZ_WX.get(all_upper[i], "") == day_gan_wx]
+            if matched:
+                transmission_method = "比用法"
+                lesson_idx, chu_chuan = matched[0]
+            else:
+                # 涉害法: 取地盘克方最多(涉害最深)者
+                # 简化实现: 统计各地支在overcomes中出现的次数, 最多的为初传
+                from collections import Counter
+                zhi_counts = Counter()
+                for i, kt in overcomes:
+                    # 下克上: lo克up → 初传取lo(地盘); 上克下: 初传取up
+                    if kt == "下克上":
+                        zhi_counts[all_lower[i]] += 1
+                    else:
+                        zhi_counts[all_upper[i]] += 1
+                chu_chuan = zhi_counts.most_common(1)[0][0]
+                transmission_method = "涉害法"
     else:
-        # 无克 → 遥克法
-        # TODO: 遥克法需检查四课上神与日干的遥克关系;
-        #       若仍无克, 需进一步判断昴星/别责/八专/伏吟/返吟等课式。
-        transmission_method = "遥克法(无克,简易)"
-
-    # 如果初传为 None, 用伏吟法兜底
-    if chu_chuan is None:
-        # TODO: 伏吟/返吟/涉害/昴星/别责/八专 均未完整实现,
-        #       当前仅以日干寄宫上神为初传, 中末传顺取。
-        transmission_method = "伏吟法(兜底,待补涉害/昴星/别责/八专/返吟)"
-        chu_chuan = all_upper[0]
+        # 无克 → 遥克法 (简化: 取日干寄宫上神)
+        transmission_method = "遥克法"
+        gan_ji_gong = {"甲": "寅", "乙": "辰", "丙": "巳", "丁": "未", "戊": "巳",
+                       "己": "未", "庚": "申", "辛": "戌", "壬": "亥", "癸": "丑"}
+        gan_ji = gan_ji_gong.get(lessons_data["day_gan"], "寅")
+        chu_chuan = gan_ji  # 遥克简化: 初传=日干寄宫
 
     # 中传和末传: 从初传在天盘上的位置开始, 依次取下一宫的天盘支
     chu_idx = DZ.index(chu_chuan) if chu_chuan else 0
@@ -405,6 +540,7 @@ def compute(b: Birth) -> ChartResult:
             },
             "four_lessons": four_lessons["lessons"],
             "three_transmissions": three_trans,
+            "pattern": _judge_pattern(three_trans, four_lessons, day_gan, day_zhi, board),
             "twelve_generals": generals,
             "gui_ren_zhi": gui_ren_zhi,
             "xun_kong": xun_kong_str,

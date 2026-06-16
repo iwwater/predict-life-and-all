@@ -4,6 +4,8 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Birth, Gender } from "../lib/types";
 
+export type BirthTimeAccuracy = "exact" | "approximate" | "period" | "unknown";
+
 export interface StoredBirth {
   year: number;
   month: number;
@@ -17,6 +19,7 @@ export interface StoredBirth {
   tz: string;
   city?: string;
   is_leap_month?: boolean;
+  birth_time_accuracy?: BirthTimeAccuracy;  // 用户设置的时辰精度
 }
 
 const DEFAULT_BIRTH: StoredBirth = {

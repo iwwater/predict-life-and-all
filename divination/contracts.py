@@ -3,7 +3,11 @@ from dataclasses import dataclass, field, asdict
 from typing import Any, Literal, Optional
 
 School = Literal["east", "west"]
-Method = Literal["bazi", "ziwei", "qimen", "liuyao", "meihua", "chenggu", "bazhai", "xuankong", "hepan", "western", "vedic", "tarot", "numerology"]
+Method = Literal[
+    "bazi", "ziwei", "qimen", "liuyao", "meihua", "chenggu", "bazhai", "xuankong",
+    "hepan", "western", "vedic", "tarot", "numerology", "lenormand", "liuren",
+    "tieban", "xiaoliuren",
+]
 
 
 @dataclass

@@ -62,6 +62,14 @@ METHOD_META = {
         "required_inputs": {"time_qigua": ["birth"], "number_qigua": ["seed"], "external_omen": ["question"]},
         "recommended_for": ["快速起卦", "外应取象", "趋势判断"],
     },
+    "shicao": {
+        "school": "east", "name_zh": "蓍草筮法", "name_en": "Yarrow Stalk Divination",
+        "group": "east", "needs": ["birth", "question"], "engine": "self+揲四归奇",
+        "subjects": ["decision", "relationship", "career"],
+        "modes": ["time_shicao", "manual_lines", "number_seed"], "default_mode": "time_shicao",
+        "required_inputs": {"time_shicao": ["birth"], "manual_lines": [], "number_seed": ["seed"]},
+        "recommended_for": ["《周易》本法", "一事一断", "蓍草概率分布（老阳3/16少阳5/16少阴7/16老阴1/16）"],
+    },
     "chenggu": {
         "school": "east", "name_zh": "称骨", "name_en": "Bone Weight",
         "group": "命", "needs": ["birth"], "engine": "self+traditional-table",
@@ -127,6 +135,17 @@ METHOD_META = {
         "subjects": ["decision", "career", "wealth", "relationship", "self_life"],
         "modes": ["liuren_divination"], "default_mode": "liuren_divination",
         "required_inputs": {"liuren_divination": ["birth"]}, "recommended_for": ["人事决疑", "天时地利", "三式之首"],
+    },
+    "xiaoliuren": {
+        "school": "east", "name_zh": "小六壬", "name_en": "Xiao Liu Ren",
+        "group": "卜", "needs": ["question"], "engine": "self+xiaoliuren-palm",
+        "subjects": ["decision", "lost_item", "career", "relationship"],
+        "modes": ["time_xiaoliuren", "number_xiaoliuren"], "default_mode": "time_xiaoliuren",
+        "required_inputs": {
+            "time_xiaoliuren": ["lunar_month", "lunar_day", "hour"],
+            "number_xiaoliuren": ["seed"],
+        },
+        "recommended_for": ["即时决疑", "出行寻物", "短期吉凶速断"],
     },
     "tieban": {
         "school": "east", "name_zh": "铁板神数", "name_en": "Tie Ban Shen Shu",

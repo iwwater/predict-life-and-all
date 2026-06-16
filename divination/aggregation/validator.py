@@ -23,6 +23,10 @@ from .schema import (
     DivinationSignal,
     ValidationResult,
 )
+from .selector import DIMENSION_CONFIG
+
+# Type: (signal, credit_multiplier) — credit_multiplier = 1/|D(M)| for multi-dim methods
+WeightedSignal = tuple[DivinationSignal, float]
 
 # ── 共识/冲突阈值 ────────────────────────────────────────────────────────────
 
@@ -84,6 +88,12 @@ def validate_signals(
     # VAL-014: 行动建议
     action_advice = _extract_action_advice(signals, consensus_items, conflict_items)
 
+    # VAL-015: 5 维分组 + per-dim 评分 (Phase 1)
+    dim_groups = _group_by_dimension(signals)
+    dim_scores, dim_signals_count = _compute_dim_scores(dim_groups, weights)
+    per_dim_consensus = _build_per_dim_consensus(dim_groups, weights, consensus_items)
+    dim_breakdown = _build_dim_breakdown(dim_groups, dim_scores, dim_signals_count)
+
     return ValidationResult(
         consensus=consensus_items,
         conflicts=conflict_items,
@@ -92,6 +102,10 @@ def validate_signals(
         confidence_level=confidence_level,
         risks=risks,
         timing=timing,
+        dim_scores=dim_scores,
+        dim_signals_count=dim_signals_count,
+        per_dim_consensus=per_dim_consensus,
+        dim_breakdown=dim_breakdown,
         action_advice=action_advice,
     )
 
@@ -600,6 +614,138 @@ def _extract_action_advice(
     unique.append("以上建议基于传统文化视角，重大决策请咨询相关专业人士")
 
     return unique[:8]  # cap at 8
+
+
+# ── VAL-015: 5 维分组 + per-dim 评分 (Phase 1) ───────────────────────────────
+
+DIM_LABELS: dict[str, str] = {
+    "long_term":     "长期命格",
+    "current_cycle": "当前周期",
+    "relationship":  "关系合参",
+    "one_question":  "一事一断",
+    "space":         "空间环境",
+}
+
+
+def _dim_multiplier(method: str, dim: str) -> float:
+    """Credit multiplier for a method in a given dimension.
+
+    If method appears in N dimensions (per DIMENSION_CONFIG), each gets 1/N.
+    Single-dimension methods get 1.0.
+    """
+    dims = DIMENSION_CONFIG.get(method, [dim])
+    return 1.0 / len(dims)
+
+
+def _group_by_dimension(
+    signals: list[DivinationSignal],
+) -> dict[str, list[WeightedSignal]]:
+    """按 signal.dimension 分组，并对 multi-dim 方法复制到所有所属维。
+
+    W7 fix: 方法出现在 N 个维度时，每个维度获得 1/N 的 credit 加权，
+    防止该方法在两个维里都拿完整权重，导致 validator 评分偏袒 multi-dim 方法。
+    """
+    groups: dict[str, list[WeightedSignal]] = {dim: [] for dim in DIM_LABELS}
+    for s in signals:
+        d = getattr(s, "dimension", None) or "_unspecified"
+        method = s.method
+        dims = DIMENSION_CONFIG.get(method, [d])
+        multiplier = 1.0 / len(dims)
+        # Emit into all dims this method belongs to
+        for dim in dims:
+            if dim not in groups:
+                groups[dim] = []
+            groups[dim].append((s, multiplier))
+    return groups
+
+
+def _compute_dim_scores(
+    dim_groups: dict[str, list[WeightedSignal]],
+    weights: dict[str, float],
+) -> tuple[dict[str, float], dict[str, int]]:
+    """每维内部算 0-100 分数, 复用 _compute_overall_score 同公式但 scope 限到 dim 内。
+
+    W7 fix: 每条 signal 的 credit = method_weight × signal_strength × signal_confidence × dim_credit_multiplier。
+    """
+    scores: dict[str, float] = {}
+    counts: dict[str, int] = {}
+    for dim, weighted_sigs in dim_groups.items():
+        raw_count = len(weighted_sigs)
+        counts[dim] = raw_count
+        if not weighted_sigs:
+            scores[dim] = 50.0
+            continue
+        total_score = 0.0
+        total_weight = 0.0
+        for s, multiplier in weighted_sigs:
+            w = weights.get(s.method, 0.05) * s.strength * s.confidence * multiplier
+            if s.polarity == "positive":
+                score = 50.0 + s.strength * 50.0
+            elif s.polarity == "negative":
+                score = 50.0 - s.strength * 50.0
+            elif s.polarity == "mixed":
+                score = 50.0 + (s.strength * 20.0)
+            else:
+                score = 50.0
+            total_score += score * w
+            total_weight += w
+        scores[dim] = round(min(95, max(5, total_score / max(0.01, total_weight))), 1)
+    return scores, counts
+
+
+def _build_per_dim_consensus(
+    dim_groups: dict[str, list[WeightedSignal]],
+    weights: dict[str, float],
+    all_consensus: list[ConsensusItem],
+) -> dict[str, list[ConsensusItem]]:
+    """把全局 consensus 按支持方法 → 落到对应 dimension。"""
+    out: dict[str, list[ConsensusItem]] = {dim: [] for dim in DIM_LABELS}
+    for c in all_consensus:
+        if not c.supporting_methods:
+            continue
+        # 按 supporting_methods 第一个 method 推断 dimension
+        method = c.supporting_methods[0]
+        # 反查该方法所属维
+        for dim, weighted_sigs in dim_groups.items():
+            if any(ws[0].method == method for ws in weighted_sigs):
+                if dim in out:
+                    out[dim].append(c)
+                break
+    return out
+
+
+def _build_dim_breakdown(
+    dim_groups: dict[str, list[WeightedSignal]],
+    dim_scores: dict[str, float],
+    dim_signals_count: dict[str, int],
+) -> dict[str, dict[str, Any]]:
+    """每维子结构 {score, signals_count, top_signal, summary}。"""
+    breakdown: dict[str, dict[str, Any]] = {}
+    for dim, weighted_sigs in dim_groups.items():
+        top: Optional[DivinationSignal] = None
+        if weighted_sigs:
+            top = max(weighted_sigs, key=lambda ws: ws[0].strength * ws[0].confidence)[0]
+        summary = ""
+        if dim == "long_term":
+            summary = "基于本命盘的长期格局参考"
+        elif dim == "current_cycle":
+            summary = "基于流年/限运/行运的当前周期参考"
+        elif dim == "relationship":
+            summary = "需要目标对象出生信息, 否则为单方推演"
+        elif dim == "one_question":
+            summary = "针对当前具体事的短期信号"
+        elif dim == "space":
+            summary = "需要空间信息, 否则为通用风水参考"
+        else:
+            summary = "未归入 5 维的兜底信号"
+        breakdown[dim] = {
+            "score": dim_scores.get(dim, 50.0),
+            "signals_count": dim_signals_count.get(dim, 0),
+            "top_signal": top,
+            "summary": summary,
+        }
+    return breakdown
+
 
 
 # ── 向后兼容 wrapper ──────────────────────────────────────────────────────────

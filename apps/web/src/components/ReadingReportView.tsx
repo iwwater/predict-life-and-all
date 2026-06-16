@@ -36,6 +36,33 @@ function ScoreSeal({ score }: { score: number }) {
   );
 }
 
+// Phase 1: 5 维小印章 (紧凑版, 用于 dim 矩阵)
+function DimSeal({ label, score }: { label: string; score: number }) {
+  const color = score >= 70 ? "var(--verdigris)" : score >= 50 ? "var(--indigo)" : score >= 35 ? "var(--cinnabar-dim)" : "var(--cinnabar)";
+  return (
+    <div className="text-center" style={{ flex: "1 1 0", minWidth: 0 }}>
+      <span className="paper-seal" style={{
+        display: "inline-block",
+        width: "1.8rem", height: "1.8rem", lineHeight: "1.8rem", fontSize: "0.7rem",
+        color, borderColor: color,
+      }}>
+        {Math.round(score)}
+      </span>
+      <div style={{ fontSize: "0.5rem", color: "var(--ink-soft)", marginTop: "0.15rem", letterSpacing: "0.04em" }}>
+        {label}
+      </div>
+    </div>
+  );
+}
+
+const DIM_LABELS: Record<string, string> = {
+  long_term:     "长期命格",
+  current_cycle: "当前周期",
+  relationship:  "关系合参",
+  one_question:  "一事一断",
+  space:         "空间环境",
+};
+
 // ── Markdown → HTML（去掉 LLM 输出中的 emoji 字符）──────────────────────────
 
 const EMOJI_STRIP = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}\u{200D}]/gu;
@@ -172,6 +199,21 @@ export function ReadingReportView({ result }: ReadingReportViewProps) {
         }}>
           {headline}
         </blockquote>
+
+        {/* ── Phase 1: 5 维 score 矩阵 ── */}
+        {validation.dim_scores && Object.keys(validation.dim_scores).length > 0 && (
+          <div style={{
+            display: "flex", gap: "0.4rem", alignItems: "stretch",
+            padding: "0.5rem 0.25rem 0.6rem",
+            borderTop: "1px dashed var(--rule)",
+            borderBottom: "1px dashed var(--rule)",
+            margin: "0 0 0.75rem",
+          }}>
+            {Object.entries(validation.dim_scores).map(([dim, sc]) => (
+              <DimSeal key={dim} label={DIM_LABELS[dim] || dim} score={sc as number} />
+            ))}
+          </div>
+        )}
 
         {/* ── 报告层级切换 ── */}
         <div className="flex items-center justify-between" style={{ marginBottom: "0.5rem" }}>

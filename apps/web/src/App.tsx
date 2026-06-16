@@ -17,6 +17,9 @@ const Daily = lazy(() => import("./pages/Daily").then((m) => ({ default: m.Daily
 const FengShui = lazy(() => import("./pages/FengShui").then((m) => ({ default: m.FengShui })));
 const Almanac = lazy(() => import("./pages/Almanac").then((m) => ({ default: m.Almanac })));
 const Compatibility = lazy(() => import("./pages/Compatibility").then((m) => ({ default: m.Compatibility })));
+const Cases = lazy(() => import("./pages/Cases").then((m) => ({ default: m.Cases })));
+const BirthTimeRectifyPage = lazy(() => import("./pages/BirthTimeRectifyPage").then((m) => ({ default: m.BirthTimeRectifyPage })));
+const CompassPage = lazy(() => import("./pages/CompassPage").then((m) => ({ default: m.default })));
 const Reading = lazy(() => import("./pages/Reading").then((m) => ({ default: m.Reading })));
 const ReadingHistory = lazy(() => import("./pages/ReadingHistory").then((m) => ({ default: m.ReadingHistory })));
 const ResultSample = lazy(() => import("./pages/ResultSample").then((m) => ({ default: m.ResultSample })));
@@ -37,6 +40,10 @@ const QimenPage = lazy(() => import("./pages/methods/QimenPage").then((m) => ({ 
 const ChengguPage = lazy(() => import("./pages/methods/ChengguPage").then((m) => ({ default: m.ChengguPage })));
 const MeihuaPage = lazy(() => import("./pages/methods/MeihuaPage").then((m) => ({ default: m.MeihuaPage })));
 const BazhaiPage = lazy(() => import("./pages/methods/BazhaiPage").then((m) => ({ default: m.BazhaiPage })));
+const LiurenPage = lazy(() => import("./pages/methods/LiurenPage").then((m) => ({ default: m.LiurenPage })));
+const LenormandPage = lazy(() => import("./pages/methods/LenormandPage").then((m) => ({ default: m.LenormandPage })));
+const XiaoliurenPage = lazy(() => import("./pages/methods/XiaoliurenPage").then((m) => ({ default: m.XiaoliurenPage })));
+const TiebanPage = lazy(() => import("./pages/methods/TiebanPage").then((m) => ({ default: m.TiebanPage })));
 
 // HePan & HeShen (合盘 + 合参)
 const HePanPage = lazy(() => import("./pages/HePanPage").then((m) => ({ default: m.HePanPage })));
@@ -68,14 +75,18 @@ export function App() {
                 {/* 命类 */}
                 <Route path="/m/bazi" element={<BaziPage />} />
                 <Route path="/m/ziwei" element={<ZiweiPage />} />
+                <Route path="/m/tieban" element={<TiebanPage />} />
                 {/* 卜类 */}
                 <Route path="/m/qimen" element={<QimenPage />} />
                 <Route path="/m/liuyao" element={<LiuyaoPage />} />
                 <Route path="/m/meihua" element={<MeihuaPage />} />
+                <Route path="/m/liuren" element={<LiurenPage />} />
+                <Route path="/m/xiaoliuren" element={<XiaoliurenPage />} />
                 <Route path="/m/chenggu" element={<ChengguPage />} />
                 {/* 相类 */}
                 <Route path="/m/hepan" element={<HePanPage />} />
                 <Route path="/m/tarot" element={<TarotPage />} />
+                <Route path="/m/lenormand" element={<LenormandPage />} />
                 <Route path="/m/western" element={<WesternPage />} />
                 <Route path="/m/vedic" element={<VedicPage />} />
                 <Route path="/m/numerology" element={<NumerologyPage />} />
@@ -84,6 +95,9 @@ export function App() {
                 <Route path="/m/xuankong" element={<XuankongPage />} />
 
                 {/* 合参（用户主动发起） */}
+                <Route path="/cases" element={<Cases />} />
+                <Route path="/birth-time" element={<BirthTimeRectifyPage />} />
+                <Route path="/compass" element={<CompassPage />} />
                 <Route path="/heshen" element={<HeShenPage />} />
 
                 {/* 旧路由重定向 */}

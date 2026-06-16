@@ -36,8 +36,10 @@ from .schema import (
 )
 from .selector import get_method_names, select_methods
 from .synthesizer import DISCLAIMER, synthesize_report
+from divination.knowledge import extract_rules_for_chart
 from .validator import validate_signals
 from .weights import get_weights
+from .reality import RealityConstraintEngine
 
 log = logging.getLogger("mystic-hub.reading")
 
@@ -119,6 +121,7 @@ async def run_reading(request: ReadingRequest) -> ReadingResult:
     # 为每种术法构造只含相关字段的 Birth
     method_births = build_method_inputs(
         birth=_build_birth(request.birth) if request.birth else None,
+        target_birth=_build_birth(request.target_birth) if getattr(request, 'target_birth', None) else None,
         space=request.space if hasattr(request, 'space') else None,
         method_options=getattr(request, 'method_options', None),
         question=request.question,
@@ -135,14 +138,18 @@ async def run_reading(request: ReadingRequest) -> ReadingResult:
             if method_birth is None:
                 # fallback: 默认 birth
                 method_birth = _default_birth()
-            charts[m] = ENGINES[m](method_birth)
+            # hepan 需要 partner Birth 作为 kwarg
+            if m == "hepan" and hasattr(method_birth, "partner"):
+                charts[m] = ENGINES[m](method_birth, partner=method_birth.partner)
+            else:
+                charts[m] = ENGINES[m](method_birth)
         except Exception as e:
             log.warning("Method %s failed: %s", m, e)
             errors.append({"method": m, "error": str(e)})
             from divination.contracts import ChartResult
             charts[m] = ChartResult(
                 method=m,
-                school="east" if m not in ("western", "vedic", "tarot", "numerology") else "west",
+                school="west" if m in ("western", "vedic", "tarot", "numerology", "lenormand") else "east",
                 engine="placeholder",
                 normalized={},
                 raw={"_error": str(e), "_placeholder": True},
@@ -155,6 +162,27 @@ async def run_reading(request: ReadingRequest) -> ReadingResult:
     weights = get_weights(goal, method_entries)
     validation = validate_signals(signals, weights, method_entries)
 
+    # Step 6b: 现实条件校正 (Phase B: §十四)
+    reality_result = None
+    if request.constraints:
+        engine = RealityConstraintEngine()
+        reality_result = engine.evaluate(
+            signals=signals,
+            constraints=request.constraints,
+            domain=goal,
+        )
+
+    # Step 6c: 古典规则提取 (Phase E)
+    # 以信号最多的术法 chart 为 primary_chart
+    primary_chart = None
+    if method_names and charts:
+        def _chart_size(m: str) -> int:
+            c = charts.get(m)
+            return len(c.raw) if (c and hasattr(c, "raw") and c.raw) else 0
+        primary_method = max(method_names, key=_chart_size)
+        primary_chart = charts.get(primary_method)
+    classical_rules = extract_rules_for_chart(primary_chart, max_rules=5) if primary_chart else []
+
     # Step 7: 模板报告生成（基础/降级用）
     intent["question"] = request.question  # 供 synthesizer 生成 headline
     template_report = synthesize_report(
@@ -163,6 +191,8 @@ async def run_reading(request: ReadingRequest) -> ReadingResult:
         intent=intent,
         methods_used=method_names,
         depth=request.depth,
+        reality=reality_result,
+        classical=classical_rules,
     )
 
     # Step 8: LLM 报告生成（standard 和 premium 都走 LLM，fallback 到模板）
@@ -210,10 +240,20 @@ async def run_reading(request: ReadingRequest) -> ReadingResult:
 
     dt_ms = int((time.perf_counter() - t0) * 1000)
 
+    # W10 fix: hepan without target_birth is not a real method for this case
+    effective_methods = []
+    hepan_no_partner = False
+    has_target_birth = getattr(request, 'target_birth', None) is not None
+    for m in method_names:
+        if m == "hepan" and not has_target_birth:
+            hepan_no_partner = True
+            continue  # hepan without partner: don't count as real method in 18法
+        effective_methods.append(m)
+
     return ReadingResult(
         session_id=session_id,
         intent=intent,
-        methods_used=method_names,
+        methods_used=effective_methods if effective_methods else method_names,
         signals=signals,
         consensus=validation.consensus,
         conflicts=validation.conflicts,
@@ -226,6 +266,8 @@ async def run_reading(request: ReadingRequest) -> ReadingResult:
         safety_downgrades=safety_downgrades,
         is_unlocked_standard=is_unlocked_standard,
         is_unlocked_premium=is_unlocked_premium,
+        reality_adjusted=_reality_to_dict(reality_result),
+        hepan_no_partner=hepan_no_partner,
     )
 
 
@@ -390,6 +432,8 @@ def _generate_data_driven_mock(result_dict: dict[str, Any]) -> str:
         "liuyao": "六爻", "meihua": "梅花", "fengshui": "风水",
         "bazhai": "八宅", "xuankong": "玄空", "western": "占星",
         "vedic": "吠陀", "tarot": "塔罗", "numerology": "数理",
+        "liuren": "大六壬", "xiaoliuren": "小六壬", "tieban": "铁板神数",
+        "lenormand": "雷诺曼", "hepan": "合盘",
     }
     DOMAIN_ZH: dict[str, str] = {
         "self_life": "整体格局", "career": "事业", "wealth": "财运",
@@ -778,3 +822,27 @@ def _default_birth() -> Birth:
         calendar="gregorian",
         tz="Asia/Shanghai",
     )
+
+
+def _reality_to_dict(reality) -> dict[str, Any]:
+    """将 RealityResult dataclass 转为 dict，供 API 序列化。"""
+    if reality is None:
+        return {}
+    from .reality import RealityResult
+    if not isinstance(reality, RealityResult):
+        return {}
+    return {
+        "has_warnings": reality.has_warnings,
+        "core_conclusion": reality.core_conclusion,
+        "dimension_judgments": reality.dimension_judgments,
+        "adjusted_advice": reality.adjusted_advice,
+        "warnings": [
+            {
+                "dimension": w.dimension,
+                "severity": w.severity,
+                "message": w.message,
+                "signal_adjusted": w.signal_adjusted,
+            }
+            for w in reality.warnings
+        ],
+    }

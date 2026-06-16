@@ -2,6 +2,8 @@
 import type {
   Method, MethodMeta, ChartResult,
   ComputeRequest, InterpretEvent, Birth,
+  EventCase, CaseCreateRequest, CaseContextRequest, CaseCastRequest,
+  CaseVersionRequest, CastResponse,
 } from "./types";
 
 // ── Enhanced result types ───────────────────────────────────────────
@@ -95,7 +97,83 @@ export async function fetchPrompt(method: Method | string): Promise<{ method: st
   return jsonFetch(`${BASE}/prompts/${method}`);
 }
 
-// fetchCases removed — celebrity content purged per legal compliance
+/* ── Birth-time rectification ──────────────────────────────── */
+export interface RectifyCandidate {
+  branch: string;
+  hour: number;
+  label: string;
+  score: number;
+  confidence: "low" | "medium" | "high";
+  evidence: string[];
+  chart_summary: Record<string, unknown>;
+}
+
+export interface RectifyResponse {
+  status: string;
+  birth_time_accuracy: string;
+  candidates: RectifyCandidate[];
+  best?: RectifyCandidate;
+  second?: RectifyCandidate;
+  confidence_level: "low" | "medium" | "high";
+  next_question?: { prompt: string; options: string[] };
+  common_conclusions: string[];
+  main_differences: string[];
+  uncertainty_note: string;
+  elapsed_ms: number;
+}
+
+export interface RectifyRequest {
+  birth: Birth;
+  birth_time_accuracy: "exact" | "approximate" | "period" | "unknown";
+  approximate_hour?: number;
+  day_period?: "morning" | "afternoon" | "evening" | "night";
+  known_events: Array<{ year: number; month?: number; category: string; description?: string }>;
+  keep_top_n?: number;
+}
+
+export async function rectifyBirthTime(req: RectifyRequest): Promise<RectifyResponse> {
+  return jsonFetch<RectifyResponse>(`${BASE}/birth-time/rectify`, {
+    method: "POST",
+    body: JSON.stringify(req),
+  });
+}
+
+export async function createEventCase(req: CaseCreateRequest): Promise<EventCase> {
+  return jsonFetch<EventCase>(`${BASE}/cases`, {
+    method: "POST",
+    body: JSON.stringify(req),
+  });
+}
+
+export async function updateEventCaseContext(caseId: string, req: CaseContextRequest): Promise<EventCase> {
+  return jsonFetch<EventCase>(`${BASE}/cases/${caseId}/context`, {
+    method: "POST",
+    body: JSON.stringify(req),
+  });
+}
+
+export async function castEventCase(
+  caseId: string,
+  req: CaseCastRequest,
+  idempotencyKey: string,
+): Promise<CastResponse> {
+  return jsonFetch<CastResponse>(`${BASE}/cases/${caseId}/cast`, {
+    method: "POST",
+    headers: { "Idempotency-Key": idempotencyKey },
+    body: JSON.stringify(req),
+  });
+}
+
+export async function fetchEventCaseResult(caseId: string): Promise<CastResponse> {
+  return jsonFetch<CastResponse>(`${BASE}/cases/${caseId}/result`);
+}
+
+export async function createEventCaseVersion(caseId: string, req: CaseVersionRequest): Promise<EventCase> {
+  return jsonFetch<EventCase>(`${BASE}/cases/${caseId}/versions`, {
+    method: "POST",
+    body: JSON.stringify(req),
+  });
+}
 
 export async function computeChart(req: ComputeRequest): Promise<ChartResult> {
   return jsonFetch<ChartResult>(`${BASE}/compute`, {
@@ -388,4 +466,56 @@ export async function fetchReading(req: ReadingAPIRequest): Promise<ReadingResul
     method: "POST",
     body: JSON.stringify(req),
   });
+}
+
+// ── Compass API ──────────────────────────────────────────────────────────────
+
+export interface CompassReading {
+  sans: string;
+  direction: string;
+  azimuth_deg: number;
+  device: string;
+  note?: string;
+}
+
+export interface CompassSession {
+  session_id: string;
+  direction_hint: string;
+  target_sans: string;
+  target_direction: string;
+  samples: number[];
+  readings: CompassReading[];
+  result_sans: string;
+  result_direction: string;
+  result_azimuth: number;
+  std_dev: number;
+  quality: "high" | "medium" | "low";
+  created_at: number;
+  closed: boolean;
+}
+
+export async function createCompassSession(directionHint: string): Promise<CompassSession> {
+  return jsonFetch<CompassSession>(`${BASE}/compass/sessions`, {
+    method: "POST",
+    body: JSON.stringify({ direction_hint: directionHint, sample_count: 5 }),
+  });
+}
+
+export async function addCompassSample(
+  sessionId: string, azimuthDeg: number,
+): Promise<{ added: number; samples_count: number; closed: boolean }> {
+  return jsonFetch(`${BASE}/compass/sessions/${sessionId}/samples`, {
+    method: "POST",
+    body: JSON.stringify({ azimuth_deg: azimuthDeg }),
+  });
+}
+
+export async function getCompassSession(sessionId: string): Promise<CompassSession> {
+  return jsonFetch<CompassSession>(`${BASE}/compass/sessions/${sessionId}`);
+}
+
+export async function convertAzimuth(
+  azimuthDeg: number,
+): Promise<{ azimuth_deg: number; sans: string; sans_zh: string; direction: string; trigram: string; element: string; fengshui_tip: string }> {
+  return jsonFetch(`${BASE}/compass/convert/${azimuthDeg}`);
 }

@@ -14,7 +14,8 @@ export type Subject =
 
 export type TarotSpread =
   | "single" | "three_time" | "three_mind" | "choice_two"
-  | "relationship_cross" | "career_path" | "celtic_cross";
+  | "relationship_cross" | "career_path" | "celtic_cross"
+  | "three_line" | "five_cross" | "nine_square" | "grand_tableau";
 
 export interface Birth {
   year: number; month: number; day: number;
@@ -53,7 +54,67 @@ export interface ChartResult {
   elapsed_ms?: number;
 }
 
-// Case interface removed — celebrity content purged per legal compliance
+// User-created event cases. This is not the removed celebrity-case dataset.
+export type CaseStatus = "draft" | "context_ready" | "officially_cast";
+
+export interface MinimalQuestion {
+  id: string;
+  prompt: string;
+  options: string[];
+  required: boolean;
+}
+
+export interface EventCase {
+  case_id: string;
+  parent_case_id?: string | null;
+  event_type: string;
+  question: string;
+  subject?: string | null;
+  target?: string | null;
+  time_horizon?: string | null;
+  location?: string | null;
+  status: CaseStatus;
+  version: number;
+  intent: Record<string, any>;
+  minimal_questions: MinimalQuestion[];
+  birth?: Birth | null;
+  space?: Record<string, any> | null;
+  context: Record<string, any>;
+  constraints: Record<string, any>;
+  result_session_id?: string | null;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface CaseCreateRequest {
+  question: string;
+  goal?: string | null;
+  birth?: Birth | null;
+  subject?: string | null;
+  target?: string | null;
+  time_horizon?: string | null;
+  location?: string | null;
+  current_city?: string | null;
+}
+
+export interface CaseContextRequest {
+  answers?: Record<string, any>;
+  birth?: Birth | null;
+  space?: Record<string, any> | null;
+  constraints?: Record<string, any>;
+}
+
+export interface CaseCastRequest {
+  depth?: ReadingDepth;
+  methods?: string[] | null;
+  method_options?: Record<string, any> | null;
+}
+
+export interface CaseVersionRequest {
+  question?: string | null;
+  changed_condition: string;
+  context_updates?: Record<string, any>;
+}
 
 export type InterpretEvent =
   | { type: "delta"; text: string }
@@ -119,6 +180,16 @@ export interface ReadingAPIRequest {
   language?: "zh" | "en";
 }
 
+export type Dimension = "long_term" | "current_cycle" | "relationship" | "one_question" | "space";
+
+export type TimeScope =
+  | "short_term"
+  | "medium_term"
+  | "long_term"
+  | "current_cycle"
+  | "one_question"
+  | "space";
+
 export interface DivinationSignal {
   method: string;
   domain: string;
@@ -127,7 +198,10 @@ export interface DivinationSignal {
   strength: number;
   evidence: string;
   confidence: number;
-  time_scope?: string | null;
+  /** 5 维职责分派 (方案 §十三): long_term/current_cycle/relationship/one_question/space */
+  dimension?: Dimension | null;
+  /** 时间范围: short_term/medium_term/long_term/current_cycle/one_question/space */
+  time_scope?: TimeScope | null;
   advice?: string | null;
 }
 
@@ -158,12 +232,25 @@ export interface ValidationResult {
   risks: string[];
   timing?: Record<string, any> | null;
   action_advice: string[];
+  /** 5 维 0-100 分数 (long_term/current_cycle/relationship/one_question/space) */
+  dim_scores?: Record<Dimension, number>;
+  /** 每维有效信号数 */
+  dim_signals_count?: Record<Dimension, number>;
+  /** 按维度分组的共识 */
+  per_dim_consensus?: Record<Dimension, ConsensusItem[]>;
 }
 
 export interface ReadingReport {
   free: string;
   standard: string;
   premium: string;
+}
+
+export interface DimBreakdown {
+  score: number;
+  signals_count: number;
+  top_signal?: DivinationSignal | null;
+  summary?: string;
 }
 
 export interface ReadingResult {
@@ -182,10 +269,32 @@ export interface ReadingResult {
   is_unlocked_premium: boolean;
   safety_flags: string[];
   safety_downgrades: string[];
+  /** 5 维分解 */
+  dim_breakdown?: Record<Dimension, DimBreakdown>;
+}
+
+export interface CastResponse {
+  case: EventCase;
+  result: ReadingResult;
+  idempotent: boolean;
 }
 
 export const METHOD_LABELS_ZH: Record<string, string> = {
-  bazi_v2: "八字", ziwei: "紫微", qimen: "奇门", liuyao: "六爻",
-  meihua: "梅花", fengshui: "风水", bazhai: "八宅", xuankong: "玄空",
-  western: "西方占星", vedic: "吠陀占星", tarot: "塔罗", numerology: "数字命理",
+  bazi_v2: "八字",
+  ziwei: "紫微",
+  qimen: "奇门",
+  liuyao: "六爻",
+  meihua: "梅花",
+  fengshui: "风水",
+  bazhai: "八宅",
+  xuankong: "玄空",
+  western: "西方占星",
+  vedic: "吠陀占星",
+  tarot: "塔罗",
+  numerology: "数字命理",
+  liuren: "大六壬",
+  xiaoliuren: "小六壬",
+  tieban: "铁板",
+  lenormand: "雷诺曼",
+  hepan: "合盘",
 };

@@ -1,194 +1,95 @@
-// 古籍×仪器 布局:侧边栏 + 顶部栏 + 主内容 + 凡例式页脚
-import { Outlet, useLocation } from "react-router-dom";
-import { useEffect, useState, useCallback } from "react";
-import { Sidebar } from "./Sidebar";
-import { COLOR } from "./ui";
+import { Link, Outlet, useLocation } from "react-router-dom";
+import { useMemo } from "react";
 import { useI18n } from "../lib/i18n";
+
+const METHOD_NAV = [
+  { to: "/", label: "术数" },
+  { to: "/cases", label: "问事" },
+  { to: "/heshen", label: "合参" },
+  { to: "/about", label: "凡例" },
+];
+
+const METHOD_LABELS: Record<string, string> = {
+  bazi: "八字四柱",
+  ziwei: "紫微斗数",
+  tieban: "铁板神数",
+  qimen: "奇门遁甲",
+  liuyao: "六爻",
+  meihua: "梅花易数",
+  liuren: "大六壬",
+  xiaoliuren: "小六壬",
+  chenggu: "称骨",
+  hepan: "合盘",
+  tarot: "塔罗",
+  lenormand: "雷诺曼",
+  western: "西方占星",
+  vedic: "吠陀占星",
+  numerology: "数字命理",
+  bazhai: "八宅",
+  xuankong: "玄空飞星",
+};
 
 export function Layout() {
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { t, lang, toggle: toggleLang } = useI18n();
+  const { lang, toggle: toggleLang } = useI18n();
+  const isHome = location.pathname === "/";
 
-  // Close sidebar on Escape
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setSidebarOpen(false);
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, []);
-
-  const toggleSidebar = useCallback(() => setSidebarOpen((v) => !v), []);
+  const pageLabel = useMemo(() => {
+    if (location.pathname.startsWith("/m/")) {
+      return METHOD_LABELS[location.pathname.replace("/m/", "")] || "观盘";
+    }
+    if (location.pathname === "/cases") return "问事档案";
+    if (location.pathname === "/reading") return "十二法合参";
+    if (location.pathname === "/heshen") return "合参卷";
+    if (location.pathname === "/daily") return "今日";
+    if (location.pathname === "/almanac") return "老黄历";
+    if (location.pathname === "/compatibility") return "合盘";
+    if (location.pathname === "/fengshui") return "风水";
+    if (location.pathname === "/history") return "历史";
+    if (location.pathname === "/knowledge") return "知识馆";
+    if (location.pathname === "/about") return "凡例";
+    return "玄枢";
+  }, [location.pathname]);
 
   return (
-    <div className="min-h-full flex paper-page">
-      {/* 侧边栏 */}
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+    <div className="mystic-shell paper-page">
+      <header className="mystic-topbar">
+        <Link className="mystic-wordmark" to="/">
+          玄枢 <i>Mystic Hub</i>
+        </Link>
 
-      {/* 主区域 */}
-      <div className="flex-1 flex flex-col min-h-full lg:ml-[232px]">
-        {/* 顶部栏 — 界格线底边, 无毛玻璃 */}
-        <header
-          className="sticky top-0 z-30 flex items-center h-12"
-          style={{
-            background: "var(--paper)",
-            borderBottom: "1px solid var(--rule)",
-          }}
-        >
-          <div className="flex-1 flex items-center justify-between px-4 sm:px-6">
-            {/* 左侧:汉堡 + 面包屑 */}
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                className="lg:hidden flex items-center justify-center w-8 h-8"
-                style={{ color: "var(--ink-soft)", fontFamily: "'Noto Serif SC', serif" }}
-                onClick={toggleSidebar}
-                aria-label={sidebarOpen ? "关闭侧栏" : "打开侧栏"}
-              >
-                <span style={{ fontSize: "1.1rem" }}>{sidebarOpen ? "✕" : "☰"}</span>
-              </button>
-              <Breadcrumb pathname={location.pathname} />
-            </div>
+        <nav className="mystic-topnav" aria-label="主导航">
+          {METHOD_NAV.map((item) => (
+            <Link key={item.to} to={item.to}>
+              {item.label}
+            </Link>
+          ))}
+          <button type="button" onClick={toggleLang}>
+            {lang === "zh" ? "EN" : "中"}
+          </button>
+        </nav>
+      </header>
 
-            {/* 右侧:语言切换 + 标识 */}
-            <div className="flex items-center gap-3 text-xs" style={{ color: "var(--ink-soft)" }}>
-              <button
-                type="button"
-                onClick={toggleLang}
-                className="paper-tag"
-                style={{ cursor: "pointer", fontFamily: "'JetBrains Mono', monospace", fontSize: "0.65rem" }}
-              >
-                {lang === "zh" ? "EN" : "中"}
-              </button>
-              <span className="hidden sm:inline" style={{ fontFamily: "'Noto Serif SC', serif", letterSpacing: "0.08em" }}>
-                {t("app.name")} · {t("app.tagline").split(" · ")[0]}
-              </span>
-            </div>
-          </div>
-        </header>
+      {!isHome && (
+        <div className="mystic-breadcrumb" aria-label="当前位置">
+          <Link to="/">首页</Link>
+          <span>/</span>
+          <strong>{pageLabel}</strong>
+        </div>
+      )}
 
-        {/* 主内容 */}
-        <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 py-5 animate-fade-in">
-          <Outlet />
-        </main>
+      <main className={isHome ? "mystic-main mystic-main-home" : "mystic-main"}>
+        <Outlet />
+      </main>
 
-        {/* Footer — 凡例样式 */}
-        <footer
-          className="mt-auto"
-          style={{ borderTop: "1px solid var(--rule)" }}
-        >
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5">
-            <div className="paper-fanli">
-              <div className="paper-fanli-title">凡 例</div>
-              <p>{t("app.disclaimer")}</p>
-              <p style={{ marginTop: "0.5rem" }}>{t("app.compliance")}</p>
-            </div>
-          </div>
-        </footer>
-      </div>
+      <footer className="mystic-footer">
+        <div className="mystic-footer-mark" />
+        <p>
+          本站所有解读为传统文化象征视角的参考，非科学预测，亦不构成医疗、法律、财务等专业意见。
+          重大决定请结合现实并咨询专业人士。
+        </p>
+        <span>MYSTIC HUB · MIT/BSD · COMPUTED, NOT GUESSED</span>
+      </footer>
     </div>
-  );
-}
-
-// 面包屑:从路径推导
-function Breadcrumb({ pathname }: { pathname: string }) {
-  const { t, lang } = useI18n();
-  const crumbs: { label: string; to?: string }[] = [];
-
-  if (pathname === "/") {
-    crumbs.push({ label: t("nav.home") });
-  } else if (pathname.startsWith("/m/")) {
-    crumbs.push({ label: t("nav.home"), to: "/" });
-    const m = pathname.replace("/m/", "");
-    const labels: Record<string, string> = {
-      bazi: t("nav.bazi"), ziwei: t("nav.ziwei"), qimen: "奇门遁甲",
-      liuyao: t("nav.liuyao"), meihua: t("nav.meihua"), chenggu: t("nav.chenggu"),
-      western: t("nav.western"), vedic: t("nav.vedic"),
-      tarot: t("nav.tarot"), numerology: t("nav.numerology"),
-      xuankong: t("nav.xuankong"), bazhai: t("nav.bazhai"),
-      hepan: lang === "zh" ? "合盘" : "Synastry",
-    };
-    crumbs.push({ label: labels[m] || m });
-  } else if (pathname.startsWith("/heshen")) {
-    crumbs.push({ label: t("nav.home"), to: "/" });
-    crumbs.push({ label: lang === "zh" ? "合参" : "Cross-Reference" });
-  } else if (pathname.startsWith("/method/")) {
-    crumbs.push({ label: t("nav.home"), to: "/" });
-    const m = pathname.replace("/method/", "");
-    const labels: Record<string, string> = {
-      bazi: t("nav.bazi"), "bazi-v2": t("nav.baziV2"), ziwei: t("nav.ziwei"), qimen: "奇门遁甲",
-      liuyao: t("nav.liuyao"), meihua: t("nav.meihua"), chenggu: t("nav.chenggu"),
-      liuren: t("nav.liuren"), tieban: t("nav.tieban"), xiaoliuren: t("nav.xiaoliuren"),
-      western: t("nav.western"), vedic: t("nav.vedic"),
-      tarot: t("nav.tarot"), lenormand: t("nav.lenormand"), numerology: t("nav.numerology"),
-      xuankong: t("nav.xuankong"), bazhai: t("nav.bazhai"),
-    };
-    crumbs.push({ label: labels[m] || m });
-  } else if (pathname.startsWith("/aggregate")) {
-    crumbs.push({ label: t("nav.home"), to: "/" });
-    crumbs.push({ label: t("nav.aggregate") });
-  } else if (pathname.startsWith("/cast")) {
-    crumbs.push({ label: t("nav.home"), to: "/" });
-    crumbs.push({ label: t("nav.cast") });
-  } else if (pathname.startsWith("/reading")) {
-    crumbs.push({ label: t("nav.home"), to: "/" });
-    crumbs.push({ label: "12法合参" });
-  } else if (pathname.startsWith("/compatibility")) {
-    crumbs.push({ label: t("nav.home"), to: "/" });
-    crumbs.push({ label: t("nav.compatibility") });
-  } else if (pathname.startsWith("/result")) {
-    crumbs.push({ label: t("nav.home"), to: "/" });
-    crumbs.push({ label: t("nav.cast"), to: "/cast" });
-    crumbs.push({ label: lang === "zh" ? "结果" : "Result" });
-  } else if (pathname.startsWith("/result-sample")) {
-    crumbs.push({ label: t("nav.home"), to: "/" });
-    crumbs.push({ label: lang === "zh" ? "风格样张" : "Style Sample" });
-  } else if (pathname.startsWith("/daily")) {
-    crumbs.push({ label: t("nav.home"), to: "/" });
-    crumbs.push({ label: t("nav.daily") });
-  } else if (pathname.startsWith("/almanac")) {
-    crumbs.push({ label: t("nav.home"), to: "/" });
-    crumbs.push({ label: t("nav.almanac") });
-  } else if (pathname.startsWith("/fengshui")) {
-    crumbs.push({ label: t("nav.home"), to: "/" });
-    crumbs.push({ label: t("nav.fengshui") });
-  } else if (pathname.startsWith("/history")) {
-    crumbs.push({ label: t("nav.home"), to: "/" });
-    crumbs.push({ label: t("nav.history") });
-  } else if (pathname.startsWith("/reading-history")) {
-    crumbs.push({ label: t("nav.home"), to: "/" });
-    crumbs.push({ label: "报告历史" });
-  } else if (pathname.startsWith("/about")) {
-    crumbs.push({ label: t("nav.home"), to: "/" });
-    crumbs.push({ label: t("nav.about") });
-  } else if (pathname.startsWith("/dateselect")) {
-    crumbs.push({ label: t("nav.home"), to: "/" });
-    crumbs.push({ label: t("nav.dateselect") });
-  } else if (pathname.startsWith("/knowledge")) {
-    crumbs.push({ label: t("nav.home"), to: "/" });
-    crumbs.push({ label: t("nav.knowledge") });
-  } else if (pathname.startsWith("/methods")) {
-    crumbs.push({ label: t("nav.home"), to: "/" });
-    crumbs.push({ label: lang === "zh" ? "术数详情" : "Method Info" });
-  } else {
-    crumbs.push({ label: t("nav.home"), to: "/" });
-  }
-
-  return (
-    <nav className="flex items-center gap-1.5 text-xs" style={{ color: "var(--ink-soft)" }} aria-label="面包屑">
-      {crumbs.map((c, i) => (
-        <span key={i} className="flex items-center gap-1.5" style={{ fontFamily: "'Noto Serif SC', serif" }}>
-          {i > 0 && <span style={{ color: "var(--rule)" }}>/</span>}
-          {c.to ? (
-            <a href={c.to} className="paper-link" style={{ fontSize: "0.75rem", borderBottom: "none" }}>
-              {c.label}
-            </a>
-          ) : (
-            <span style={{ color: "var(--cinnabar)", fontWeight: 600 }}>{c.label}</span>
-          )}
-        </span>
-      ))}
-    </nav>
   );
 }

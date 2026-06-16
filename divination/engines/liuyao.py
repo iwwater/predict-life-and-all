@@ -21,8 +21,13 @@ _GAN_START = {"甲": 0, "乙": 0, "丙": 1, "丁": 1, "戊": 2, "己": 3,
 
 
 def compute(b: Birth, tosses: list[int] | None = None, seed: int | None = None, query: str | None = None) -> ChartResult:
+    tosses = getattr(b, "tosses", None) or tosses
+    seed = getattr(b, "seed", None) if getattr(b, "seed", None) is not None else seed
+    query = getattr(b, "question", None) or getattr(b, "subject", None) or query
     rng = random.Random(seed)
     if tosses is None:
+        if seed is None and getattr(b, "mode", None) == "number_qigua":
+            raise ValueError("liuyao number_qigua mode requires a seed (pass question or explicit seed)")
         # 每爻三钱：字(阴)=2 背(阳)=3，和为6/7/8/9
         tosses = [sum(rng.choice([2, 3]) for _ in range(3)) for _ in range(6)]
     lines = [1 if t in (7, 9) else 0 for t in tosses]        # 本卦阴阳

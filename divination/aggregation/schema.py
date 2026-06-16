@@ -41,6 +41,44 @@ class SpaceModel(BaseModel):
     address: Optional[str] = None
 
 
+class RealityConstraints(BaseModel):
+    """现实条件约束 — 方案 §十四：防止命理结果脱离现实。
+
+    各字段均为 Optional，不提供则该项不参与判断。
+    """
+    # 财务
+    cash_reserve_months: Optional[int] = Field(
+        None, ge=0, le=60,
+        description="现金储备月数，e.g. 2 表示仅有 2 个月生活费"
+    )
+    has_formal_contract: Optional[bool] = Field(
+        None,
+        description="是否已有正式书面合同（非口头 offer）"
+    )
+    # 地点
+    current_city: Optional[str] = Field(None, description="当前所在城市")
+    target_city: Optional[str] = Field(None, description="目标城市/是否需要搬迁")
+    commute_tolerance: Optional[Literal["accept", "negotiable", "reject"]] = Field(
+        None, description="对长途通勤的接受度"
+    )
+    # 健康
+    health_status: Optional[Literal["good", "fair", "poor"]] = Field(
+        None, description="当前健康状况"
+    )
+    # 资质
+    has_qualification: Optional[bool] = Field(
+        None, description="是否具备目标方向的资质/证书/许可"
+    )
+    # 家庭
+    has_dependents: Optional[bool] = Field(
+        None, description="是否有需抚养家庭成员"
+    )
+    # 备选
+    has_backup_plan: Optional[bool] = Field(
+        None, description="是否有备选方案（退路）"
+    )
+
+
 class ReadingRequest(BaseModel):
     """主入口请求 — 用户只需输入问题，系统自动调用 12 法。
 
@@ -67,6 +105,10 @@ class ReadingRequest(BaseModel):
     space: Optional[SpaceModel] = Field(
         None,
         description="空间信息（风水相关术法使用）",
+    )
+    constraints: Optional[RealityConstraints] = Field(
+        None,
+        description="现实条件约束（方案 §十四）",
     )
     method_options: Optional[dict[str, Any]] = Field(
         None,
@@ -119,9 +161,18 @@ class DivinationSignal(BaseModel):
         le=1,
         description="该信号在本术法内的置信度 0-1",
     )
-    time_scope: Optional[str] = Field(
+    dimension: Optional[Literal[
+        "long_term", "current_cycle", "relationship", "one_question", "space"
+    ]] = Field(
         None,
-        description="时间范围: short_term/medium_term/long_term",
+        description="5 维职责分派: long_term/current_cycle/relationship/one_question/space",
+    )
+    time_scope: Optional[Literal[
+        "short_term", "medium_term", "long_term",
+        "current_cycle", "one_question", "space",
+    ]] = Field(
+        None,
+        description="时间范围: short_term/medium_term/long_term/current_cycle/one_question/space",
     )
     advice: Optional[str] = Field(
         None,
@@ -222,6 +273,22 @@ class ValidationResult(BaseModel):
         default_factory=list,
         description="行动建议",
     )
+    dim_scores: dict[str, float] = Field(
+        default_factory=dict,
+        description="5 维 0-100 分数 (long_term/current_cycle/relationship/one_question/space)",
+    )
+    dim_signals_count: dict[str, int] = Field(
+        default_factory=dict,
+        description="每维有效信号数",
+    )
+    per_dim_consensus: dict[str, list[ConsensusItem]] = Field(
+        default_factory=dict,
+        description="按维度分组的共识",
+    )
+    dim_breakdown: dict[str, dict[str, Any]] = Field(
+        default_factory=dict,
+        description="每维子结构 {score, signals_count, top_signal, summary}",
+    )
 
 
 # ── 报告模型 ─────────────────────────────────────────────────────────────────
@@ -259,7 +326,7 @@ class ReadingResult(BaseModel):
     )
     methods_used: list[str] = Field(
         ...,
-        description="实际使用的术法列表 — 必须包含 12 法 (M0-05)",
+        description="实际使用的术法列表 — 必须包含 18 法 (Phase 0 全量)",
     )
     signals: list[DivinationSignal] = Field(
         default_factory=list,
@@ -276,6 +343,10 @@ class ReadingResult(BaseModel):
     validation: ValidationResult = Field(
         default_factory=ValidationResult,
         description="交叉验证汇总",
+    )
+    dim_breakdown: dict[str, dict[str, Any]] = Field(
+        default_factory=dict,
+        description="每维子结构 {score, signals_count, top_signal, summary}",
     )
     report: ReadingReport = Field(
         default_factory=ReadingReport,
@@ -307,4 +378,14 @@ class ReadingResult(BaseModel):
     safety_downgrades: list[str] = Field(
         default_factory=list,
         description="降级提示消息列表",
+    )
+    # Phase B: §十四 现实条件校正
+    reality_adjusted: dict[str, Any] = Field(
+        default_factory=dict,
+        description="现实条件校正结果: {has_warnings, core_conclusion, dimension_judgments, adjusted_advice}",
+    )
+    # W10: 合盘缺 partner 标记
+    hepan_no_partner: bool = Field(
+        False,
+        description="hepan 术法因缺少目标对象 birth而降级为一般参考，不计入术法数量",
     )

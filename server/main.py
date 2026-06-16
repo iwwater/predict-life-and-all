@@ -18,7 +18,7 @@ from pydantic import ValidationError
 import logging
 import time
 
-from .api import chart, methods, prompts, interpret, almanac, reading
+from .api import birth_time, cases, chart, methods, prompts, interpret, almanac, reading
 from .api import daily as daily_api
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
@@ -43,7 +43,8 @@ app.include_router(methods.router,   prefix="/api", tags=["meta"])
 app.include_router(chart.router,     prefix="/api", tags=["chart"])
 app.include_router(interpret.router, prefix="/api", tags=["interpret"])
 app.include_router(prompts.router,   prefix="/api", tags=["prompts"])
-# cases router removed — celebrity content purged per legal compliance
+app.include_router(cases.router, prefix="/api", tags=["cases"])
+app.include_router(birth_time.router, prefix="/api", tags=["birth-time"])
 app.include_router(daily_api.router, prefix="/api", tags=["daily"])
 app.include_router(almanac.router, prefix="/api", tags=["almanac"])
 app.include_router(reading.router,  prefix="/api", tags=["reading"])
