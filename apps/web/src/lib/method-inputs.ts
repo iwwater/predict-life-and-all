@@ -241,7 +241,7 @@ export const METHOD_INPUT_CONFIG: Record<string, MethodFormConfig> = {
     needsZodiac: false,
     defaultMode: "lenormand_spread",
     availableModes: [{ value: "lenormand_spread", label: "雷诺曼" }],
-    defaultSpread: "three_time",
+    defaultSpread: "three_line",
   },
 
   // ── Group D: no birth, coin/seed ─────────────────────────────────────

@@ -5,8 +5,11 @@ from ..fengshui import xuankong as _xk, san_yuan_jiu_yun
 
 
 def compute(b: Birth, period: int | None = None, sitting: str = "子") -> ChartResult:
+    period = getattr(b, "period", None) or period
+    sitting = getattr(b, "sitting", None) or sitting
+    construction_year = getattr(b, "construction_year", None)
     if period is None:
-        period = san_yuan_jiu_yun(b.year)["运"]
+        period = san_yuan_jiu_yun(construction_year or b.year)["运"]
     r = _xk(period, sitting)
     return ChartResult(method="xuankong", school="east", engine="self(沈氏玄空)",
                        normalized={"elements": {}, "timeline": []}, raw=r)

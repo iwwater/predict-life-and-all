@@ -65,10 +65,7 @@ async def interpret_endpoint(body: InterpretRequest):
 
     async def gen():
         try:
-            async for chunk in interpret_stream(
-                charts, body.question, client,
-                enhanced_data=body.enhanced_data,
-            ):
+            async for chunk in interpret_stream(charts, body.question, client):
                 yield _ndjson(chunk)
         except Exception as e:
             log.exception("interpret failed: %s", e)

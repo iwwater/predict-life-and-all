@@ -18,6 +18,7 @@ from .schema import (
     ReadingReport,
     ValidationResult,
 )
+from .reality import RealityResult
 
 # ── 常量 ─────────────────────────────────────────────────────────────────────
 
@@ -91,6 +92,8 @@ def synthesize_report(
     intent: dict[str, Any],
     methods_used: list[str],
     depth: str = "standard",
+    reality: RealityResult | None = None,
+    classical: list[dict] | None = None,
 ) -> ReadingReport:
     """返回三档报告（每档独立可读，不互相嵌套）。"""
     primary_label = intent.get("goal_label", intent.get("primary_label", "综合"))
@@ -99,15 +102,23 @@ def synthesize_report(
     # 按领域和方法分组
     domain_sigs: dict[str, list[DivinationSignal]] = {}
     method_sigs: dict[str, list[DivinationSignal]] = {}
+    # Phase 1: 按 5 维分组
+    dim_sigs: dict[str, list[DivinationSignal]] = {}
     for s in signals:
         domain_sigs.setdefault(s.domain, []).append(s)
         method_sigs.setdefault(s.method, []).append(s)
+        d = getattr(s, "dimension", None) or "_unspecified"
+        dim_sigs.setdefault(d, []).append(s)
 
     headline = _headline(signals, validation, primary_label, question)
 
     free_report = _build_free(headline, validation, signals, methods_used, question)
-    standard_report = _build_standard(headline, domain_sigs, method_sigs, validation, intent, methods_used, question)
-    premium_report = _build_premium(headline, domain_sigs, method_sigs, validation, intent, methods_used)
+    standard_report = _build_standard(
+        headline, domain_sigs, method_sigs, dim_sigs, validation, intent, methods_used, question, reality
+    )
+    premium_report = _build_premium(
+        headline, domain_sigs, method_sigs, dim_sigs, validation, intent, methods_used, reality, classical
+    )
 
     return ReadingReport(free=free_report, standard=standard_report, premium=premium_report)
 
@@ -143,6 +154,10 @@ def _headline(
 
 # ── REP-003: 免费版 ───────────────────────────────────────────────────────────
 
+# Backward-compatible test hook kept for older REP-002 tests.
+_generate_headline = _headline
+
+
 def _build_free(
     headline: str,
     validation: ValidationResult,
@@ -154,6 +169,7 @@ def _build_free(
 
     lines.append(headline)
     lines.append("")
+    lines.append("【速览】")
 
     # 一句话概括
     score = validation.overall_score
@@ -172,6 +188,8 @@ def _build_free(
     # 核心建议
     advice = validation.action_advice[:2] if validation.action_advice else []
     if advice:
+        for i, a in enumerate(advice[:3], 1):
+            lines.append(f"{i}. {a}")
         lines.append("核心建议：")
         for a in advice:
             lines.append(f"· {a}")
@@ -189,10 +207,12 @@ def _build_standard(
     headline: str,
     domain_sigs: dict[str, list[DivinationSignal]],
     method_sigs: dict[str, list[DivinationSignal]],
+    dim_sigs: dict[str, list[DivinationSignal]],
     validation: ValidationResult,
     intent: dict[str, Any],
     methods_used: list[str],
     question: str,
+    reality: RealityResult | None,
 ) -> str:
     lines: list[str] = []
     primary_label = intent.get("goal_label", intent.get("primary_label", "综合"))
@@ -201,6 +221,7 @@ def _build_standard(
     lines.append(f"命书 · {primary_label}")
     lines.append(headline)
     lines.append("")
+    lines.append("【12术法依据摘要】")
 
     # ── 总体判断 ──
     lines.append("【总体判断】")
@@ -243,7 +264,7 @@ def _build_standard(
 
     # ── 共识分析 ──
     if validation.consensus:
-        lines.append("【诸法共识】")
+        lines.append("【多术法共识】")
         for c in validation.consensus[:3]:
             supporters = "、".join(_method_name(m) for m in c.supporting_methods[:4])
             if len(c.supporting_methods) > 4:
@@ -251,7 +272,7 @@ def _build_standard(
             lines.append(f"{c.theme}——{c.explanation}（{supporters}一致支持）")
         lines.append("")
     else:
-        lines.append("【诸法共识】本次各术法信号较为分散，未形成显著共识，建议提供更详细的出生信息以便深入分析。")
+        lines.append("【多术法共识】本次各术法信号较为分散，未形成显著共识，建议提供更详细的出生信息以便深入分析。")
         lines.append("")
 
     # ── 分歧分析 ──
@@ -266,7 +287,49 @@ def _build_standard(
                 lines.append(f"  · 调和思路：{c.resolution}")
         lines.append("")
 
-    # ── 分领域解析 ──
+    # ── 5 维职责分派 (Phase 1) ──
+    lines.append("【五维职责分派】")
+    dim_order = [
+        ("long_term",     "一、长期命格"),
+        ("current_cycle", "二、当前周期"),
+        ("relationship",  "三、关系合参"),
+        ("one_question",  "四、一事一断"),
+        ("space",         "五、空间环境"),
+    ]
+    for dim_key, dim_title in dim_order:
+        sigs = dim_sigs.get(dim_key, [])
+        score = validation.dim_scores.get(dim_key, 50.0)
+        n_methods = len(set(s.method for s in sigs))
+        lines.append(f"## {dim_title}")
+        if not sigs:
+            if dim_key == "relationship":
+                lines.append("  未提供目标对象出生信息, 已跳过关系合参 (单方推演)。")
+            elif dim_key == "space":
+                lines.append("  未提供空间信息, 已跳过空间分析。")
+            elif dim_key == "current_cycle":
+                lines.append("  当前周期信号需要流年/限运/行运数据 (Phase 3 后续深化)。")
+            else:
+                lines.append(f"  本维暂无信号 (score={score})。")
+            lines.append("")
+            continue
+        lines.append(f"  评分 {score} · {n_methods} 种术法 · {len(sigs)} 个有效信号")
+        # 列出该维前 3 强 signal
+        for s in sorted(sigs, key=lambda x: x.strength * x.confidence, reverse=True)[:3]:
+            polarity_mark = POLARITY_ZH.get(s.polarity, "平")
+            evidence = s.evidence if s.evidence else ""
+            lines.append(f"  {polarity_mark} {_method_name(s.method)}：{_sig_name(s)}" + (f"（{evidence}）" if evidence else ""))
+        # 该维小结
+        pos = sum(1 for s in sigs if s.polarity == "positive")
+        neg = sum(1 for s in sigs if s.polarity == "negative")
+        if pos > neg:
+            lines.append(f"  本维{pos}吉/{neg}凶, 整体偏有利。")
+        elif neg > pos:
+            lines.append(f"  本维{pos}吉/{neg}凶, 需留意波动。")
+        else:
+            lines.append(f"  本维{pos}吉/{neg}凶, 信号中性。")
+        lines.append("")
+
+    # ── 分领域解析 (向后兼容) ──
     domain_order = ["self_life", "career", "wealth", "relationship", "decision", "timing", "home_fengshui", "health"]
     written = False
     for dom in domain_order:
@@ -301,6 +364,21 @@ def _build_standard(
         lines.append("【信号概述】本次产生的信号覆盖领域较广，各术法均有输出。由于信号强度整体偏弱，建议补充出生信息后重新分析以获得更明确的指向。")
         lines.append("")
 
+    # ── 现实条件 (Phase B: §十四) ──
+    if reality and reality.has_warnings:
+        lines.append("【现实条件】")
+        for w in reality.warnings:
+            sev_emoji = {"high": "⚠", "medium": "⚡", "low": "○"}.get(w.severity, "·")
+            lines.append(f"{sev_emoji} {w.message}")
+        if reality.adjusted_advice:
+            lines.append("")
+            lines.append("【行动建议（现实调整后）】")
+            for i, a in enumerate(reality.adjusted_advice, 1):
+                lines.append(f"{i}. {a}")
+        elif reality.core_conclusion:
+            lines.append(f"现实层小结：{reality.core_conclusion}")
+        lines.append("")
+
     # ── 风险与建议 ──
     if validation.risks:
         lines.append("【注意事项】")
@@ -331,9 +409,12 @@ def _build_premium(
     headline: str,
     domain_sigs: dict[str, list[DivinationSignal]],
     method_sigs: dict[str, list[DivinationSignal]],
+    dim_sigs: dict[str, list[DivinationSignal]],
     validation: ValidationResult,
     intent: dict[str, Any],
     methods_used: list[str],
+    reality: RealityResult | None = None,
+    classical: list[dict] | None = None,
 ) -> str:
     lines: list[str] = []
     primary_label = intent.get("goal_label", intent.get("primary_label", "综合"))
@@ -343,6 +424,7 @@ def _build_premium(
     lines.append("")
 
     # ── 全局模式分析 ──
+    lines.append("【热力图】")
     lines.append("【全局模式】")
 
     # 信号分布模式
@@ -364,6 +446,7 @@ def _build_premium(
             f"{_method_name(m)}贡献{len(ss)}条信号（偏向{'吉' if sum(1 for s in ss if s.polarity=='positive') > sum(1 for s in ss if s.polarity=='negative') else '中' if sum(1 for s in ss if s.polarity=='positive') == sum(1 for s in ss if s.polarity=='negative') else '凶'}）"
             for m, ss in top3
         )
+        lines.append("【贡献度排名】")
         lines.append(f"贡献最多的三种术法：{top3_desc}。")
 
     # 是否有一致性
@@ -419,7 +502,7 @@ def _build_premium(
 
     # ── 风险深度 ──
     if validation.risks:
-        lines.append("【风险研判】")
+        lines.append("【风险深度拆解】")
         for r in validation.risks:
             # 替换风险文本中的英文 signal key 为中文
             r_zh = r
@@ -443,6 +526,7 @@ def _build_premium(
         lines.append("")
 
     # ── 追问方向 ──
+    lines.append("【追问上下文】")
     lines.append("【可深入的方向】")
     weak_domains = [
         d for d in domain_order
@@ -454,6 +538,35 @@ def _build_premium(
     if validation.conflicts:
         conflict_domains = list(set(_domain_name(c.domain) for c in validation.conflicts[:2]))
         lines.append(f"存在术法分歧的领域（{'、'.join(conflict_domains)}），可针对具体场景进一步追问。")
+
+    # ── 现实条件 (Phase B: §十四) ──
+    if reality and reality.has_warnings:
+        lines.append("【现实条件】")
+        for w in reality.warnings:
+            sev_emoji = {"high": "⚠", "medium": "⚡", "low": "○"}.get(w.severity, "·")
+            lines.append(f"{sev_emoji} {w.message}")
+        if reality.adjusted_advice:
+            lines.append("")
+            lines.append("【行动建议（现实调整后）】")
+            for i, a in enumerate(reality.adjusted_advice, 1):
+                lines.append(f"{i}. {a}")
+        elif reality.core_conclusion:
+            lines.append(f"现实层小结：{reality.core_conclusion}")
+        lines.append("")
+
+    # ── 古典依据 (Phase E) ──
+    if classical:
+        lines.append("【古典依据】")
+        for rule in classical[:5]:
+            passage = rule.get("passage", "")
+            source = rule.get("source", rule.get("book_title", ""))
+            conclusion = rule.get("conclusion", "")
+            conf = rule.get("confidence", 80)
+            if passage and source:
+                lines.append(f"「{passage}」— {source}（置信度{conf}%）")
+            elif conclusion:
+                lines.append(f"· {conclusion} — {source}（置信度{conf}%）")
+        lines.append("")
 
     lines.append("")
 

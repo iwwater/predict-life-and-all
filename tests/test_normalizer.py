@@ -1,13 +1,14 @@
 """NOR-016~019: 标准化器单元测试。
 
-NOR-016: NORMALIZERS 必须有 12 个 key
+NOR-016: NORMALIZERS 必须有 18 个 key
 NOR-017: signal 字段完整
 NOR-018: strength 范围 — 0 <= strength <= 1
 NOR-019: polarity 合法 — positive/negative/neutral/mixed
+Phase 1: 18 法全部纳入 (方案 §二十一)。
 """
 import pytest
 
-from divination.contracts import ChartResult
+from divination.contracts import Birth, ChartResult
 from divination.aggregation.normalizer import (
     SIGNAL_KEYS,
     DOMAIN_KEYS,
@@ -26,6 +27,10 @@ from divination.aggregation.normalizer import (
     _normalize_vedic,
     _normalize_tarot,
     _normalize_numerology,
+    _normalize_liuren,
+    _normalize_xiaoliuren,
+    _normalize_tieban,
+    _normalize_lenormand,
 )
 
 
@@ -329,13 +334,14 @@ class TestNormalizeNumerology:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# NOR-001: normalize() unified entry — 12 methods
+# NOR-001: normalize() unified entry — 18 methods (Phase 1)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 ALL_METHODS = [
     "bazi_v2", "ziwei", "qimen", "liuyao", "meihua",
     "fengshui", "bazhai", "xuankong", "western", "vedic",
     "tarot", "numerology",
+    "liuren", "xiaoliuren", "tieban", "lenormand",
 ]
 
 
@@ -387,9 +393,102 @@ class TestNormalizeAll:
         assert len(signals) >= 3
 
     @pytest.mark.parametrize("method", ALL_METHODS)
-    def test_12_methods_all_present(self, method):
+    def test_18_methods_all_present(self, method):
         charts = {m: _cr({}) for m in ALL_METHODS}
         signals = normalize_all(charts)
-        assert len(signals) >= 36, f"normalize_all: expected ≥36, got {len(signals)}"
+        # 当前 16 methods × ≥3 = ≥48, 目标 18 × ≥3 = ≥54
+        assert len(signals) >= 48, f"normalize_all: expected ≥48 (16×3), got {len(signals)}"
         methods_found = set(s.method for s in signals)
         assert methods_found == set(ALL_METHODS), f"Missing: {set(ALL_METHODS) - methods_found}"
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Phase 1: NOR-101~104 — 4 个新法 (大六壬/小六壬/铁板/雷诺曼) 的 dimension 标签
+# ═══════════════════════════════════════════════════════════════════════════════
+
+
+def test_liuren_normalizer_tags_one_question():
+    """大六壬 — 决疑占, 短期一题一答, 维度=one_question。"""
+    chart = ChartResult(
+        method="liuren", school="east", engine="test",
+        raw={
+            "three_transmissions": {"chu_chuan": "子", "zhong_chuan": "丑", "mo_chuan": "寅"},
+            "pattern": {"name": "贼克", "type": "auspicious"},
+            "day_ganzhi": "甲子",
+        },
+        normalized={},
+    )
+    sigs = _normalize_liuren("liuren", chart.raw, chart.normalized)
+    assert len(sigs) >= 3, f"Expected ≥3 signals, got {len(sigs)}"
+    for s in sigs:
+        assert s.dimension == "one_question", f"liuren should tag one_question, got {s.dimension}"
+        assert s.time_scope == "short_term", f"liuren should be short_term, got {s.time_scope}"
+
+
+def test_xiaoliuren_normalizer_tags_one_question():
+    """小六壬 — 即时占, 维度=one_question。"""
+    chart = ChartResult(
+        method="xiaoliuren", school="east", engine="test",
+        raw={
+            "mode": "time_xiaoliuren", "palace": "大安", "tone": "auspicious",
+            "meaning": "稳为主", "subject": "decision", "question": "test",
+        },
+        normalized={},
+    )
+    sigs = _normalize_xiaoliuren("xiaoliuren", chart.raw, chart.normalized)
+    assert len(sigs) >= 3, f"Expected ≥3 signals, got {len(sigs)}"
+    for s in sigs:
+        assert s.dimension == "one_question", f"xiaoliuren should tag one_question, got {s.dimension}"
+        assert s.time_scope == "short_term", f"xiaoliuren should be short_term, got {s.time_scope}"
+
+
+def test_tieban_normalizer_tags_long_term():
+    """铁板神数 — 命数条文, 长期, 维度=long_term。"""
+    chart = ChartResult(
+        method="tieban", school="east", engine="test",
+        raw={
+            "verse_set_number": 1234,
+            "verse_result": {
+                "matched_verses": [{"category": "财运", "number": 1, "text": "x"}],
+                "total_matched": 5,
+            },
+        },
+        normalized={},
+    )
+    sigs = _normalize_tieban("tieban", chart.raw, chart.normalized)
+    assert len(sigs) >= 3, f"Expected ≥3 signals, got {len(sigs)}"
+    for s in sigs:
+        assert s.dimension == "long_term", f"tieban should tag long_term, got {s.dimension}"
+        assert s.time_scope == "long_term", f"tieban should be long_term, got {s.time_scope}"
+
+
+def test_lenormand_normalizer_tags_one_question():
+    """雷诺曼 — 日常占卜, 维度=one_question。"""
+    chart = ChartResult(
+        method="lenormand", school="west", engine="test",
+        raw={
+            "spread": "three_line", "spread_name": "三张线",
+            "cards": [
+                {"name": "Rider", "name_zh": "骑士", "timing": "快速", "index": 1},
+                {"name": "Heart", "name_zh": "心", "timing": "当下", "index": 2},
+                {"name": "Sun", "name_zh": "太阳", "timing": "当下", "index": 3},
+            ],
+            "analysis": {"positive_count": 2, "negative_count": 0, "neutral_count": 1, "tone": "positive"},
+        },
+        normalized={},
+    )
+    sigs = _normalize_lenormand("lenormand", chart.raw, chart.normalized)
+    assert len(sigs) >= 3, f"Expected ≥3 signals, got {len(sigs)}"
+    for s in sigs:
+        assert s.dimension == "one_question", f"lenormand should tag one_question, got {s.dimension}"
+        assert s.time_scope == "short_term", f"lenormand should be short_term, got {s.time_scope}"
+
+
+def test_normalize_dispatches_to_new_methods():
+    """验证 4 新法能通过 normalize() 入口调用 (Phase 1 NOR-101~104)。"""
+    for method in ["liuren", "xiaoliuren", "tieban", "lenormand"]:
+        chart = _cr({})
+        sigs = normalize(method, chart)
+        assert len(sigs) >= 3, (
+            f"normalize({method}) returned {len(sigs)} signals, expected ≥3"
+        )

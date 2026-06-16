@@ -50,6 +50,16 @@ INPUT_PROFILES: dict[str, dict[str, Any]] = {
         "modes": ["time_qigua", "manual_coin", "number_qigua"],
         "default_mode": "time_qigua",
     },
+    "shicao": {
+        "needs_birth": "conditional",  # time 模式需要出生，manual/seed 模式不需要
+        "birth_fields": ["year", "month", "day", "hour", "minute"],
+        "needs_space": False,
+        "needs_question": True,
+        "needs_seed": True,           # 必须有 seed（方案 §十一）
+        "has_modes": True,
+        "modes": ["time_shicao", "manual_lines", "number_seed"],
+        "default_mode": "time_shicao",
+    },
     "meihua": {
         "needs_birth": "conditional",
         "birth_fields": ["year", "month", "day", "hour", "minute"],
@@ -122,11 +132,60 @@ INPUT_PROFILES: dict[str, dict[str, Any]] = {
         "has_name": True,              # 可选名字
         "default_mode": "life_path",
     },
+
+    # ═══ 4 个新建术法 (Phase 0) ═══
+    "liuren": {
+        "needs_birth": True,
+        "birth_fields": ["year", "month", "day", "hour", "minute"],
+        "needs_space": False,
+        "needs_question": True,
+        "default_mode": "time_qigua",
+    },
+    "xiaoliuren": {
+        "needs_birth": "conditional",  # time_xiaoliuren 要月日时, number_xiaoliuren 不要
+        "birth_fields": ["month", "day", "hour"],
+        "needs_space": False,
+        "needs_question": True,
+        "needs_seed": True,
+        "has_modes": True,
+        "modes": ["time_xiaoliuren", "number_xiaoliuren"],
+        "default_mode": "time_xiaoliuren",
+    },
+    "tieban": {
+        "needs_birth": True,
+        "birth_fields": ["year", "month", "day", "hour", "minute"],
+        "needs_space": False,
+        "needs_question": False,
+        "has_parents": True,
+        "parent_fields": ["father_zodiac", "mother_zodiac"],
+        "default_mode": "tieban_base",
+    },
+    "lenormand": {
+        "needs_birth": False,          # 雷诺曼完全不需要出生
+        "birth_fields": [],
+        "needs_space": False,
+        "needs_question": True,
+        "needs_seed": True,
+        "needs_spread": True,
+        "spread_options": ["single", "three_line", "five_cross", "nine_square", "grand_tableau"],
+        "default_spread": "three_line",
+        "default_mode": "reflective",
+    },
+    # ═══ 合盘 (relationship 维) ═══
+    "hepan": {
+        "needs_birth": True,           # 至少要本人 birth
+        "birth_fields": ["year", "month", "day", "hour", "minute", "gender"],
+        "needs_space": False,
+        "needs_question": True,
+        "needs_target_birth": True,    # 必须有对象 birth
+        "default_mode": "synastry",
+    },
 }
 
 
 def build_method_inputs(
     birth: Optional[Birth],
+    target_birth: Optional[Birth],
     space: Optional[Any],
     method_options: Optional[dict[str, Any]],
     question: str,
@@ -160,7 +219,16 @@ def build_method_inputs(
     meihua_mode = opts.get("meihua_mode", "time_qigua")
     meihua_seed = opts.get("meihua_seed", None)
     tarot_spread = opts.get("tarot_spread", "celtic_cross")
+    shicao_mode = opts.get("shicao_mode", "time_shicao")
+    shicao_seed = opts.get("shicao_seed", None)
     tarot_mode = opts.get("tarot_mode", "reflective")
+    # Phase 0 新建术法选项
+    xiaoliuren_mode = opts.get("xiaoliuren_mode", "time_xiaoliuren")
+    xiaoliuren_seed = opts.get("xiaoliuren_seed", None)
+    lenormand_spread = opts.get("lenormand_spread", "three_line")
+    lenormand_mode = opts.get("lenormand_mode", "reflective")
+    father_zodiac = opts.get("father_zodiac", None)
+    mother_zodiac = opts.get("mother_zodiac", None)
 
     # 构建默认出生（当用户未提供出生信息时用于需要出生的术法）
     _default_birth = _make_default_birth()
@@ -229,6 +297,18 @@ def build_method_inputs(
             if question:
                 b.seed = _question_seed(question)
 
+        # 注入蓍草筮法（方案 §十一：必须 seed）
+        if method == "shicao":
+            b.mode = shicao_mode or profile.get("default_mode", "time_shicao")
+            # manual_lines 模式用外部指定的 lines；其他模式用 question 派生 seed
+            if b.mode == "manual_lines":
+                b.seed = shicao_seed
+            else:
+                if question:
+                    b.seed = _question_seed(question)
+                elif shicao_seed:
+                    b.seed = shicao_seed
+
         # 注入梅花数字/外应
         if method == "meihua" and meihua_mode == "number_qigua":
             b.mode = "number_qigua"
@@ -236,6 +316,31 @@ def build_method_inputs(
         elif method == "meihua" and meihua_mode == "external_omen":
             b.mode = "external_omen"
             b.seed = meihua_seed or (_question_seed(question) if question else None)
+
+        # 注入小六壬模式/seed (Phase 0)
+        if method == "xiaoliuren":
+            b.mode = xiaoliuren_mode or profile.get("default_mode", "time_xiaoliuren")
+            if b.mode == "number_xiaoliuren":
+                b.seed = xiaoliuren_seed or (_question_seed(question) if question else None)
+
+        # 注入铁板神数父母生肖 (Phase 0)
+        if method == "tieban":
+            b.father_zodiac = father_zodiac
+            b.mother_zodiac = mother_zodiac
+
+        # 注入雷诺曼牌阵/模式/seed (Phase 0)
+        if method == "lenormand":
+            b.spread = lenormand_spread or profile.get("default_spread", "three_line")
+            b.mode = lenormand_mode or profile.get("default_mode", "reflective")
+            if question:
+                b.seed = _question_seed(question)
+
+        # 注入合盘 (Phase 0) — 用 target_birth 作为 partner
+        if method == "hepan":
+            b.mode = "synastry"
+            b.target_birth_required = True
+            if target_birth is not None:
+                b.partner = target_birth
 
         inputs[method] = b
 

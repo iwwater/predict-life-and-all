@@ -103,7 +103,8 @@ def _lookup_verses(verse_set_number: int, father_zodiac: str = "", mother_zodiac
         for v in verses:
             # If parents zodiac provided, filter by checksum match
             if expected_checksum > 0:
-                if v["checksum"] % 1000 == expected_checksum or v["checksum"] % 1000 == 0:
+                # 父母生肖校验 (《铁板神数》考刻分): 严格匹配 checksum % 1000, 避免 % 1000 == 0 永远放行
+                if v["checksum"] % 1000 == expected_checksum:
                     matched.append({
                         "category": category,
                         "number": v["number"],
@@ -183,7 +184,7 @@ def compute(b: Birth) -> ChartResult:
         },
         raw={
             "mode": "tieban_base",
-            "subject": b.subject or "self_life",
+            "subject": getattr(b, "subject", None) or "self_life",
             "rule_version": "v1",
             "four_pillars": pillars,
             "encoding": {

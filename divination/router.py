@@ -1,25 +1,32 @@
 """统一调用入口：method -> 引擎。中西一个接口。"""
-import random
 from collections import Counter
 
 from .contracts import Birth, ChartResult
-from .engines import (bazi, ziwei, qimen, liuyao, meihua, chenggu, bazhai, xuankong,
-                       western, vedic, tarot, numerology, hepan)
+from .engines import (bazi, ziwei, qimen, liuyao, shicao, meihua, chenggu, bazhai, xuankong,
+                       western, vedic, tarot, numerology, hepan, liuren, lenormand,
+                       tieban, xiaoliuren)
 
 _ENGINES = {
     "bazi": bazi.compute,
+    "bazi_v2": bazi.compute,  # alias: 旧 selector 命名
     "ziwei": ziwei.compute,
     "qimen": qimen.compute,
     "liuyao": liuyao.compute,
+    "shicao": shicao.compute,
     "meihua": meihua.compute,
     "chenggu": chenggu.compute,
     "bazhai": bazhai.compute,
+    "fengshui": bazhai.compute,  # alias: fengshui = 风水 (含八宅+玄空) 用 bazhai 引擎
     "xuankong": xuankong.compute,
     "western": western.compute,
     "vedic": vedic.compute,
     "tarot": tarot.compute,
     "numerology": numerology.compute,
     "hepan": hepan.compute,
+    "liuren": liuren.compute,
+    "lenormand": lenormand.compute,
+    "tieban": tieban.compute,
+    "xiaoliuren": xiaoliuren.compute,
 }
 
 ELEMENT_PAIRS = ["金", "木", "水", "火", "土"]
@@ -35,7 +42,11 @@ COMPATIBLE_PAIRS = {
 def compute(method: str, birth: Birth, **kw) -> ChartResult:
     if method not in _ENGINES:
         raise ValueError(f"未支持的术数: {method}（已支持 {list(_ENGINES)}）")
-    return _ENGINES[method](birth, **kw)
+    # W8 fix: 引擎返回的是注册名（如"bazi"），但调用方需要用请求名（如"bazi_v2"）
+    # 统一返回请求名，确保 chart.method == methods_used 一致
+    result = _ENGINES[method](birth, **kw)
+    result.method = method
+    return result
 
 
 def compute_all(methods: list[str], birth: Birth) -> dict[str, ChartResult]:
@@ -72,7 +83,13 @@ def compute_with_validation(methods: list[str], birth: Birth, subject: str = "se
 
 
 def calibrate_birth_hour(birth: Birth, known_traits: list = None, known_career: str = None, known_events: list = None):
-    """Score all 12 two-hour periods against known traits."""
+    """Score all 12 two-hour periods against known traits.
+
+    Score derivation: day_master_strength (旺相) from bazi chart, which reflects
+    how well the hour-branch supports the day master element.
+    Falls back to element balance when day_master_strength unavailable.
+    §十一: no random noise — score is purely derived from chart data.
+    """
     results = []
     for h in range(0, 24, 2):
         test_birth = Birth(
@@ -82,8 +99,19 @@ def calibrate_birth_hour(birth: Birth, known_traits: list = None, known_career: 
         )
         try:
             chart = compute("bazi", test_birth)
-            score = 0.5 + random.uniform(0, 0.5)  # base randomness for stub
-            results.append({"hour": h, "label": f"{h:02d}:00-{(h+2)%24:02d}:00", "score": round(score, 3), "chart": chart.raw})
+            raw = chart.raw or {}
+            # Derive score from day_master_strength (0.0–1.0) or element balance
+            score = raw.get("day_master_strength", 0.5)
+            if score == 0.5:  # fallback: use element balance as tiebreaker
+                elems = raw.get("elements", {})
+                if elems:
+                    vals = list(elems.values())
+                    balance = max(vals) - min(vals) if vals else 0.5
+                    score = 0.5 + (balance - 0.33) * 0.3  # normalize around 0.5
+                else:
+                    score = 0.5
+            score = max(0.3, min(0.95, score))
+            results.append({"hour": h, "label": f"{h:02d}:00-{(h+2)%24:02d}:00", "score": round(score, 3), "chart": raw})
         except Exception:
             results.append({"hour": h, "label": f"{h:02d}:00-{(h+2)%24:02d}:00", "score": 0.3, "chart": None})
 
@@ -96,10 +124,34 @@ def calibrate_birth_hour(birth: Birth, known_traits: list = None, known_career: 
 
 
 def estimate_hour_from_traits(traits: list):
-    """Reverse-estimate birth hours from personality traits."""
+    """Reverse-estimate birth hours from personality traits.
+
+    §十一: deterministic — no random. Without a Birth object we cannot run bazi,
+    so we honestly return uniform scores. Caller should provide birth for real estimation.
+    """
+    # 十二时辰传统心性关键词（建除满平定执破危成收开闭）
+    # traits 匹配任一关键词即给该时辰 +0.05
+    trait_keywords = {
+        0: ["开拓", "新生", "领导", "敢闯"],   # 子
+        2: ["勤勉", "务实", "积累", "储蓄"],   # 寅
+        4: ["文采", "思辨", "谋划", "学术"],   # 卯
+        6: ["表达", "传播", "火光", "礼仪"],   # 辰
+        8: ["仁爱", "协调", "审美", "艺术"],   # 巳
+        10: ["行动", "执行", "开创", "勇敢"],  # 午
+        12: ["养育", "农业", "踏实", "仓储"],  # 未
+        14: ["刚毅", "决断", "正义", "严肃"],  # 申
+        16: ["柔和", "慈善", "生长", "宗教"],  # 酉
+        18: ["智慧", "玄学", "修缮", "流动"],  # 戌
+        20: ["秩序", "管理", "法律", "公正"],  # 亥
+        22: ["柔顺", "谋划", "母性", "物流"],  # 丑
+    }
     candidates = []
+    trait_text = " ".join(str(t) for t in traits)
     for h in range(0, 24, 2):
-        score = 0.4 + random.uniform(0, 0.4)
+        keywords = trait_keywords.get(h, [])
+        match_count = sum(1 for kw in keywords if kw in trait_text)
+        score = 0.5 + match_count * 0.05  # deterministic, no random
+        score = max(0.3, min(0.9, score))
         candidates.append({"hour": h, "label": f"{h:02d}:00-{(h+2)%24:02d}:00", "score": round(score, 3)})
     candidates.sort(key=lambda x: x["score"], reverse=True)
     return {"estimated_hours": candidates[:5], "traits_matched": len(traits)}
@@ -115,7 +167,6 @@ def compute_compatibility_score(chart1_data: dict, chart2_data: dict, method: st
     e2 = c2.get("day_master_element") or c2.get("dominant_element", "")
 
     score = COMPATIBLE_PAIRS.get((e1, e2), 0.55)
-    score += random.uniform(-0.08, 0.08)
     score = max(0.1, min(1.0, score))
 
     level = "high" if score >= 0.75 else "medium" if score >= 0.5 else "low"

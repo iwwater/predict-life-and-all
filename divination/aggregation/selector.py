@@ -1,11 +1,11 @@
-"""术法选择器 — 根据 goal 返回全部 12 法并标记 primary/secondary/reference 三层。
+"""术法选择器 — 根据 goal 返回全部 18 法并标记 primary/secondary/reference 三层。
 
 BE-004: 术法选择
-SEL-001: ALL_METHODS 固定 12 术法
-SEL-002: select_methods(goal) 任意 goal 都返回 12 法
+SEL-001: ALL_METHODS 固定 18 术法 (Phase 0 扩展: +liuren/xiaoliuren/tieban/lenormand, hepan 单独触发)
+SEL-002: select_methods(goal) 任意 goal 都返回 18 法 (默认) 或 12 法 (legacy 旁路)
 SEL-003: 每个术法标记 tier
 SEL-004~013: 每个 goal 各有 primary 配置
-SEL-015: 少于 12 法时直接报错
+SEL-015: 少于 18 法时直接报错 (legacy 旁路下 12 法)
 """
 from __future__ import annotations
 
@@ -13,21 +13,33 @@ from typing import Any, Literal, Optional
 
 Tier = Literal["primary", "secondary", "reference"]
 
-# ── SEL-001: 固定 12 术法清单 ──────────────────────────────────────────────
+# ── SEL-001: 固定 18 术法清单 (Phase 0 扩展) ──────────────────────────────
 
 ALL_METHODS: list[str] = [
-    "bazi_v2",      # 1. 八字精算版
-    "ziwei",        # 2. 紫微斗数
-    "qimen",        # 3. 奇门遁甲
-    "liuyao",       # 4. 六爻
-    "meihua",       # 5. 梅花易数
-    "fengshui",     # 6. 风水（八宅+玄空复合）
-    "bazhai",       # 7. 八宅
-    "xuankong",     # 8. 玄空飞星
-    "western",      # 9. 西方占星
-    "vedic",        # 10. 吠陀占星
-    "tarot",        # 11. 塔罗
-    "numerology",   # 12. 数字命理
+    "bazi_v2",      # 1. 八字精算版 (long_term + current_cycle)
+    "ziwei",        # 2. 紫微斗数 (long_term + current_cycle)
+    "qimen",        # 3. 奇门遁甲 (one_question)
+    "liuyao",       # 4. 六爻 (one_question)
+    "meihua",       # 5. 梅花易数 (one_question)
+    "fengshui",     # 6. 风水 (space)
+    "bazhai",       # 7. 八宅 (space)
+    "xuankong",     # 8. 玄空飞星 (space)
+    "western",      # 9. 西方占星 (long_term + current_cycle)
+    "vedic",        # 10. 吠陀占星 (long_term + current_cycle)
+    "tarot",        # 11. 塔罗 (one_question)
+    "numerology",   # 12. 数字命理 (long_term)
+    "liuren",       # 13. 大六壬 (one_question)
+    "xiaoliuren",   # 14. 小六壬 (one_question)
+    "tieban",       # 15. 铁板神数 (long_term)
+    "lenormand",    # 16. 雷诺曼 (one_question)
+    "hepan",        # 17. 合盘 (relationship) — relationship 维核心
+    "chenggu",      # 18. 称骨 (long_term) — 袁天罡称骨歌
+]
+
+# 兼容老 API/老测试, 12 法旁路
+LEGACY_12_METHODS: list[str] = [
+    "bazi_v2", "ziwei", "qimen", "liuyao", "meihua", "fengshui",
+    "bazhai", "xuankong", "western", "vedic", "tarot", "numerology",
 ]
 
 METHOD_LABELS: dict[str, str] = {
@@ -43,6 +55,31 @@ METHOD_LABELS: dict[str, str] = {
     "vedic":      "吠陀占星",
     "tarot":      "塔罗",
     "numerology": "数字命理",
+    "liuren":     "大六壬",
+    "xiaoliuren": "小六壬",
+    "tieban":     "铁板神数",
+    "lenormand":  "雷诺曼",
+    "hepan":      "合盘",
+    "chenggu":    "称骨",
+}
+
+# ── 5 维职责分派 (Phase 0: 18 法合参架构) ──────────────────────────────
+# 5 维: long_term / current_cycle / relationship / one_question / space
+
+DIMENSION_CONFIG: dict[str, list[str]] = {
+    "long_term":     ["bazi_v2", "ziwei", "western", "vedic", "numerology", "tieban", "chenggu"],
+    "current_cycle": ["bazi_v2", "ziwei", "western", "vedic"],
+    "relationship":  ["hepan"],
+    "one_question":  ["liuyao", "qimen", "meihua", "tarot", "liuren", "xiaoliuren", "lenormand"],
+    "space":         ["fengshui", "bazhai", "xuankong"],
+}
+
+DIMENSION_BUDGET: dict[str, float] = {
+    "long_term":     0.25,
+    "current_cycle": 0.25,
+    "relationship":  0.15,
+    "one_question":  0.20,
+    "space":         0.15,
 }
 
 # ── SEL-003~013: 每个 goal 的 tier 配置 ───────────────────────────────────
@@ -130,46 +167,51 @@ _GOAL_TIER_CONFIG: dict[str, dict[str, list[str]]] = {
 def select_methods(
     goal: Optional[str] = None,
     user_methods: Optional[list[str]] = None,
+    include_legacy_18: bool = True,
 ) -> list[dict[str, Any]]:
-    """根据 goal 返回全部 12 术法及其 tier 标记。
+    """根据 goal 返回全部术法及其 tier 标记。
 
-    SEL-002: 任意 goal 都返回 12 法
+    SEL-002: 任意 goal 都返回 18 法 (Phase 0 默认) 或 12 法 (legacy 旁路)
     SEL-003: 每个术法含 tier 和 label
-    SEL-015: 少于 12 法直接报错
+    SEL-015: 少于 18 法 (或 legacy 12 法) 直接报错
 
     Args:
         goal: 标准 goal 类型（如 "career"）
         user_methods: 用户指定的术法子集
+        include_legacy_18: True=18 法 (默认), False=12 法旁路
 
     Returns:
         [{"method": "bazi_v2", "label": "八字", "tier": "primary"}, ...]
 
     Raises:
-        AssertionError: 当结果少于 12 法时 (SEL-015)
+        AssertionError: 当结果少于 18 法 (或 12 法) 时 (SEL-015)
     """
+    methods_pool = ALL_METHODS if include_legacy_18 else LEGACY_12_METHODS
+    min_count = 18 if include_legacy_18 else 12
+
     # 用户指定子集
     if user_methods:
-        valid = [m for m in user_methods if m in ALL_METHODS]
-        # 填充到 12 法（用 reference 兜底）
-        remaining = [m for m in ALL_METHODS if m not in valid]
+        valid = [m for m in user_methods if m in methods_pool]
+        # 填充（用 reference 兜底）
+        remaining = [m for m in methods_pool if m not in valid]
         config = _GOAL_TIER_CONFIG.get(goal or "general_life",
                                         _GOAL_TIER_CONFIG["general_life"])
         methods = _build_method_list(valid + remaining, config)
         # SEL-015: 防删减断言
-        assert len(methods) >= 12, (
-            f"SEL-015: 术法数量不足! 当前 {len(methods)} < 12。"
+        assert len(methods) >= min_count, (
+            f"SEL-015: 术法数量不足! 当前 {len(methods)} < {min_count}。"
             f"user_methods={user_methods}, valid={valid}"
         )
         return methods
 
-    # 默认全 12 法
+    # 默认全量
     config = _GOAL_TIER_CONFIG.get(goal or "general_life",
                                     _GOAL_TIER_CONFIG["general_life"])
-    methods = _build_method_list(ALL_METHODS, config)
+    methods = _build_method_list(methods_pool, config)
 
     # SEL-015: 防删减断言
-    assert len(methods) >= 12, (
-        f"SEL-015: 术法数量不足! 当前 {len(methods)} < 12, goal={goal}"
+    assert len(methods) >= min_count, (
+        f"SEL-015: 术法数量不足! 当前 {len(methods)} < {min_count}, goal={goal}"
     )
 
     return methods
@@ -224,7 +266,29 @@ def get_tier_for_method(method: str, goal: str) -> Tier:
     return "reference"
 
 
+# ── 5 维辅助 (Phase 0) ─────────────────────────────────────────────────────
+
+def get_methods_by_dim(methods: list[str]) -> dict[str, list[str]]:
+    """把方法列表反向分组到 5 维 (用于 normalizer 批量打 dimension tag)。"""
+    out: dict[str, list[str]] = {dim: [] for dim in DIMENSION_CONFIG}
+    for m in methods:
+        for dim, members in DIMENSION_CONFIG.items():
+            if m in members:
+                out[dim].append(m)
+    return out
+
+
+def get_dimension_for_method(method: str) -> Optional[str]:
+    """返回该方法所属的 5 维, 如有多个 (八字/紫微/西占/吠陀) 优先 current_cycle。"""
+    if method in ("bazi_v2", "ziwei", "western", "vedic"):
+        return "current_cycle"  # 多维方法, signal 会按 context 切
+    for dim, members in DIMENSION_CONFIG.items():
+        if method in members:
+            return dim
+    return None
+
+
 # ── 向后兼容 ─────────────────────────────────────────────────────────────────
 
-# FIXED_12_METHODS 别名
-FIXED_12_METHODS = list(ALL_METHODS)
+# FIXED_12_METHODS 别名 (老测试用 — 12 法旁路)
+FIXED_12_METHODS = list(LEGACY_12_METHODS)

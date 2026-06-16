@@ -78,7 +78,9 @@ export const TAROT_SPREAD_OPTIONS: SpreadOption[] = [
 
 /** 雷诺曼牌阵选项 */
 export const LENORMAND_SPREAD_OPTIONS: SpreadOption[] = [
-  { code: "three_time", label: "三张牌", desc: "过去·现在·未来", cards: 3 },
+  { code: "three_line", label: "三张线", desc: "主题·展开·结果", cards: 3 },
   { code: "single", label: "单张牌", desc: "快速指引", cards: 1 },
-  { code: "celtic_cross", label: "十字阵", desc: "5张·深入", cards: 5 },
+  { code: "five_cross", label: "五张十字", desc: "核心与四方影响", cards: 5 },
+  { code: "nine_square", label: "九宫格", desc: "3×3 全景审视", cards: 9 },
+  { code: "grand_tableau", label: "大桌阵", desc: "36张全牌阵", cards: 36 },
 ];

@@ -10,7 +10,7 @@
 牌义来源: 传统 Petit Lenormand 体系 (1799), 融合法国/德国学派。
 """
 
-import random
+import hashlib
 from datetime import date
 from typing import Optional
 
@@ -256,27 +256,44 @@ def _analyze_tableau(cards: list[dict]) -> dict:
 # 5. Main Compute
 # ═══════════════════════════════════════════════════════════════
 def compute(b: Birth) -> ChartResult:
-    subject = b.subject or "lenormand_guidance"
-    time_budget = b.mode or "reflective"
+    subject = getattr(b, "subject", None) or "lenormand_guidance"
+    time_budget = getattr(b, "mode", None) or "reflective"
     if time_budget not in {"quick", "reflective", "deep"}:
         time_budget = "reflective"
 
-    spread_key = ALIASES.get(b.spread or "", b.spread or _default_spread(subject, time_budget))
+    requested_spread = getattr(b, "spread", None)
+    spread_key = ALIASES.get(requested_spread or "", requested_spread or _default_spread(subject, time_budget))
     if spread_key not in SPREADS:
         spread_key = _default_spread(subject, time_budget)
     spread = SPREADS[spread_key]
 
     # 雷诺曼传统不用逆位
     # Deterministic seed
-    if b.seed is not None:
-        seed_used = b.seed
-    elif b.question:
-        seed_used = f"lenormand-{date.today().isoformat()}-{b.question}"
+    seed = getattr(b, "seed", None)
+    question = getattr(b, "question", None)
+    if seed is not None:
+        seed_used = str(seed)
+    elif question:
+        # 方案 §十一: 用户给问题就用问题作 seed (确定性), 不再用 date.today()
+        seed_used = f"lenormand|{question}"
     else:
-        seed_used = f"lenormand-{date.today().isoformat()}-{subject}-{spread_key}"
+        raise ValueError(
+            "lenormand 需要 seed 或 question 用于确定性洗牌 "
+            "(方案 §十一 'AI 不参与随机')。"
+        )
 
-    rng = random.Random(str(seed_used))
-    draw = rng.sample(LENORMAND_NAMES, spread["card_count"])
+    # 用 hashlib SHA-256 作种子, Fisher-Yates 洗牌
+    digest = hashlib.sha256(seed_used.encode("utf-8")).digest()
+    draw: list[str] = []
+    pool = list(LENORMAND_NAMES)
+    # 用 digest 字节按位决定 Fisher-Yates 洗牌
+    for i in range(spread["card_count"]):
+        if not pool:
+            break
+        byte_idx = i % (len(digest) // 4)
+        n = int.from_bytes(digest[byte_idx*4:byte_idx*4+4], "big")
+        idx = n % len(pool)
+        draw.append(pool.pop(idx))
 
     # Build card data
     cards = []

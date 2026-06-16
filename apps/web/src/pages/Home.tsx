@@ -1,279 +1,236 @@
-// 首页:「排盘台」— 一屏即用的排盘入口,非落地页
-// 依据:《前端视觉重设计规范》§3
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchMethods, fetchDaily, type DailyPayload } from "../lib/api";
+import { fetchDaily, fetchMethods, type DailyPayload } from "../lib/api";
+import { METHOD_PLAIN } from "../lib/method-info";
 import type { MethodMeta } from "../lib/types";
-import { SchoolChip } from "../components/ui";
-import { METHOD_PLAIN, SUBJECTS } from "../lib/method-info";
 import { useHistory } from "../store/history";
-import type { HistoryEntry } from "../store/history";
-import { useI18n } from "../lib/i18n";
 
-const SUBJECT_LABEL: Record<string, string> = SUBJECTS.reduce(
-  (acc, s) => ({ ...acc, [s.key]: s.label }),
-  {} as Record<string, string>,
-);
+const METHOD_FALLBACK: MethodMeta[] = [
+  { id: "bazi", name_zh: "八字四柱", name_en: "Four Pillars", school: "east" } as MethodMeta,
+  { id: "ziwei", name_zh: "紫微斗数", name_en: "Zi Wei Dou Shu", school: "east" } as MethodMeta,
+  { id: "tieban", name_zh: "铁板神数", name_en: "Iron Plate Numbers", school: "east" } as MethodMeta,
+  { id: "qimen", name_zh: "奇门遁甲", name_en: "Qi Men Dun Jia", school: "east" } as MethodMeta,
+  { id: "liuyao", name_zh: "六爻", name_en: "Six Lines", school: "east" } as MethodMeta,
+  { id: "meihua", name_zh: "梅花易数", name_en: "Plum Blossom", school: "east" } as MethodMeta,
+  { id: "liuren", name_zh: "大六壬", name_en: "Da Liu Ren", school: "east" } as MethodMeta,
+  { id: "hepan", name_zh: "合盘", name_en: "Synastry", school: "east" } as MethodMeta,
+  { id: "tarot", name_zh: "塔罗", name_en: "Tarot", school: "west" } as MethodMeta,
+  { id: "western", name_zh: "西方占星", name_en: "Natal Astrology", school: "west" } as MethodMeta,
+  { id: "vedic", name_zh: "吠陀占星", name_en: "Vedic Astrology", school: "west" } as MethodMeta,
+  { id: "xuankong", name_zh: "玄空飞星", name_en: "Flying Stars", school: "east" } as MethodMeta,
+  { id: "numerology", name_zh: "数字命理", name_en: "Numerology", school: "west" } as MethodMeta,
+  { id: "lenormand", name_zh: "雷诺曼", name_en: "Lenormand", school: "west" } as MethodMeta,
+];
+
+const CATEGORY: Record<string, string> = {
+  bazi: "Ming · 命",
+  ziwei: "Ming · 命",
+  tieban: "Ming · 命",
+  chenggu: "Ming · 命",
+  qimen: "Bu · 卜",
+  liuyao: "Bu · 卜",
+  meihua: "Bu · 卜",
+  liuren: "Bu · 卜",
+  xiaoliuren: "Bu · 卜",
+  hepan: "Xiang · 相",
+  tarot: "Xiang · 相",
+  lenormand: "Xiang · 相",
+  western: "Xiang · 相",
+  vedic: "Xiang · 相",
+  numerology: "Xiang · 相",
+  bazhai: "Shan · 山",
+  xuankong: "Shan · 山",
+};
 
 export function Home() {
-  const { t, lang } = useI18n();
   const [methods, setMethods] = useState<MethodMeta[]>([]);
   const [daily, setDaily] = useState<DailyPayload | null>(null);
-  const items = useHistory((s) => s.items);
-  const recent3 = items.slice(0, 3);
+  const historyItems = useHistory((s) => s.items);
 
   useEffect(() => {
     fetchMethods().then(setMethods).catch(() => setMethods([]));
-    const last = items.find((it) => it.birth?.year);
+    const last = historyItems.find((it) => it.birth?.year);
     const birth = last
       ? {
-          year: last.birth.year, month: last.birth.month, day: last.birth.day,
-          hour: last.birth.hour, minute: last.birth.minute,
-          gender: last.birth.gender, calendar: "gregorian" as const,
-          lat: last.birth.lat ?? null, lng: last.birth.lng ?? null,
-          tz: last.birth.tz, is_leap_month: false,
+          year: last.birth.year,
+          month: last.birth.month,
+          day: last.birth.day,
+          hour: last.birth.hour,
+          minute: last.birth.minute,
+          gender: last.birth.gender,
+          calendar: "gregorian" as const,
+          lat: last.birth.lat ?? null,
+          lng: last.birth.lng ?? null,
+          tz: last.birth.tz,
+          is_leap_month: false,
         }
       : undefined;
     fetchDaily(undefined, birth).then(setDaily).catch(() => setDaily(null));
-  }, [items]);
+  }, [historyItems]);
 
-  const eastMethods = methods.filter((m) => m.school === "east");
-  const westMethods = methods.filter((m) => m.school === "west");
+  const visibleMethods = useMemo(() => {
+    const source = methods.length > 0 ? methods : METHOD_FALLBACK;
+    const preferred = [
+      "bazi",
+      "ziwei",
+      "tieban",
+      "qimen",
+      "liuyao",
+      "meihua",
+      "liuren",
+      "hepan",
+      "tarot",
+      "western",
+      "vedic",
+      "xuankong",
+      "numerology",
+      "lenormand",
+    ];
+    return preferred
+      .map((id) => source.find((m) => m.id === id))
+      .filter(Boolean) as MethodMeta[];
+  }, [methods]);
 
   return (
-    <div className="space-y-8">
-      {/* 今日摘要 — 纸墨风格 */}
-      <DailyTeaser payload={daily} hasBirth={items.some((it) => it.birth?.year)} />
-
-      {/* 排盘台主体 */}
-      <section className="paper-frame relative">
-        <div className="paper-compass-bg" aria-hidden />
-        <div className="relative z-10">
-          {/* 标题 */}
-          <h1 className="paper-title mb-5">
-            <span className="stamp" />
-            <span>排盘台</span>
-            <span className="sub">{t("app.tagline")}</span>
+    <div className="mystic-home">
+      <section className="mystic-stage">
+        <div className="mystic-stage-copy">
+          <div className="mystic-eyebrow">Computed to the minute · 精算如仪</div>
+          <h1 className="mystic-display">
+            知命,
+            <br />
+            而后 <b>从容</b>
           </h1>
-
-          <div className="paper-main-grid">
-            {/* 左:五术导航 + 快捷入口 */}
-            <div className="flex gap-4 min-w-0">
-              {/* 五术竖题签 */}
-              <div className="paper-vertical shrink-0" style={{ fontSize: "0.95rem" }}>
-                命 · 卜 · 相 · 山 · 医
-              </div>
-              {/* 快捷任务 */}
-              <div className="flex-1 min-w-0 space-y-2">
-                <div className="paper-eyebrow">问事</div>
-                <div className="grid grid-cols-2 gap-1.5">
-                  {[
-                    { key: "self_life", label: lang === "zh" ? "本命格局" : "Life Chart", to: "/cast?subject=self_life" },
-                    { key: "career", label: lang === "zh" ? "事业工作" : "Career", to: "/cast?subject=career" },
-                    { key: "relationship", label: lang === "zh" ? "感情姻缘" : "Love", to: "/cast?subject=relationship" },
-                    { key: "wealth", label: lang === "zh" ? "财运" : "Wealth", to: "/cast?subject=wealth" },
-                    { key: "decision", label: lang === "zh" ? "重大决策" : "Decision", to: "/cast?subject=decision" },
-                    { key: "annual_luck", label: lang === "zh" ? "年度运势" : "Annual", to: "/cast?subject=annual_luck" },
-                    { key: "home_fengshui", label: lang === "zh" ? "风水调理" : "Feng Shui", to: "/cast?subject=home_fengshui" },
-                    { key: "tarot_guidance", label: lang === "zh" ? "塔罗指引" : "Tarot", to: "/cast?subject=tarot_guidance" },
-                  ].map((t) => (
-                    <Link
-                      key={t.key}
-                      to={t.to}
-                      className="paper-grid-cell"
-                      style={{ padding: "0.4rem 0.6rem", textDecoration: "none", display: "block" }}
-                    >
-                      <span style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "0.82rem", color: "var(--ink)", fontWeight: 500 }}>
-                        {t.label}
-                      </span>
-                    </Link>
-                  ))}
-                </div>
-
-                {/* 关键入口 */}
-                <div className="paper-eyebrow" style={{ marginTop: "0.75rem" }}>合参</div>
-                <div className="flex flex-wrap gap-1.5">
-                  <Link to="/reading" className="paper-btn" style={{ fontSize: "0.8rem" }}>
-                    12法合参
-                  </Link>
-                  <Link to="/compatibility" className="paper-btn-ghost" style={{ fontSize: "0.8rem" }}>
-                    {t("nav.compatibility")}
-                  </Link>
-                  <Link to="/daily" className="paper-btn-ghost" style={{ fontSize: "0.8rem" }}>
-                    {t("nav.daily")}
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            {/* 右:罗盘装饰 + 快捷信息 */}
-            <div className="min-w-0 space-y-3" style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
-              {/* 罗盘环(纯装饰,极淡) */}
-              <svg aria-hidden width="180" height="180" viewBox="0 0 200 200" style={{ opacity: 0.12 }}>
-                <circle cx="100" cy="100" r="94" fill="none" stroke="var(--cinnabar)" strokeWidth="0.8" />
-                <circle cx="100" cy="100" r="78" fill="none" stroke="var(--cinnabar)" strokeWidth="0.6" strokeDasharray="3 5" />
-                <circle cx="100" cy="100" r="62" fill="none" stroke="var(--cinnabar)" strokeWidth="0.5" />
-                <circle cx="100" cy="100" r="46" fill="none" stroke="var(--cinnabar)" strokeWidth="0.4" />
-                <circle cx="100" cy="100" r="30" fill="none" stroke="var(--cinnabar)" strokeWidth="0.4" />
-                <circle cx="100" cy="100" r="14" fill="none" stroke="var(--cinnabar)" strokeWidth="0.5" />
-                {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg) => {
-                  const rad = (deg * Math.PI) / 180;
-                  const x1 = 100 + 85 * Math.cos(rad);
-                  const y1 = 100 + 85 * Math.sin(rad);
-                  const x2 = 100 + 95 * Math.cos(rad);
-                  const y2 = 100 + 95 * Math.sin(rad);
-                  return <line key={deg} x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--cinnabar)" strokeWidth="0.6" />;
-                })}
-                {["子", "午", "卯", "酉"].map((z, i) => {
-                  const deg = i * 90 - 90;
-                  const rad = (deg * Math.PI) / 180;
-                  const x = 100 + 70 * Math.cos(rad);
-                  const y = 100 + 70 * Math.sin(rad);
-                  return (
-                    <text key={z} x={x} y={y} textAnchor="middle" dominantBaseline="central"
-                      fontFamily="'Noto Serif SC', serif" fontSize="14" fill="var(--cinnabar)" fontWeight="700">
-                      {z}
-                    </text>
-                  );
-                })}
-              </svg>
-              <div style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "0.72rem", color: "var(--ink-soft)", letterSpacing: "0.2em", textAlign: "center" }}>
-                子午卯酉<br/>天地定位
-              </div>
-            </div>
+          <p className="mystic-latin-line">Fourteen arts of East &amp; West, computed not guessed.</p>
+          <div className="mystic-cta-row">
+            <Link className="mystic-cta" to="/m/tieban">
+              <span />
+              起盘
+            </Link>
+            <a className="mystic-quiet-link" href="#arts">
+              浏览术数
+            </a>
+            <Link className="mystic-quiet-link" to="/heshen">
+              收入卷宗合参
+            </Link>
           </div>
         </div>
+
+        <Instrument />
       </section>
 
-      {/* 近期排盘 */}
-      {recent3.length > 0 && (
-        <section>
-          <div className="paper-eyebrow" style={{ marginBottom: "0.5rem" }}>
-            {lang === "zh" ? "近期排盘" : "Recent Casts"}
-          </div>
-          <div className="space-y-1">
-            {recent3.map((it) => (
-              <div key={it.id} className="paper-grid-cell flex items-center justify-between gap-2 flex-wrap" style={{ padding: "0.5rem 0.8rem" }}>
-                <div className="flex items-center gap-2 min-w-0 flex-wrap">
-                  <span className="paper-tag" style={{ color: "var(--cinnabar)", borderColor: "rgba(176,58,46,0.3)" }}>
-                    {SUBJECT_LABEL[it.subject || ""] || it.subject || (lang === "zh" ? "未分类" : "—")}
-                  </span>
-                  <span style={{ fontSize: "0.8rem", color: "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace" }}>
-                    {it.question || it.methods.join(" / ")}
-                  </span>
-                  <span style={{ fontSize: "0.7rem", color: "var(--rule)" }}>
-                    {new Date(it.ts).toLocaleString()}
-                  </span>
-                </div>
-                <Link
-                  to={`/cast?fromHistory=${encodeURIComponent(it.id)}`}
-                  className="paper-btn-ghost"
-                  style={{ fontSize: "0.7rem", padding: "0.2rem 0.6rem" }}
-                >
-                  {t("history.continue")}
-                </Link>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      {daily && <DailyRibbon payload={daily} />}
 
-      <div className="paper-hr" />
+      <section className="mystic-section" id="arts">
+        <div className="mystic-section-head">
+          <h2>术数</h2>
+          <span>The Fourteen Arts</span>
+        </div>
 
-      {/* 术数总览 */}
-      <MethodOverview eastMethods={eastMethods} westMethods={westMethods} />
-
-      {/* 公开案例已下架 — 法律合规:真实名人生辰/命运论断涉及个人信息保护法与民法典人格权 */}
-
-      {/* 合规说明由全局 Footer 统一承载，此处不再重复 */}
+        <div className="mystic-arts">
+          {visibleMethods.map((method) => {
+            const plain = METHOD_PLAIN[method.id as keyof typeof METHOD_PLAIN];
+            return (
+              <Link className="mystic-art" key={method.id} to={`/m/${method.id}`}>
+                <span className="mystic-art-cat">{CATEGORY[method.id] || method.school}</span>
+                <span className="mystic-art-name">
+                  {method.name_zh}
+                  <i>{method.name_en}</i>
+                </span>
+                <span className="mystic-art-hint">{plain?.tagline || "观盘"} →</span>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 }
 
-/* ── 子组件 ── */
-
-function DailyTeaser({ payload, hasBirth }: { payload: DailyPayload | null; hasBirth: boolean }) {
-  const { t, lang } = useI18n();
-  if (!payload) return null;
+function DailyRibbon({ payload }: { payload: DailyPayload }) {
   const td = payload.today;
-  const it = payload.interaction;
   return (
-    <section className="paper-grid-cell" style={{ padding: "0.7rem 1rem", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
-      <div className="min-w-0 flex-1">
-        <div className="paper-eyebrow">
-          {t("home.daily.label")} · {payload.date}
-        </div>
-        <div style={{ fontSize: "0.92rem", color: "var(--ink)", fontFamily: "'Noto Serif SC', serif", marginTop: "0.2rem" }}>
-          {td.ganzhi_day} {t("cast.birth.day")} · {td.day_wuxing} · {td.tarot_card.name}{" "}
-          <span style={{
-            fontSize: "0.75rem",
-            color: td.tarot_card.orient === "正位" ? "var(--verdigris)" : "var(--ink-soft)",
-          }}>
-            ({td.tarot_card.orient})
-          </span>
-        </div>
-        {it && (
-          <div style={{ fontSize: "0.75rem", color: "var(--ink-soft)", marginTop: "0.2rem" }}>
-            {it.label} · {it.action}
-          </div>
-        )}
-        {!hasBirth && (
-          <div style={{ fontSize: "0.68rem", color: "var(--rule)", marginTop: "0.15rem" }}>
-            {t("daily.noBirth")}
-          </div>
-        )}
-      </div>
-      <Link to="/daily" className="paper-btn" style={{ fontSize: "0.78rem", flexShrink: 0 }}>
-        {t("daily.title")} →
-      </Link>
+    <section className="mystic-daily-ribbon">
+      <span>今日 · {payload.date}</span>
+      <strong>
+        {td.ganzhi_day} · {td.day_wuxing} · {td.tarot_card.name}
+      </strong>
+      <Link to="/daily">今日个人化 →</Link>
     </section>
   );
 }
 
-function MethodOverview({ eastMethods, westMethods }: { eastMethods: MethodMeta[]; westMethods: MethodMeta[] }) {
-  const { t, lang } = useI18n();
-  const all = [...eastMethods, ...westMethods];
-  if (all.length === 0) {
-    return (
-      <div className="paper-empty">
-        <span className="paper-pulse" style={{ marginRight: "0.5rem" }} />
-        {t("action.loading")}
-      </div>
-    );
-  }
+function Instrument() {
+  const mountain = "子癸丑艮寅甲卯乙辰巽巳丙午丁未坤申庚酉辛戌乾亥壬";
+  const ticks = Array.from({ length: 72 }, (_, i) => i);
+  const microTicks = Array.from({ length: 60 }, (_, i) => i);
+
   return (
-    <section>
-      <div className="paper-eyebrow" style={{ marginBottom: "0.5rem" }}>
-        {lang === "zh" ? "十四术数" : "Fourteen Arts"}
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-        {all.map((m) => {
-          const plain = METHOD_PLAIN[m.id as keyof typeof METHOD_PLAIN];
-          return (
-            <Link
-              key={m.id}
-              to={`/m/${m.id}`}
-              className="paper-grid-cell"
-              style={{ textDecoration: "none", display: "block" }}
-            >
-              <div className="flex items-center justify-between mb-0.5">
-                <span style={{ fontFamily: "'Noto Serif SC', serif", fontWeight: 600, fontSize: "0.88rem", color: "var(--ink)" }}>
-                  {m.name_zh}
-                </span>
-                <SchoolChip school={m.school} />
-              </div>
-              <div style={{ fontSize: "0.65rem", color: "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace" }}>
-                {m.name_en}
-              </div>
-              {plain?.tagline && (
-                <div style={{ fontSize: "0.72rem", color: "var(--ink-soft)", marginTop: "0.3rem", letterSpacing: "0.03em" }}>
-                  {plain.tagline}
-                </div>
-              )}
-            </Link>
-          );
-        })}
-      </div>
-    </section>
+    <div className="mystic-instrument" aria-hidden="true">
+      <svg viewBox="0 0 600 600" role="img">
+        <defs>
+          <linearGradient id="mysticGold" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#d6be8a" />
+            <stop offset="1" stopColor="#8c7548" />
+          </linearGradient>
+        </defs>
+
+        <g className="mystic-ring-slow">
+          <circle cx="300" cy="300" r="272" />
+          <circle cx="300" cy="300" r="238" className="thin" />
+          {ticks.map((i) => {
+            const a = (i * 5 * Math.PI) / 180;
+            const length = i % 3 ? 5 : 11;
+            return (
+              <line
+                key={i}
+                x1={300 + Math.sin(a) * 272}
+                y1={300 - Math.cos(a) * 272}
+                x2={300 + Math.sin(a) * (272 - length)}
+                y2={300 - Math.cos(a) * (272 - length)}
+                className={i % 3 ? "minor" : "major"}
+              />
+            );
+          })}
+          {Array.from(mountain).map((char, i) => {
+            const a = (i * 15 * Math.PI) / 180;
+            const x = 300 + Math.sin(a) * 253;
+            const y = 300 - Math.cos(a) * 253;
+            return (
+              <text key={char + i} x={x} y={y} transform={`rotate(${i * 15} ${x} ${y})`}>
+                {char}
+              </text>
+            );
+          })}
+        </g>
+
+        <g className="mystic-ring-rev">
+          <circle cx="300" cy="300" r="196" className="middle" />
+          <circle cx="300" cy="300" r="170" className="thin" />
+          {microTicks.map((i) => {
+            const a = (i * 6 * Math.PI) / 180;
+            return (
+              <line
+                key={i}
+                x1={300 + Math.sin(a) * 196}
+                y1={300 - Math.cos(a) * 196}
+                x2={300 + Math.sin(a) * 190}
+                y2={300 - Math.cos(a) * 190}
+                className="minor"
+              />
+            );
+          })}
+        </g>
+
+        <g className="mystic-ring-static">
+          <circle cx="300" cy="300" r="128" />
+          <circle cx="300" cy="300" r="124" className="thin" />
+          <circle cx="300" cy="300" r="86" className="thin" />
+          <circle cx="300" cy="300" r="30" className="middle" />
+          <line x1="300" y1="300" x2="300" y2="118" className="needle" />
+          <circle cx="300" cy="300" r="2.5" className="hub" />
+        </g>
+      </svg>
+    </div>
   );
 }

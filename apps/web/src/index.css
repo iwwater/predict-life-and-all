@@ -591,3 +591,690 @@
     font-size: 1rem;
   }
 }
+
+/* ============================================================
+ * Mystic Hub v2: dark instrument language from the supplied sample.
+ * This block intentionally overrides the older paper theme while keeping
+ * existing paper-* component names alive across the app.
+ * ============================================================ */
+
+:root {
+  --black: #0f0d0b;
+  --black-lit: #1c1813;
+  --bone: #e8e2d6;
+  --bone-dim: #8f887b;
+  --gold-1: #d6be8a;
+  --gold-2: #8c7548;
+  --hair: rgba(214, 190, 138, 0.16);
+  --hair-strong: rgba(214, 190, 138, 0.32);
+
+  --paper: var(--black);
+  --paper-2: var(--black-lit);
+  --ink: var(--bone);
+  --ink-soft: var(--bone-dim);
+  --rule: var(--hair-strong);
+  --rule-soft: var(--hair);
+  --cinnabar: #a8362a;
+  --cinnabar-dim: #7d261d;
+  --indigo: #9cafb8;
+  --verdigris: #a4b49a;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    min-height: 100%;
+    background: var(--black);
+  }
+
+  body {
+    background:
+      radial-gradient(1200px 800px at 68% 38%, #221c14 0%, transparent 60%),
+      radial-gradient(900px 600px at 20% 90%, #17130e 0%, transparent 55%),
+      var(--black);
+    color: var(--bone);
+    font-family: "Noto Serif SC", "Noto Serif", "Songti SC", "PingFang SC", serif;
+    font-weight: 300;
+    letter-spacing: 0;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.045;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+.mystic-shell {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  background: transparent;
+}
+
+.mystic-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.45rem 4vw;
+  background: linear-gradient(180deg, rgba(15, 13, 11, 0.74), rgba(15, 13, 11, 0));
+  backdrop-filter: blur(8px);
+}
+
+.mystic-wordmark {
+  color: var(--bone);
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0.66em;
+  padding-left: 0.66em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.mystic-wordmark i {
+  margin-left: 0.9rem;
+  color: var(--bone-dim);
+  font-family: "Cormorant Garamond", "Cormorant", "Times New Roman", serif;
+  font-size: 0.78rem;
+  font-style: italic;
+  font-weight: 300;
+  letter-spacing: 0.18em;
+}
+
+.mystic-topnav {
+  display: flex;
+  align-items: center;
+  gap: 2.4rem;
+}
+
+.mystic-topnav a,
+.mystic-topnav button {
+  border: 0;
+  background: none;
+  color: var(--bone-dim);
+  cursor: pointer;
+  font-family: "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 300;
+  letter-spacing: 0.32em;
+  text-decoration: none;
+  transition: color 0.35s ease;
+}
+
+.mystic-topnav a:hover,
+.mystic-topnav button:hover {
+  color: var(--gold-1);
+}
+
+.mystic-breadcrumb {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 6.8rem 6vw 0;
+  color: var(--bone-dim);
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+  font-size: 0.68rem;
+  letter-spacing: 0.25em;
+}
+
+.mystic-breadcrumb a {
+  color: var(--bone-dim);
+  text-decoration: none;
+}
+
+.mystic-breadcrumb strong {
+  color: var(--gold-1);
+  font-weight: 300;
+}
+
+.mystic-main {
+  width: min(1080px, calc(100% - 12vw));
+  margin: 0 auto;
+  padding: 3rem 0 7rem;
+}
+
+.mystic-main-home {
+  width: 100%;
+  padding: 0;
+}
+
+.mystic-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: 2rem;
+  min-height: 100vh;
+  padding: 0 6vw;
+}
+
+.mystic-stage-copy {
+  position: relative;
+  z-index: 2;
+}
+
+.mystic-eyebrow,
+.mystic-art-cat,
+.mystic-daily-ribbon span,
+.paper-eyebrow,
+.paper-label {
+  color: var(--gold-2);
+  font-family: "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 300;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+}
+
+.mystic-eyebrow {
+  margin-bottom: 2.2rem;
+}
+
+.mystic-display {
+  color: var(--bone);
+  font-size: clamp(3rem, 6.2vw, 5.4rem);
+  font-weight: 200;
+  letter-spacing: 0.16em;
+  line-height: 1.18;
+}
+
+.mystic-display b {
+  color: transparent;
+  background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
+  background-clip: text;
+  -webkit-background-clip: text;
+  font-weight: 400;
+}
+
+.mystic-latin-line {
+  margin: 1.8rem 0 3.4rem;
+  color: var(--bone-dim);
+  font-family: "Cormorant Garamond", "Cormorant", "Times New Roman", serif;
+  font-size: 1.15rem;
+  font-style: italic;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+}
+
+.mystic-cta-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem 3rem;
+}
+
+.mystic-cta,
+.mystic-quiet-link {
+  color: var(--bone);
+  text-decoration: none;
+  transition: color 0.35s ease;
+}
+
+.mystic-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.1rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.5em;
+  padding-left: 0.5em;
+}
+
+.mystic-cta span {
+  display: inline-block;
+  width: 3.2rem;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold-1), var(--gold-2));
+  transition: width 0.45s ease;
+}
+
+.mystic-cta:hover {
+  color: var(--gold-1);
+}
+
+.mystic-cta:hover span {
+  width: 5rem;
+}
+
+.mystic-quiet-link {
+  color: var(--bone-dim);
+  font-size: 0.72rem;
+  letter-spacing: 0.34em;
+}
+
+.mystic-quiet-link:hover {
+  color: var(--gold-1);
+}
+
+.mystic-instrument {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.mystic-instrument::after {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgba(214, 190, 138, 0.07), transparent 70%);
+}
+
+.mystic-instrument svg {
+  width: min(46vw, 640px);
+  height: auto;
+  overflow: visible;
+}
+
+.mystic-instrument circle {
+  fill: none;
+  stroke: url("#mysticGold");
+  stroke-width: 0.7;
+  opacity: 0.5;
+}
+
+.mystic-instrument .thin {
+  stroke-width: 0.45;
+  opacity: 0.32;
+}
+
+.mystic-instrument .middle {
+  stroke-width: 0.55;
+  opacity: 0.42;
+}
+
+.mystic-instrument line {
+  stroke: url("#mysticGold");
+}
+
+.mystic-instrument .minor {
+  stroke-width: 0.45;
+  opacity: 0.4;
+}
+
+.mystic-instrument .major {
+  stroke-width: 0.9;
+  opacity: 0.7;
+}
+
+.mystic-instrument text {
+  fill: var(--gold-2);
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 10px;
+  font-weight: 300;
+  opacity: 0.85;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.mystic-instrument .needle {
+  stroke: var(--cinnabar);
+  stroke-width: 1.1;
+}
+
+.mystic-instrument .hub {
+  fill: var(--cinnabar);
+  stroke: none;
+  opacity: 1;
+}
+
+.mystic-ring-slow {
+  transform-origin: center;
+  animation: mystic-rotate 240s linear infinite;
+}
+
+.mystic-ring-rev {
+  transform-origin: center;
+  animation: mystic-rotate 360s linear infinite reverse;
+}
+
+@keyframes mystic-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.mystic-daily-ribbon {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 1.4rem;
+  flex-wrap: wrap;
+  width: min(980px, calc(100% - 12vw));
+  margin: -5.5rem auto 4rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--hair);
+  border-bottom: 1px solid var(--hair);
+  color: var(--bone-dim);
+}
+
+.mystic-daily-ribbon strong {
+  color: var(--bone);
+  font-weight: 300;
+  letter-spacing: 0.12em;
+}
+
+.mystic-daily-ribbon a {
+  color: var(--gold-1);
+  font-size: 0.72rem;
+  letter-spacing: 0.25em;
+  text-decoration: none;
+}
+
+.mystic-section {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 8rem 6vw 9rem;
+}
+
+.mystic-section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 2.2rem;
+  margin-bottom: 4.6rem;
+}
+
+.mystic-section-head h2 {
+  color: var(--bone);
+  font-size: 2rem;
+  font-weight: 200;
+  letter-spacing: 0.42em;
+}
+
+.mystic-section-head span {
+  color: var(--bone-dim);
+  font-family: "Cormorant Garamond", "Cormorant", "Times New Roman", serif;
+  font-size: 0.94rem;
+  font-style: italic;
+  letter-spacing: 0.16em;
+}
+
+.mystic-arts {
+  border-top: 1px solid var(--hair);
+}
+
+.mystic-art {
+  position: relative;
+  display: grid;
+  grid-template-columns: 6rem 1fr auto;
+  align-items: baseline;
+  gap: 2.4rem;
+  padding: 2.1rem 0.6rem;
+  border-bottom: 1px solid var(--hair);
+  color: var(--bone);
+  text-decoration: none;
+  transition: background 0.45s ease;
+}
+
+.mystic-art-name {
+  font-size: 1.5rem;
+  font-weight: 300;
+  letter-spacing: 0.3em;
+  transition: color 0.45s ease, letter-spacing 0.45s ease;
+}
+
+.mystic-art-name i {
+  margin-left: 1.6rem;
+  color: var(--bone-dim);
+  font-family: "Cormorant Garamond", "Cormorant", "Times New Roman", serif;
+  font-size: 0.88rem;
+  font-style: italic;
+  letter-spacing: 0.1em;
+}
+
+.mystic-art-hint {
+  color: var(--bone-dim);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+.mystic-art:hover {
+  background: linear-gradient(90deg, rgba(214, 190, 138, 0.05), transparent 70%);
+}
+
+.mystic-art:hover .mystic-art-name {
+  color: var(--gold-1);
+  letter-spacing: 0.38em;
+}
+
+.mystic-art:hover .mystic-art-hint {
+  opacity: 1;
+  transform: none;
+}
+
+.mystic-footer {
+  width: min(780px, calc(100% - 12vw));
+  margin: 0 auto;
+  padding: 2rem 0 3rem;
+  text-align: center;
+}
+
+.mystic-footer-mark {
+  width: 1px;
+  height: 3rem;
+  margin: 0 auto 2rem;
+  background: linear-gradient(180deg, transparent, var(--cinnabar));
+}
+
+.mystic-footer p {
+  color: var(--bone-dim);
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  line-height: 2.2;
+}
+
+.mystic-footer span {
+  display: block;
+  margin-top: 2rem;
+  color: #564f44;
+  font-family: "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.3em;
+}
+
+.paper-page,
+.paper-frame,
+.paper-grid-cell,
+.paper-input,
+.paper-tag,
+.paper-empty {
+  background: transparent;
+  color: var(--bone);
+}
+
+.paper-frame {
+  border: 1px solid var(--hair);
+  padding: 2rem;
+}
+
+.paper-frame::before {
+  border-color: rgba(214, 190, 138, 0.1);
+}
+
+.paper-grid-cell,
+.paper-remedy,
+.paper-fanli,
+.paper-empty {
+  border-color: var(--hair);
+  background: rgba(28, 24, 19, 0.42);
+}
+
+.paper-title,
+.paper-section,
+.paper-body,
+.markdown,
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown strong,
+.paper-mono,
+.paper-degree {
+  color: var(--bone);
+}
+
+.paper-title {
+  border-bottom-color: var(--hair);
+  font-size: clamp(1.8rem, 3vw, 3rem);
+  font-weight: 200;
+  letter-spacing: 0.16em;
+}
+
+.paper-title .stamp,
+.paper-seal,
+.paper-remedy .yi {
+  background: var(--cinnabar);
+}
+
+.paper-title .sub,
+.paper-body,
+.markdown em,
+.markdown blockquote,
+.paper-source,
+.paper-fanli,
+.paper-grid-cell .label {
+  color: var(--bone-dim);
+}
+
+.paper-btn {
+  min-height: 6rem;
+  min-width: 6rem;
+  border-radius: 999px;
+  border: 1px solid var(--hair-strong);
+  background: transparent;
+  color: var(--bone);
+  letter-spacing: 0.34em;
+  padding: 1rem;
+}
+
+.paper-btn:hover {
+  border-color: var(--gold-1);
+  background: transparent;
+  color: var(--gold-1);
+  box-shadow: 0 0 40px rgba(214, 190, 138, 0.12);
+}
+
+.paper-btn-ghost {
+  border-color: var(--hair);
+  background: transparent;
+  color: var(--bone-dim);
+  border-radius: 0;
+}
+
+.paper-btn-ghost:hover {
+  border-color: var(--gold-1);
+  color: var(--gold-1);
+}
+
+.paper-input {
+  border: 0;
+  border-bottom: 1px solid var(--hair-strong);
+  border-radius: 0;
+  background: transparent;
+  color: var(--bone);
+  font-family: "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
+}
+
+select.paper-input {
+  font-family: "Noto Serif SC", "Songti SC", serif;
+}
+
+.paper-input:focus {
+  border-color: var(--gold-1);
+  box-shadow: none;
+}
+
+.paper-input::placeholder {
+  color: rgba(143, 136, 123, 0.75);
+}
+
+.paper-link {
+  color: var(--gold-1);
+  border-bottom-color: rgba(214, 190, 138, 0.42);
+}
+
+.paper-hr,
+.paper-hr-double {
+  background: var(--hair);
+  border-color: var(--hair);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 920px) {
+  .mystic-topbar {
+    padding: 1.1rem 5vw;
+  }
+
+  .mystic-wordmark {
+    font-size: 0.86rem;
+    letter-spacing: 0.4em;
+    padding-left: 0.4em;
+  }
+
+  .mystic-wordmark i {
+    display: none;
+  }
+
+  .mystic-topnav {
+    gap: 1rem;
+  }
+
+  .mystic-topnav a,
+  .mystic-topnav button {
+    font-size: 0.66rem;
+    letter-spacing: 0.2em;
+  }
+
+  .mystic-stage {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    min-height: auto;
+    padding-top: 8rem;
+    text-align: center;
+  }
+
+  .mystic-cta-row {
+    justify-content: center;
+  }
+
+  .mystic-instrument svg {
+    width: 78vw;
+  }
+
+  .mystic-daily-ribbon {
+    margin-top: 2rem;
+  }
+
+  .mystic-art {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .mystic-art-hint {
+    display: none;
+  }
+
+  .mystic-main {
+    width: min(100% - 10vw, 1080px);
+  }
+}

@@ -32,6 +32,54 @@ _JI_DOOR = {"开门", "休门", "生门"}      # 三吉门
 _XIONG_DOOR = {"死门", "惊门", "伤门"}   # 凶门
 
 
+_CN_NUM = {1: "一", 2: "二", 3: "三", 4: "四", 5: "五", 6: "六", 7: "七", 8: "八", 9: "九"}
+_FALLBACK_SANYUAN = {
+    "冬至": ("陽", (1, 7, 4)),
+    "春分": ("陽", (3, 9, 6)),
+    "小滿": ("陽", (5, 2, 8)),
+    "立秋": ("陰", (2, 5, 8)),
+    "寒露": ("陰", (6, 9, 3)),
+}
+
+
+def _fallback_term(month: int, day: int) -> str:
+    md = month * 100 + day
+    if 1222 <= md or md <= 105:
+        return "冬至"
+    if 320 <= md <= 404:
+        return "春分"
+    if 521 <= md <= 605:
+        return "小滿"
+    if 807 <= md <= 822:
+        return "立秋"
+    if 1008 <= md <= 1022:
+        return "寒露"
+    return "冬至" if md < 620 or md >= 1222 else "立秋"
+
+
+def _fallback_raw(b: Birth, reason: str) -> dict:
+    term = _fallback_term(b.month, b.day)
+    yy, sanyuan = _FALLBACK_SANYUAN.get(term, ("陽", (1, 7, 4)))
+    ju = sanyuan[0]
+    return {
+        "fallback": True,
+        "fallback_reason": reason,
+        "calculation_basis": {
+            "method": "qimen",
+            "mode": "hour_qimen",
+            "input_source": "safe fallback because kinqimen is not installed",
+            "limits": ["Install kinqimen to enable full Qi Men Dun Jia charts."],
+        },
+        "节气": term,
+        "排局": f"{yy}遁{_CN_NUM[ju]}局上",
+        "九宫": {},
+        "八门": {},
+        "九星": {},
+        "八神": {},
+        "断": {"说明": "kinqimen dependency missing; returned a stable fallback shape."},
+    }
+
+
 def _judge(raw):
     out = {"格局": [], "门状态": {}, "空亡宫": [], "入墓": []}
     sky = raw["天盘三奇六仪"]; doors = raw["八门"]
@@ -80,7 +128,16 @@ def _judge(raw):
 def compute(b: Birth, method: int = 1) -> ChartResult:
     """method: 1=拆補法（默认，主流）, 2=置閏法。"""
     # kinqimen 内部用绝对 import config，需把其包目录加入 sys.path
-    import os, sys, importlib, kinqimen as _k
+    import os, sys, importlib
+    try:
+        import kinqimen as _k
+    except ModuleNotFoundError as exc:
+        raw = _fallback_raw(b, str(exc))
+        return ChartResult(
+            method="qimen", school="east", engine="kinqimen-fallback",
+            normalized={"elements": {}, "timeline": []},
+            raw=raw,
+        )
     pkg = os.path.dirname(_k.__file__)
     if pkg not in sys.path:
         sys.path.insert(0, pkg)
