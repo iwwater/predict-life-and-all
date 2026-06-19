@@ -1,11 +1,12 @@
-import { type FormEvent, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { type FormEvent, useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useBirthStore } from "../store/birth";
 import {
   castEventCase,
   createEventCase,
   createEventCaseVersion,
   updateEventCaseContext,
+  type CompassFengShuiResponse,
 } from "../lib/api";
 import type { CastResponse, EventCase } from "../lib/types";
 import { ReadingReportView } from "../components/ReadingReportView";
@@ -18,6 +19,7 @@ const DEPTH_OPTIONS = [
 
 export function Cases() {
   const navigate = useNavigate();
+  const routerLocation = useLocation();
   const birthStore = useBirthStore();
   const [question, setQuestion] = useState("接下来三个月，我是否适合推进这件事？");
   const [target, setTarget] = useState("");
@@ -30,6 +32,57 @@ export function Cases() {
   const [changedCondition, setChangedCondition] = useState("");
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // CompassPage 注入的待消费数据
+  const [pendingFengShui, setPendingFengShui] = useState<CompassFengShuiResponse | null>(null);
+  const [pendingSitting, setPendingSitting] = useState<string | null>(null);
+  const [pendingDirection, setPendingDirection] = useState<string | null>(null);
+
+  // 消费 CompassPage 通过 navigate state 传来的待处理数据
+  useEffect(() => {
+    const state = (routerLocation.state || {}) as {
+      pendingSitting?: string;
+      pendingFengShui?: CompassFengShuiResponse;
+      pendingDirection?: string;
+    };
+    const navFeng = state.pendingFengShui;
+    const navSitting = state.pendingSitting;
+    const navDir = state.pendingDirection;
+    // 兜底: 从 localStorage 读取 (旧入口或刷新后)
+    let storedFeng: CompassFengShuiResponse | null = null;
+    let storedSitting: string | null = null;
+    try {
+      const raw = localStorage.getItem("pending_fengshui");
+      if (raw) storedFeng = JSON.parse(raw) as CompassFengShuiResponse;
+      storedSitting = localStorage.getItem("pending_sitting");
+    } catch {
+      // 忽略 localStorage 解析错误
+    }
+    const feng = navFeng || storedFeng;
+    const sitting = navSitting || storedSitting;
+    const dir = navDir || feng?.direction || null;
+    if (feng) {
+      setPendingFengShui(feng);
+      // 预填问题与目标
+      setQuestion(
+        (prev) =>
+          prev ||
+          `我现住的房子坐${sitting || feng.sitting}向${dir || feng.direction || ""}, 这次合参想了解近期迁居/调整布局的吉凶.`,
+      );
+      setTarget((prev) => prev || `坐${sitting || feng.sitting}`);
+      setLocation((prev) => prev || birthStore.birth.city || "");
+      // 消费后清掉 (避免下次进入页面误用)
+      localStorage.removeItem("pending_fengshui");
+    }
+    if (sitting) {
+      setPendingSitting(sitting);
+      localStorage.removeItem("pending_sitting");
+    }
+    if (dir) setPendingDirection(dir);
+    // 路由历史清空 state, 避免刷新再次触发
+    if (navFeng || navSitting) {
+      window.history.replaceState({}, document.title, routerLocation.pathname);
+    }
+  }, [routerLocation.state, routerLocation.pathname, birthStore.birth.city]);
 
   const selectedCount = useMemo(() => Object.keys(answers).length, [answers]);
   const missingRequired = useMemo(() => {
@@ -130,6 +183,49 @@ export function Cases() {
           一事一档：先记录问题和现实条件，再回答系统追问，最后固定一次合参结果。当前为本地演示存储，刷新或重启后端后档案可能消失。
         </p>
       </header>
+
+      {/* pending fengshui 注入提示 */}
+      {pendingFengShui && (
+        <div
+          className="paper-frame flex flex-col gap-2 p-4"
+          style={{ background: "var(--paper)", borderColor: "var(--cinnabar)" }}
+        >
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="paper-tag" style={{ color: "var(--cinnabar)", borderColor: "var(--cinnabar)" }}>
+              罗盘已注入
+            </span>
+            <span style={{ fontSize: "0.78rem", color: "var(--ink-soft)" }}>
+              来自 CompassPage 的风水上下文已自动带入问题与目标,可直接调整后立档
+            </span>
+            <button
+              type="button"
+              className="paper-btn-ghost text-sm"
+              onClick={() => {
+                setPendingFengShui(null);
+                setPendingSitting(null);
+                setPendingDirection(null);
+              }}
+            >
+              清除
+            </button>
+          </div>
+          <div style={{ fontSize: "0.76rem", color: "var(--ink-soft)", lineHeight: 1.7 }}>
+            坐山: <strong style={{ color: "var(--ink)" }}>{pendingSitting || pendingFengShui.sitting}</strong>
+            {pendingFengShui.sitting_zh && ` (${pendingFengShui.sitting_zh})`}
+            {" · "}朝向: {pendingDirection || pendingFengShui.direction}
+            {" · "}精度: {pendingFengShui.quality}
+            {pendingFengShui.dual_candidate && (
+              <span style={{ color: "var(--cinnabar)" }}> · 临界角双候选</span>
+            )}
+          </div>
+          {pendingFengShui.bazhai?.命卦 && (
+            <div style={{ fontSize: "0.72rem", color: "var(--ink-soft)" }}>
+              八宅命卦: {pendingFengShui.bazhai.命卦}
+              {pendingFengShui.xuankong?.格局 && ` · 玄空: ${pendingFengShui.xuankong.格局}`}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* birth time accuracy nudge */}
       {birthStore.birth.birth_time_accuracy !== "exact" && (
