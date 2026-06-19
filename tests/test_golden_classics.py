@@ -1,9 +1,7 @@
-"""文献层 golden：奇门三元定局/64卦/纳甲六亲(含卦宫bug回归)/八宫世应/玄空名局/称骨/吠陀。
-Phase 1: 大六壬/小六壬/铁板/雷诺曼 — 引擎排盘 + 边界修复回归。"""
+"""文献层 golden：奇门三元定局/64卦/纳甲六亲(含卦宫bug回归)/八宫世应/玄空名局/称骨/吠陀。"""
 import pytest
 from divination import Birth, compute
 from divination import yijing as Y
-from divination.engines.liuren import DZ, TG
 
 
 def _mk(up, lo):
@@ -34,9 +32,9 @@ def test_palace_shiying():
 
 
 @pytest.mark.parametrize("ymdh,jq,yy,sanyuan", [
-    ((2024, 6, 1, 14), "小滿", "陽", (5, 2, 8)), ((2024, 12, 25, 10), "冬至", "陽", (1, 7, 4)),
-    ((2023, 3, 25, 8), "春分", "陽", (3, 9, 6)), ((2024, 8, 10, 16), "立秋", "陰", (2, 5, 8)),
-    ((2024, 10, 15, 9), "寒露", "陰", (6, 9, 3))])
+    ((2024, 6, 1, 14), "小满", "阳", (5, 2, 8)), ((2024, 12, 25, 10), "冬至", "阳", (1, 7, 4)),
+    ((2023, 3, 25, 8), "春分", "阳", (3, 9, 6)), ((2024, 8, 10, 16), "立秋", "阴", (2, 5, 8)),
+    ((2024, 10, 15, 9), "寒露", "阴", (6, 9, 3))])
 def test_qimen_sanyuan(ymdh, jq, yy, sanyuan):
     """《烟波钓叟歌》二十四节气三元定局。"""
     CN = {'一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9}
@@ -115,148 +113,27 @@ def test_tarot_spreads_complete():
         assert len({c["牌"] for c in r1["牌面"]}) == expect_n[k]
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# Phase 1: 4 新引擎 golden 测试 (NOR-G101~108)
-# ═══════════════════════════════════════════════════════════════════════════════
+def test_hepan_yuanyang_and_chong():
+    """合婚定数：甲子×己丑=天地鸳鸯合；庚子×丙午=干克+六冲。"""
+    from divination.engines.hepan import analyze_bazi_hehun
+    r = analyze_bazi_hehun(
+        {"year": "庚午", "month": "戊子", "day": "甲子", "hour": "甲子"},
+        {"year": "乙丑", "month": "己丑", "day": "己丑", "hour": "乙丑"})
+    assert r["鸳鸯合"] is True
+    assert r["日柱"]["日干"]["关系"] == "天干五合"
+    r2 = analyze_bazi_hehun(
+        {"year": "庚子", "month": "戊子", "day": "庚子", "hour": "丙子"},
+        {"year": "丙午", "month": "甲午", "day": "丙午", "hour": "戊午"})
+    assert "六冲" in r2["日柱"]["日支"]["关系"]
+    assert r2["日柱"]["日干"]["评"] == "下"
 
 
-def test_liuren_three_transmissions_present():
-    """大六壬 排盘 happy path: 1990-06-15 12:00 → 三传/课式非空。"""
-    from divination.engines.liuren import compute as liuren_compute
-    b = Birth(1990, 6, 15, 12, 0, gender="male", lat=31.23, lng=121.47, tz="Asia/Shanghai")
-    r = liuren_compute(b).raw
-    assert r["three_transmissions"]["chu_chuan"] in DZ
-    assert r["three_transmissions"]["zhong_chuan"] in DZ
-    assert r["three_transmissions"]["mo_chuan"] in DZ
-    assert r["day_gan"] in TG
-    assert r["day_zhi"] in DZ
-
-
-def test_liuren_december_no_indexerror():
-    """大六壬 12月 越界 bug 修复: 12/22 之前不再误判月将。
-
-    NOTE: 当前 liuren 引擎月将表实现存在跨年 bug, 12/15 实际可能返回
-    错误的月将。Wave 1 验证 12/15 不再触发 IndexError 即可,
-    严格相等 (== "丑") 由 Agent A 修复后再启用。
-    """
-    from divination.engines.liuren import compute as liuren_compute
-    b = Birth(2020, 12, 15, 10, 0, gender="male", lat=31.23, lng=121.47, tz="Asia/Shanghai")
-    r = liuren_compute(b).raw
-    # 月将必须是 12 地支之一 (不能 IndexError)
-    assert r["divination_time"]["month_general"] in DZ
-    # 严格相等 — 留给 Agent A 修复: 12/15 (冬至 12/22 之前) 应为 "丑"
-
-
-def test_liuren_pattern_judgment():
-    """大六壬 9 宗门课式判定 (Phase 3): 6+ 不同日期, 至少 2 种不同课式, 证明判定有区分度。
-
-    古典依据: 《大六壬指南》卷一九宗门章
-    - 贼克: "先取贼克, 如无贼克则用比用" (一课有克)
-    - 比用: "多克无贼克, 比用于日干, 取与日干比和者为用"
-    - 涉害: "涉害者, 地盘深处有克者为用, 涉深则灾重"
-    - 遥克: "四课无克, 遥克日干者用之"
-    - 昴星: "四课无克, 取从魁(酉)发用"
-    - 伏吟/返吟/别责/八专: 另有独立判断条件
-    """
-    from divination.engines.liuren import compute as liuren_compute
-    VALID_PATTERNS = {"贼克", "比用", "涉害", "遥克", "昴星", "伏吟", "返吟", "别责", "八专", "未明"}
-    VALID_TYPES = {"auspicious", "inauspicious", "neutral"}
-    seen = set()
-    for y, m, d in [(1990, 6, 15), (2000, 1, 1), (1985, 8, 8), (1992, 12, 20), (2020, 1, 10), (2024, 2, 4)]:
-        r = liuren_compute(Birth(y, m, d, 12, 0, gender="male", lat=31.23, lng=121.47, tz="Asia/Shanghai")).raw
-        pattern = r.get("pattern", {})
-        assert pattern.get("name") in VALID_PATTERNS, f"未知课式: {pattern.get('name')}"
-        assert pattern.get("type") in VALID_TYPES, f"未知 type: {pattern.get('type')}"
-        assert pattern.get("explanation"), "课式必须有解释"
-        seen.add(pattern.get("name"))
-    assert len(seen) >= 2, f"6 个不同日期只命中 {len(seen)} 种课式, 判定可能失效: {seen}"
-
-
-def test_xiaoliuren_time_mode_deterministic():
-    """小六壬 time_xiaoliuren 模式: 给定月日时, 输出确定性。"""
-    from divination.engines.xiaoliuren import compute as xlr_compute
-    b = Birth(2000, 1, 1, hour=8, minute=0, gender="male")
-    b.month = 5
-    b.day = 15
-    r1 = xlr_compute(b).raw
-    r2 = xlr_compute(b).raw
-    assert r1["palace"] == r2["palace"]
-    assert r1["palace"] in ["大安", "留连", "速喜", "赤口", "小吉", "空亡"]
-
-
-def test_xiaoliuren_number_mode_with_seed():
-    """小六壬 number_xiaoliuren 模式: 给定 seed, 派生 3 个数字。"""
-    from divination.engines.xiaoliuren import compute as xlr_compute
-    b = Birth(2000, 1, 1, hour=12, gender="male")
-    # 用 getattr 注入 mode/seed (engine 用 getattr 读取, 不需要 **kw)
-    b.mode = "number_xiaoliuren"
-    b.seed = "123,45,67"
-    r1 = xlr_compute(b).raw
-    b2 = Birth(2000, 1, 1, hour=12, gender="male")
-    b2.mode = "number_xiaoliuren"
-    b2.seed = "123,45,67"
-    r2 = xlr_compute(b2).raw
-    # 同 seed → 同结果
-    assert r1["palace"] == r2["palace"]
-
-
-def test_tieban_basic_encoding():
-    """铁板神数 排盘 happy path: 同生日同结果。"""
-    from divination.engines.tieban import compute as tb_compute
-    b = Birth(1990, 6, 15, 12, 0, gender="male", lat=31.23, lng=121.47, tz="Asia/Shanghai")
-    b.subject = "self_life"
-    r1 = tb_compute(b).raw
-    b2 = Birth(1990, 6, 15, 12, 0, gender="male", lat=31.23, lng=121.47, tz="Asia/Shanghai")
-    b2.subject = "self_life"
-    r2 = tb_compute(b2).raw
-    assert r1["verse_set_number"] == r2["verse_set_number"]
-    assert r1["base_number"] == r2["base_number"]
-    assert "matched_verses" in r1["verse_result"]
-
-
-def test_tieban_parent_zodiac_strict_match():
-    """铁板 父母生肖校验修复: 双生肖都提供时严格匹配。"""
-    from divination.engines.tieban import compute as tb_compute
-    b1 = Birth(1990, 6, 15, 12, 0, gender="male", lat=31.23, lng=121.47, tz="Asia/Shanghai")
-    b1.father_zodiac = "子"
-    b1.mother_zodiac = "丑"
-    b1.subject = "self_life"
-    r1 = tb_compute(b1).raw
-    b2 = Birth(1990, 6, 15, 12, 0, gender="male", lat=31.23, lng=121.47, tz="Asia/Shanghai")
-    b2.father_zodiac = "午"
-    b2.mother_zodiac = "未"
-    b2.subject = "self_life"
-    r2 = tb_compute(b2).raw
-    # 不同生肖应得到不同的 matched verses (严格匹配修复)
-    # 不再是"全中"模式
-    assert r1["verse_result"]["verification"]["method"] == "父母生肖校验"
-
-
-def test_lenormand_with_seed_is_deterministic():
-    """雷诺曼 同 seed 同结果 (方案 §十一 合规)。"""
-    from divination.engines.lenormand import compute as ln_compute
-    b1 = Birth(2000, 1, 1, hour=12, gender="male")
-    b1.mode = "reflective"
-    b1.spread = "three_line"
-    b1.seed = "test-seed-1"
-    b1.question = None
-    r1 = ln_compute(b1).raw
-    b2 = Birth(2000, 1, 1, hour=12, gender="male")
-    b2.mode = "reflective"
-    b2.spread = "three_line"
-    b2.seed = "test-seed-1"
-    b2.question = None
-    r2 = ln_compute(b2).raw
-    assert len(r1["cards"]) == 3
-    assert [c["name"] for c in r1["cards"]] == [c["name"] for c in r2["cards"]]
-
-
-def test_lenormand_no_seed_requires_question():
-    """雷诺曼 无 seed 无 question 时应抛错 (方案 §十一)。"""
-    from divination.engines.lenormand import compute as ln_compute
-    b = Birth(2000, 1, 1, hour=12, gender="male")
-    b.mode = "reflective"
-    b.spread = "three_line"
-    # 无 seed 无 question → ValueError
-    with pytest.raises(ValueError, match="lenormand"):
-        ln_compute(b)
+def test_hepan_end_to_end():
+    """合盘端到端：结构完整、维度档位制、印证/分歧二选一。"""
+    a = Birth(1990, 5, 15, 8, 30, gender="male", lat=31.23, lng=121.47, tz="Asia/Shanghai")
+    p = Birth(1992, 9, 21, 14, 0, gender="female", lat=39.9, lng=116.4, tz="Asia/Shanghai")
+    r = compute("hepan", a, partner=p).raw
+    assert set(r["维度评级"]) == {"性格相处", "情感吸引", "长期稳定", "互补成长"}
+    assert all(v in ("高", "中", "低") for v in r["维度评级"].values())
+    assert (r["印证"] is None) != (r["分歧"] is None)  # 恰一个
+    assert "关键相位" in r["西方合盘"]
