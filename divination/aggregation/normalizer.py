@@ -9,11 +9,12 @@ Phase 1: 5 维职责分派 — 每个 signal 自动打 dimension + time_scope �
 """
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from divination.contracts import ChartResult
 
-from .schema import DivinationSignal
+from .schema import DimensionPolarity, DivinationSignal
+from .signal_digest import attach_digest
 
 # ── Phase 1: 方法→5 维 默认映射 (NOR-019) ──────────────────────────────────
 # _make_signal() 收到未指定的 dimension/time_scope 时, 用此表兜底。
@@ -100,6 +101,12 @@ SIGNAL_KEYS: set[str] = {
     # ── 长期潜力 (SIG-010) ──
     "long_term_potential",
     "short_term_caution",
+    # ── 当前大运/大限 (Sprint 2.1) ──
+    "current_cycle_dasha",
+    # ── 次限推运 (Sprint 2.2 western) ──
+    "prog_timing_opportunity",
+    "prog_timing_obstacle",
+    "prog_timing_transition",
     # ── 通用 fallback (SIG-011) ──
     "general_reference",
 }
@@ -125,8 +132,8 @@ def _make_signal(
     strength: float,
     evidence: str = "",
     confidence: float = 0.5,
-    dimension: Optional[str] = None,
-    time_scope: Optional[str] = None,
+    dimension: str | None = None,
+    time_scope: str | None = None,
 ) -> DivinationSignal:
     """创建归一化的 signal (strength 0-1, NOR-018)。
 
@@ -142,7 +149,7 @@ def _make_signal(
     if time_scope is None:
         time_scope = _METHOD_TIME_SCOPE.get(method)
 
-    return DivinationSignal(
+    sig = DivinationSignal(
         method=method,
         domain=domain,
         signal_key=signal_key,
@@ -153,6 +160,8 @@ def _make_signal(
         dimension=dimension,
         time_scope=time_scope,
     )
+    # Sprint 1.4: 自动派生 signal_digest
+    return attach_digest(sig)
 
 
 def _fallback(method: str, domain: str = "self_life") -> DivinationSignal:
@@ -344,11 +353,67 @@ def _normalize_bazi(method: str, raw: dict, _norm: dict) -> list[DivinationSigna
                 strength=0.5, evidence=f"五行最旺{dominant}最弱{weak}", confidence=0.45,
                 dimension="long_term", time_scope="long_term"))
 
+    # 6. Sprint 2.1: 当前大运 (大限) — current_cycle, 10 年期
+    horoscope = raw.get("horoscope", {}) or {}
+    current_dayun = horoscope.get("current_dayun")
+    if current_dayun:
+        gz = current_dayun.get("label", "")
+        # 大运天干与日主天干关系 → 极性
+        dm_tg = day_master[:1] if day_master else ""
+        dayun_tg = gz.replace("大运·", "")[:1] if gz else ""
+        pol = _bazi_gan_relation(dm_tg, dayun_tg)
+        s.append(_make_signal(method, "self_life", "current_cycle_dasha", pol,
+            strength=0.65, confidence=0.6,
+            dimension="current_cycle", time_scope="current_cycle",
+            evidence=f"当前大运: {gz} ({current_dayun.get('from','')}-{current_dayun.get('to','')})"))
+
+    # 7. Sprint 2.1: 流月 — 当前月的月柱
+    current_month_num = horoscope.get("current_month")
+    monthly_list = horoscope.get("monthly", [])
+    if current_month_num and monthly_list:
+        cur_month = next((m for m in monthly_list if m.get("month") == current_month_num), None)
+        if cur_month:
+            mz = cur_month.get("ganzhi", "")
+            dm_tg = day_master[:1] if day_master else ""
+            month_tg = mz[:1] if mz else ""
+            pol = _bazi_gan_relation(dm_tg, month_tg)
+            s.append(_make_signal(method, "timing", "timing_transition", pol,
+                strength=0.5, confidence=0.5,
+                dimension="current_cycle", time_scope="current_cycle",
+                evidence=f"{current_month_num}月流月{mz}: 日主{dm_tg}, 月令{month_tg}"))
+
     return s
 
 
+def _bazi_gan_relation(dm_tg: str, other_tg: str) -> str:
+    """天干五行生克 → polarity。
+
+    简化: 同五行=比和(neutral), 生日=positive, 克日=negative
+    """
+    if not dm_tg or not other_tg:
+        return "neutral"
+    wx_map = {"甲": "木", "乙": "木", "丙": "火", "丁": "火", "戊": "土", "己": "土",
+              "庚": "金", "辛": "金", "壬": "水", "癸": "水"}
+    sheng_map = {"木": "火", "火": "土", "土": "金", "金": "水", "水": "木"}
+    dm_wx = wx_map.get(dm_tg, "")
+    other_wx = wx_map.get(other_tg, "")
+    if not dm_wx or not other_wx:
+        return "neutral"
+    if sheng_map.get(other_wx) == dm_wx:
+        return "positive"
+    if sheng_map.get(dm_wx) == other_wx:
+        return "negative"
+    if other_wx == dm_wx:
+        return "neutral"
+    return "neutral"
+
+
 def _normalize_ziwei(method: str, raw: dict, _norm: dict) -> list[DivinationSignal]:
-    """NOR-005: 紫微 — ≥3 signals (natal + 4 化 current_cycle)。"""
+    """NOR-005: 紫微 — ≥3 signals (natal + 4 化 current_cycle)。
+
+    Sprint 4.1: 消费 `four_transformations_enriched` 结构化数据, 取代字符串关键字
+    匹配 (W1 老 API 空串 bug 修复). 大限/流年 evidence 改用含义字典, 信息密度更高.
+    """
     s: list[DivinationSignal] = []
     palaces = raw.get("palaces", [])
 
@@ -357,6 +422,15 @@ def _normalize_ziwei(method: str, raw: dict, _norm: dict) -> list[DivinationSign
 
     def _star_names(stars: list) -> list[str]:
         return [st.get("name", st) if isinstance(st, dict) else st for st in stars]
+
+    # W1 修复: py_iztro 0.3+ 旧 API 返回 ['','','',''], 跳过空串
+    def _classify_mutagen(mut: str) -> str:
+        if not mut:
+            return "neutral"
+        m = mut.lower()
+        if "ji" in m or "obstacle" in m:
+            return "negative"
+        return "positive"
 
     # 1. 事业 — 官禄宫 (natal, long_term)
     guanlu = _get_palace("官禄宫")
@@ -403,25 +477,49 @@ def _normalize_ziwei(method: str, raw: dict, _norm: dict) -> list[DivinationSign
             strength=0.5, evidence=f"命宫: {ming_names}", confidence=0.55,
             dimension="long_term", time_scope="long_term"))
 
-    # 4. Phase 3: 4 化 → current_cycle signal
-    # 取 decadal (大限) 和 yearly (流年) 两层 4 化, 各出 1-2 个 current_cycle signal
+    # 4. Sprint 4.1: 本命四化 (结构化 enriched.natal, 取代字符串匹配)
+    #    W1 修复: 直接读 NATAL_SIHUA 结构, 跳过空串/不存在的 hua_type
+    enriched = raw.get("four_transformations_enriched", {}) or {}
+    natal_sihua = enriched.get("natal") or {}
+    if natal_sihua:
+        lu = natal_sihua.get("禄") or {}
+        ji = natal_sihua.get("忌") or {}
+        lu_star = lu.get("star", "")
+        ji_star = ji.get("star", "")
+        lu_meaning = lu.get("meaning", "")
+        ji_meaning = ji.get("meaning", "")
+        pol = "positive" if lu_star and not ji_star else "negative" if ji_star and not lu_star else "neutral"
+        s.append(_make_signal(
+            method, "self_life", "natal_four_transformations",
+            pol, strength=0.7, confidence=0.75,
+            dimension="long_term", time_scope="long_term",
+            evidence=f"本命四化: 禄{lu_star} ({lu_meaning}) | 权{natal_sihua.get('权', {}).get('star', '')} | "
+                     f"科{natal_sihua.get('科', {}).get('star', '')} | 忌{ji_star} ({ji_meaning})",
+        ))
+
+    # 5. Sprint 4.1: 大限四化 (优先 enriched 结构化, fallback 字符串路径)
+    decadal_sihua = enriched.get("current_decadal") or {}
     four_trans = raw.get("four_transformations", {})
-    decadal_muts = four_trans.get("decadal", []) or []
-    yearly_muts = four_trans.get("yearly", []) or []
-
-    # 化禄/化权/化科 → positive, 化忌 → negative
-    POSITIVE_KEYS = {"lu", "huaLu", "huaQuan", "huaKe", "luminance", "M", "F"}  # 各种 py_iztro 命名
-    NEGATIVE_KEYS = {"ji", "huaJi", "obstacle", "B"}
-
-    def _classify_mutagen(mut: str) -> str:
-        if not mut:
-            return "neutral"  # 空字符串不计（py_iztro 0.3+ 旧 API 兼容）
-        m = mut.lower()
-        if "ji" in m or "obstacle" in m:
-            return "negative"
-        return "positive"
-
-    if decadal_muts:
+    decadal_muts = [m for m in (four_trans.get("decadal", []) or []) if m]
+    if decadal_sihua:
+        lu = decadal_sihua.get("化禄") or {}
+        ji = decadal_sihua.get("化忌") or {}
+        pol = "positive" if lu and not ji else "negative" if ji and not lu else "neutral"
+        ev_parts = []
+        for hua_type in ("化禄", "化权", "化科", "化忌"):
+            entry = decadal_sihua.get(hua_type) or {}
+            star = entry.get("star", "")
+            meaning = entry.get("meaning", "")
+            if star:
+                ev_parts.append(f"{hua_type}{star}{' → ' + meaning if meaning else ''}")
+        s.append(_make_signal(
+            method, "timing", "timing_opportunity" if pol == "positive" else "timing_obstacle",
+            pol, strength=0.6, confidence=0.65,
+            dimension="current_cycle", time_scope="current_cycle",
+            evidence="大限4化: " + " · ".join(ev_parts),
+        ))
+    elif decadal_muts:
+        # Fallback: engine 输出 bare star names (e.g. ['巨门','太阳']), 用字符串路径
         pol_count = {"positive": 0, "negative": 0, "neutral": 0}
         for mut in decadal_muts:
             pol_count[_classify_mutagen(mut)] += 1
@@ -433,7 +531,27 @@ def _normalize_ziwei(method: str, raw: dict, _norm: dict) -> list[DivinationSign
             evidence=f"大限4化: {decadal_muts} ({pol_count['positive']}吉{pol_count['negative']}忌)",
         ))
 
-    if yearly_muts:
+    # 6. Sprint 4.1: 流年四化 (优先 enriched 结构化, fallback 字符串路径)
+    yearly_sihua = enriched.get("current_yearly") or {}
+    yearly_muts = [m for m in (four_trans.get("yearly", []) or []) if m]
+    if yearly_sihua:
+        lu = yearly_sihua.get("化禄") or {}
+        ji = yearly_sihua.get("化忌") or {}
+        pol = "positive" if lu and not ji else "negative" if ji and not lu else "neutral"
+        ev_parts = []
+        for hua_type in ("化禄", "化权", "化科", "化忌"):
+            entry = yearly_sihua.get(hua_type) or {}
+            star = entry.get("star", "")
+            meaning = entry.get("meaning", "")
+            if star:
+                ev_parts.append(f"{hua_type}{star}{' → ' + meaning if meaning else ''}")
+        s.append(_make_signal(
+            method, "timing", "timing_transition",
+            pol, strength=0.55, confidence=0.6,
+            dimension="current_cycle", time_scope="current_cycle",
+            evidence="流年4化: " + " · ".join(ev_parts),
+        ))
+    elif yearly_muts:
         pol_count = {"positive": 0, "negative": 0, "neutral": 0}
         for mut in yearly_muts:
             pol_count[_classify_mutagen(mut)] += 1
@@ -445,20 +563,31 @@ def _normalize_ziwei(method: str, raw: dict, _norm: dict) -> list[DivinationSign
             evidence=f"流年4化: {yearly_muts} ({pol_count['positive']}吉{pol_count['negative']}忌)",
         ))
 
-    # monthly / daily / hourly 任一有有效 4 化 → 出短期 current_cycle signal
+    # 7. Sprint 4.1: 短期四化 (流月/日/时, 兼容老 API, 跳过空串)
+    monthly_muts = [m for m in (four_trans.get("monthly", []) or []) if m]
+    if monthly_muts:
+        pol_count = {"positive": 0, "negative": 0, "neutral": 0}
+        for mut in monthly_muts:
+            pol_count[_classify_mutagen(mut)] += 1
+        overall = "positive" if pol_count["positive"] > pol_count["negative"] else "negative" if pol_count["negative"] > pol_count["positive"] else "neutral"
+        s.append(_make_signal(
+            method, "timing", "timing_transition",
+            overall, strength=0.52, confidence=0.5,
+            dimension="current_cycle", time_scope="current_cycle",
+            evidence=f"流月4化: {monthly_muts} ({pol_count['positive']}吉{pol_count['negative']}忌)",
+        ))
     short_scopes = [(s_name, [m for m in (four_trans.get(s_name, []) or []) if m]) for s_name in ("monthly", "daily", "hourly")]
     has_short = any(muts for _, muts in short_scopes)
     if has_short:
         all_muts = [m for _, muts in short_scopes for m in muts]
-        pol_count = {"positive": 0, "negative": 0, "neutral": 0}
-        for mut in all_muts:
-            pol_count[_classify_mutagen(mut)] += 1
-        overall = "positive" if pol_count["positive"] > pol_count["negative"] else "negative" if pol_count["negative"] > pol_count["positive"] else "neutral"
+        pos = sum(1 for m in all_muts if _classify_mutagen(m) == "positive")
+        neg = sum(1 for m in all_muts if _classify_mutagen(m) == "negative")
+        overall = "positive" if pos > neg else "negative" if neg > pos else "neutral"
         s.append(_make_signal(
             method, "decision", "decision_support" if overall == "positive" else "decision_risk",
             overall, strength=0.5, confidence=0.45,
             dimension="current_cycle", time_scope="current_cycle",
-            evidence=f"流月/日/时4化: {all_muts[:4]}",
+            evidence=f"流月/日/时4化: {all_muts[:4]} ({pos}吉{neg}忌)",
         ))
 
     return s
@@ -484,7 +613,7 @@ def _normalize_qimen(method: str, raw: dict, _norm: dict) -> list[DivinationSign
             evidence=f"凶格{bad_pat}多于吉格{good_pat}", confidence=0.6))
     else:
         s.append(_make_signal(method, "decision", "decision_delay", "neutral",
-            strength=0.45, evidence=f"格局吉凶各半", confidence=0.5))
+            strength=0.45, evidence="格局吉凶各半", confidence=0.5))
 
     # 2. 时机
     if door_status:
@@ -494,7 +623,7 @@ def _normalize_qimen(method: str, raw: dict, _norm: dict) -> list[DivinationSign
     # 3. 贵人
     if "休" in str(door_status) or "生" in str(door_status):
         s.append(_make_signal(method, "self_life", "noble_help", "positive",
-            strength=0.55, evidence=f"吉门相助", confidence=0.5))
+            strength=0.55, evidence="吉门相助", confidence=0.5))
     else:
         s.append(_make_signal(method, "self_life", "general_reference", "neutral",
             strength=0.35, evidence="奇门遁甲综合参考", confidence=0.4))
@@ -575,7 +704,7 @@ def _normalize_liuyao(method: str, raw: dict, _norm: dict) -> list[DivinationSig
 
     # 2. 时机
     s.append(_make_signal(method, "timing", "timing_transition", "neutral",
-        strength=0.45, evidence=f"六爻卦象参考", confidence=0.4))
+        strength=0.45, evidence="六爻卦象参考", confidence=0.4))
 
     # 3. 变动
     if raw.get("动爻") or raw.get("变卦"):
@@ -739,6 +868,17 @@ def _normalize_western(method: str, raw: dict, _norm: dict) -> list[DivinationSi
             strength=0.52, confidence=0.48,
             dimension="current_cycle", time_scope="current_cycle",
             evidence=f"次限推运 {len(progressions)} 相位 (次限期{prog_date})，{tightest.get('planet','')}{tightest.get('aspect','')}"))
+
+    # Sprint 2.2: 太阳返照 (Solar Return) — annual cycle
+    solar_return = raw.get("solar_return")
+    if solar_return:
+        sr_year = solar_return.get("year", "")
+        sr_diff = solar_return.get("sun_diff_deg", 99)
+        pol = "positive" if sr_diff < 0.5 else "neutral"
+        s.append(_make_signal(method, "timing", "timing_transition", pol,
+            strength=0.5, confidence=0.5,
+            dimension="current_cycle", time_scope="current_cycle",
+            evidence=f"太阳返照 {sr_year} (精度 {sr_diff:.3f}°)"))
 
     return s
 

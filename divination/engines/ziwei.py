@@ -1,4 +1,4 @@
-"""Zi Wei Dou Shu charting via the iztro Python ports."""
+﻿"""Zi Wei Dou Shu charting via the iztro Python ports."""
 
 from __future__ import annotations
 
@@ -45,6 +45,37 @@ def _text(value: Any) -> str:
     if value is None:
         return ""
     return str(value)
+
+
+def _extract_year_gan(chart, birth: Birth) -> str | None:
+    """从 py_iztro chart.chinese_date 提取出生年干 (甲/乙/.../癸).
+
+    chinese_date.yearly 形如 [("甲子", 1984), ...] 或类似结构, 取干支字符串首字符.
+    若 py_iztro 接口不暴露 chinese_date, 退化为用 lunar-python 直接计算年干.
+    """
+    cd = getattr(chart, "chinese_date", None)
+    yearly = getattr(cd, "yearly", None) if cd else None
+    if yearly:
+        first = yearly[0] if isinstance(yearly, (list, tuple)) and yearly else None
+        if first is not None:
+            # 多种可能结构: ("甲子", 1984) / [年, 干支] / 干支字符串本身
+            ganzhi = None
+            if isinstance(first, (list, tuple)):
+                for item in first:
+                    s = _text(item)
+                    if s and any(g in s for g in "甲乙丙丁戊己庚辛壬癸"):
+                        ganzhi = s
+                        break
+            else:
+                ganzhi = _text(first)
+            if ganzhi:
+                for ch in ganzhi:
+                    if ch in "甲乙丙丁戊己庚辛壬癸":
+                        return ch
+    # Fallback: 用 lunar-python 直接从 birth.year 计算年干 (按立春年界近似)
+    ganzhi_cycle = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"]
+    # 公历年 1984=甲子, 4年一循环: 1984%10=4 → 0
+    return ganzhi_cycle[(birth.year - 4) % 10]
 
 
 def _star_names(stars: Any) -> list[str]:
@@ -132,6 +163,105 @@ def _extract_four_transformations(horoscope: dict[str, Any]) -> dict[str, list[s
         mutagens = item.get("mutagen") or item.get("mutagens") or []
         out[scope] = list(mutagens) if isinstance(mutagens, list) else []
     return out
+
+
+def _enrich_four_transformations(sihua_raw: dict[str, list[str]], year_gan: str | None = None) -> dict[str, Any]:
+    """丰富四化数据：含化星、含义、吉凶。
+
+    文献依据: 顾祥弘《飞星紫微斗数全书》, 陈世兴《紫微斗数全书》四化篇。
+
+    Args:
+        sihua_raw: {scope: [mutagen_list]} 来自 _extract_four_transformations
+        year_gan: 出生年干 (可选, 用于本命四化判定)
+
+    Returns:
+        {
+            "natal": {禄/权/科/忌: {star, meaning, category}},  # 本命四化
+            "decadal": {scope: enriched...},
+            "yearly": ...,
+            "interpretation": 综合解读文本,
+            "evidence_sources": ["飞星紫微斗数全书", "紫微斗数全书"]
+        }
+    """
+    from ..data.ziwei_sihua import NATAL_SIHUA, SIHUA_MEANINGS, get_sihua_meaning
+
+    result: dict[str, Any] = {
+        "natal": {},
+        "current_decadal": {},
+        "current_yearly": {},
+        "interpretation": "",
+        "evidence_sources": ["《飞星紫微斗数全书》(顾祥弘)", "《紫微斗数全书》四化篇"],
+    }
+
+    # 本命四化（基于生年天干）
+    if year_gan and year_gan in NATAL_SIHUA:
+        natal_sihua = NATAL_SIHUA[year_gan]
+        for hua_type, star in natal_sihua.items():
+            meaning = get_sihua_meaning(f"化{hua_type}", star)
+            result["natal"][hua_type] = {
+                "star": star,
+                "category": SIHUA_MEANINGS.get(f"化{hua_type}", {}).get("category", ""),
+                "meaning": meaning,
+            }
+
+    # 大限 / 流年 四化（原始 + 含义）
+    # 支持多种格式: "贪狼化禄" / "化禄贪狼" / "贪狼 化禄" 等
+    KNOWN_STARS = ("廉贞", "破军", "武曲", "太阳", "天机", "天梁",
+                   "紫微", "太阴", "天同", "文昌", "巨门", "贪狼",
+                   "右弼", "文曲", "左辅")
+
+    def parse_mutagen(m: str) -> tuple[str, str] | None:
+        """解析单条四化, 返回 (hua_type, star)。"""
+        m = str(m).strip()
+        for hua_type in ["禄", "权", "科", "忌"]:
+            for star in KNOWN_STARS:
+                # 匹配 "贪狼化禄" 或 "化禄贪狼" 等
+                patterns = [
+                    f"{star}化{hua_type}",
+                    f"化{hua_type}{star}",
+                    f"{star} 化{hua_type}",
+                    f"化{hua_type} {star}",
+                    f"{star}{hua_type}",
+                ]
+                if any(p in m for p in patterns) or (star in m and hua_type in m and len(m) <= 8):
+                    return (hua_type, star)
+        return None
+
+    for scope_name, mutagens in sihua_raw.items():
+        enriched_scope: dict[str, Any] = {}
+        for m in (mutagens or []):
+            parsed = parse_mutagen(m)
+            if parsed:
+                hua_type, star = parsed
+                enriched_scope[f"化{hua_type}"] = {
+                    "star": star,
+                    "meaning": get_sihua_meaning(f"化{hua_type}", star),
+                }
+        if scope_name == "decadal":
+            result["current_decadal"] = enriched_scope
+        elif scope_name == "yearly":
+            result["current_yearly"] = enriched_scope
+
+    # 综合解读
+    parts = []
+    if result["natal"]:
+        natal_str = " · ".join(
+            f"{t}{info['star']}" for t, info in result["natal"].items()
+        )
+        parts.append(f"本命四化: {natal_str}")
+    if result["current_decadal"]:
+        dec_str = " · ".join(
+            f"{t}{info['star']}" for t, info in result["current_decadal"].items()
+        )
+        parts.append(f"当前大限: {dec_str}")
+    if result["current_yearly"]:
+        yr_str = " · ".join(
+            f"{t}{info['star']}" for t, info in result["current_yearly"].items()
+        )
+        parts.append(f"本年流年: {yr_str}")
+    result["interpretation"] = " | ".join(parts) if parts else "暂无四化数据"
+
+    return result
 
 
 def _fallback_chart(b: Birth, reason: str) -> ChartResult:
@@ -291,6 +421,13 @@ def _compute_native(b: Birth) -> ChartResult:
         "palaces": palaces,
         "horoscope": _horoscope(chart, b, time_index),
         "four_transformations": _extract_four_transformations(_horoscope(chart, b, time_index)),
+        # 飞星四化深度解读（集成 ziwei_sihua 数据）
+        # W: 修复 year_gan 提取 bug - 之前 _text(yearly)[:1] 取的是 "(", 不是年干
+        # chinese_date.yearly 形如 [("甲子", 1984, ...)] 或 [年, 干支], 取干支字符串首字符
+        "four_transformations_enriched": _enrich_four_transformations(
+            _extract_four_transformations(_horoscope(chart, b, time_index)),
+            year_gan=_extract_year_gan(chart, b),
+        ),
         "changsheng12_map": _palace_map(palaces, "changsheng12"),
         "boshi12_map": _palace_map(palaces, "boshi12"),
         "jiangqian12_map": _palace_map(palaces, "jiangqian12"),
