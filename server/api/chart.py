@@ -1,17 +1,51 @@
 """POST /api/compute - unified chart endpoint with mode/subject options."""
 import logging
 import time
-from typing import Literal, Optional
+from typing import Literal
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from divination import Birth
 from divination.meta import method_meta
-from divination.router import _ENGINES, compute_with_validation, calibrate_birth_hour, estimate_hour_from_traits, compute_compatibility_score, compute_multimethod_compatibility
+from divination.router import (
+    _ENGINES,
+    calibrate_birth_hour,
+    compute_compatibility_score,
+    compute_multimethod_compatibility,
+    compute_with_validation,
+    estimate_hour_from_traits,
+)
 
 router = APIRouter()
 log = logging.getLogger("chart")
+
+
+def _sanitize_numpy(obj):
+    """递归把 numpy 标量/数组/容器转成原生 Python, 避免 FastAPI jsonable_encoder 500.
+
+    FastAPI 的 jsonable_encoder 不识别 np.bool_ (尝试 iter/dict 都失败),
+    会抛 "'numpy.bool_' object is not iterable" / "vars() argument must have __dict__ attribute".
+    在出口处做一次清洗最稳妥 (一次性覆盖所有 engine).
+    """
+    try:
+        import numpy as np
+    except ImportError:
+        return obj
+    if isinstance(obj, dict):
+        return {k: _sanitize_numpy(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple, set)):
+        return [_sanitize_numpy(v) for v in obj]
+    if isinstance(obj, np.bool_):
+        return bool(obj)
+    if isinstance(obj, np.integer):
+        return int(obj)
+    if isinstance(obj, np.floating):
+        v = float(obj)
+        return v if v == v else None  # NaN/Inf -> None
+    if isinstance(obj, np.ndarray):
+        return [_sanitize_numpy(v) for v in obj.tolist()]
+    return obj
 
 
 class BirthModel(BaseModel):
@@ -22,8 +56,8 @@ class BirthModel(BaseModel):
     minute: int = Field(0, ge=0, le=59)
     gender: Literal["male", "female", "unspecified"] = "unspecified"
     calendar: Literal["gregorian", "lunar"] = "gregorian"
-    lat: Optional[float] = None
-    lng: Optional[float] = None
+    lat: float | None = None
+    lng: float | None = None
     tz: str = "Asia/Shanghai"
     is_leap_month: bool = False
 
@@ -83,7 +117,7 @@ def compute_endpoint(body: ComputeRequest):
         # Lenormand and Tarot are the two methods with custom spread systems
         if body.method in ("tarot", "lenormand"):
             try:
-                from divination.engines.tarot import SPREADS as TAROT_SPREADS, ALIASES as TAROT_ALIASES
+                from divination.engines.tarot import ALIASES as TAROT_ALIASES, SPREADS as TAROT_SPREADS
                 if spread not in TAROT_SPREADS and spread not in TAROT_ALIASES:
                     if body.method == "lenormand":
                         from divination.engines.lenormand import SPREADS as LEN_SPREADS
@@ -118,14 +152,14 @@ def compute_endpoint(body: ComputeRequest):
         raise HTTPException(500, f"{type(e).__name__}: {e}")
     dt_ms = int((time.perf_counter() - t0) * 1000)
 
-    return {
+    return _sanitize_numpy({
         "method": result.method,
         "school": result.school,
         "engine": result.engine,
         "normalized": result.normalized,
         "raw": result.raw,
         "elapsed_ms": dt_ms,
-    }
+    })
 
 
 # ── Advanced Multi-Method Endpoints ──────────────────────────────────────────
@@ -139,9 +173,9 @@ class MultiComputeRequest(BaseModel):
 
 class HourCalibrateRequest(BaseModel):
     birth: BirthModel
-    known_traits: Optional[list] = None
-    known_career: Optional[str] = None
-    known_events: Optional[list] = None
+    known_traits: list | None = None
+    known_career: str | None = None
+    known_events: list | None = None
 
 
 class TraitEstimateRequest(BaseModel):
@@ -152,7 +186,7 @@ class CompatibilityRequest(BaseModel):
     chart1_birth: BirthModel
     chart2_birth: BirthModel
     method: str = "bazi_v2"
-    methods: Optional[list] = None  # multi-method: ["bazi_v2", "western"]
+    methods: list | None = None  # multi-method: ["bazi_v2", "western"]
     subject: str = "relationship"
 
 
@@ -188,13 +222,13 @@ def compute_multi_endpoint(body: MultiComputeRequest):
     # Serialize charts
     serialized_charts = {}
     for m, chart in result.get("charts", {}).items():
-        serialized_charts[m] = {
+        serialized_charts[m] = _sanitize_numpy({
             "method": chart.method,
             "school": chart.school,
             "engine": chart.engine,
             "normalized": chart.normalized,
             "raw": chart.raw,
-        }
+        })
 
     response = {
         "charts": serialized_charts,
@@ -239,7 +273,7 @@ def calibrate_hour_endpoint(body: HourCalibrateRequest):
     dt_ms = int((time.perf_counter() - t0) * 1000)
 
     result["elapsed_ms"] = dt_ms
-    return result
+    return _sanitize_numpy(result)
 
 
 @router.post("/estimate/traits")
@@ -321,4 +355,4 @@ def compatibility_endpoint(body: CompatibilityRequest):
 
     dt_ms = int((time.perf_counter() - t0) * 1000)
     result["elapsed_ms"] = dt_ms
-    return result
+    return _sanitize_numpy(result)

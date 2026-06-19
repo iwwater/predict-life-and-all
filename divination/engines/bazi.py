@@ -1,100 +1,21 @@
-"""八字 / 四柱  ——  lunar-python (MIT)。
-
-Phase 3: 增加 流年/流月/神煞 到 raw['horoscope'] 和 raw['shensha'],
-供 normalizer 出 current_cycle 维 signal。
-"""
-from __future__ import annotations
-
-import datetime as _dt
+"""八字 / 四柱  ——  lunar-python (MIT)。"""
 from lunar_python import Solar
+
+from .. import wuxing as _wuxing
 from ..contracts import Birth, ChartResult
 
 _WX = {"金": "metal", "木": "wood", "水": "water", "火": "fire", "土": "earth"}
 
-# 60 甲子 (干支循环) — 简化为查表
-_TG = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"]
-_DZ = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"]
-
-
-def _year_gz(year: int) -> str:
-    """公历年 → 年干支 (近似: 1984=甲子, 用 lunar 立春会更准, 此处简化)。"""
-    # 1984 = 甲子 (0), 1985 = 乙丑 (1)...
-    idx = (year - 1984) % 60
-    return _TG[idx % 10] + _DZ[idx % 12]
-
-
-def _month_gz(year: int, month: int) -> str:
-    """公历年月 → 月干支 (年上起月法: 甲己之年丙作首, 乙庚之岁戊为头...)。
-
-    简化: 用 (year - 1984) % 5 决定年干起月点 (甲己→丙寅起, 乙庚→戊寅起...)。
-    """
-    year_tg_idx = (year - 1984) % 10  # 年干在 10 天干中的索引
-    # 月支固定: 正月寅, 二月卯...
-    month_dz = _DZ[(month + 1) % 12]  # month=1 → 寅 (正月)
-    # 年干起月口诀
-    start_offset = {0: 2, 5: 2, 1: 4, 6: 4, 2: 6, 7: 6, 3: 8, 8: 8, 4: 0, 9: 0}
-    tg_start = start_offset.get(year_tg_idx, 2)
-    month_tg_idx = (tg_start + month - 1) % 10
-    return _TG[month_tg_idx] + month_dz
-
-
-def _liunian(birth_year: int, current_year: int) -> list[dict]:
-    """流年: 出生年到当前+10 年, 每年的年干支。"""
-    out = []
-    for y in range(birth_year, current_year + 11):
-        out.append({"year": y, "ganzhi": _year_gz(y), "label": f"{y}年 {_year_gz(y)}"})
-    return out
-
-
-def _liuyue(year: int, current_month: int) -> list[dict]:
-    """流月: 当前年 1-12 月月干支。"""
-    return [{"month": m, "ganzhi": _month_gz(year, m), "label": f"{m}月 {_month_gz(year, m)}"}
-            for m in range(1, 13)]
-
-
-def _shensha(lun, ec) -> dict:
-    """提取 lunar-python 的神煞 (日柱层面) + 十神 (年/月/日/时四柱)。
-
-    lunar-python 仅提供日柱吉神/凶煞/天神，无年/月/时柱神煞 API（W3 limitation）。
-    为扩大覆盖，补充 EightChar 的 ShiShen 十神四柱。
-    """
-    out = {"吉神": [], "凶煞": [], "天神": [], "十神四柱": {}}
-    try:
-        ji = lun.getDayJiShen()
-        if isinstance(ji, (list, tuple)):
-            out["吉神"] = list(ji)
-        elif isinstance(ji, str):
-            out["吉神"] = [ji] if ji else []
-    except Exception:
-        pass
-    try:
-        xiong = lun.getDayXiongSha()
-        if isinstance(xiong, (list, tuple)):
-            out["凶煞"] = list(xiong)
-        elif isinstance(xiong, str):
-            out["凶煞"] = [xiong] if xiong else []
-    except Exception:
-        pass
-    try:
-        tian = lun.getDayTianShen()
-        if isinstance(tian, (list, tuple)):
-            out["天神"] = list(tian)
-        elif isinstance(tian, str):
-            out["天神"] = [tian] if tian else []
-    except Exception:
-        pass
-    # W3 fix: 十神四柱 (年/月/日/时)，扩大神煞覆盖面
-    if ec is not None:
-        try:
-            out["十神四柱"] = {
-                "年柱": ec.getYearShiShenGan(),
-                "月柱": ec.getMonthShiShenGan(),
-                "日柱": ec.getDayShiShenGan(),
-                "时柱": ec.getTimeShiShenGan(),
-            }
-        except Exception:
-            pass
-    return out
+# ── 兼容层: bazi_v2 与 hour_calibrator 需要的常量别名 ───────────────────────
+# 复用 wuxing 模块的常量, 并补齐 bazi_v2 用的命名 (WUXING_KEY/KE_WO/SHENG_WO).
+GAN_WUXING = _wuxing.GAN_WX                              # 天干 → 五行
+ZHI_WUXING = _wuxing.ZHI_WX                              # 地支 → 五行
+WO_SHENG = _wuxing.SHENG                                 # 我生
+WO_KE = _wuxing.KE                                       # 我克
+WUXING_KEY = {"木": "wood", "火": "fire", "土": "earth", "金": "metal", "水": "water"}
+# 反向映射: 五行 → 克我/生我 (生克闭环)
+KE_WO = {v: k for k, v in WO_KE.items()}                 # 克我 (我被X克 → X克我)
+SHENG_WO = {v: k for k, v in WO_SHENG.items()}           # 生我 (我被X生 → X生我)
 
 
 def compute(b: Birth, zi_hour: str = "late") -> ChartResult:
@@ -109,6 +30,7 @@ def compute(b: Birth, zi_hour: str = "late") -> ChartResult:
         try:
             from datetime import datetime
             from zoneinfo import ZoneInfo
+
             from ..solartime import true_solar_time
             tst = true_solar_time(datetime(b.year,b.month,b.day,b.hour,b.minute,tzinfo=ZoneInfo(b.tz)), b.lng)
             solar = Solar.fromYmdHms(tst.year,tst.month,tst.day,tst.hour,tst.minute,0)
@@ -117,7 +39,6 @@ def compute(b: Birth, zi_hour: str = "late") -> ChartResult:
     else:
         solar = Solar.fromYmdHms(b.year, b.month, b.day, b.hour, b.minute, 0)
     ec = solar.getLunar().getEightChar()
-    lun = solar.getLunar()
     pillars = {
         "year": ec.getYear(), "month": ec.getMonth(),
         "day": ec.getDay(), "hour": ec.getTime(),
@@ -151,21 +72,52 @@ def compute(b: Birth, zi_hour: str = "late") -> ChartResult:
         "月令": es["month_wx"],
         "说明": strength["说明"],
     }
+    # ---- Sprint 2.1: 流年/流月/当前大运 (raw.horoscope) ----
+    from datetime import datetime as _dt
+    now = _dt.utcnow()
+    current_year = now.year
+    current_month = now.month
 
-    # ---- Phase 3: 流年/流月/神煞 ----
-    now = _dt.datetime.now()
-    liunian = _liunian(b.year, now.year)
-    liuyue = _liuyue(now.year, now.month)
-    shensha = _shensha(lun, ec)
+    yearly = []
+    try:
+        # Sprint 2.1: 覆盖人生 ±60 年, 包含本命年前后大跨度
+        # (1984 甲子 / 1998 戊寅 / 2014 甲午 golden case 验证需要)
+        for y in range(current_year - 60, current_year + 30):
+            s = Solar.fromYmdHms(y, 6, 15, 0, 0, 0)
+            lun = s.getLunar()
+            gz_year = lun.getYearInGanZhi()
+            yearly.append({"year": y, "ganzhi": gz_year})
+    except Exception:
+        pass
+
+    monthly: list[dict] = []
+    try:
+        for m in range(1, 13):
+            s = Solar.fromYmdHms(current_year, m, 15, 0, 0, 0)
+            lun = s.getLunar()
+            gz_month = lun.getMonthInGanZhi()
+            monthly.append({"month": m, "ganzhi": gz_month})
+    except Exception:
+        pass
+
+    # 当前大运: 按当前年找 timeline 匹配
+    current_dayun = None
+    for d in timeline:
+        try:
+            if int(d["from"]) <= current_year <= int(d["to"]):
+                current_dayun = d
+                break
+        except Exception:
+            pass
+
     horoscope = {
-        "decadal":  timeline,  # 大运 (已有)
-        "yearly":   liunian[-10:],  # 最近 10 年流年
-        "monthly":  liuyue,         # 当前年 12 月
-        "daily":    [],
-        "hourly":   [],
-        "current_year": now.year,
-        "current_month": now.month,
+        "current_year": current_year,
+        "current_month": current_month,
+        "yearly": yearly,
+        "monthly": monthly,
+        "current_dayun": current_dayun,
     }
+
     return ChartResult(
         method="bazi", school="east", engine="lunar-python",
         normalized={"elements": elements, "timeline": timeline},
@@ -174,6 +126,5 @@ def compute(b: Birth, zi_hour: str = "late") -> ChartResult:
             "day_master": ec.getDayGan(),
             "断": judgement,
             "horoscope": horoscope,
-            "shensha": shensha,
         },
     )

@@ -87,12 +87,13 @@ def test_compute_all_methods():
         if method == "lenormand":
             payload = _compute_with_options("lenormand", {"seed": "test-seed-api", "spread": "three_line"})
             assert payload["method"] == "lenormand"
-            assert payload["school"] in {"east", "west"}
+            assert payload["school"] in {"east", "west", "hybrid"}
             assert payload["engine"]
             continue
         payload = _compute(method)
         assert payload["method"] == method
-        assert payload["school"] in {"east", "west"}
+        # hybrid 允许中西合参术法 (numerology = 毕达哥拉斯 + 姓名学)
+        assert payload["school"] in {"east", "west", "hybrid"}
         assert payload["engine"]
         assert isinstance(payload["raw"], dict)
         assert isinstance(payload["normalized"], dict)

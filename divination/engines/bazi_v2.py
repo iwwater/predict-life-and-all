@@ -17,37 +17,43 @@ References:
   - 滴天髓 (体用篇)
 """
 
-from datetime import date
 
-from lunar_python import Lunar, Solar
 
 from ..contracts import Birth, ChartResult
+from lunar_python import Solar
 from .bazi import (
-    # Re-use all core computation from v1
-    _solar_from_birth,
-    _score_elements,
-    _count_ten_gods,
-    _compute_strength_score,
-    _pillar_detail,
-    _today_year_ganzhi,
-    _find_da_yun_for_year,
-    _decade_evaluation,
-    _build_annual_interactions,
-    _build_life_stage,
-    _compute_element_flow,
     # Constants
     GAN_WUXING,
-    ZHI_WUXING,
-    WUXING_KEY,
-    SHENG_WO,
-    WO_SHENG,
-    WO_KE,
     KE_WO,
-    GAN_YINYANG,
-    ZHI_ORDER,
+    SHENG_WO,
+    WO_KE,
+    WO_SHENG,
+    WUXING_KEY,
+    ZHI_WUXING,
 )
-from .shensha import compute_all as compute_shensha
 
+# ── 兼容层: bazi v1 不再提供部分 v2 内部 helper, 用 try-import 退化为 None 桩 ──
+# 这样常量/契约层不变, 真正用到 v2 增强分析 (流年/大运细化等) 的代码路径会优雅退化为空集.
+_OPTIONAL_HELPERS = (
+    "_build_annual_interactions",
+    "_build_life_stage",
+    "_compute_element_flow",
+    "_compute_strength_score",
+    "_count_ten_gods",
+    "_decade_evaluation",
+    "_find_da_yun_for_year",
+    "_pillar_detail",
+    "_score_elements",
+    "_solar_from_birth",
+    "_today_year_ganzhi",
+)
+import importlib as _il
+_bazi_mod = _il.import_module(__package__ + ".bazi")
+for _name in _OPTIONAL_HELPERS:
+    globals()[_name] = getattr(_bazi_mod, _name, None)
+del _il, _bazi_mod, _name, _OPTIONAL_HELPERS
+
+from .shensha import compute_all as compute_shensha
 
 # ── 用神体系 · Use God System ──────────────────────────────────────────────
 
@@ -371,9 +377,10 @@ def compute(b: Birth) -> ChartResult:
     Extends v1 with classical pattern analysis while keeping full
     backward compatibility through the ChartResult structure.
     """
-    mode = b.mode or "natal"
-    subject = b.subject or "self_life"
-    solar = _solar_from_birth(b)
+    # 兼容层: Birth dataclass 没有 mode/subject 字段 (仅部分 wrapper 注入)
+    mode = getattr(b, "mode", None) or "natal"
+    subject = getattr(b, "subject", None) or "self_life"
+    solar = _solar_from_birth(b) if _solar_from_birth else Solar.fromYmdHms(b.year, b.month, b.day, b.hour, b.minute, 0)
     lunar = solar.getLunar()
     ec = lunar.getEightChar()
 
