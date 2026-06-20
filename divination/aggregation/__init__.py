@@ -11,9 +11,47 @@ BE-001: 聚合模块
   - validate(signals, intent) → ValidationResult  交叉验证
   - generate(signals, validation, ...) → ReadingReport  报告生成
 """
-from .intent import classify, classify_intent, GOAL_TYPES, GOAL_LABELS
+from .intent import GOAL_LABELS, GOAL_TYPES, classify, classify_intent
+from .llm_prompt import (
+    DEFAULT_COMPLIANCE_RULES,
+    build_reading_prompt,
+    check_llm_output,
+    generate_mock_report,
+    llm_fallback_report,
+)
 from .normalizer import normalize, normalize_all
+from .questioner import (
+    Question,
+    get_questions_for_case,
+    list_all_goals_with_questions,
+    pick_questions,
+    question_count,
+)
 from .reading_service import run_reading
+from .situation import (
+    ConditionContext,
+    CounterpartContext,
+    EventContext,
+    MethodContext,
+    PersonContext,
+    SituationContext,
+    SpaceContext,
+    TimeContext,
+    build_situation,
+    is_ready,
+    missing_dims,
+    to_summary,
+)
+from .safety import (
+    CRISIS_KEYWORDS,
+    CRISIS_RESPONSE,
+    DISCLAIMER as SAFETY_DISCLAIMER,
+    PRIVACY_NOTICE,
+    check_input_safety,
+    check_output_safety,
+    sanitize_birth_for_log,
+    sanitize_for_log,
+)
 from .schema import (
     BirthModel,
     ConflictItem,
@@ -32,23 +70,6 @@ from .selector import (
     get_primary_methods,
     get_tier_for_method,
     select_methods,
-)
-from .safety import (
-    DISCLAIMER as SAFETY_DISCLAIMER,
-    PRIVACY_NOTICE,
-    CRISIS_KEYWORDS,
-    CRISIS_RESPONSE,
-    check_input_safety,
-    check_output_safety,
-    sanitize_for_log,
-    sanitize_birth_for_log,
-)
-from .llm_prompt import (
-    build_reading_prompt,
-    generate_mock_report,
-    check_llm_output,
-    llm_fallback_report,
-    DEFAULT_COMPLIANCE_RULES,
 )
 from .synthesizer import DISCLAIMER, generate
 from .validator import validate
@@ -71,6 +92,25 @@ __all__ = [
     # ── 标准化 ──
     "normalize",
     "normalize_all",
+    # ── 追问 ──
+    "Question",
+    "pick_questions",
+    "get_questions_for_case",
+    "list_all_goals_with_questions",
+    "question_count",
+    # ── 境限 ──
+    "PersonContext",
+    "CounterpartContext",
+    "EventContext",
+    "TimeContext",
+    "SpaceContext",
+    "ConditionContext",
+    "MethodContext",
+    "SituationContext",
+    "build_situation",
+    "is_ready",
+    "missing_dims",
+    "to_summary",
     # ── 验证 ──
     "validate",
     # ── 安全 ──

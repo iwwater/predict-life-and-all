@@ -1,7 +1,6 @@
 """解读编排：盘面 + 问题 -> 护栏 -> LLM -> 护栏 -> 解读结果。"""
-import json
 from ..contracts import ChartResult
-from . import prompts, guardrails
+from . import guardrails, prompts
 from .client import LLMClient, MockClient
 
 
@@ -22,12 +21,7 @@ def interpret(charts: list[ChartResult], question: str | None = None,
 
 async def interpret_stream(charts: list[ChartResult], question: str | None = None,
                            client: LLMClient | None = None):
-    """Async generator yielding JSON-serializable SSE events for streaming.
-
-    Yields: {"type": "delta", "text": "..."}
-            {"type": "done", "meta": {...}}
-            {"type": "error", "text": "..."}
-    """
+    """Yield JSON-serializable streaming events for the interpret endpoint."""
     client = client or MockClient()
     gi = guardrails.check_input(question)
     if gi.get("block"):
@@ -37,18 +31,16 @@ async def interpret_stream(charts: list[ChartResult], question: str | None = Non
     msg = prompts.build_messages(charts, question)
     try:
         raw = client.complete(msg["system"], msg["user"])
-    except Exception as e:
-        yield {"type": "error", "text": str(e)}
+    except Exception as exc:
+        yield {"type": "error", "text": str(exc)}
         return
 
     text, flags = guardrails.soften_output(raw)
     extra = "\n".join(gi.get("notes", []))
     reading = text + ("\n\n" + extra if extra else "") + "\n\n" + prompts.DISCLAIMER
 
-    # Yield in chunks to simulate streaming
-    chunk_size = 60
-    for i in range(0, len(reading), chunk_size):
-        yield {"type": "delta", "text": reading[i:i + chunk_size]}
+    for i in range(0, len(reading), 60):
+        yield {"type": "delta", "text": reading[i:i + 60]}
 
     yield {"type": "done", "meta": {
         "blocked": False,
@@ -56,4 +48,3 @@ async def interpret_stream(charts: list[ChartResult], question: str | None = Non
         "methods": [c.method for c in charts],
         "flags": [],
     }}
-

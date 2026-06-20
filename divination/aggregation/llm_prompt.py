@@ -12,11 +12,10 @@ LLM-009: LLM 失败 fallback
 """
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from .safety import DISCLAIMER, check_output_safety
-from .schema import ValidationResult, DivinationSignal, ReadingReport
-
+from .schema import ReadingReport
 
 # ── Provider config (LLM-007) ────────────────────────────────────────────────
 
@@ -74,7 +73,7 @@ def build_reading_prompt(
     # ── Intent context ──
     goal_label = intent.get("goal_label", "综合")
     question = intent.get("question", "")
-    parts.append(f"## 用户问题")
+    parts.append("## 用户问题")
     parts.append(f"领域: {goal_label}")
     if question:
         parts.append(f"问题: {question}")
@@ -127,9 +126,23 @@ def build_reading_prompt(
                 parts.append(f"  调和建议: {c['resolution']}")
         parts.append("")
 
-    # ── Score + confidence ──
-    parts.append(f"## 综合评分: {validation.get('overall_score', 50)}/100")
-    parts.append(f"置信等级: {validation.get('confidence_level', 'medium')}")
+    # ── 五档计票(替代单一分数) ──
+    tally = validation.get("tally_by_scope") or {}
+    parts.append("## 多术法计票(按 time_scope)")
+    if tally:
+        for scope, t in tally.items():
+            parts.append(
+                f"- {scope}: 强支持{t.get('strong_support',0)}/弱支持{t.get('weak_support',0)}/"
+                f"中性{t.get('neutral',0)}/弱警示{t.get('weak_warn',0)}/强警示{t.get('strong_warn',0)} "
+                f"({t.get('summary','')})"
+            )
+    else:
+        parts.append("- 暂无有效计票信号")
+    polarity = validation.get("dimension_polarity") or {}
+    if polarity:
+        parts.append("## 五维极性")
+        for dim, p in polarity.items():
+            parts.append(f"- {dim}: {p}")
     parts.append("")
 
     # ── Risks ──
@@ -188,11 +201,16 @@ def generate_mock_report(
 
     lines: list[str] = []
 
-    # Headline
-    score = validation.get("overall_score", 50)
+    # Headline — 五档计票(无单一分数)
+    tally = validation.get("tally_by_scope") or {}
     goal_label = intent.get("goal_label", "综合")
     lines.append(f"## {goal_label}综合分析报告")
-    lines.append(f"综合评分: {score}/100 | 置信度: {validation.get('confidence_level', 'medium')}")
+    if tally:
+        sup_total = sum(t.get("strong_support", 0) + t.get("weak_support", 0) for t in tally.values())
+        warn_total = sum(t.get("strong_warn", 0) + t.get("weak_warn", 0) for t in tally.values())
+        lines.append(f"多术法计票: {sup_total} 法支持 / {warn_total} 法警示(各 time_scope 详见下文)")
+    else:
+        lines.append("多术法计票: 暂无有效信号")
     lines.append("")
 
     # Consensus

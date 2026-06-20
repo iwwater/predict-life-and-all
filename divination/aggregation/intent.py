@@ -4,11 +4,33 @@ BE-003: 问题分类
 INT-001: classify_intent() — 输入问题，返回 goal
 INT-002~013: 支持 12 个 goal 类型
 INT-014: 支持显式 goal 覆盖
+
+Sprint 1.1 重写（参考 arxiv 2103.02559 two-stage FSM + AWS Lex V2 0-1 confidence）:
+- 显式 FSM 状态: START → RULE_MATCHED → RESOLVED
+                    → LOW_CONF → LLM_PENDING → RESOLVED
+                    → LOW_CONF → FALLBACK (无 LLM 客户端)
+- 阈值: top_score ≥ 0.70 → 直接 resolve
+        0.50 ≤ top_score < 0.70 → 触发 LLM 兜底
+        top_score < 0.50 → 直接降级 general_life
+- LLM 客户端通过 set_llm_client() 注入（默认 None → 降级）
+- LLM 结果按 question 文本 hash LRU cache 1000 条
+- 失败时降级到 top candidate + flag llm_timeout/llm_error
+
+向后兼容:
+- classify_intent() 返回 dict (与 cases.py / reading.py 保持兼容)
+- 新增 classify_intent_v2() 返回 IntentResult Pydantic 模型 (内部用)
+- 旧 classify() alias 保留
 """
 from __future__ import annotations
 
+import hashlib
 import re
-from typing import Any, Optional
+import time
+from collections import OrderedDict
+from enum import Enum
+from typing import Any, Protocol
+
+from pydantic import BaseModel, Field
 
 # ── 12 个标准 goal 类型 ────────────────────────────────────────────────────
 
@@ -41,6 +63,89 @@ GOAL_LABELS: dict[str, str] = {
     "fengshui":           "风水",
     "health_reflection":  "健康自省",
 }
+
+# ── FSM 阈值 (参考 arxiv 2103.02559 + Lex V2 0-1 置信度) ─────────────────
+#
+# 设计要点: 归一化 score 永远以最高分为 1.0, 无法作 FSM 分支依据。
+# 改用 evidence_count (命中证据条数) 做 FSM 决策:
+#   evidence_count ≥ EVIDENCE_RESOLVE  → RULE_MATCHED → RESOLVED (高置信)
+#   evidence_count ≥ EVIDENCE_LLM      → LLM_PENDING → RESOLVED / FALLBACK
+#   evidence_count <  EVIDENCE_LLM     → FALLBACK → RESOLVED (降级)
+#
+# normalized_score (0-1) 仍保留, 仅用于 domain_scores 展示, 不参与 FSM 决策。
+
+EVIDENCE_RESOLVE = 2      # 命中 ≥2 条证据(模式+关键词混合) → 高置信 resolve
+EVIDENCE_LLM     = 1      # 命中 1 条证据 → 触发 LLM 兜底
+LLM_CACHE_SIZE = 1000
+LLM_TIMEOUT_S  = 3.0       # LLM 兜底超时阈值
+
+
+# ── FSM 状态 ──────────────────────────────────────────────────────────────
+
+class FSMState(str, Enum):
+    """意图分类 FSM 状态 — 用于追踪和诊断。"""
+    START          = "start"
+    RULE_MATCHED   = "rule_matched"        # 规则层拿到 winner
+    LOW_CONF       = "low_conf"            # 规则层 winner 不足, 走 LLM
+    LLM_PENDING    = "llm_pending"         # 调用 LLM 中
+    RESOLVED       = "resolved"            # 最终结果已定
+    FALLBACK       = "fallback"            # 降级到 general_life
+
+
+# ── LLM 客户端协议 (依赖反转 — 业务代码不耦合具体 SDK) ───────────────────
+
+class LLMClient(Protocol):
+    """LLM 客户端协议。任何 LLM SDK 适配器实现此协议即可注入。"""
+
+    def classify(
+        self,
+        question: str,
+        candidates: list[tuple[str, float]],
+        taxonomy: list[str],
+    ) -> dict[str, Any] | None:
+        """对 question 在 taxonomy 中分类。
+
+        Args:
+            question: 原始问题
+            candidates: 规则层 top-3 [(goal, score), ...]
+            taxonomy: 12 个标准 goal
+
+        Returns:
+            {"goal": "career", "confidence": 0.85} 或 None (失败)
+        """
+
+
+# ── LLM 客户端注入 (单例) ─────────────────────────────────────────────────
+
+_LLM_CLIENT: LLMClient | None = None
+_LLM_CACHE: "OrderedDict[str, dict[str, Any]]" = OrderedDict()
+
+
+def set_llm_client(client: LLMClient | None) -> None:
+    """注入 LLM 客户端。传 None 关闭 LLM 兜底。"""
+    global _LLM_CLIENT
+    _LLM_CLIENT = client
+    # 注入新客户端时清缓存 (旧缓存可能用了旧 schema)
+    _LLM_CACHE.clear()
+
+
+def get_llm_client() -> LLMClient | None:
+    """获取当前 LLM 客户端 (供测试/debug)。"""
+    return _LLM_CLIENT
+
+
+def clear_llm_cache() -> None:
+    """清空 LLM 结果缓存。"""
+    _LLM_CACHE.clear()
+
+
+def llm_cache_stats() -> dict[str, int]:
+    """返回 LLM 缓存统计。"""
+    return {
+        "size": len(_LLM_CACHE),
+        "max_size": LLM_CACHE_SIZE,
+    }
+
 
 # ── 关键词库 ────────────────────────────────────────────────────────────────
 
@@ -144,97 +249,345 @@ _PATTERN_MAP: list[tuple[str, str]] = [
 ]
 
 
-def classify_intent(question: str, goal: Optional[str] = None) -> dict[str, Any]:
-    """对用户问题进行意图分类，返回标准 goal 类型。
+# ── 内部模型 ──────────────────────────────────────────────────────────────
 
-    INT-001: classify_intent() — 输入问题，返回 goal
-    INT-014: 用户显式传 goal 时优先使用
+class IntentResult(BaseModel):
+    """意图分类结果 — 内部 Pydantic 模型。"""
+    goal: str
+    goal_label: str
+    goal_confidence: float
+    goal_source: str       # explicit | classified | llm_fallback | fallback
+    sub_goals: list[str]
+    domain_scores: dict[str, float]
+    needs_birth: bool
+    needs_space: bool
+    fsm_state: FSMState
+    fsm_trace: list[str]   # FSM 状态转移轨迹, 供 debug
+    note: str | None = None
+    flags: list[str] = Field(default_factory=list)
+
+
+# ── 规则层评分 ────────────────────────────────────────────────────────────
+
+def _rule_score(question: str) -> dict[str, float]:
+    """规则层评分 — 返回 {goal: 归一化分数 0-1} + evidence_count (命中证据条数)。
 
     Args:
-        question: 用户自然语言问题
-        goal: 用户显式指定的 goal（可选），传入时跳过分类
+        question: 用户原始问题
 
     Returns:
         {
-            "goal": "career",
-            "goal_label": "事业工作",
-            "goal_confidence": 0.85,
-            "goal_source": "explicit" | "classified",
-            "sub_goals": [...],
-            "domain_scores": {...},
-            "needs_birth": True,
-            "needs_space": False,
+            "scores": {goal: 归一化分数 0-1, ...},
+            "evidence_count": int,  # 总命中证据数(模式+关键词去重)
+            "top_goal": str,        # 最高分 goal
+            "raw_top": float,       # 最高原始分(未归一化)
         }
+
+    计分规则 (参考 Lex V2 / Rasa 实践):
+      正则模式命中: +4.0 (高优先级, 表达明确意图)
+      关键词命中: +min(len(keyword), 6) (更长的关键词权更高)
+      归一化: 取最高分 = 1.0, 其余按比例归一化
+
+    FSM 分支用 evidence_count, scores 仅供展示。
     """
-    # INT-014: 显式 goal 覆盖
-    if goal and goal in GOAL_TYPES:
-        return _build_result(goal, 1.0, "explicit", {goal: 1.0})
-
-    if goal:
-        # 用户传了 goal 但不在标准列表中 → 仍然尝试匹配，同时记录
-        return _build_result(
-            _classify(question)["goal"],
-            _classify(question)["goal_confidence"],
-            "classified",
-            _classify(question)["domain_scores"],
-            note=f"用户传入未知 goal='{goal}'，已自动分类",
-        )
-
-    return _classify(question)
-
-
-def _classify(question: str) -> dict[str, Any]:
-    """核心分类逻辑。"""
     q = question.lower().strip()
-
-    # Step 1: 正则模式匹配（加分）
     domain_hits: dict[str, float] = {}
+    evidence_count = 0
+
+    # Step 1: 正则模式
     for pattern, goal_type in _PATTERN_MAP:
         if re.search(pattern, q):
             domain_hits[goal_type] = domain_hits.get(goal_type, 0) + 4.0
+            evidence_count += 1
 
-    # Step 2: 关键词匹配（加分）
+    # Step 2: 关键词
     for goal_type, keywords in _KEYWORD_MAP.items():
         for kw in keywords:
             if kw in q:
-                # 更长的关键词权重更高
                 domain_hits[goal_type] = domain_hits.get(goal_type, 0) + min(len(kw), 6)
+                evidence_count += 1
 
-    # Step 3: 确定主 goal
     if not domain_hits:
-        primary = "general_life"
-        confidence = 0.3
-        sub_goals = ["general_life"]
-    else:
-        sorted_goals = sorted(domain_hits.items(), key=lambda x: -x[1])
-        primary = sorted_goals[0][0]
-        total_score = sum(v for _, v in sorted_goals)
-        primary_score = sorted_goals[0][1]
-        confidence = min(0.95, primary_score / max(1, total_score) * 0.85 + 0.15)
-        # 子 goal：得分 >= 25% 主 goal 分
-        threshold = primary_score * 0.25
-        sub_goals = [d for d, s in sorted_goals if s >= threshold]
+        return {
+            "scores": {},
+            "evidence_count": 0,
+            "top_goal": "general_life",
+            "raw_top": 0.0,
+        }
 
-    # Step 4: 计算各 goal 得分
-    max_score = max(domain_hits.values()) if domain_hits else 1
-    domain_scores = {
-        d: round(s / max_score, 2)
-        for d, s in sorted(domain_hits.items(), key=lambda x: -x[1])[:8]
+    # 归一化: max → 1.0
+    max_score = max(domain_hits.values())
+    scores = {g: round(s / max_score, 3) for g, s in domain_hits.items()}
+    top_goal = max(domain_hits, key=domain_hits.get)
+    return {
+        "scores": scores,
+        "evidence_count": evidence_count,
+        "top_goal": top_goal,
+        "raw_top": domain_hits[top_goal],
     }
 
-    return _build_result(primary, confidence, "classified", domain_scores, sub_goals)
+
+def _top_n(scores: dict[str, float], n: int = 3) -> list[tuple[str, float]]:
+    """取 top-N (goal, score)。"""
+    return sorted(scores.items(), key=lambda x: -x[1])[:n]
 
 
-def _build_result(
+# ── FSM 兜底 LLM 调用 ────────────────────────────────────────────────────
+
+def _llm_fallback_classify(
+    question: str,
+    candidates: list[tuple[str, float]],
+) -> dict[str, Any] | None:
+    """调用 LLM 兜底分类。带超时 + cache。
+
+    Returns:
+        {"goal": "career", "confidence": 0.85} 或 None
+    """
+    if _LLM_CLIENT is None:
+        return None
+
+    cache_key = hashlib.sha256(question.encode("utf-8")).hexdigest()
+    if cache_key in _LLM_CACHE:
+        # LRU: 移动到末尾
+        _LLM_CACHE.move_to_end(cache_key)
+        return _LLM_CACHE[cache_key]
+
+    t0 = time.perf_counter()
+    try:
+        result = _LLM_CLIENT.classify(
+            question=question,
+            candidates=candidates,
+            taxonomy=GOAL_TYPES,
+        )
+    except Exception:
+        result = None
+    elapsed = time.perf_counter() - t0
+
+    if result is None:
+        return None
+
+    # 校验: goal 必须在 taxonomy 中, confidence 0-1
+    goal = result.get("goal") if isinstance(result, dict) else None
+    conf = result.get("confidence", 0.0) if isinstance(result, dict) else 0.0
+    if goal not in GOAL_TYPES or not (0.0 <= conf <= 1.0):
+        return None
+
+    # 超时: 即使返回了 result, 视为不可信
+    if elapsed > LLM_TIMEOUT_S:
+        return None
+
+    payload = {"goal": goal, "confidence": float(conf), "elapsed_ms": int(elapsed * 1000)}
+    _LLM_CACHE[cache_key] = payload
+    if len(_LLM_CACHE) > LLM_CACHE_SIZE:
+        _LLM_CACHE.popitem(last=False)
+    return payload
+
+
+# ── FSM 核心: classify_intent_v2() ────────────────────────────────────────
+
+def classify_intent_v2(
+    question: str,
+    goal: str | None = None,
+) -> IntentResult:
+    """显式 FSM 意图分类。返回 IntentResult 模型。
+
+    FSM 状态转移:
+      START
+        ├── goal 在 GOAL_TYPES         → RESOLVED (explicit)
+        ├── goal 给了但不在白名单     → LOW_CONF (走分类, 标 note)
+        └── goal = None
+            ├── 规则层 top ≥ 0.70      → RULE_MATCHED → RESOLVED (classified)
+            ├── 规则层 top ∈ [0.50, 0.70)
+            │     ├── LLM 客户端有     → LLM_PENDING → RESOLVED (llm_fallback)
+            │     └── LLM 客户端无     → FALLBACK → RESOLVED (fallback)
+            └── 规则层 top < 0.50      → FALLBACK → RESOLVED (fallback)
+    """
+    trace: list[str] = [FSMState.START.value]
+
+    # Step 1: 显式 goal 优先
+    if goal and goal in GOAL_TYPES:
+        trace.append(FSMState.RESOLVED.value)
+        return IntentResult(
+            goal=goal,
+            goal_label=GOAL_LABELS.get(goal, goal),
+            goal_confidence=1.0,
+            goal_source="explicit",
+            sub_goals=[goal],
+            domain_scores={goal: 1.0},
+            needs_birth=goal not in ("daily",),
+            needs_space=goal == "fengshui",
+            fsm_state=FSMState.RESOLVED,
+            fsm_trace=trace,
+        )
+
+    # Step 2: 规则层评分
+    rule = _rule_score(question)
+    scores = rule["scores"]
+    evidence_count = rule["evidence_count"]
+    top = _top_n(scores, 3)
+    if top:
+        top_goal = rule["top_goal"]
+        top_score = scores[top_goal]  # 归一化分数, 展示用
+    else:
+        top_goal = "general_life"
+        top_score = 0.0
+        top = [("general_life", 0.0)]
+
+    # Step 3: FSM 状态转移 (用 evidence_count 而非归一化 score)
+    flags: list[str] = []
+    note: str | None = None
+
+    if evidence_count >= EVIDENCE_RESOLVE:
+        # 多条证据命中 → 高置信 resolve
+        trace.append(FSMState.RULE_MATCHED.value)
+        trace.append(FSMState.RESOLVED.value)
+        # 置信度基于证据数 + 归一化分
+        confidence = min(0.95, 0.55 + evidence_count * 0.08 + top_score * 0.2)
+        threshold = top_score * 0.25
+        sub_goals = [g for g, s in top if s >= threshold] or [top_goal]
+        return IntentResult(
+            goal=top_goal,
+            goal_label=GOAL_LABELS.get(top_goal, top_goal),
+            goal_confidence=round(confidence, 2),
+            goal_source="classified",
+            sub_goals=sub_goals,
+            domain_scores={g: round(s, 2) for g, s in top},
+            needs_birth=top_goal not in ("daily",),
+            needs_space=top_goal == "fengshui",
+            fsm_state=FSMState.RESOLVED,
+            fsm_trace=trace,
+        )
+
+    trace.append(FSMState.LOW_CONF.value)
+
+    if evidence_count < EVIDENCE_LLM:
+        # 零证据 → 降级 general_life
+        trace.append(FSMState.FALLBACK.value)
+        trace.append(FSMState.RESOLVED.value)
+        flags.append("rule_low_conf")
+        return IntentResult(
+            goal="general_life",
+            goal_label=GOAL_LABELS["general_life"],
+            goal_confidence=0.3,
+            goal_source="fallback",
+            sub_goals=["general_life"],
+            domain_scores={g: round(s, 2) for g, s in top},
+            needs_birth=True,
+            needs_space=False,
+            fsm_state=FSMState.FALLBACK,
+            fsm_trace=trace,
+            note="问题意图不明确, 降级到 general_life",
+            flags=flags,
+        )
+
+    # 单条证据 → 走 LLM 兜底
+    trace.append(FSMState.LLM_PENDING.value)
+    llm_result = _llm_fallback_classify(question, top)
+
+    if llm_result is None:
+        # LLM 不可用/超时 → 降级到 top candidate (但保留原 score)
+        trace.append(FSMState.FALLBACK.value)
+        if _LLM_CLIENT is None:
+            flags.append("llm_unavailable")
+            note = "LLM 客户端未注入, 使用规则层结果"
+        else:
+            flags.append("llm_error_or_timeout")
+            note = "LLM 调用失败/超时, 使用规则层结果"
+        confidence = min(0.65, 0.4 + top_score * 0.2)
+        return IntentResult(
+            goal=top_goal,
+            goal_label=GOAL_LABELS.get(top_goal, top_goal),
+            goal_confidence=round(confidence, 2),
+            goal_source="fallback",
+            sub_goals=[g for g, _ in top],
+            domain_scores={g: round(s, 2) for g, s in top},
+            needs_birth=top_goal not in ("daily",),
+            needs_space=top_goal == "fengshui",
+            fsm_state=FSMState.FALLBACK,
+            fsm_trace=trace,
+            note=note,
+            flags=flags,
+        )
+
+    # LLM 返回有效结果
+    trace.append(FSMState.RESOLVED.value)
+    llm_goal = llm_result["goal"]
+    llm_conf = llm_result["confidence"]
+    flags.append("llm_used")
+    return IntentResult(
+        goal=llm_goal,
+        goal_label=GOAL_LABELS.get(llm_goal, llm_goal),
+        goal_confidence=round(llm_conf, 2),
+        goal_source="llm_fallback",
+        sub_goals=[llm_goal, top_goal] if llm_goal != top_goal else [llm_goal],
+        domain_scores={g: round(s, 2) for g, s in top},
+        needs_birth=llm_goal not in ("daily",),
+        needs_space=llm_goal == "fengshui",
+        fsm_state=FSMState.RESOLVED,
+        fsm_trace=trace,
+        flags=flags,
+    )
+
+
+# ── 向后兼容: classify_intent() 返回 dict ──────────────────────────────
+
+def classify_intent(question: str, goal: str | None = None) -> dict[str, Any]:
+    """对用户问题进行意图分类，返回标准 goal 类型。
+
+    INT-001: classify_intent() — 输入问题，返回 goal
+    INT-014: 用户显式传 goal 时优先使用 (Sprint 1.1: explicit 走 FSM 快速通道)
+    """
+    # 显式 goal 走老分支 (保持 dict 结构 + note 兼容老测试)
+    if goal and goal in GOAL_TYPES:
+        return _build_dict_result(
+            goal=goal,
+            confidence=1.0,
+            source="explicit",
+            domain_scores={goal: 1.0},
+            sub_goals=[goal],
+        )
+
+    # 显式 goal 但不在白名单 → 走分类, 标 note (兼容老测试 test_unknown_goal_falls_back_to_classify)
+    if goal:
+        result = classify_intent_v2(question, goal=None)
+        d = _result_to_dict(result)
+        d["note"] = f"用户传入未知 goal='{goal}'，已自动分类"
+        return d
+
+    # 走完整 FSM
+    result = classify_intent_v2(question, goal=None)
+    return _result_to_dict(result)
+
+
+def _result_to_dict(r: IntentResult) -> dict[str, Any]:
+    """IntentResult → dict (向后兼容 cases.py / reading.py)。"""
+    out: dict[str, Any] = {
+        "goal": r.goal,
+        "goal_label": r.goal_label,
+        "goal_confidence": r.goal_confidence,
+        "goal_source": r.goal_source,
+        "sub_goals": r.sub_goals,
+        "domain_scores": r.domain_scores,
+        "needs_birth": r.needs_birth,
+        "needs_space": r.needs_space,
+        "fsm_state": r.fsm_state.value,
+        "fsm_trace": r.fsm_trace,
+        "flags": r.flags,
+    }
+    if r.note:
+        out["note"] = r.note
+    return out
+
+
+def _build_dict_result(
     goal: str,
     confidence: float,
     source: str,
     domain_scores: dict[str, float],
     sub_goals: list[str] | None = None,
-    note: str | None = None,
 ) -> dict[str, Any]:
-    """构建统一返回结构。"""
-    result: dict[str, Any] = {
+    """构造 legacy dict 格式 (仅 explicit 路径用)。"""
+    return {
         "goal": goal,
         "goal_label": GOAL_LABELS.get(goal, goal),
         "goal_confidence": round(confidence, 2),
@@ -243,13 +596,13 @@ def _build_result(
         "domain_scores": domain_scores,
         "needs_birth": goal not in ("daily",),
         "needs_space": goal == "fengshui",
+        "fsm_state": FSMState.RESOLVED.value,
+        "fsm_trace": [FSMState.START.value, FSMState.RESOLVED.value],
+        "flags": [],
     }
-    if note:
-        result["note"] = note
-    return result
 
 
-# ── 向后兼容 ─────────────────────────────────────────────────────────────────
+# ── 向后兼容: classify() alias ────────────────────────────────────────────
 
 def classify(question: str) -> dict[str, Any]:
     """向后兼容的 alias — 返回旧格式。

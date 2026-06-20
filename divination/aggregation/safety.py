@@ -14,8 +14,7 @@ SAFE-010: 日志脱敏 — 不记录完整出生信息和用户隐私问题
 from __future__ import annotations
 
 import re
-from typing import Any, Optional
-
+from typing import Any
 
 # ── SAFE-001: 统一免责声明 ──────────────────────────────────────────────────
 
@@ -211,7 +210,7 @@ def sanitize_for_log(text: str) -> str:
     return text
 
 
-def sanitize_birth_for_log(birth_dict: Optional[dict[str, Any]] = None) -> str:
+def sanitize_birth_for_log(birth_dict: dict[str, Any] | None = None) -> str:
     """SAFE-010: 将出生信息脱敏后返回摘要字符串。"""
     if not birth_dict:
         return "无出生信息"

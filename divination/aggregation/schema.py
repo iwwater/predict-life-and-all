@@ -1,4 +1,4 @@
-"""聚合模块数据模型 — 统一 12 术法输入输出契约。
+"""聚合模块数据模型 — 统一 17 术法输入输出契约。
 
 BE-002: schema 文件
 BE-011: ReadingRequest
@@ -7,13 +7,59 @@ BE-013: ConsensusItem
 BE-014: ConflictItem
 BE-015: ReadingReport
 BE-016: ReadingResult
-BE-017: ValidationResult
+BE-017: ValidationResult — 五档极性 + 分 scope 计票（无单一分数）
 """
 from __future__ import annotations
 
-from typing import Any, Literal, Optional
+from enum import Enum
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
+
+# ── 五档极性（替代单一综合分 0-100） ───────────────────────────────────────
+
+class DimensionPolarity(str, Enum):
+    """五档极性 — 替代单一 0-100 综合分。
+
+    strong_support : 3+ 法一致支持, 加权强度 > 0.4
+    weak_support   : 1-2 法支持, 或加权 0.15-0.4
+    neutral        : 无显著倾向
+    weak_warn      : 1-2 法警示, 或加权 0.15-0.4
+    strong_warn    : 3+ 法一致警示, 加权强度 > 0.4
+    """
+    STRONG_SUPPORT = "strong_support"
+    WEAK_SUPPORT = "weak_support"
+    NEUTRAL = "neutral"
+    WEAK_WARN = "weak_warn"
+    STRONG_WARN = "strong_warn"
+
+
+# 时域/职责 scope — 五维(同 dimension 但语义不同, time_scope 用于计票分组)
+TimeScope = Literal[
+    "long_term",      # 长期命格
+    "current_cycle",  # 当前周期
+    "short_term",     # 短期
+    "space",          # 空间
+    "one_question",   # 一事一断
+    "relationship",   # 关系
+]
+
+
+class ScopeTally(BaseModel):
+    """按 time_scope 计票 — 五档极性各计数 + 支持/警示方法列表。"""
+    scope: TimeScope
+    strong_support: int = Field(0, ge=0, description="强支持票数")
+    weak_support: int = Field(0, ge=0, description="弱支持票数")
+    neutral: int = Field(0, ge=0, description="中性票数")
+    weak_warn: int = Field(0, ge=0, description="弱警示票数")
+    strong_warn: int = Field(0, ge=0, description="强警示票数")
+    supporting_methods: list[str] = Field(
+        default_factory=list, description="贡献支持信号的方法列表(去重)",
+    )
+    warning_methods: list[str] = Field(
+        default_factory=list, description="贡献警示信号的方法列表(去重)",
+    )
+    summary: str = Field("", description="该 scope 一句话小结(供报告渲染)")
 
 
 # ── 输入模型 ─────────────────────────────────────────────────────────────────
@@ -27,18 +73,18 @@ class BirthModel(BaseModel):
     minute: int = Field(0, ge=0, le=59)
     gender: Literal["male", "female", "unspecified"] = "unspecified"
     calendar: Literal["gregorian", "lunar"] = "gregorian"
-    lat: Optional[float] = None
-    lng: Optional[float] = None
+    lat: float | None = None
+    lng: float | None = None
     tz: str = "Asia/Shanghai"
     is_leap_month: bool = False
 
 
 class SpaceModel(BaseModel):
     """空间信息（风水用）。"""
-    sitting: Optional[str] = None       # 坐向, e.g. "坐北朝南"
-    period: Optional[int] = None        # 元运, e.g. 8
-    construction_year: Optional[int] = None
-    address: Optional[str] = None
+    sitting: str | None = None       # 坐向, e.g. "坐北朝南"
+    period: int | None = None        # 元运, e.g. 8
+    construction_year: int | None = None
+    address: str | None = None
 
 
 class RealityConstraints(BaseModel):
@@ -47,34 +93,34 @@ class RealityConstraints(BaseModel):
     各字段均为 Optional，不提供则该项不参与判断。
     """
     # 财务
-    cash_reserve_months: Optional[int] = Field(
+    cash_reserve_months: int | None = Field(
         None, ge=0, le=60,
         description="现金储备月数，e.g. 2 表示仅有 2 个月生活费"
     )
-    has_formal_contract: Optional[bool] = Field(
+    has_formal_contract: bool | None = Field(
         None,
         description="是否已有正式书面合同（非口头 offer）"
     )
     # 地点
-    current_city: Optional[str] = Field(None, description="当前所在城市")
-    target_city: Optional[str] = Field(None, description="目标城市/是否需要搬迁")
-    commute_tolerance: Optional[Literal["accept", "negotiable", "reject"]] = Field(
+    current_city: str | None = Field(None, description="当前所在城市")
+    target_city: str | None = Field(None, description="目标城市/是否需要搬迁")
+    commute_tolerance: Literal["accept", "negotiable", "reject"] | None = Field(
         None, description="对长途通勤的接受度"
     )
     # 健康
-    health_status: Optional[Literal["good", "fair", "poor"]] = Field(
+    health_status: Literal["good", "fair", "poor"] | None = Field(
         None, description="当前健康状况"
     )
     # 资质
-    has_qualification: Optional[bool] = Field(
+    has_qualification: bool | None = Field(
         None, description="是否具备目标方向的资质/证书/许可"
     )
     # 家庭
-    has_dependents: Optional[bool] = Field(
+    has_dependents: bool | None = Field(
         None, description="是否有需抚养家庭成员"
     )
     # 备选
-    has_backup_plan: Optional[bool] = Field(
+    has_backup_plan: bool | None = Field(
         None, description="是否有备选方案（退路）"
     )
 
@@ -84,7 +130,7 @@ class ReadingRequest(BaseModel):
 
     BE-011: 支持 goal/question/birth/target_birth/space/methods/depth/language
     """
-    goal: Optional[str] = Field(
+    goal: str | None = Field(
         None,
         description="目标/意图 — 可留空，由系统从 question 自动推断",
     )
@@ -94,27 +140,27 @@ class ReadingRequest(BaseModel):
         max_length=2000,
         description="用户问题（必填），e.g. '我该换工作吗？'",
     )
-    birth: Optional[BirthModel] = Field(
+    birth: BirthModel | None = Field(
         None,
         description="求测者出生信息（部分术法如六爻/塔罗可不提供）",
     )
-    target_birth: Optional[BirthModel] = Field(
+    target_birth: BirthModel | None = Field(
         None,
         description="关系对象出生信息（合盘/关系场景）",
     )
-    space: Optional[SpaceModel] = Field(
+    space: SpaceModel | None = Field(
         None,
         description="空间信息（风水相关术法使用）",
     )
-    constraints: Optional[RealityConstraints] = Field(
+    constraints: RealityConstraints | None = Field(
         None,
         description="现实条件约束（方案 §十四）",
     )
-    method_options: Optional[dict[str, Any]] = Field(
+    method_options: dict[str, Any] | None = Field(
         None,
         description="术法专属选项: liuyao_mode, meihua_mode, tarot_spread, tarot_mode 等",
     )
-    methods: Optional[list[str]] = Field(
+    methods: list[str] | None = Field(
         None,
         description="可指定术法子集；不传则默认使用全部 12 法 (M0-05)",
     )
@@ -151,6 +197,10 @@ class DivinationSignal(BaseModel):
         le=1,
         description="信号强度 0-1 (NOR-018)",
     )
+    signal_digest: DimensionPolarity | None = Field(
+        None,
+        description="Sprint 1.4: 五档 SignalDigest (rule-based, 无 LLM). 派生自 evidence/polarity/strength",
+    )
     evidence: str = Field(
         "",
         description="盘面依据 — 来自原始排盘的具体证据",
@@ -161,20 +211,15 @@ class DivinationSignal(BaseModel):
         le=1,
         description="该信号在本术法内的置信度 0-1",
     )
-    dimension: Optional[Literal[
-        "long_term", "current_cycle", "relationship", "one_question", "space"
-    ]] = Field(
+    dimension: Literal["long_term", "current_cycle", "relationship", "one_question", "space"] | None = Field(
         None,
         description="5 维职责分派: long_term/current_cycle/relationship/one_question/space",
     )
-    time_scope: Optional[Literal[
-        "short_term", "medium_term", "long_term",
-        "current_cycle", "one_question", "space",
-    ]] = Field(
+    time_scope: Literal["short_term", "medium_term", "long_term", "current_cycle", "one_question", "space"] | None = Field(
         None,
         description="时间范围: short_term/medium_term/long_term/current_cycle/one_question/space",
     )
-    advice: Optional[str] = Field(
+    advice: str | None = Field(
         None,
         description="该信号衍生的行动建议",
     )
@@ -239,43 +284,32 @@ class ConflictItem(BaseModel):
 # ── 验证结果模型 ─────────────────────────────────────────────────────────────
 
 class ValidationResult(BaseModel):
-    """交叉验证汇总结果。
+    """交叉验证汇总结果 — 五档极性 + 分 scope 计票（无单一分数）。
 
-    BE-017: consensus/conflicts/overall_score/confidence/risks/timing/action_advice
+    BE-017: consensus/conflicts/tally_by_scope/dimension_polarity/risks/timing/action_advice
     """
     consensus: list[ConsensusItem] = Field(default_factory=list)
     conflicts: list[ConflictItem] = Field(default_factory=list)
-    overall_score: float = Field(
-        50.0,
-        ge=0,
-        le=100,
-        description="综合评分",
+    # ── 五档极性 + 计票（替代综合分 0-100 / confidence / confidence_level） ──
+    tally_by_scope: dict[TimeScope, ScopeTally] = Field(
+        default_factory=dict,
+        description="按 time_scope 计票, 五档极性各计数",
     )
-    confidence: float = Field(
-        50.0,
-        ge=0,
-        le=100,
-        description="整体置信度数值",
-    )
-    confidence_level: Literal["low", "medium", "medium_high", "high"] = Field(
-        "medium",
-        description="整体置信等级 (VAL-011)",
+    dimension_polarity: dict[str, DimensionPolarity] = Field(
+        default_factory=dict,
+        description="5 维职责分派的五档极性(long_term/current_cycle/relationship/one_question/space)",
     )
     risks: list[str] = Field(
         default_factory=list,
         description="风险提示",
     )
-    timing: Optional[dict[str, Any]] = Field(
+    timing: dict[str, Any] | None = Field(
         None,
         description="时机分析",
     )
     action_advice: list[str] = Field(
         default_factory=list,
         description="行动建议",
-    )
-    dim_scores: dict[str, float] = Field(
-        default_factory=dict,
-        description="5 维 0-100 分数 (long_term/current_cycle/relationship/one_question/space)",
     )
     dim_signals_count: dict[str, int] = Field(
         default_factory=dict,
@@ -287,7 +321,7 @@ class ValidationResult(BaseModel):
     )
     dim_breakdown: dict[str, dict[str, Any]] = Field(
         default_factory=dict,
-        description="每维子结构 {score, signals_count, top_signal, summary}",
+        description="每维子结构 {polarity, signals_count, top_signal, summary}",
     )
 
 

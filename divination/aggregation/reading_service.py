@@ -18,15 +18,17 @@ import logging
 import os
 import time
 import uuid
-from typing import Any, Optional
+from typing import Any
 
 from divination.contracts import Birth
+from divination.knowledge import extract_rules_for_chart
 
 from .intent import classify_intent
 from .llm_prompt import build_reading_prompt
 from .method_inputs import build_method_inputs
 from .normalizer import normalize_all
-from .safety import check_input_safety, sanitize_for_log, sanitize_birth_for_log
+from .reality import RealityConstraintEngine
+from .safety import check_input_safety, sanitize_for_log
 from .schema import (
     BirthModel,
     ReadingReport,
@@ -35,11 +37,10 @@ from .schema import (
     ValidationResult,
 )
 from .selector import get_method_names, select_methods
+from .situation import build_situation
 from .synthesizer import DISCLAIMER, synthesize_report
-from divination.knowledge import extract_rules_for_chart
 from .validator import validate_signals
 from .weights import get_weights
-from .reality import RealityConstraintEngine
 
 log = logging.getLogger("mystic-hub.reading")
 
@@ -77,7 +78,7 @@ async def run_reading(request: ReadingRequest) -> ReadingResult:
             signals=[],
             consensus=[],
             conflicts=[],
-            validation=VR(overall_score=0, confidence=0, confidence_level="low"),
+            validation=VR(risks=["安全响应: 暂停常规分析"]),
             report=crisis_report,
             disclaimer=safety["crisis_message"],
             elapsed_ms=0,
@@ -115,10 +116,19 @@ async def run_reading(request: ReadingRequest) -> ReadingResult:
     if not method_names:
         raise ValueError("没有可用的术法 — 请至少选择一种术法")
 
+    # Step 1.5: 境限装配 (Sprint 1.3)
+    situation = build_situation(
+        request=request,
+        intent=intent,
+        context_answers=getattr(request, "context_answers", None) or {},
+    )
+
     # Step 3-4: 构建术法专属输入 + 并行排盘
     from divination.router import _ENGINES as ENGINES
 
     # 为每种术法构造只含相关字段的 Birth
+    # Sprint 1.4/1.7: 注入 intent + situation + user_selections
+    user_selections = getattr(request, "context_answers", None) or {}
     method_births = build_method_inputs(
         birth=_build_birth(request.birth) if request.birth else None,
         target_birth=_build_birth(request.target_birth) if getattr(request, 'target_birth', None) else None,
@@ -126,6 +136,9 @@ async def run_reading(request: ReadingRequest) -> ReadingResult:
         method_options=getattr(request, 'method_options', None),
         question=request.question,
         goal=goal,
+        intent=intent,
+        situation=situation,
+        user_selections=user_selections,
     )
 
     charts: dict[str, Any] = {}
@@ -162,13 +175,14 @@ async def run_reading(request: ReadingRequest) -> ReadingResult:
     weights = get_weights(goal, method_entries)
     validation = validate_signals(signals, weights, method_entries)
 
-    # Step 6b: 现实条件校正 (Phase B: §十四)
+    # Step 6b: 现实条件校正 (Sprint 1.6: 声明式 + 安全转介)
     reality_result = None
-    if request.constraints:
+    if request.constraints or request.question:
         engine = RealityConstraintEngine()
         reality_result = engine.evaluate(
             signals=signals,
             constraints=request.constraints,
+            question=request.question,  # Sprint 1.6: 用于安全转介关键词扫描
             domain=goal,
         )
 
@@ -198,8 +212,8 @@ async def run_reading(request: ReadingRequest) -> ReadingResult:
     # Step 8: LLM 报告生成（standard 和 premium 都走 LLM，fallback 到模板）
     is_unlocked_standard = False
     is_unlocked_premium = False
-    llm_standard_text: Optional[str] = None
-    llm_premium_text: Optional[str] = None
+    llm_standard_text: str | None = None
+    llm_premium_text: str | None = None
 
     api_key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
 
@@ -283,8 +297,21 @@ def _build_result_dict(
     """将内部对象转为 dict，供 LLM prompt builder 使用。"""
     return {
         "validation": {
-            "overall_score": validation.overall_score,
-            "confidence_level": validation.confidence_level,
+            "tally_by_scope": {
+                k: {
+                    "scope": v.scope,
+                    "strong_support": v.strong_support,
+                    "weak_support": v.weak_support,
+                    "neutral": v.neutral,
+                    "weak_warn": v.weak_warn,
+                    "strong_warn": v.strong_warn,
+                    "supporting_methods": v.supporting_methods,
+                    "warning_methods": v.warning_methods,
+                    "summary": v.summary,
+                }
+                for k, v in (validation.tally_by_scope or {}).items()
+            },
+            "dimension_polarity": dict(validation.dimension_polarity or {}),
             "consensus": [
                 {
                     "theme": c.theme,
@@ -334,7 +361,7 @@ async def _generate_llm_report(
     question: str,
     depth: str,
     api_key: str,
-) -> Optional[str]:
+) -> str | None:
     """调用 LLM 生成报告（支持 standard 和 premium）。
 
     standard: 简洁务实，800字内，聚焦关键发现 + 实操建议
@@ -404,6 +431,29 @@ async def _generate_llm_report(
         return None
 
 
+def _tone_level(sup_total: int, warn_total: int) -> str:
+    """根据 tally_by_scope 累计计票推断整体基调(替代旧 0-100 score 阈值)。
+
+    very_positive : sup_total >= 3 法支持 且 warn_total == 0
+    positive      : sup_total >  warn_total 且 warn_total == 0
+    cautious      : warn_total >= 3 法警示 且 sup_total == 0
+    negative      : warn_total >  sup_total 且 sup_total == 0
+    mixed         : 双方均有
+    neutral       : 双方均 0
+    """
+    if sup_total == 0 and warn_total == 0:
+        return "neutral"
+    if sup_total >= 3 and warn_total == 0:
+        return "very_positive"
+    if warn_total >= 3 and sup_total == 0:
+        return "cautious"
+    if sup_total > warn_total and warn_total == 0:
+        return "positive"
+    if warn_total > sup_total and sup_total == 0:
+        return "negative"
+    return "mixed"
+
+
 def _generate_data_driven_mock(result_dict: dict[str, Any]) -> str:
     """无 API Key 时生成数据驱动的深度报告。
 
@@ -416,7 +466,9 @@ def _generate_data_driven_mock(result_dict: dict[str, Any]) -> str:
     methods = result_dict.get("methods_used", [])
     question = intent.get("question", "")
     goal_label = intent.get("goal_label", "综合")
-    score = validation.get("overall_score", 50)
+    tally = validation.get("tally_by_scope") or {}
+    sup_total = sum(t.get("strong_support", 0) + t.get("weak_support", 0) for t in tally.values())
+    warn_total = sum(t.get("strong_warn", 0) + t.get("weak_warn", 0) for t in tally.values())
 
     pos_sigs = sorted(
         [s for s in signals if s.get("polarity") == "positive"],
@@ -476,22 +528,23 @@ def _generate_data_driven_mock(result_dict: dict[str, Any]) -> str:
     lines.append("")
     if question:
         lines.append(f"> 您问的是：「{question}」")
-    lines.append(f"> 综合{len(methods)}种术法交叉验证 · 评分 {score}/100")
+    lines.append(f"> 综合{len(methods)}种术法交叉验证 · {sup_total} 法支持 / {warn_total} 法警示(无单一分数)")
     lines.append("")
 
     # ═══ 一、白话总览 ═══
     lines.append("## 一句话总结")
     lines.append("")
-    if score >= 70:
+    tone = _tone_level(sup_total, warn_total)
+    if tone == "very_positive":
         lines.append("总体来看，当前运势处于一个**比较有利的阶段**。多个不同的分析角度都给出了积极信号，")
         lines.append("说明这段时间适合推进重要事项，把握住机会的概率比较大。")
-    elif score >= 55:
+    elif tone == "positive":
         lines.append("总体来看，当前运势**平稳中带有机会**。没有特别明显的风险信号，但也不是一切都顺风顺水。")
         lines.append("适合稳扎稳打地推进计划，不必急于求成。")
-    elif score >= 40:
+    elif tone in ("mixed", "neutral"):
         lines.append("总体来看，当前运势**有些复杂**。好消息和需要注意的方面同时存在，不同的分析角度之间也有不同看法。")
         lines.append("建议不要做太大决定，先把情况看清楚再说。")
-    else:
+    else:  # cautious / negative
         lines.append("总体来看，当前运势**需要多留个心眼**。多个分析角度都提示需要注意的地方，")
         lines.append("建议这段时间以稳为主，先把重要决策放一放。")
     lines.append("")
@@ -519,7 +572,7 @@ def _generate_data_driven_mock(result_dict: dict[str, Any]) -> str:
     lines.append("")
 
     # 具体建议
-    _append_domain_advice(lines, primary_domain, primary_sigs, pos_sigs, neg_sigs, score, METHOD_ZH, SIGNAL_ZH)
+    _append_domain_advice(lines, primary_domain, primary_sigs, pos_sigs, neg_sigs, METHOD_ZH, SIGNAL_ZH)
     lines.append("")
 
     # ═══ 三、其他方面 ═══
@@ -541,7 +594,7 @@ def _generate_data_driven_mock(result_dict: dict[str, Any]) -> str:
             elif neg_n > pos_n and neg_strength > pos_strength:
                 lines.append(f"需要稍微留意一下，{neg_n}个术法提示可能有挑战。但也别太紧张。")
             else:
-                lines.append(f"信号比较中性，说明这个方面当前没有太大波澜，维持现状就好。")
+                lines.append("信号比较中性，说明这个方面当前没有太大波澜，维持现状就好。")
             lines.append("")
     else:
         lines.append("## 其他方面")
@@ -590,7 +643,7 @@ def _generate_data_driven_mock(result_dict: dict[str, Any]) -> str:
     lines.append("## 现在可以做的事")
     lines.append("")
     # 从数据中生成有针对性的建议
-    _append_practical_advice(lines, primary_domain, primary_sigs, pos_sigs, neg_sigs, score, advice, METHOD_ZH, SIGNAL_ZH, DOMAIN_ZH)
+    _append_practical_advice(lines, primary_domain, primary_sigs, pos_sigs, neg_sigs, tone, advice, METHOD_ZH, SIGNAL_ZH, DOMAIN_ZH)
     lines.append("")
 
     # ═══ 七、你还想了解什么 ═══
@@ -684,7 +737,7 @@ def _append_plain_explanation(
 
 def _append_domain_advice(
     lines: list[str], domain: str, sigs: list[dict],
-    pos_sigs: list[dict], neg_sigs: list[dict], score: float,
+    pos_sigs: list[dict], neg_sigs: list[dict],
     METHOD_ZH: dict, SIGNAL_ZH: dict,
 ) -> None:
     """为某个领域生成具体建议。"""
@@ -733,10 +786,11 @@ def _append_domain_advice(
 
 def _append_practical_advice(
     lines: list[str], primary_domain: str, primary_sigs: list[dict],
-    pos_sigs: list[dict], neg_sigs: list[dict], score: float,
+    pos_sigs: list[dict], neg_sigs: list[dict],
+    tone: str,
     advice: list, METHOD_ZH: dict, SIGNAL_ZH: dict, DOMAIN_ZH: dict,
 ) -> None:
-    """生成实操建议列表。"""
+    """生成实操建议列表 — tone 来自 tally_by_scope, 不再用 score。"""
     count = 0
     # 过滤掉太泛的样板建议（"结合交叉验证"、"咨询专业人士"等）
     GENERIC_PATTERNS = [
@@ -754,24 +808,24 @@ def _append_practical_advice(
             count += 1
             lines.append(f"{count}. {a_zh}")
 
-    # 通用建议补齐
+    # 通用建议补齐(基于 tone 字符串, 替代旧 0-100 score 阈值)
     if count < 3:
-        if score >= 70:
+        if tone in ("very_positive", "positive"):
             if count < 3:
                 count += 1; lines.append(f"{count}. 现在是适合行动的时间窗口，想做但一直犹豫的事，可以考虑往前推一步")
             if count < 3:
                 count += 1; lines.append(f"{count}. 多跟朋友或同行交流，你的好状态会感染别人，也会吸引更多好机会")
-        elif score >= 55:
+        elif tone == "mixed":
             if count < 3:
                 count += 1; lines.append(f"{count}. 保持现状，同时留意身边的小机会。有时候一个小突破能带来意想不到的大变化")
             if count < 3:
                 count += 1; lines.append(f"{count}. 把大的目标拆成小的步骤，每天推进一点点，三个月后回头看会有惊喜")
-        elif score >= 40:
+        elif tone == "neutral":
             if count < 3:
                 count += 1; lines.append(f"{count}. 这段时间不太适合做大决定，但很适合做准备——查资料、找人聊、做调研")
             if count < 3:
                 count += 1; lines.append(f"{count}. 注意休息和调节，人在焦虑的时候做出的判断，事后看往往不够好")
-        else:
+        else:  # cautious / negative
             if count < 3:
                 count += 1; lines.append(f"{count}. 先稳住基本盘：保证收入来源、维护好关键关系、照顾好身体健康")
             if count < 3:

@@ -2,8 +2,9 @@
 
 前端直连 LLM 时,可以先调这个拿 prompt 模板,再拼装发给 LLM。
 """
-from fastapi import APIRouter, HTTPException
 from pathlib import Path
+
+from fastapi import APIRouter, HTTPException
 
 router = APIRouter()
 

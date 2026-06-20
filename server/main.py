@@ -11,15 +11,15 @@
     GET  /api/prompts/{method}
     GET  /api/cases
 """
+import logging
+import time
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
-import logging
-import time
 
-from .api import birth_time, cases, chart, methods, prompts, interpret, almanac, reading
-from .api import daily as daily_api
+from .api import almanac, birth_time, cases, chart, compass, daily as daily_api, dream, extended_knowledge, hepan_share, interpret, knowledge, methods, prompts, reading
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 log = logging.getLogger("mystic-hub")
@@ -48,6 +48,11 @@ app.include_router(birth_time.router, prefix="/api", tags=["birth-time"])
 app.include_router(daily_api.router, prefix="/api", tags=["daily"])
 app.include_router(almanac.router, prefix="/api", tags=["almanac"])
 app.include_router(reading.router,  prefix="/api", tags=["reading"])
+app.include_router(compass.router, prefix="/api", tags=["compass"])
+app.include_router(hepan_share.router, prefix="/api", tags=["hepan-share"])
+app.include_router(knowledge.router, tags=["knowledge"])
+app.include_router(extended_knowledge.router, tags=["knowledge-ext"])
+app.include_router(dream.router)
 
 
 @app.get("/health", tags=["meta"])
