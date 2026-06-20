@@ -7,13 +7,11 @@
 - 组合中点盘: Composite Chart (中点法)
 - 合盘评分: sun-moon, venus-mars, ascendant 连接等
 """
-import math
 from datetime import date
-from typing import Optional
 
-from ..contracts import Birth, ChartResult
 from .. import astro_math as am
-from .western import _PLANETS, _HOUSE_RULER, _HOUSE_RULER_CLASSICAL
+from ..contracts import Birth, ChartResult
+from .western import _PLANETS
 
 # ═══════════════════════════════════════════════════════════════
 # 合盘专用: 行星组合权重
@@ -311,7 +309,7 @@ def _score_synastry(cross_aspects: list, overlays: dict,
     sun_moon_score = 0
     sun_moon_aspects = [a for a in cross_aspects
                         if {a["planet_a"], a["planet_b"]} in (
-                            {"太阳", "月亮"}, {"太阳", "太阳"}, {"月亮", "月亮"})]
+                            {"太阳", "月亮"}, {"太阳"}, {"月亮"})]
     for a in sun_moon_aspects:
         if a["aspect"] in ("合", "拱"):
             sun_moon_score += 4
@@ -364,9 +362,10 @@ def _interpret(score: float) -> dict:
 # ═══════════════════════════════════════════════════════════════
 def compute(birth_a: Birth, birth_b: Birth) -> ChartResult:
     """计算两个人的西方占星合盘 (Synastry)。"""
-    from skyfield.api import load
     from datetime import datetime
     from zoneinfo import ZoneInfo
+
+    from skyfield.api import load
 
     ts = load.timescale()
     eph = load("de421.bsp")

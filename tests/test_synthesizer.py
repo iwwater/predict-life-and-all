@@ -9,8 +9,10 @@ import pytest
 from divination.aggregation.schema import (
     ConflictItem,
     ConsensusItem,
+    DimensionPolarity,
     DivinationSignal,
     ReadingReport,
+    ScopeTally,
     ValidationResult,
 )
 from divination.aggregation.synthesizer import (
@@ -33,6 +35,37 @@ def _sig(method="bazi_v2", domain="career", signal_key="career_stability",
         evidence=evidence or f"{method} evidence",
         advice=advice,
     )
+
+
+def _default_tally():
+    """构造一组五档制 tally_by_scope — 替代原 overall_score=68/confidence=70/medium_high。"""
+    return {
+        "long_term": ScopeTally(
+            scope="long_term",
+            strong_support=3, weak_support=1, neutral=0, weak_warn=0, strong_warn=0,
+            supporting_methods=["bazi_v2", "ziwei", "western"],
+            warning_methods=[],
+            summary="长期命格支持",
+        ),
+        "current_cycle": ScopeTally(
+            scope="current_cycle",
+            strong_support=2, weak_support=1, neutral=0, weak_warn=1, strong_warn=0,
+            supporting_methods=["bazi_v2", "ziwei"],
+            warning_methods=["meihua"],
+            summary="当前周期偏积极",
+        ),
+    }
+
+
+def _default_polarity():
+    """构造 dimension_polarity — 替代原 confidence_level='medium_high'。"""
+    return {
+        "long_term": DimensionPolarity.STRONG_SUPPORT,
+        "current_cycle": DimensionPolarity.WEAK_SUPPORT,
+        "relationship": DimensionPolarity.NEUTRAL,
+        "one_question": DimensionPolarity.NEUTRAL,
+        "space": DimensionPolarity.NEUTRAL,
+    }
 
 
 # Phase 1: 18 法全部纳入 (方案 §二十一)
@@ -104,9 +137,8 @@ class TestThreeTierReportsExist:
         validation = ValidationResult(
             consensus=SAMPLE_CONSENSUS,
             conflicts=[SAMPLE_CONFLICT],
-            overall_score=68.0,
-            confidence=70.0,
-            confidence_level="medium_high",
+            tally_by_scope=_default_tally(),
+            dimension_polarity=_default_polarity(),
             risks=["career领域存在较强负面信号，建议谨慎对待"],
             timing={"summary": "时机信号中性"},
             action_advice=["可积极关注career领域", "建议谨慎决策"],
@@ -122,13 +154,15 @@ class TestThreeTierReportsExist:
         signals = _make_18_method_signals()
         validation = ValidationResult(
             consensus=SAMPLE_CONSENSUS,
-            overall_score=68,
-            confidence=70,
-            confidence_level="medium_high",
+            tally_by_scope=_default_tally(),
+            dimension_polarity=_default_polarity(),
             action_advice=["建议稳定发展"],
         )
         report = synthesize_report(signals, validation, SAMPLE_INTENT, ALL_18_METHODS)
-        assert "综合评分" in report.free, f"REP-002: free report missing headline with score"
+        # 新 headline 改为按 tally 输出的"综N种术法交叉参详"文案
+        assert "综" in report.free and "种术法交叉参详" in report.free, (
+            f"REP-002: free report missing tally-based headline: {report.free[:200]}"
+        )
         assert "速览" in report.free, f"Free report should have a quick overview title"
 
     def test_free_report_has_3_suggestions(self):
@@ -136,9 +170,8 @@ class TestThreeTierReportsExist:
         signals = _make_18_method_signals()
         validation = ValidationResult(
             consensus=SAMPLE_CONSENSUS,
-            overall_score=68,
-            confidence=70,
-            confidence_level="medium_high",
+            tally_by_scope=_default_tally(),
+            dimension_polarity=_default_polarity(),
             action_advice=["建议A", "建议B", "建议C", "建议D", "建议E"],
         )
         report = synthesize_report(signals, validation, SAMPLE_INTENT, ALL_18_METHODS)
@@ -160,9 +193,8 @@ class Test12MethodSummary:
         validation = ValidationResult(
             consensus=SAMPLE_CONSENSUS,
             conflicts=[SAMPLE_CONFLICT],
-            overall_score=68,
-            confidence=70,
-            confidence_level="medium_high",
+            tally_by_scope=_default_tally(),
+            dimension_polarity=_default_polarity(),
             action_advice=["建议谨慎决策"],
         )
         report = synthesize_report(signals, validation, SAMPLE_INTENT, ALL_18_METHODS)
@@ -174,7 +206,8 @@ class Test12MethodSummary:
     def test_standard_contains_method_summary_section(self):
         signals = _make_18_method_signals()
         validation = ValidationResult(
-            overall_score=68, confidence=70, confidence_level="medium_high",
+            tally_by_scope=_default_tally(),
+            dimension_polarity=_default_polarity(),
             action_advice=["建议"],
         )
         report = synthesize_report(signals, validation, SAMPLE_INTENT, ALL_18_METHODS)
@@ -188,7 +221,8 @@ class Test12MethodSummary:
         signals = _make_18_method_signals()
         validation = ValidationResult(
             consensus=SAMPLE_CONSENSUS,
-            overall_score=68, confidence=70, confidence_level="medium_high",
+            tally_by_scope=_default_tally(),
+            dimension_polarity=_default_polarity(),
             action_advice=["建议"],
         )
         report = synthesize_report(signals, validation, SAMPLE_INTENT, ALL_18_METHODS)
@@ -199,7 +233,8 @@ class Test12MethodSummary:
         signals = _make_18_method_signals()
         validation = ValidationResult(
             conflicts=[SAMPLE_CONFLICT],
-            overall_score=68, confidence=70, confidence_level="medium_high",
+            tally_by_scope=_default_tally(),
+            dimension_polarity=_default_polarity(),
             action_advice=["建议"],
         )
         report = synthesize_report(signals, validation, SAMPLE_INTENT, ALL_18_METHODS)
@@ -218,7 +253,8 @@ class TestDisclaimer:
     def test_free_has_disclaimer(self):
         signals = _make_18_method_signals()
         validation = ValidationResult(
-            overall_score=68, confidence=70, confidence_level="medium_high",
+            tally_by_scope=_default_tally(),
+            dimension_polarity=_default_polarity(),
             action_advice=["建议"],
         )
         report = synthesize_report(signals, validation, SAMPLE_INTENT, ALL_18_METHODS)
@@ -228,7 +264,8 @@ class TestDisclaimer:
     def test_standard_has_disclaimer(self):
         signals = _make_18_method_signals()
         validation = ValidationResult(
-            overall_score=68, confidence=70, confidence_level="medium_high",
+            tally_by_scope=_default_tally(),
+            dimension_polarity=_default_polarity(),
             action_advice=["建议"],
         )
         report = synthesize_report(signals, validation, SAMPLE_INTENT, ALL_18_METHODS)
@@ -238,7 +275,8 @@ class TestDisclaimer:
     def test_premium_has_disclaimer(self):
         signals = _make_18_method_signals()
         validation = ValidationResult(
-            overall_score=68, confidence=70, confidence_level="medium_high",
+            tally_by_scope=_default_tally(),
+            dimension_polarity=_default_polarity(),
             action_advice=["建议"],
         )
         report = synthesize_report(signals, validation, SAMPLE_INTENT, ALL_18_METHODS)
@@ -256,17 +294,22 @@ class TestHeadline:
             _sig("bazi_v2", "career", "career_stability", "positive", 0.7, 0.6),
         ]
         validation = ValidationResult(
-            overall_score=72, confidence=68, confidence_level="medium_high",
+            tally_by_scope=_default_tally(),
+            dimension_polarity=_default_polarity(),
         )
         headline = _generate_headline(signals, validation, "事业工作", "我该换工作吗")
-        assert "72" in headline or "综合评分" in headline
+        # 新 headline: 改为"综N种术法交叉参详" + tally 描述, 不再包含具体数字评分
+        assert "综" in headline and "种术法交叉参详" in headline, (
+            f"REP-002: headline should use tally-based format: {headline}"
+        )
 
     def test_headline_mentions_question_context(self):
         signals = [
             _sig("bazi_v2", "career", "career_stability", "positive", 0.7, 0.6),
         ]
         validation = ValidationResult(
-            overall_score=55, confidence=50, confidence_level="medium",
+            tally_by_scope=_default_tally(),
+            dimension_polarity=_default_polarity(),
         )
         headline = _generate_headline(signals, validation, "事业工作", "我该换工作吗")
         assert "我该换工作吗" in headline, f"Headline should mention question: {headline}"
@@ -277,8 +320,19 @@ class TestHeadline:
             _sig("bazi_v2", "career", "career_pressure", "negative", 0.9, 0.8),
             _sig("ziwei", "career", "career_pressure", "negative", 0.85, 0.8),
         ]
+        # 构造一个负面倾向的 tally: 强警示 > 强支持
+        warn_tally = {
+            "long_term": ScopeTally(
+                scope="long_term",
+                strong_support=0, weak_support=0, neutral=0, weak_warn=2, strong_warn=2,
+                supporting_methods=[],
+                warning_methods=["bazi_v2", "ziwei"],
+                summary="风险警示",
+            ),
+        }
         validation = ValidationResult(
-            overall_score=30, confidence=45, confidence_level="low",
+            tally_by_scope=warn_tally,
+            dimension_polarity={"long_term": DimensionPolarity.STRONG_WARN},
         )
         headline = _generate_headline(signals, validation, "事业工作", "我该换工作吗")
         # Must NOT contain absolute language
@@ -297,7 +351,8 @@ class TestPremiumReport:
         validation = ValidationResult(
             consensus=SAMPLE_CONSENSUS,
             conflicts=[SAMPLE_CONFLICT],
-            overall_score=68, confidence=70, confidence_level="medium_high",
+            tally_by_scope=_default_tally(),
+            dimension_polarity=_default_polarity(),
             risks=["风险A", "风险B"],
             timing={"short_term_signals": 3, "medium_term_signals": 1, "long_term_signals": 2,
                     "timing_signals_count": 2, "favorable_count": 1, "unfavorable_count": 0,
@@ -312,7 +367,8 @@ class TestPremiumReport:
         signals = _make_18_method_signals()
         validation = ValidationResult(
             conflicts=[SAMPLE_CONFLICT],
-            overall_score=68, confidence=70, confidence_level="medium_high",
+            tally_by_scope=_default_tally(),
+            dimension_polarity=_default_polarity(),
             risks=["风险A", "风险B"],
             action_advice=["建议"],
         )
@@ -322,7 +378,8 @@ class TestPremiumReport:
     def test_premium_contains_followup_context(self):
         signals = _make_18_method_signals()
         validation = ValidationResult(
-            overall_score=68, confidence=70, confidence_level="medium_high",
+            tally_by_scope=_default_tally(),
+            dimension_polarity=_default_polarity(),
             action_advice=["建议"],
         )
         report = synthesize_report(signals, validation, SAMPLE_INTENT, ALL_18_METHODS)
@@ -338,7 +395,8 @@ class TestAdviceLanguage:
         """REP-010: 行动建议使用可执行建议，不做强制命令。"""
         signals = _make_18_method_signals()
         validation = ValidationResult(
-            overall_score=68, confidence=70, confidence_level="medium_high",
+            tally_by_scope=_default_tally(),
+            dimension_polarity=_default_polarity(),
             action_advice=["你必须辞职", "建议在当前岗位积累经验后再考虑变动"],
         )
         report = synthesize_report(signals, validation, SAMPLE_INTENT, ALL_18_METHODS)

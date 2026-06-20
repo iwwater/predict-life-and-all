@@ -2,8 +2,8 @@
 文献：八字合婚（天干五合/地支六合三合六冲相刑、用神互补，《三命通会》合婚论）；
      西方 Synastry（跨盘相位，重点 Sun-Moon / Venus-Mars 轴）。
 输出维度评级（高/中/低）而非单一分数——多体系不可通约，避免虚假精确。"""
-from ..contracts import Birth, ChartResult
 from .. import wuxing as wx
+from ..contracts import Birth, ChartResult
 
 # 天干五合
 _WUHE = {frozenset(p): h for p, h in [(("甲","己"),"土"),(("乙","庚"),"金"),

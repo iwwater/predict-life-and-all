@@ -23,8 +23,9 @@
   - 蓍草法无"6"为老阴（6 = 2+2+2 三字=老阴在三钱法，但在蓍草法中概率最低 1/16）
 """
 import random
-from ..contracts import Birth, ChartResult
+
 from .. import yijing
+from ..contracts import Birth, ChartResult
 
 RULE_VERSION = "shicao-1.0"
 
