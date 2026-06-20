@@ -7,6 +7,7 @@ import { computeChart } from "../../lib/api";
 import { useI18n } from "../../lib/i18n";
 import { useBasket } from "../../store/basket";
 import { useBirthStore } from "../../store/birth";
+import { MethodSourcesPanel } from "../../components/MethodSourcesPanel";
 
 // 九宫方位: 按 巽离坤/震中兑/艮坎乾 排列（方位是红线不能错）
 const PALACE_ORDER = [
@@ -116,6 +117,7 @@ function ChartFooter({ chart, inBasket, onBasket, onReset }: any) {
         </button>
         <button type="button" className="paper-btn" onClick={onReset} style={{ fontSize: "0.78rem" }}>{lang === "zh" ? "重新起盘" : "Recast"}</button>
       </div>
+      <MethodSourcesPanel method="qimen" />
     </div>
   );
 }

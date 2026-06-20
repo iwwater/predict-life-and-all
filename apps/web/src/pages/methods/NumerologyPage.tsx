@@ -4,6 +4,7 @@ import type { Birth, ChartResult } from "../../lib/types";
 import { computeChart } from "../../lib/api";
 import { useI18n } from "../../lib/i18n";
 import { useBasket } from "../../store/basket";
+import { MethodSourcesPanel } from "../../components/MethodSourcesPanel";
 
 const MODES = [
   { value: "life_path", labelZh: "生命灵数", labelEn: "Life Path" },
@@ -126,6 +127,7 @@ function ChartFooter({ chart, inBasket, onBasket, onReset }: any) {
         </button>
         <button type="button" className="paper-btn" onClick={onReset} style={{ fontSize: "0.78rem" }}>{lang === "zh" ? "重新推算" : "Recalculate"}</button>
       </div>
+      <MethodSourcesPanel method="numerology" />
     </div>
   );
 }

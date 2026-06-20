@@ -8,6 +8,7 @@ import { MethodSubmitBar } from "../../components/forms/MethodSubmitBar";
 import { useI18n } from "../../lib/i18n";
 import { useHistory, deriveTags } from "../../store/history";
 import { useBasket } from "../../store/basket";
+import { MethodSourcesPanel } from "../../components/MethodSourcesPanel";
 
 export function XiaoliurenPage() {
   const { t, lang } = useI18n(); const navigate = useNavigate();
@@ -73,6 +74,7 @@ export function XiaoliurenPage() {
       </section>
       <MethodSubmitBar loading={loading} error={error} inBasket={inBasket} onAddToBasket={addToBasket} submitLabel={lang === "zh" ? "掐小六壬" : "Cast Xiao Liu Ren"} />
       <p className="paper-source" style={{ fontSize: "0.6rem", textAlign: "center" }}>{t("method.notice")}</p>
+      <MethodSourcesPanel method="xiaoliuren" />
     </form>
   );
 }

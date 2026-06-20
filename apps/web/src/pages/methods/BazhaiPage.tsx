@@ -7,6 +7,7 @@ import { computeChart } from "../../lib/api";
 import { useI18n } from "../../lib/i18n";
 import { useBasket } from "../../store/basket";
 import { useBirthStore } from "../../store/birth";
+import { MethodSourcesPanel } from "../../components/MethodSourcesPanel";
 
 const DIRECTIONS = ["正北", "东北", "正东", "东南", "正南", "西南", "正西", "西北"];
 
@@ -128,6 +129,7 @@ function ChartFooter({ chart, inBasket, onBasket, onReset }: any) {
         </button>
         <button type="button" className="paper-btn" onClick={onReset} style={{ fontSize: "0.78rem" }}>{lang === "zh" ? "重新排盘" : "Recast"}</button>
       </div>
+      <MethodSourcesPanel method="fengshui" />
     </div>
   );
 }

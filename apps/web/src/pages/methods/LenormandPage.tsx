@@ -9,6 +9,7 @@ import { MethodSubmitBar } from "../../components/forms/MethodSubmitBar";
 import { useI18n } from "../../lib/i18n";
 import { useHistory, deriveTags } from "../../store/history";
 import { useBasket } from "../../store/basket";
+import { MethodSourcesPanel } from "../../components/MethodSourcesPanel";
 
 export function LenormandPage() {
   const { t, lang } = useI18n(); const navigate = useNavigate();
@@ -49,6 +50,7 @@ export function LenormandPage() {
       </section>
       <MethodSubmitBar loading={loading} error={error} inBasket={inBasket} onAddToBasket={addToBasket} submitLabel={lang === "zh" ? "抽牌" : "Draw"} />
       <p className="paper-source" style={{ fontSize: "0.6rem", textAlign: "center" }}>{t("method.notice")}</p>
+      <MethodSourcesPanel method="lenormand" />
     </form>
   );
 }

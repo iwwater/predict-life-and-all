@@ -26,6 +26,7 @@ const ResultSample = lazy(() => import("./pages/ResultSample").then((m) => ({ de
 const NotFound = lazy(() => import("./pages/NotFound").then((m) => ({ default: m.NotFound })));
 const DateSelect = lazy(() => import("./pages/DateSelect").then((m) => ({ default: m.DateSelect })));
 const Knowledge = lazy(() => import("./pages/Knowledge").then((m) => ({ default: m.Knowledge })));
+const DreamPage = lazy(() => import("./pages/DreamPage").then((m) => ({ default: m.DreamPage })));
 
 // Method pages — v2 routes /m/{method}
 const TarotPage = lazy(() => import("./pages/methods/TarotPage").then((m) => ({ default: m.TarotPage })));
@@ -114,6 +115,7 @@ export function App() {
                 <Route path="/compatibility" element={<Compatibility />} />
                 <Route path="/dateselect" element={<DateSelect />} />
                 <Route path="/knowledge" element={<Knowledge />} />
+                <Route path="/dream" element={<DreamPage />} />
                 <Route path="/reading" element={<Reading />} />
                 <Route path="/reading-history" element={<ReadingHistory />} />
                 <Route path="/about" element={<About />} />

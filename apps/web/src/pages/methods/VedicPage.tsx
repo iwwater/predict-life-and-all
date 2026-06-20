@@ -7,6 +7,7 @@ import { computeChart } from "../../lib/api";
 import { useI18n } from "../../lib/i18n";
 import { useBasket } from "../../store/basket";
 import { useBirthStore } from "../../store/birth";
+import { MethodSourcesPanel } from "../../components/MethodSourcesPanel";
 
 const MODES = [
   { value: "natal", labelZh: "本命盘", labelEn: "Natal" },
@@ -144,6 +145,7 @@ function ChartFooter({ chart, inBasket, onBasket, onReset }: any) {
         </button>
         <button type="button" className="paper-btn" onClick={onReset} style={{ fontSize: "0.78rem" }}>{lang === "zh" ? "重新排盘" : "Recast"}</button>
       </div>
+      <MethodSourcesPanel method="vedic" />
     </div>
   );
 }

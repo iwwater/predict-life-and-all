@@ -9,6 +9,7 @@ import { useI18n } from "../../lib/i18n";
 import { useBasket } from "../../store/basket";
 import { useBirthStore } from "../../store/birth";
 import { COLOR } from "../../components/ui";
+import { MethodSourcesPanel } from "../../components/MethodSourcesPanel";
 
 // 六爻自下而上: 初爻(index 0) → 上爻(index 5)
 const YAO_NAMES = ["初爻", "二爻", "三爻", "四爻", "五爻", "上爻"];
@@ -399,6 +400,7 @@ export function LiuyaoPage() {
           </div>
         </div>
       )}
+      <MethodSourcesPanel method="liuyao" />
     </div>
   );
 }

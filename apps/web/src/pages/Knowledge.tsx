@@ -1,6 +1,12 @@
 // 玄学知识馆: 古典文献 · 五行详解 · 神煞大全 · 领域知识 · 职业五行（「古籍×仪器」纸墨风格）
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { WUXING_COLORS, WUXING_GLYPHS } from "../components/MysticElements";
+import {
+  fetchKnowledgeMethods,
+  fetchBooks,
+  type KnowledgeMethodsResponse,
+  type BookEntry,
+} from "../lib/api";
 
 // ── 五行详解 ──────────────────────────────────────────────────────
 const WUXING_DETAIL: Record<string, {
@@ -71,7 +77,7 @@ const JIEQI_HEALTH = [
   { jieqi:"立冬", element:"水", tips:"养肾藏精，早卧晚起，避寒就温" },
 ];
 
-type TabKey = "wuxing" | "shensha" | "classical" | "profession" | "wellness";
+type TabKey = "wuxing" | "shensha" | "classical" | "profession" | "wellness" | "books";
 
 const tabs: { key: TabKey; label: string }[] = [
   { key:"wuxing", label:"五行详解" },
@@ -79,6 +85,7 @@ const tabs: { key: TabKey; label: string }[] = [
   { key:"classical", label:"经典文摘" },
   { key:"profession", label:"职业适配" },
   { key:"wellness", label:"节气养生" },
+  { key:"books", label:"📚 文献书单" },
 ];
 
 export function Knowledge() {
@@ -116,6 +123,7 @@ export function Knowledge() {
         {tab === "classical" && <ClassicalTab />}
         {tab === "profession" && <ProfessionTab />}
         {tab === "wellness" && <WellnessTab />}
+        {tab === "books" && <BooksTab />}
       </div>
     </div>
   );
@@ -303,5 +311,202 @@ function WellnessTab() {
         此五行相制之理，源自《千金要方》。
       </div>
     </section>
+  );
+}
+
+// ── 📚 文献书单（古籍推荐） ───────────────────────────────────────────
+function BooksTab() {
+  const [methods, setMethods] = useState<KnowledgeMethodsResponse | null>(null);
+  const [method, setMethod] = useState<string>("");
+  const [books, setBooks] = useState<BookEntry[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
+
+  // 加载术法清单
+  useEffect(() => {
+    let alive = true;
+    fetchKnowledgeMethods()
+      .then((res) => {
+        if (!alive) return;
+        setMethods(res);
+        const first = res.methods.find((m) => (res.summary[m]?.total ?? 0) > 0);
+        if (first) setMethod(first);
+      })
+      .catch((e) => setError(String(e)));
+    return () => { alive = false; };
+  }, []);
+
+  // 切换术法或筛选时拉书单
+  useEffect(() => {
+    if (!method) return;
+    let alive = true;
+    setLoading(true);
+    setError(null);
+    fetchBooks(method, { maxPriority: 3, verifiedOnly })
+      .then((res) => {
+        if (!alive) return;
+        setBooks(res.books);
+      })
+      .catch((e) => alive && setError(String(e)))
+      .finally(() => alive && setLoading(false));
+    return () => { alive = false; };
+  }, [method, verifiedOnly]);
+
+  const summary = methods?.summary[method];
+  const methodLabel = methods?.labels[method] ?? method;
+  const star = (n: number) => "★".repeat(n) + "☆".repeat(3 - n);
+
+  return (
+    <div className="space-y-4">
+      {/* 顶部：术法选择 + 摘要 */}
+      <section className="paper-frame">
+        <h3 className="paper-eyebrow" style={{ color: "var(--cinnabar)" }}>📚 古典文献推荐</h3>
+        <p className="paper-body" style={{ fontSize: "0.75rem", marginTop: "0.3rem", color: "var(--ink-soft)" }}>
+          按术法分组；优先级 1=必修(★★★) / 2=进阶(★★) / 3=拓展(★)。
+          推荐以公共领域版本为主，详见各条 <code>online_resources</code>。
+        </p>
+
+        <div className="flex flex-wrap items-center gap-2" style={{ marginTop: "0.7rem" }}>
+          <select
+            value={method}
+            onChange={(e) => { setMethod(e.target.value); setOpenIdx(null); }}
+            className="paper-tag"
+            style={{ fontSize: "0.82rem", padding: "0.35rem 0.7rem", cursor: "pointer" }}
+          >
+            {methods?.methods.map((m) => (
+              <option key={m} value={m}>
+                {methods.labels[m] ?? m} ({methods.summary[m]?.total ?? 0} 本)
+              </option>
+            ))}
+          </select>
+
+          <label className="paper-tag" style={{ fontSize: "0.75rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.35rem" }}>
+            <input
+              type="checkbox"
+              checked={verifiedOnly}
+              onChange={(e) => setVerifiedOnly(e.target.checked)}
+            />
+            仅显示已验证
+          </label>
+
+          {summary && (
+            <div className="paper-tag" style={{ fontSize: "0.7rem", color: "var(--ink-soft)" }}>
+              已验证 {summary.verified}/{summary.total} 本 ·
+              朝代: {Object.entries(summary.dynasties).slice(0, 4).map(([d, n]) => `${d} ${n}`).join(" · ")}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* 错误提示 */}
+      {error && (
+        <div className="paper-grid-cell" style={{ padding: "0.6rem 0.85rem", borderColor: "rgba(176,58,46,0.3)", color: "var(--cinnabar)", fontSize: "0.8rem" }}>
+          ⚠ 加载失败: {error}
+        </div>
+      )}
+
+      {/* 书单 */}
+      <div className="space-y-2">
+        {loading && (
+          <div className="paper-grid-cell" style={{ padding: "1rem", textAlign: "center", color: "var(--ink-soft)", fontSize: "0.8rem" }}>
+            正在加载…
+          </div>
+        )}
+
+        {!loading && books.length === 0 && (
+          <div className="paper-grid-cell" style={{ padding: "1rem", textAlign: "center", color: "var(--ink-soft)", fontSize: "0.8rem" }}>
+            当前筛选下无书单；请尝试切换术法或取消"仅显示已验证"。
+          </div>
+        )}
+
+        {books.map((b, i) => {
+          const open = openIdx === i;
+          const isVerified = !!b.verified_examples;
+          return (
+            <div key={`${b.title}-${i}`} className="paper-frame" style={{ padding: "0.6rem 0.85rem" }}>
+              {/* 标题行 */}
+              <button
+                type="button"
+                onClick={() => setOpenIdx(open ? null : i)}
+                className="w-full text-left flex items-start justify-between gap-2"
+                style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
+              >
+                <div className="flex-1">
+                  <div style={{ fontSize: "0.95rem", fontWeight: 700, fontFamily: "'Noto Serif SC', serif", color: "var(--ink)" }}>
+                    {b.title}
+                    <span style={{ fontSize: "0.72rem", color: "var(--cinnabar)", marginLeft: "0.5rem", letterSpacing: "0.05em" }}>
+                      {star(b.priority)}
+                    </span>
+                    {isVerified && (
+                      <span style={{ fontSize: "0.62rem", color: "var(--verdigris)", marginLeft: "0.4rem", border: "1px solid var(--verdigris)", padding: "0 0.3rem", borderRadius: "0.2rem" }}>
+                        ✓ 已验证
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ fontSize: "0.7rem", color: "var(--ink-soft)", marginTop: "0.15rem" }}>
+                    {b.dynasty} · {b.author} · {b.difficulty}
+                  </div>
+                </div>
+                <span style={{ fontSize: "0.8rem", color: "var(--ink-soft)", flexShrink: 0, transition: "transform 0.2s", transform: open ? "rotate(180deg)" : "none" }}>
+                  ▾
+                </span>
+              </button>
+
+              {/* 折叠详情 */}
+              {open && (
+                <div className="animate-fade-in" style={{ marginTop: "0.6rem", fontSize: "0.78rem", color: "var(--ink)", lineHeight: 1.7 }}>
+                  <p style={{ marginBottom: "0.5rem" }}>{b.description}</p>
+
+                  {b.key_chapters.length > 0 && (
+                    <div style={{ marginBottom: "0.4rem" }}>
+                      <span style={{ color: "var(--cinnabar)", fontSize: "0.7rem", opacity: 0.8 }}>▸ 核心篇章: </span>
+                      <span style={{ fontFamily: "'Noto Serif SC', serif" }}>{b.key_chapters.join(" · ")}</span>
+                    </div>
+                  )}
+
+                  {isVerified && (
+                    <div style={{ marginBottom: "0.4rem", padding: "0.4rem 0.6rem", background: "rgba(90,112,88,0.08)", borderRadius: "0.2rem", fontSize: "0.72rem" }}>
+                      <span style={{ color: "var(--verdigris)", fontWeight: 600 }}>✓ 验证: </span>
+                      {b.verified_examples}
+                    </div>
+                  )}
+
+                  {b.online_resources && b.online_resources.length > 0 && (
+                    <div style={{ marginBottom: "0.4rem", fontSize: "0.72rem" }}>
+                      <span style={{ color: "var(--cinnabar)", opacity: 0.8 }}>▸ 在线资源: </span>
+                      <span style={{ color: "var(--ink-soft)" }}>{b.online_resources.join(" / ")}</span>
+                    </div>
+                  )}
+
+                  {b.book_file && (
+                    <div style={{ marginBottom: "0.4rem", fontSize: "0.72rem", color: "var(--ink-soft)" }}>
+                      <span style={{ color: "var(--cinnabar)", opacity: 0.8 }}>▸ 本地文件: </span>
+                      <code style={{ fontFamily: "'JetBrains Mono', monospace" }}>docs/{b.book_file}</code>
+                    </div>
+                  )}
+
+                  {b.notes && (
+                    <div style={{ marginTop: "0.5rem", fontSize: "0.72rem", color: "var(--ink-soft)", fontStyle: "italic", borderLeft: "2px solid var(--rule)", paddingLeft: "0.6rem" }}>
+                      {b.notes}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* 版权声明 */}
+      <div className="paper-grid-cell" style={{ padding: "0.6rem 0.85rem", fontSize: "0.68rem", color: "var(--ink-soft)", lineHeight: 1.7 }}>
+        <strong style={{ color: "var(--cinnabar)" }}>⚖ 版权：</strong>
+        平台仅推荐公共领域 (public domain) 或已获合法授权的古籍版本；
+        建议读者通过 <em>书格 (shuge.org)</em>、<em>殆知阁 (daizhige.org)</em>、<em>中国国家图书馆</em> 等
+        公益数字图书馆获取扫描版，或购买正版纸本以支持古籍数字化。
+        本平台所有推断仅供文化研究与娱乐参考，<strong>不构成</strong>医疗、投资、婚姻、法律等决策依据。
+      </div>
+    </div>
   );
 }
