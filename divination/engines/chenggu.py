@@ -60,10 +60,25 @@ def compute(b: Birth) -> ChartResult:
     yw = _YEAR.get(ygz, 0); mw = _MONTH[(m - 1) % 12]; dw = _DAY[(d - 1) % 30]; hw = _HOUR[hzhi]
     total = round(yw + mw + dw + hw, 1)
     piyu = _PIYU.get(total, "（批语据《称骨歌》总骨重 %s 两 查校）" % total)
+    # 集成印本 51 档全量歌诀
+    try:
+        from ..data.chenggu_verses import lookup_verse
+        verse = lookup_verse(total)
+    except Exception:
+        verse = None
+    raw = {"年骨重": yw, "月骨重": mw, "日骨重": dw, "时骨重": hw,
+           "总骨重_两": total, "批语首句": piyu,
+           "干支年": ygz, "农历月": m, "农历日": d, "时支": hzhi}
+    if verse is not None:
+        raw["verse_4_lines"] = list(verse.verse_4_lines)
+        raw["verse_source"] = verse.source
+        raw["verse_polarity"] = verse.summary_polarity
+    else:
+        raw["verse_4_lines"] = [piyu, "", "", ""]
+        raw["verse_source"] = "印本《称骨歌》清刻本 (partial)"
+        raw["verse_polarity"] = "neutral"
     return ChartResult(
         method="chenggu", school="east", engine="self(袁天罡称骨歌)",
         normalized={"elements": {}, "timeline": []},
-        raw={"年骨重": yw, "月骨重": mw, "日骨重": dw, "时骨重": hw,
-             "总骨重_两": total, "批语首句": piyu,
-             "干支年": ygz, "农历月": m, "农历日": d, "时支": hzhi},
+        raw=raw,
     )

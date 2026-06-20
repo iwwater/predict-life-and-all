@@ -1,12 +1,11 @@
 """紫微斗数 SVG 可视化模块。
 
-提供 4 种命盘可视化:
-- render_traditional_square: 传统方盘 (12 宫固定位置, 中间留空)
-- render_modern_wheel: 现代轮盘 (圆形布局)
-- render_palace_grid: 宫位网格 (4 行 3 列)
-- render_star_map: 星曜地图 (星曜散布)
+提供 8 种可视化:
+- 4 种基础盘 (传统方盘/现代轮盘/宫位网格/星曜地图)
+- 4 种运程盘 (本命/大限/流年/流月) — 古籍×仪器风
+- 1 种小限盘 (xiaoxian) — 高亮小限所在宫位
 
-签名: render_xxx(palaces, soul, body, five_elements) -> str
+签名: render_xxx(palaces, ...) -> str
 不依赖任何第三方库, 全部使用 Python 标准库。
 """
 from __future__ import annotations
@@ -18,6 +17,13 @@ from .ziwei_svg import (
     render_modern_wheel_simple as render_modern_wheel,
     render_palace_grid_simple as render_palace_grid,
     render_star_map_simple as render_star_map,
+    render_natal_chart,
+    render_decadal_chart,
+    render_yearly_chart,
+    render_monthly_chart,
+    render_xiaoxian_chart,
+    render_xiaoxian_at_age,
+    render_all_scopes,
     wrap_html as _wrap_html_div,
     render_all,
 )
@@ -52,6 +58,13 @@ __all__ = [
     "render_modern_wheel",
     "render_palace_grid",
     "render_star_map",
+    "render_natal_chart",
+    "render_decadal_chart",
+    "render_yearly_chart",
+    "render_monthly_chart",
+    "render_xiaoxian_chart",
+    "render_xiaoxian_at_age",
+    "render_all_scopes",
     "wrap_html",
     "render_all",
 ]

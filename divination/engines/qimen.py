@@ -306,6 +306,25 @@ def _judge(raw: dict) -> dict[str, Any]:
         "已判：门迫门制/入墓/空亡/五不遇时/值使门/三奇得使/八门得令。"
         "其他干组合格局(青龙返首、飞鸟跌穴等)须据《奇门统宗》格局表补校。"
     )
+    out.setdefault("格局详细", [])
+    # 集成干组合格局检测
+    try:
+        from ..data.qimen_patterns import detect_patterns
+        tianpan = raw.get("天盘三奇六仪", {})
+        dipan = raw.get("地盘三奇六仪", {})
+        if tianpan and dipan:
+            ctx = {"day_gan": gz[0]} if "gz" in dir() else {}
+            pats = detect_patterns(tianpan, dipan, ctx)
+            if pats:
+                out["干组合格局"] = [
+                    {"id": p.id, "name": p.name, "polarity": p.polarity,
+                     "source": p.source, "category": p.category,
+                     "description": getattr(p, "description", p.name), "active": True}
+                    for p in pats
+                ]
+                out["干组合格局数"] = len(out["干组合格局"])
+    except Exception:
+        pass
     return out
 
 
@@ -450,6 +469,8 @@ def compute(b: Birth, method: int = 1, pan_type: str = "hour",
     except ModuleNotFoundError as exc:
         raw = _fallback_raw(b, str(exc))
         raw["pan_info"] = _simulate_multi_pan(raw, pan_type, pan_style, zhi_run_method)
+        raw.setdefault("qimen_patterns", [])
+        raw.setdefault("qimen_pattern_count", 0)
         return ChartResult(
             method="qimen", school="east",
             engine=f"qimen-multipan-fallback-{pan_type}-{pan_style}-{zhi_run_method}",
@@ -459,6 +480,8 @@ def compute(b: Birth, method: int = 1, pan_type: str = "hour",
     except Exception as exc:
         raw = _fallback_raw(b, f"kinqimen error: {exc}")
         raw["pan_info"] = _simulate_multi_pan(raw, pan_type, pan_style, zhi_run_method)
+        raw.setdefault("qimen_patterns", [])
+        raw.setdefault("qimen_pattern_count", 0)
         return ChartResult(
             method="qimen", school="east",
             engine=f"qimen-multipan-fallback-{pan_type}-{pan_style}-{zhi_run_method}",

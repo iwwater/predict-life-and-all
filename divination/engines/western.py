@@ -332,6 +332,40 @@ def _sun_house(sun_lon: float, houses: list[dict]) -> int | None:
 
 
 # ══════════════════════════════════════════════════════════════
+# 极区检测与处理 (Placidus 极区 fallback)
+# ══════════════════════════════════════════════════════════════
+def is_polar_region(lat: float) -> bool:
+    """检测是否在极圈内 (|lat| > 66°33' ≈ 66.55°).
+
+    Placidus 半弧公式在极区因永昼/永夜导致部分宫位线无解,
+    需回退为等宫制 (Equal House)。
+    """
+    return abs(lat) > 66.55
+
+
+def compute_polar_houses(ramc_deg: float, lat_deg: float, asc_lon: float) -> list[dict]:
+    """极区等宫制 fallback: 从上升点起每宫 30° 均分黄道。
+
+    Args:
+        ramc_deg: 本地恒星时 (RAMC, 度)
+        lat_deg: 纬度 (度)
+        asc_lon: 上升点黄经 (度)
+
+    Returns:
+        list[dict]: 12 宫位, 每项含 house/cusp_lon/sign
+    """
+    houses: list[dict] = []
+    for i in range(12):
+        cusp = (asc_lon + i * 30) % 360
+        houses.append({
+            "house": i + 1,
+            "cusp_lon": round(cusp, 4),
+            "sign": am.sign_of(cusp)["sign"],
+        })
+    return houses
+
+
+# ══════════════════════════════════════════════════════════════
 # compute 主入口
 # ══════════════════════════════════════════════════════════════
 def compute(b: Birth, house_system: str = "placidus") -> ChartResult:
@@ -374,11 +408,28 @@ def compute(b: Birth, house_system: str = "placidus") -> ChartResult:
     houses: list[dict] = []
     asc = None
     mc = None
+    polar_warning = None
     if b.lat is not None and b.lng is not None:
         ramc = (gmst * 15 + b.lng) % 360            # 本地恒星时(度) = RAMC
         mc = am.midheaven(ramc)
         asc = am.ascendant(ramc, b.lat)
-        if house_system == "placidus":
+        if is_polar_region(b.lat):
+            polar_warning = {
+                "is_polar": True,
+                "latitude": b.lat,
+                "warning": (
+                    f"纬度 {b.lat}° 在极圈内(|lat|>66°33'), "
+                    "Placidus宫位制在此失效,已回退为等宫制(Equal House)。"
+                ),
+                "house_system_fallback": "equal",
+                "reference": (
+                    "Placidus半弧公式在极区 (|lat|>66°33') "
+                    "因永昼/永夜导致部分宫位线无解,"
+                    "等宫制为学界广泛接受的fallback方案。"
+                ),
+            }
+            houses = compute_polar_houses(ramc, b.lat, asc)
+        elif house_system == "placidus":
             houses = am.placidus_houses(ramc, b.lat)
         else:
             houses = am.houses(asc, house_system)
@@ -450,6 +501,7 @@ def compute(b: Birth, house_system: str = "placidus") -> ChartResult:
                 "来源": "J. Mayo / R. Hand 传统占星容许度体系",
             },
             "house_system": house_system,
+            "polar_warning": polar_warning,
             "ascendant": am.sign_of(asc) if asc is not None else None,
             "midheaven": am.sign_of(mc) if mc is not None else None,
             "houses": houses,

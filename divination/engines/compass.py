@@ -605,6 +605,75 @@ def circular_std(samples: list[float]) -> float:
     return math.degrees(math.sqrt(-2 * math.log(max(r, 1e-10))))
 
 
+def process_samples(samples: list[float]) -> dict[str, Any]:
+    """连续采样统计: 纯函数, 无副作用.
+
+    Args:
+        samples: 方位角列表 (0-360度)
+
+    Returns:
+        dict with mean, std, median, quality, count, range
+        - mean: 环形均值 (度, 0-360)
+        - std: 环形标准差 (度)
+        - median: 中位数 (环形二分)
+        - quality: "high" | "medium" | "low"
+        - count: 样本数
+        - range: 极差 (度, 最大-最小)
+        - r_value: 环形集中度 R (0-1, 越大越集中)
+    """
+    n = len(samples)
+    if n == 0:
+        return {
+            "mean": 0.0, "std": 0.0, "median": 0.0,
+            "quality": "low", "count": 0, "range": 0.0, "r_value": 0.0,
+        }
+
+    # 环形均值
+    mean = circular_mean(samples)
+    std = circular_std(samples) if n >= 2 else 0.0
+
+    # 中位数 (环形): 找到归一化到 [mean-180, mean+180) 的角度, 取中位数后再归一化
+    normalized = [(s - mean + 540) % 360 - 180 for s in samples]
+    normalized.sort()
+    median_offset = normalized[n // 2] if n % 2 == 1 else (normalized[n // 2 - 1] + normalized[n // 2]) / 2
+    median = (mean + median_offset + 360) % 360
+
+    # 环形集中度 R
+    sin_sum = sum(math.sin(math.radians(d)) for d in samples)
+    cos_sum = sum(math.cos(math.radians(d)) for d in samples)
+    r = math.sqrt(sin_sum ** 2 + cos_sum ** 2) / n
+
+    # 极差 (最大环形距离)
+    max_dist = 0.0
+    n_pts = len(normalized)
+    for i in range(n_pts):
+        for j in range(i + 1, n_pts):
+            dist = abs(normalized[i] - normalized[j])
+            if dist > 180:
+                dist = 360 - dist
+            if dist > max_dist:
+                max_dist = dist
+    range_deg = max_dist if n_pts >= 2 else 0.0
+
+    # 质量
+    if std <= 3.0:
+        quality = "high"
+    elif std <= 8.0:
+        quality = "medium"
+    else:
+        quality = "low"
+
+    return {
+        "mean": round(mean, 2),
+        "std": round(std, 2),
+        "median": round(median, 2),
+        "quality": quality,
+        "count": n,
+        "range": round(range_deg, 2),
+        "r_value": round(r, 4),
+    }
+
+
 # ── 24 山 元数据导出 (供 API 客户端) ────────────────────────────────
 
 def list_24_mountains() -> list[dict[str, Any]]:

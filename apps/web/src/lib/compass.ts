@@ -26,6 +26,77 @@ export const DIRECTIONS_8: DirectionChoice[] = [
 // 24 山全表(给后端 sitting 字段用)
 export { SANS_24 };
 
+/** 24 山中心角度 (每山 15°, 子山为 0°) */
+export const SANS_CENTER_DEG: Record<string, number> = {};
+SANS_24.forEach((sans, i) => { SANS_CENTER_DEG[sans] = (i * 15 + 352.5) % 360; });
+
+/** 24 山八卦映射 */
+export const SANS_TRIGRAM: Record<string, string> = {
+  壬: "坎", 子: "坎", 癸: "坎",
+  丑: "艮", 艮: "艮", 寅: "艮",
+  甲: "震", 卯: "震", 乙: "震",
+  辰: "巽", 巽: "巽", 巳: "巽",
+  丙: "离", 午: "离", 丁: "离",
+  未: "坤", 坤: "坤", 申: "坤",
+  庚: "兑", 酉: "兑", 辛: "兑",
+  戌: "乾", 乾: "乾", 亥: "乾",
+};
+
+/** 24 山五行映射 */
+export const SANS_ELEMENT: Record<string, string> = {
+  壬: "水", 子: "水", 癸: "水",
+  丑: "土", 艮: "土", 寅: "土",
+  甲: "木", 卯: "木", 乙: "木",
+  辰: "土", 巽: "木", 巳: "火",
+  丙: "火", 午: "火", 丁: "火",
+  未: "土", 坤: "土", 申: "金",
+  庚: "金", 酉: "金", 辛: "金",
+  戌: "土", 乾: "金", 亥: "水",
+};
+
+/** 24 山阴阳映射 */
+export const SANS_YINYANG: Record<string, string> = {
+  壬: "阳", 子: "阳", 癸: "阴",
+  丑: "阴", 艮: "阳", 寅: "阳",
+  甲: "阳", 卯: "阴", 乙: "阴",
+  辰: "阳", 巽: "阴", 巳: "阴",
+  丙: "阳", 午: "阳", 丁: "阴",
+  未: "阴", 坤: "阳", 申: "阳",
+  庚: "阳", 酉: "阴", 辛: "阴",
+  戌: "阳", 乾: "阳", 亥: "阴",
+};
+
+/** 边界检测结果 */
+export interface BoundaryCheck {
+  sans: string;
+  center_deg: number;
+  distance_to_boundary: number;
+  is_near_boundary: boolean;
+  alternative_sans?: string;
+}
+
+/** 检测给定角度是否在 24 山边界附近 (<5°) */
+export function checkBoundary(deg: number): BoundaryCheck {
+  const normalized = ((deg % 360) + 360) % 360;
+  const idx = Math.round(((normalized - 352.5 + 360) % 360) / 15) % 24;
+  const sans = SANS_24[idx];
+  const center = SANS_CENTER_DEG[sans] ?? 0;
+  const halfWidth = 7.5;
+  const dist = Math.abs(((normalized - center + 540) % 360) - 180);
+  const isNear = dist > (halfWidth - 5);
+  const result: BoundaryCheck = {
+    sans,
+    center_deg: center,
+    distance_to_boundary: halfWidth - dist,
+    is_near_boundary: isNear,
+  };
+  if (isNear) {
+    const altIdx = normalized > center ? (idx + 1) % 24 : (idx - 1 + 24) % 24;
+    result.alternative_sans = SANS_24[altIdx];
+  }
+  return result;
+}
+
 // 根据 24 山字符反查描述(简版,后端拿到后再让 engines 算)
 export function describeSans(sans: string): string {
   const idx = SANS_24.indexOf(sans as any);

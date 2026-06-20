@@ -26,6 +26,14 @@ import random
 
 from .. import yijing
 from ..contracts import Birth, ChartResult
+from ..data.shicao_yao_ci import (
+    SHICAO_YAO_CI,
+    ChangedYaoCi,
+    lookup_changed_yao_ci as _lookup_yao_ci,
+    lookup_by_hexagram as _lookup_by_hexagram,
+    get_all_entries as _get_all_yao_ci,
+    get_complete_count as _get_yao_ci_complete_count,
+)
 
 RULE_VERSION = "shicao-1.0"
 
@@ -193,6 +201,7 @@ def compute(
             "六爻装卦": naijia,
             "日干": gz,
             "断": judgement,
+            "yao_ci_analysis": integrate_yao_ci(ben["name"], yarrow_result),
         },
     )
 
@@ -204,3 +213,146 @@ def _get_day_gan(b: Birth) -> str:
         return Solar.fromYmdHms(b.year, b.month, b.day, 12, 0, 0).getLunar().getDayGan()
     except Exception:
         return "甲"
+
+
+# ═══════════════════════════════════════════════════════════════
+# 变爻辞集成 — 数据驱动查表
+# ═══════════════════════════════════════════════════════════════
+def lookup_changed_yao_ci(
+    hexagram_name: str,
+    line_num: int,
+    is_yang_old: bool,
+) -> dict | None:
+    """查找变爻辞（封装数据层查询，返回 dict）。
+
+    Args:
+        hexagram_name: 卦名 (如 "乾")
+        line_num: 爻位 (1=初 ... 6=上)
+        is_yang_old: True=老阳(9→阴), False=老阴(6→阳)
+
+    Returns:
+        dict with hexagram_num, hexagram_name, line_num, change_type,
+        yao_ci, xiang_ci, interpretation, source; or None
+    """
+    entry = _lookup_yao_ci(hexagram_name, line_num, is_yang_old)
+    if entry is None:
+        return None
+    return {
+        "hexagram_num": entry.hexagram_num,
+        "hexagram_name": entry.hexagram_name,
+        "line_num": entry.line_num,
+        "line_label": _line_label(entry.line_num),
+        "change_type": "老阳(9)→阴" if entry.is_yang_old else "老阴(6)→阳",
+        "yao_ci": entry.yao_ci,
+        "xiang_ci": entry.xiang_ci or "",
+        "interpretation": entry.interpretation or "",
+        "source": entry.source,
+    }
+
+
+def _line_label(line_num: int) -> str:
+    """将爻位数字转为传统名称。"""
+    labels = {1: "初", 2: "二", 3: "三", 4: "四", 5: "五", 6: "上"}
+    return labels.get(line_num, str(line_num))
+
+
+def integrate_yao_ci(
+    hexagram_name: str,
+    yarrow_lines: list[dict],
+) -> dict:
+    """将蓍草起卦结果与变爻辞数据库集成，返回完整的卦辞分析。
+
+    纯函数：输入卦名 + 爻数据 → 输出完整的卦辞解读。
+
+    Args:
+        hexagram_name: 本卦名 (如 "乾")
+        yarrow_lines: 蓍草起卦的 6 爻结果列表，每项含 line_value, moving, position
+
+    Returns:
+        dict with:
+          - hexagram_name: 卦名
+          - yao_ci_entries: 各动爻的变爻辞条目列表
+          - summary: 整体变爻解读摘要
+          - moving_lines_count: 动爻数
+          - complete_entries_count: 完整录入(含interpretation)的条目数
+    """
+    entries: list[dict] = []
+    complete_count = 0
+    for yl in yarrow_lines:
+        line_val = yl.get("line_value", 0)
+        if line_val not in (6, 9):
+            continue  # 非动爻 (7,8)
+        pos = yl.get("position", 0)
+        is_yang_old = line_val == 9  # 9=老阳
+        entry = lookup_changed_yao_ci(hexagram_name, pos, is_yang_old)
+        if entry:
+            entries.append(entry)
+            if entry["interpretation"]:
+                complete_count += 1
+        else:
+            # 无数据时提供基础结构
+            entries.append({
+                "hexagram_name": hexagram_name,
+                "line_num": pos,
+                "line_label": _line_label(pos),
+                "change_type": "老阳(9)→阴" if is_yang_old else "老阴(6)→阳",
+                "yao_ci": "(数据待补)",
+                "xiang_ci": "",
+                "interpretation": "",
+                "source": "《周易》",
+            })
+
+    # 摘要
+    mv_count = len(entries)
+    summary_parts = []
+    if mv_count == 0:
+        summary_parts.append(f"{hexagram_name}卦无动爻，以本卦卦辞为断。")
+    elif mv_count == 1:
+        e = entries[0]
+        summary_parts.append(
+            f"{hexagram_name}卦一爻动（{e['line_label']}爻），以本爻辞为断。"
+        )
+    elif mv_count == 2:
+        summary_parts.append(
+            f"{hexagram_name}卦二爻动，以本卦二动爻辞合断，上爻为主。"
+        )
+    elif mv_count == 3:
+        summary_parts.append(
+            f"{hexagram_name}卦三爻动，以本卦辞及变卦辞合参。"
+        )
+    else:
+        summary_parts.append(
+            f"{hexagram_name}卦{mv_count}爻动，以变卦卦辞为断。"
+        )
+
+    if complete_count < mv_count:
+        summary_parts.append(f"({complete_count}/{mv_count}条目含完整解读)")
+
+    return {
+        "hexagram_name": hexagram_name,
+        "yao_ci_entries": entries,
+        "moving_lines_count": mv_count,
+        "complete_entries_count": complete_count,
+        "summary": " ".join(summary_parts),
+        "yao_ci_total_db": len(_get_all_yao_ci()),
+        "yao_ci_complete_db": _get_yao_ci_complete_count(),
+    }
+
+
+def lookup_by_hexagram(hexagram_name: str) -> list[dict]:
+    """查询某卦所有变爻辞条目。"""
+    entries = _lookup_by_hexagram(hexagram_name)
+    return [
+        {
+            "hexagram_num": e.hexagram_num,
+            "hexagram_name": e.hexagram_name,
+            "line_num": e.line_num,
+            "line_label": _line_label(e.line_num),
+            "change_type": "老阳(9)→阴" if e.is_yang_old else "老阴(6)→阳",
+            "yao_ci": e.yao_ci,
+            "xiang_ci": e.xiang_ci,
+            "interpretation": e.interpretation,
+            "source": e.source,
+        }
+        for e in entries
+    ]

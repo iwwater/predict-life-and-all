@@ -511,6 +511,25 @@ def compute(b: Birth) -> ChartResult:
     # 8. 旬空
     xun_kong_str = _xun_kong(day_gan, day_zhi)
 
+    # 9. 高阶课式检测 (P2-9: 查表, 不堆 if-elif)
+    try:
+        from ..data.liuren_patterns import detect_patterns as _detect_hl_patterns
+        cosmic_data = {
+            "gui_ren_zhi": gui_ren_zhi,
+            "hour_branch": hour_branch,
+            "month_general": month_general,
+        }
+        hl_patterns = _detect_hl_patterns(day_gan, day_zhi, three_trans, four_lessons, cosmic_data)
+    except Exception:
+        hl_patterns = []
+
+    # 10. 神煞落宫断语 (P3-2: 查表)
+    try:
+        from ..data.liuren_shen_sha import get_shen_sha_judgments
+        shen_sha_judgments = get_shen_sha_judgments(generals)
+    except Exception:
+        shen_sha_judgments = []
+
     # 构建解读提示
     reading_hints = {
         "overall": _build_overall_hint(board, four_lessons, three_trans, day_gan),
@@ -540,6 +559,8 @@ def compute(b: Birth) -> ChartResult:
             "four_lessons": four_lessons["lessons"],
             "three_transmissions": three_trans,
             "pattern": _judge_pattern(three_trans, four_lessons, day_gan, day_zhi, board),
+            "liuren_patterns": hl_patterns,        # P2-9: 高阶课式 (三光/铸印/斫轮等)
+            "shen_sha_judgments": shen_sha_judgments,  # P3-2: 十二神煞落宫断语
             "twelve_generals": generals,
             "gui_ren_zhi": gui_ren_zhi,
             "xun_kong": xun_kong_str,

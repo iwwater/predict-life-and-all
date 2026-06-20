@@ -339,6 +339,12 @@ class TestConvertEndpoint:
 # ── Sprint 3.3: 罗盘 → 风水 端到端 ────────────────────────────────
 
 class TestCompassFengShuiE2E:
+
+    @pytest.fixture(autouse=True)
+    def _clear_cache(self):
+        from divination.cache import get_cache
+        get_cache().clear()
+        yield
     """端到端: 罗盘测量 → 24 山 → 八宅 + 玄空."""
 
     def test_device_channel_to_fengshui(self):
@@ -564,17 +570,17 @@ class TestContinuousSamplingAPI:
     """session API 连续采样 + 统计."""
 
     def test_create_session_and_add_samples(self):
-        """创建会话 → 加样本 → 自动结算 (>=3 样本自动关闭)."""
+        """创建会话 → 加样本 → 自动结算 (>=30 样本自动关闭)."""
         r = client.post("/api/compass/sessions", json={
             "direction_hint": "大门朝东",
         })
         assert r.status_code == 200
         sid = r.json()["session_id"]
 
-        # 加样本 (第 3 个样本后自动关闭)
-        for az in [88, 92, 90]:
+        # 加 30 个样本 (第 30 个样本后自动关闭)
+        for i, az in enumerate([88, 92, 90] * 10):  # 30 samples
             r = client.post(f"/api/compass/sessions/{sid}/samples", json={
-                "azimuth_deg": az,
+                "azimuth_deg": float(az),
             })
             assert r.status_code == 200
             if r.json().get("closed"):
@@ -585,7 +591,7 @@ class TestContinuousSamplingAPI:
         assert r.status_code == 200
         body = r.json()
         assert body["closed"] is True
-        assert len(body["samples"]) >= 3
+        assert len(body["samples"]) >= 30
         assert body["result_sans"] == "卯"
         assert body["result_direction"] == "正东"
 
@@ -599,8 +605,8 @@ class TestContinuousSamplingAPI:
             "direction_hint": "大门朝东",
         })
         sid = r.json()["session_id"]
-        for az in [45, 90, 135, 180, 270]:
-            client.post(f"/api/compass/sessions/{sid}/samples", json={"azimuth_deg": az})
+        for az in [45, 90, 135, 180, 270] * 6:  # 30 samples
+            client.post(f"/api/compass/sessions/{sid}/samples", json={"azimuth_deg": float(az)})
         r = client.get(f"/api/compass/sessions/{sid}")
         body = r.json()
         assert body["quality"] == "low"

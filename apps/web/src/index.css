@@ -1247,6 +1247,18 @@ select.paper-input {
   }
 }
 
+/* ── 窄屏盘面容器 (P2-7) ── */
+@media (max-width: 390px) {
+  .chart-svg-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    min-width: 320px;
+  }
+  .chart-svg-wrapper svg {
+    min-width: 320px;
+  }
+}
+
 @media (max-width: 920px) {
   .mystic-topbar {
     padding: 1.1rem 5vw;

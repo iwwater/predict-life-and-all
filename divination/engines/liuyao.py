@@ -20,6 +20,37 @@ from ..contracts import Birth, ChartResult
 
 _LIUSHEN = ["青龙", "朱雀", "勾陈", "螣蛇", "白虎", "玄武"]
 
+_LIUSHEN_MEANINGS = {
+    "青龙": {"吉凶": "吉神", "主事": "婚嫁文书喜庆之事", "爻位吉断": "临青龙主喜美, 爻位得位则吉上加吉", "适用": "婚嫁/文书/喜庆/晋升"},
+    "朱雀": {"吉凶": "中性", "主事": "口舌文书是非", "爻位吉断": "临朱雀主口舌纷争, 需看世应节制", "适用": "文书/诉讼/口舌/消息"},
+    "勾陈": {"吉凶": "中性", "主事": "田土争讼迟滞", "爻位吉断": "临勾陈主迟滞反复, 事多纠缠", "适用": "田土/房产/争讼/迟滞"},
+    "螣蛇": {"吉凶": "中性", "主事": "惊异虚惊怪事", "爻位吉断": "临螣蛇主虚惊不实, 多怪异", "适用": "惊异/虚惊/怪梦/疑虑"},
+    "白虎": {"吉凶": "凶神", "主事": "血光凶丧兵刑", "爻位吉断": "临白虎主凶险血光, 病灾杀伤", "适用": "血光/凶丧/兵刑/疾病"},
+    "玄武": {"吉凶": "凶神", "主事": "盗贼暗昧隐私", "爻位吉断": "临玄武主暗昧不显, 隐私盗失", "适用": "盗贼/暗昧/隐私/遗失"},
+}
+
+def _transform_lines(yao):
+    """动爻变爻变换:老阳(9)→变阴,老阴(6)→变阳,少阳(7)/少阴(8)→不变.
+    接受 list[int] 或 list[dict]."""
+    result = []
+    for i, y in enumerate(yao):
+        if isinstance(y, dict):
+            val = y.get("爻值", y.get("value", 0))
+        else:
+            val = int(y) if isinstance(y, (int, float)) else 0
+        pos = i + 1
+        if val == 9:
+            result.append({"爻位": pos, "原爻": "老阳", "变爻": "阴", "变换": "老阳变阴"})
+        elif val == 6:
+            result.append({"爻位": pos, "原爻": "老阴", "变爻": "阳", "变换": "老阴变阳"})
+        elif val == 7:
+            result.append({"爻位": pos, "原爻": "少阳", "变爻": "不变", "变换": "静爻"})
+        elif val == 8:
+            result.append({"爻位": pos, "原爻": "少阴", "变爻": "不变", "变换": "静爻"})
+        else:
+            result.append({"爻位": pos, "原爻": str(val), "变爻": "未知", "变换": "未知"})
+    return result
+
 # 问事 -> 用神六亲（《增删卜易》取用）
 _YONGSHEN = {
     "财": "妻财", "求财": "妻财", "生意": "妻财", "妻": "妻财",
@@ -306,6 +337,8 @@ def compute(b: Birth, tosses: list[int] | None = None, seed: int | None = None, 
             "变卦装卦": bian_naijia if moving else None,
             "日干": gz,
             "六神": six_gods,
+            "六神注解": {god: _LIUSHEN_MEANINGS.get(god, {}) for god in six_gods},
+            "动变": _transform_lines(tosses),
             "卦身": guashen_info,
             "断": judgement,
         },
