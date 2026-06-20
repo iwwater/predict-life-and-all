@@ -7,8 +7,7 @@ from __future__ import annotations
 
 from divination.contracts import Birth, ChartResult
 
-from . import bazhai as _bazhai
-from . import xuankong as _xuankong
+from . import bazhai as _bazhai, xuankong as _xuankong
 
 
 def compute(birth: Birth) -> ChartResult:

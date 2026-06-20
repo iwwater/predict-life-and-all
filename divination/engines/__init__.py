@@ -1,15 +1,50 @@
-"""Divination engines package — one module per school.
-
-Engines registered here are wired into ``divination.router._ENGINES``.
+"""术数引擎集合 — 12 法 + 罗盘 + 校验工具。
+每个 engine 模块暴露 compute(birth: Birth, **kw) -> ChartResult 统一接口。
 """
 from . import (
-    bazi, ziwei, qimen, liuyao, shicao, meihua, chenggu, bazhai, xuankong,
-    western, vedic, tarot, numerology, hepan, liuren, lenormand,
-    tieban, xiaoliuren,
+    bazhai,
+    bazi,
+    chenggu,
+    compass,
+    dream,
+    fengshui,
+    hepan,
+    lenormand,
+    liuren,
+    liuyao,
+    meihua,
+    numerology,
+    qimen,
+    shicao,
+    tarot,
+    tieban,
+    vedic,
+    western,
+    xiaoliuren,
+    xuankong,
+    ziwei,
 )
 
 __all__ = [
-    "bazi", "ziwei", "qimen", "liuyao", "shicao", "meihua", "chenggu",
-    "bazhai", "xuankong", "western", "vedic", "tarot", "numerology",
-    "hepan", "liuren", "lenormand", "tieban", "xiaoliuren",
+    "bazhai",
+    "bazi",
+    "chenggu",
+    "dream",
+    "compass",
+    "fengshui",
+    "hepan",
+    "lenormand",
+    "liuren",
+    "liuyao",
+    "meihua",
+    "numerology",
+    "qimen",
+    "shicao",
+    "tarot",
+    "tieban",
+    "vedic",
+    "western",
+    "xiaoliuren",
+    "xuankong",
+    "ziwei",
 ]
