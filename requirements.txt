@@ -1,0 +1,12 @@
+# ── 东方·子平紫微 ──
+lunar-python>=1.4.8       # 八字/四柱/农历/节气 (MIT)
+py-iztro>=0.1.5           # 紫微斗数 (MIT, 上游 iztro)
+# ── 东方·三式之奇门 ──
+kinqimen                  # 奇门遁甲 (MIT)
+bidict                    #   kinqimen 依赖
+pendulum                  #   kinqimen 依赖
+ephem>=4.2                #   kinqimen 节气依赖 (注:其声明 ==4.1.3,但 py3.12 需 4.2+)
+# ── 东方·六爻/梅花/称骨为自实现，无需外部库 ──
+# ── 西方·占星 (B路 纯MIT 可闭源) ──
+skyfield>=1.54            # 行星位置/恒星时 (MIT)
+skyfield-data>=7.0.0      # 离线 JPL 公版星历 (MIT，生产建议打进镜像)
