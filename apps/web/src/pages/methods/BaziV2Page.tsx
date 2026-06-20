@@ -13,6 +13,7 @@ import { useI18n } from "../../lib/i18n";
 import { useHistory, deriveTags } from "../../store/history";
 import { useBasket } from "../../store/basket";
 import { CITY_PRESETS } from "../../lib/cities";
+import { MethodSourcesPanel } from "../../components/MethodSourcesPanel";
 
 export function BaziV2Page() {
   const { t, lang } = useI18n();
@@ -94,6 +95,7 @@ export function BaziV2Page() {
       </section>
       <MethodSubmitBar loading={loading} error={error} inBasket={inBasket} onAddToBasket={addToBasket} submitLabel={lang === "zh" ? "排八字盘" : "Cast Ba Zi"} />
       <p className="paper-source" style={{ fontSize: "0.6rem", textAlign: "center" }}>{t("method.notice")}</p>
+      <MethodSourcesPanel method="bazi" />
     </form>
   );
 }

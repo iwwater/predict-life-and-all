@@ -11,6 +11,7 @@ import type { TarotSpread } from "../../lib/types";
 import { useI18n } from "../../lib/i18n";
 import { useBasket } from "../../store/basket";
 import { COLOR } from "../../components/ui";
+import { MethodSourcesPanel } from "../../components/MethodSourcesPanel";
 
 // 问题关键词 → 推荐牌阵映射
 function suggestSpread(question: string): TarotSpread {
@@ -391,6 +392,7 @@ function StatBox({ label, value, total, accent }: { label: string; value: number
         {value}
         <span style={{ fontSize: "0.6rem", color: "var(--ink-soft)" }}>/{total}</span>
       </div>
+      <MethodSourcesPanel method="tarot" />
     </div>
   );
 }

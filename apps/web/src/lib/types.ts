@@ -5,7 +5,8 @@ export type Method =
   | "bazhai" | "xuankong"
   | "western" | "vedic" | "tarot" | "numerology"
   | "lenormand" | "liuren" | "tieban" | "xiaoliuren" | "hepan"
-  | "cross_validator" | "hour_calibrator" | "compatibility";
+  | "cross_validator" | "hour_calibrator" | "compatibility"
+  | "dream";
 
 export type Subject =
   | "self_life" | "annual_luck" | "career" | "relationship" | "wealth"
@@ -223,16 +224,60 @@ export interface ConflictItem {
   resolution: string;
 }
 
+/** 五档极性 — 替代旧 0-100 单一综合分。
+ *  strong_support : 多法一致支持
+ *  weak_support   : 1-2 法支持
+ *  neutral        : 无显著倾向
+ *  weak_warn      : 1-2 法警示
+ *  strong_warn    : 多法一致警示
+ */
+export type DimensionPolarity =
+  | "strong_support"
+  | "weak_support"
+  | "neutral"
+  | "weak_warn"
+  | "strong_warn";
+
+/** 整体基调(由 tally_by_scope 累计推得, 替代旧 score) */
+export type Tone =
+  | "very_positive"
+  | "positive"
+  | "mixed"
+  | "cautious"
+  | "negative"
+  | "neutral";
+
+/** 按 time_scope 五档计票 — 替代单一综合分 0-100 */
+export interface ScopeTally {
+  scope: string;
+  strong_support: number;
+  weak_support: number;
+  neutral: number;
+  weak_warn: number;
+  strong_warn: number;
+  supporting_methods: string[];
+  warning_methods: string[];
+  summary: string;
+}
+
 export interface ValidationResult {
   consensus: ConsensusItem[];
   conflicts: ConflictItem[];
-  overall_score: number;
-  confidence: number;
-  confidence_level: "low" | "medium" | "medium_high" | "high";
   risks: string[];
   timing?: Record<string, any> | null;
   action_advice: string[];
-  /** 5 维 0-100 分数 (long_term/current_cycle/relationship/one_question/space) */
+  /** 按 time_scope 五档计票(替代旧 overall_score 0-100 浮点) */
+  tally_by_scope?: Record<string, ScopeTally>;
+  /** 每维五档极性(替代旧 dim_scores 0-100 浮点) */
+  dimension_polarity?: Record<string, DimensionPolarity>;
+  /** 整体基调(可选, 后端已开始在 result 顶层返回) */
+  tone?: Tone;
+  /** 旧字段(保留为可选以兼容历史报告): 0-100 单一综合分 */
+  overall_score?: number;
+  /** 旧字段(保留为可选以兼容历史报告): 可信度 4 档 */
+  confidence?: number;
+  confidence_level?: "low" | "medium" | "medium_high" | "high";
+  /** 旧字段(保留为可选以兼容历史报告): 5 维 0-100 分数 */
   dim_scores?: Record<Dimension, number>;
   /** 每维有效信号数 */
   dim_signals_count?: Record<Dimension, number>;

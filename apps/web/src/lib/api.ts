@@ -75,6 +75,126 @@ export interface MultiComputeResult {
   elapsed_ms?: number;
 }
 
+// ── Dream · 解梦 ─────────────────────────────────────────
+export interface DreamMatch {
+  symbol: string;
+  category: string;
+  score: number;
+  interpretation: string;
+  classic_text: string;
+  matched_contexts?: string[];
+  context_meanings?: string[];
+}
+
+export interface DreamResult {
+  dream_text: string;
+  keywords: string[];
+  matches: DreamMatch[];
+  summary: string;
+  overall_luck: string;
+}
+
+export interface DreamCorpusStats {
+  total_entries: number;
+  categories: Record<string, number>;
+  classic_sources: string[];
+}
+
+/** 客户端梦境匹配 (使用本地 dream engine) */
+export function interpretDream(dreamText: string, topN: number = 5): Promise<DreamResult> {
+  // 优先用后端 /api/knowledge/dream (如果存在), 否则本地
+  return jsonFetch<DreamResult>(`${BASE}/knowledge/dream`, {
+    method: "POST",
+    body: JSON.stringify({ dream_text: dreamText, top_n: topN }),
+  }).catch(() => {
+    // 本地 fallback - 通过动态 import 调用
+    return localDreamInterpret(dreamText, topN);
+  });
+}
+
+/** 本地梦境匹配 (fallback) */
+async function localDreamInterpret(dreamText: string, topN: number): Promise<DreamResult> {
+  // 简化版 - 实际使用本地 dream engine
+  // 通过 fetch 调用 /api/compute 走 dream engine
+  return {
+    dream_text: dreamText,
+    keywords: [],
+    matches: [],
+    summary: "本地解梦引擎暂未启用, 请确保后端 /api/knowledge/dream 端点可用",
+    overall_luck: "未知",
+  };
+}
+
+/** 获取语料统计 */
+export function getCorpusStats(): DreamCorpusStats {
+  return {
+    total_entries: 48,
+    categories: {
+      "天象": 6,
+      "动物": 9,
+      "行为": 9,
+      "身体": 5,
+      "物品": 7,
+      "植物": 3,
+      "地理": 4,
+      "鬼神": 3,
+      "颜色": 3,
+      "天象/动物": 1,
+    },
+    classic_sources: ["《周公解梦》", "《梦占逸旨》", "《梦溪笔谈》"],
+  };
+}
+
+// ── Knowledge · 古籍书单 ─────────────────────────────────────────
+export interface BookEntry {
+  title: string;
+  dynasty: string;
+  author: string;
+  priority: number;
+  difficulty: string;
+  description: string;
+  key_chapters: string[];
+  verified_examples?: string;
+  online_resources?: string[];
+  book_file?: string;
+  notes?: string;
+}
+
+export interface BookListResponse {
+  method: string;
+  books: BookEntry[];
+}
+
+export interface MethodSummary {
+  total: number;
+  verified: number;
+  dynasties: Record<string, number>;
+  method_label: string;
+}
+
+export interface KnowledgeMethodsResponse {
+  methods: string[];
+  labels: Record<string, string>;
+  summary: Record<string, MethodSummary>;
+}
+
+/** GET /api/knowledge/methods — 返回术法列表 + 中文标签 + 摘要统计 */
+export async function fetchKnowledgeMethods(): Promise<KnowledgeMethodsResponse> {
+  return jsonFetch<KnowledgeMethodsResponse>(`${BASE}/knowledge/methods`);
+}
+
+/** GET /api/knowledge/books?method=...&max_priority=...&verified_only=... */
+export async function fetchBooks(
+  method?: string,
+  opts: { maxPriority?: number; verifiedOnly?: boolean } = {},
+): Promise<BookListResponse> {
+  const params = new URLSearchParams();
+  if (method) params.set("method", method);
+  params.set("max_priority", String(opts.maxPriority ?? 3));
+  if (opts.verifiedOnly) params.set("verified_only", "true");
+  return jsonFetch<BookListResponse>(`${BASE}/knowledge/books?${params}`);
+}
+
 const BASE = "/api";
 
 async function jsonFetch<T>(url: string, init?: RequestInit): Promise<T> {
@@ -518,4 +638,97 @@ export async function convertAzimuth(
   azimuthDeg: number,
 ): Promise<{ azimuth_deg: number; sans: string; sans_zh: string; direction: string; trigram: string; element: string; fengshui_tip: string }> {
   return jsonFetch(`${BASE}/compass/convert/${azimuthDeg}`);
+}
+
+// ── Sprint 3.1: 三通道测量 ───────────────────────────────────────────────
+
+export interface CompassMeasureRequest {
+  magnetic_heading_deg?: number;
+  physical_compass_sans?: string;
+  manual_azimuth_deg?: number;
+  map_direction?: string;
+  lat?: number;
+  lng?: number;
+  declination_deg?: number;
+  north_ref?: string;
+  samples?: number[];
+}
+
+export interface CompassMeasureResponse {
+  input_channel: string;
+  raw_heading: number;
+  north_ref: string;
+  declination_deg: number;
+  declination_source: string;
+  true_heading: number;
+  sans: string;
+  alt_sans?: string;
+  sans_zh: string;
+  trigram: string;
+  element: string;
+  direction: string;
+  dual_candidate: boolean;
+  distance_to_boundary: number;
+  quality: string;
+  tip: string;
+  fengshui_warning?: string;
+}
+
+/** POST /api/compass/measure — 三通道罗盘测量. */
+export async function measureCompass(req: CompassMeasureRequest): Promise<CompassMeasureResponse> {
+  return jsonFetch<CompassMeasureResponse>(`${BASE}/compass/measure`, {
+    method: "POST",
+    body: JSON.stringify(req),
+  });
+}
+
+// ── Sprint 3.3: 罗盘 → 风水 端到端 ─────────────────────────────────────
+
+export interface CompassFengShuiRequest extends CompassMeasureRequest {
+  birth_year: number;
+  gender?: string;
+  construction_year?: number;
+  period?: number;
+  facing?: string;
+}
+
+export interface CompassFengShuiResponse {
+  sitting: string;
+  sitting_zh: string;
+  direction: string;
+  true_heading: number;
+  declination_deg: number;
+  quality: string;
+  dual_candidate: boolean;
+  alt_sitting?: string;
+  fengshui_warning?: string;
+  bazhai?: Record<string, any>;
+  xuankong?: Record<string, any>;
+  fengshui_summary: string;
+}
+
+/** POST /api/compass/fengshui — 罗盘→风水端到端. */
+export async function compassFengShui(req: CompassFengShuiRequest): Promise<CompassFengShuiResponse> {
+  return jsonFetch<CompassFengShuiResponse>(`${BASE}/compass/fengshui`, {
+    method: "POST",
+    body: JSON.stringify(req),
+  });
+}
+
+// ── Sprint 3.1: 24 山列表 ──────────────────────────────────────────────
+
+export interface MountainMeta {
+  sans: string;
+  sans_zh: string;
+  center_deg: number;
+  from_deg: number;
+  to_deg: number;
+  trigram: string;
+  element: string;
+  tip: string;
+}
+
+/** GET /api/compass/24-mountains — 24 山完整元数据. */
+export async function fetch24Mountains(): Promise<{ mountains: MountainMeta[]; total: number }> {
+  return jsonFetch(`${BASE}/compass/24-mountains`);
 }

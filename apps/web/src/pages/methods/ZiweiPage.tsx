@@ -7,6 +7,7 @@ import { computeChart } from "../../lib/api";
 import { useI18n } from "../../lib/i18n";
 import { useBasket } from "../../store/basket";
 import { useBirthStore } from "../../store/birth";
+import { MethodSourcesPanel } from "../../components/MethodSourcesPanel";
 
 export function ZiweiPage() {
   const { t, lang } = useI18n();
@@ -110,6 +111,7 @@ function ChartFooter({ chart, method, inBasket, onBasket, onReset }: any) {
         </button>
         <button type="button" className="paper-btn" onClick={onReset} style={{ fontSize: "0.78rem" }}>{lang === "zh" ? "重新排盘" : "Recast"}</button>
       </div>
+      <MethodSourcesPanel method="ziwei" />
     </div>
   );
 }

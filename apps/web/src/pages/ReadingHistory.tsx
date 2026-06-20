@@ -11,13 +11,27 @@ const GOAL_LABELS: Record<string, string> = {
   fengshui: "风水调理", health_reflection: "健康自省", crisis: "安全响应",
 };
 
-function ScoreBarSmall({ score }: { score: number }) {
-  const color = score >= 70 ? "var(--verdigris)" : score >= 50 ? "var(--cinnabar)" : score >= 35 ? "var(--ink-soft)" : "var(--cinnabar)";
+// 整体基调(对齐后端 _tone_level 与 readingHistory.computeTone)
+const TONE_META: Record<string, { zh: string; color: string }> = {
+  very_positive: { zh: "大吉", color: "var(--verdigris)" },
+  positive:      { zh: "小吉", color: "var(--verdigris)" },
+  mixed:         { zh: "参半", color: "var(--indigo)" },
+  cautious:      { zh: "当慎", color: "var(--cinnabar-dim)" },
+  negative:      { zh: "有险", color: "var(--cinnabar)" },
+  neutral:       { zh: "平和", color: "var(--ink-soft)" },
+};
+
+function ToneChip({ tone }: { tone: string }) {
+  const meta = TONE_META[tone] || TONE_META.neutral;
   return (
-    <div className="flex items-center gap-1.5">
-      <span style={{ fontSize: "0.82rem", fontWeight: 700, color, fontFamily: "'JetBrains Mono', monospace" }}>{score}</span>
-      <div className="paper-progress" style={{ width: "3rem" }}><div className="paper-progress-bar" style={{ width: `${score}%` }} /></div>
-    </div>
+    <span style={{
+      display: "inline-block",
+      padding: "0.1rem 0.45rem",
+      border: `1px solid ${meta.color}`,
+      borderRadius: "2px",
+      fontSize: "0.7rem", fontWeight: 700, color: meta.color,
+      fontFamily: "'Noto Serif SC', serif",
+    }}>{meta.zh}</span>
   );
 }
 
@@ -72,7 +86,7 @@ export function ReadingHistory() {
                   <span style={{ fontSize: "0.78rem", fontWeight: 600, color: "var(--ink)", fontFamily: "'Noto Serif SC', serif" }}>
                     {GOAL_LABELS[entry.goal] || entry.goalLabel || entry.goal}
                   </span>
-                  <ScoreBarSmall score={entry.score} />
+                  <ToneChip tone={entry.tone} />
                 </div>
                 <p style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }} className="truncate">{entry.question.slice(0, 60) || "无问题"}</p>
                 <div className="flex items-center justify-between" style={{ marginTop: "0.25rem" }}>
@@ -107,8 +121,7 @@ export function ReadingHistory() {
 
                 <div className="paper-grid-cell space-y-1.5" style={{ padding: "0.6rem 0.85rem", fontSize: "0.72rem", maxHeight: "24rem", overflowY: "auto" }}>
                   <div className="flex gap-3 flex-wrap" style={{ color: "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace" }}>
-                    <span>评分: <strong style={{ color: "var(--cinnabar)" }}>{selectedEntry.score}/100</strong></span>
-                    <span>置信度: <strong style={{ color: "var(--indigo)" }}>{selectedEntry.result.validation?.confidence_level || "medium"}</strong></span>
+                    <span>基调: <ToneChip tone={selectedEntry.tone} /></span>
                     <span>方法: <strong>{selectedEntry.result.methods_used?.length || 0}/12</strong></span>
                   </div>
 

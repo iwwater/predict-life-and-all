@@ -29,6 +29,7 @@ export const METHOD_PLAIN: Record<Method, MethodPlain> = {
   hour_calibrator: { tagline: "时辰校准·解决排盘幻觉", bestFor: "出生时辰不确定、定盘校验", sample: "我不确定出生时辰，帮我校准?", source: "AI时辰校准算法" },
   compatibility: { tagline: "八字合婚·五行互补分析", bestFor: "婚配合盘、关系匹配度、五行互补", sample: "我们俩八字合不合?", source: "子平合婚体系" },
   hepan: { tagline: "双人合盘·多维比对", bestFor: "四维评级、印证分歧、八字/紫微/西方", sample: "我们各方面匹配吗?", source: "多系统合盘" },
+  dream: { tagline: "周公解梦·古典语义匹配", bestFor: "梦境符号解读、古典文献对照、组合梦境分析", sample: "我梦见一条龙在天上飞是什么意思?", source: "《周公解梦》《梦占逸旨》《梦溪笔谈》" },
 };
 
 export const SUBJECTS: Array<{

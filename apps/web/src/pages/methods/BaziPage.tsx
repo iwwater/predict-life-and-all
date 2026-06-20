@@ -13,6 +13,7 @@ import { useBasket } from "../../store/basket";
 import { useBirthStore } from "../../store/birth";
 import { CITY_PRESETS } from "../../lib/cities";
 import { COLOR } from "../../components/ui";
+import { MethodSourcesPanel } from "../../components/MethodSourcesPanel";
 
 export function BaziPage() {
   const { t, lang } = useI18n();
@@ -386,6 +387,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <div>
       <label className="paper-label">{label}</label>
       {children}
+      <MethodSourcesPanel method="bazi" />
     </div>
   );
 }

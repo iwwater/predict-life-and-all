@@ -101,6 +101,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       label: t("section.more"),
       items: [
         { to: "/knowledge", label: t("nav.knowledge") },
+        { to: "/dream", label: lang === "zh" ? "解梦" : "Dream" },
         { to: "/history", label: t("nav.history") },
         { to: "/dateselect", label: t("nav.dateselect") },
         { to: "/about", label: t("nav.about") },

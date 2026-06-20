@@ -7,6 +7,7 @@ import { computeChart } from "../../lib/api";
 import { useI18n } from "../../lib/i18n";
 import { useBasket } from "../../store/basket";
 import { useBirthStore } from "../../store/birth";
+import { MethodSourcesPanel } from "../../components/MethodSourcesPanel";
 
 export function ChengguPage() {
   const { t, lang } = useI18n();
@@ -126,6 +127,7 @@ export function ChengguPage() {
           </div>
         </div>
       )}
+      <MethodSourcesPanel method="chenggu" />
     </div>
   );
 }

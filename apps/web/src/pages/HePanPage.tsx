@@ -7,6 +7,7 @@ import { computeChart } from "../lib/api";
 import { useI18n } from "../lib/i18n";
 import { useBasket } from "../store/basket";
 import { useBirthStore } from "../store/birth";
+import { MethodSourcesPanel } from "../components/MethodSourcesPanel";
 
 type PersonForm = {
   year: number; month: number; day: number; hour: number; minute: number;
@@ -170,6 +171,8 @@ export function HePanPage() {
             onReset={() => setChart(null)} />
         </div>
       )}
+
+      <MethodSourcesPanel method="hepan" />
     </div>
   );
 }

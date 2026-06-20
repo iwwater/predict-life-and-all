@@ -2,11 +2,14 @@
  *
  * LLM 报告即正文；结构化信号退到可折叠附录。
  * 解决上一版"正文+结构化重复渲染"导致的用户不可读问题。
+ *
+ * Sprint 0.1 适配: 综合分数（overall_score 0-100）已下线，
+ * 改为展示 tally_by_scope 累计计票（X 法支持 / Y 法警示）。
  */
 import { useState, useMemo, useCallback } from "react";
-import type { ReadingResult, DivinationSignal } from "../lib/types";
+import type { ReadingResult, DivinationSignal, ScopeTally } from "../lib/types";
 import { METHOD_LABELS_ZH } from "../lib/types";
-import { saveReadingToHistory } from "../store/readingHistory";
+import { saveReadingToHistory, computeTone } from "../store/readingHistory";
 
 // ── 静态常量 ──────────────────────────────────────────────────────────────────
 
@@ -63,6 +66,28 @@ const DIM_LABELS: Record<string, string> = {
   space:         "空间环境",
 };
 
+// 整体基调标签(对齐后端 _tone_level 与 readingHistory.computeTone 口径)
+const TONE_LABELS: Record<string, { zh: string; color: string }> = {
+  very_positive: { zh: "大吉", color: "var(--verdigris)" },
+  positive:      { zh: "小吉", color: "var(--verdigris)" },
+  mixed:         { zh: "参半", color: "var(--indigo)" },
+  cautious:      { zh: "当慎", color: "var(--cinnabar-dim)" },
+  negative:      { zh: "有险", color: "var(--cinnabar)" },
+  neutral:       { zh: "平和", color: "var(--ink-soft)" },
+};
+
+/** 由 tally_by_scope 累计计票 — 替代旧 overall_score */
+function tallyTotals(tally: Record<string, ScopeTally> | undefined) {
+  let support = 0;
+  let warn = 0;
+  if (!tally) return { support: 0, warn: 0 };
+  for (const t of Object.values(tally)) {
+    support += (t.strong_support || 0) + (t.weak_support || 0);
+    warn += (t.strong_warn || 0) + (t.weak_warn || 0);
+  }
+  return { support, warn };
+}
+
 // ── Markdown → HTML（去掉 LLM 输出中的 emoji 字符）──────────────────────────
 
 const EMOJI_STRIP = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}\u{200D}]/gu;
@@ -98,6 +123,18 @@ export function ReadingReportView({ result }: ReadingReportViewProps) {
   const [viewTier, setViewTier] = useState<"standard" | "premium">("standard");
 
   const { validation, report, signals } = result;
+
+  // 五档计票汇总(替代旧 overall_score)
+  const tallyTotalsMemo = useMemo(
+    () => tallyTotals(validation.tally_by_scope),
+    [validation.tally_by_scope],
+  );
+  // 整体基调: 优先用后端给的,否则前端按 tally 推
+  const tone = (validation.tone as string | undefined) ?? computeTone(validation.tally_by_scope);
+  const toneMeta = TONE_LABELS[tone] || TONE_LABELS.neutral;
+  // 旧字段(可选) — 旧报告兜底显示
+  const legacyScore = typeof validation.overall_score === "number" ? validation.overall_score : null;
+  const legacyConfidence = validation.confidence_level;
 
   const handleSave = useCallback(() => {
     try {
@@ -168,23 +205,60 @@ export function ReadingReportView({ result }: ReadingReportViewProps) {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* 五档计票印章 — 替代旧 <ScoreSeal overall_score /> */}
             <div className="text-center">
-              <ScoreSeal score={validation.overall_score} />
-              <div style={{ fontSize: "0.52rem", color: "var(--ink-soft)", marginTop: "0.1rem" }}>综合</div>
+              <span className="paper-seal" style={{
+                display: "inline-block",
+                width: "2.6rem", height: "2.6rem", lineHeight: "2.6rem", fontSize: "0.7rem",
+                fontWeight: 700, fontFamily: "'Noto Serif SC', serif",
+                color: toneMeta.color, borderColor: toneMeta.color,
+              }} title={`支持 ${tallyTotalsMemo.support} 法 / 警示 ${tallyTotalsMemo.warn} 法`}>
+                {toneMeta.zh}
+              </span>
+              <div style={{ fontSize: "0.52rem", color: "var(--ink-soft)", marginTop: "0.1rem" }}>基调</div>
             </div>
+
+            {/* X 法支持 / Y 法警示(五档计票) */}
             <div style={{
               textAlign: "center", padding: "0.25rem 0.5rem",
-              border: `1px solid ${CONFIDENCE_COLORS[validation.confidence_level] || "var(--rule)"}`,
+              border: `1px solid ${tallyTotalsMemo.warn > 0 ? "var(--cinnabar-dim)" : "var(--verdigris)"}`,
               borderRadius: "2px",
             }}>
-              <div style={{ fontSize: "0.55rem", color: "var(--ink-soft)", letterSpacing: "0.08em" }}>可信</div>
+              <div style={{ fontSize: "0.55rem", color: "var(--ink-soft)", letterSpacing: "0.08em" }}>五档计票</div>
               <div style={{
                 fontSize: "0.7rem", fontWeight: 700, fontFamily: "'Noto Serif SC', serif",
-                color: CONFIDENCE_COLORS[validation.confidence_level] || "var(--ink-soft)",
+                color: "var(--ink)",
               }}>
-                {CONFIDENCE_LABELS[validation.confidence_level] || validation.confidence_level}
+                <span style={{ color: "var(--verdigris)" }}>{tallyTotalsMemo.support} 支</span>
+                <span style={{ color: "var(--ink-soft)", margin: "0 0.15rem" }}>/</span>
+                <span style={{ color: tallyTotalsMemo.warn > 0 ? "var(--cinnabar)" : "var(--ink-soft)" }}>{tallyTotalsMemo.warn} 警</span>
               </div>
             </div>
+
+            {/* 可信度(旧字段, 仅在历史报告携带时显示; 新报告后端不再返回) */}
+            {legacyConfidence && (
+              <div style={{
+                textAlign: "center", padding: "0.25rem 0.5rem",
+                border: `1px solid ${CONFIDENCE_COLORS[legacyConfidence] || "var(--rule)"}`,
+                borderRadius: "2px",
+              }}>
+                <div style={{ fontSize: "0.55rem", color: "var(--ink-soft)", letterSpacing: "0.08em" }}>可信</div>
+                <div style={{
+                  fontSize: "0.7rem", fontWeight: 700, fontFamily: "'Noto Serif SC', serif",
+                  color: CONFIDENCE_COLORS[legacyConfidence] || "var(--ink-soft)",
+                }}>
+                  {CONFIDENCE_LABELS[legacyConfidence] || legacyConfidence}
+                </div>
+              </div>
+            )}
+
+            {/* 旧 overall_score 兜底(仅历史报告显示) */}
+            {legacyScore !== null && (
+              <div className="text-center" title="旧版综合分(0-100), 仅历史报告使用">
+                <ScoreSeal score={legacyScore} />
+                <div style={{ fontSize: "0.52rem", color: "var(--ink-soft)", marginTop: "0.1rem" }}>旧分</div>
+              </div>
+            )}
           </div>
         </div>
 
