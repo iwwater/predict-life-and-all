@@ -1,0 +1,15 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.0
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+  - repo: local
+    hooks:
+      - id: lint-random
+        name: lint_random (Sprint 0.10)
+        entry: python tools/lint_random.py
+        language: system
+        types: [python]
+        pass_filenames: false
