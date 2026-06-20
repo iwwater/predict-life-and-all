@@ -11,14 +11,13 @@ from __future__ import annotations
 
 from typing import Any
 
+from .reality import RealityResult
 from .schema import (
-    ConflictItem,
-    ConsensusItem,
+    DimensionPolarity,
     DivinationSignal,
     ReadingReport,
     ValidationResult,
 )
-from .reality import RealityResult
 
 # ── 常量 ─────────────────────────────────────────────────────────────────────
 
@@ -131,25 +130,60 @@ def _headline(
     primary_label: str,
     question: str,
 ) -> str:
-    score = validation.overall_score
+    """生成一句话结论 — 基于 tally_by_scope 五档计票, 不再使用单一分数。
+
+    选 signals 所属的最具体 scope 优先; 若 tally_by_scope 为空, 退回按极性统计。
+    """
     pos_n = sum(1 for s in signals if s.polarity == "positive")
     neg_n = sum(1 for s in signals if s.polarity == "negative")
     method_n = len(set(s.method for s in signals))
 
-    if score >= 70:
-        tone = "整体趋势积极向好"
-    elif score >= 55:
-        tone = "整体态势平稳"
-    elif score >= 40:
-        tone = "需留意潜在波动"
-    else:
-        tone = "宜谨慎行事，多作准备"
+    # 从 tally_by_scope 推断整体基调(强支持票数 - 强警示票数)
+    tally_summary = _tally_overall_tone(validation)
+    tone = tally_summary["tone"]
+    breakdown = tally_summary["breakdown"]
 
     ctx = f"就「{question}」所问，" if question else ""
     return (
         f"{ctx}综{method_n}种术法交叉参详，{tone}。"
-        f"正向信号{pos_n}条，负向信号{neg_n}条，综合评分{score}分。"
+        f"{breakdown}"
     )
+
+
+def _tally_overall_tone(validation: ValidationResult) -> dict[str, str]:
+    """基于 tally_by_scope 汇总一句话基调(强支持 vs 强警示 vs 分歧 vs 中性)。
+
+    Returns: {"tone": "...", "breakdown": "X 法支持, Y 法警示..."}
+    """
+    strong_sup = weak_sup = strong_warn = weak_warn = 0
+    for t in (validation.tally_by_scope or {}).values():
+        strong_sup += t.strong_support
+        weak_sup += t.weak_support
+        strong_warn += t.strong_warn
+        weak_warn += t.weak_warn
+
+    sup = strong_sup + weak_sup
+    warn = strong_warn + weak_warn
+
+    if strong_sup >= 3 and strong_warn == 0:
+        tone = "整体趋势积极向好"
+    elif strong_warn >= 3 and strong_sup == 0:
+        tone = "宜谨慎行事，多作准备"
+    elif sup > 0 and warn == 0:
+        tone = "整体态势平稳偏积极"
+    elif warn > 0 and sup == 0:
+        tone = "需留意潜在波动"
+    elif sup > 0 and warn > 0:
+        tone = "术法间存在分歧, 建议关注共识与警示"
+    else:
+        tone = "信号中性, 缺乏明确倾向"
+
+    if sup == 0 and warn == 0:
+        breakdown = "暂无支持/警示信号"
+    else:
+        breakdown = f"{sup} 法支持(强{strong_sup}/弱{weak_sup})，{warn} 法警示(强{strong_warn}/弱{weak_warn})"
+
+    return {"tone": tone, "breakdown": breakdown}
 
 
 # ── REP-003: 免费版 ───────────────────────────────────────────────────────────
@@ -171,8 +205,7 @@ def _build_free(
     lines.append("")
     lines.append("【速览】")
 
-    # 一句话概括
-    score = validation.overall_score
+    # 一句话概括(基于 tally, 不再引用单一综合分)
     pos_sigs = [s for s in signals if s.polarity == "positive"]
     neg_sigs = [s for s in signals if s.polarity == "negative"]
 
@@ -225,7 +258,6 @@ def _build_standard(
 
     # ── 总体判断 ──
     lines.append("【总体判断】")
-    score = validation.overall_score
 
     # 找最强正向和负向信号
     pos_sigs = sorted(
@@ -241,11 +273,15 @@ def _build_standard(
         key=lambda s: s.strength, reverse=True,
     )
 
-    # 综合描述
+    # 综合描述(基于 tally, 不再引用单一综合分)
+    tally_summary = _tally_overall_tone(validation)
     method_list = "、".join(_method_name(m) for m in methods_used[:6])
     if len(methods_used) > 6:
         method_list += f"等{len(methods_used)}种术法"
-    lines.append(f"本次合参共调用{method_list}，交叉验证后综合评分为{score}分。")
+    lines.append(
+        f"本次合参共调用{method_list}，{tally_summary['tone']}。"
+        f"{tally_summary['breakdown']}。"
+    )
 
     if pos_sigs and neg_sigs:
         lines.append(
@@ -298,7 +334,14 @@ def _build_standard(
     ]
     for dim_key, dim_title in dim_order:
         sigs = dim_sigs.get(dim_key, [])
-        score = validation.dim_scores.get(dim_key, 50.0)
+        polarity = validation.dimension_polarity.get(dim_key, DimensionPolarity.NEUTRAL).value
+        polarity_zh = {
+            "strong_support": "强支持",
+            "weak_support": "弱支持",
+            "neutral": "中性",
+            "weak_warn": "弱警示",
+            "strong_warn": "强警示",
+        }.get(polarity, "中性")
         n_methods = len(set(s.method for s in sigs))
         lines.append(f"## {dim_title}")
         if not sigs:
@@ -309,10 +352,10 @@ def _build_standard(
             elif dim_key == "current_cycle":
                 lines.append("  当前周期信号需要流年/限运/行运数据 (Phase 3 后续深化)。")
             else:
-                lines.append(f"  本维暂无信号 (score={score})。")
+                lines.append(f"  本维暂无信号 (极性={polarity_zh})。")
             lines.append("")
             continue
-        lines.append(f"  评分 {score} · {n_methods} 种术法 · {len(sigs)} 个有效信号")
+        lines.append(f"  极性 {polarity_zh} · {n_methods} 种术法 · {len(sigs)} 个有效信号")
         # 列出该维前 3 强 signal
         for s in sorted(sigs, key=lambda x: x.strength * x.confidence, reverse=True)[:3]:
             polarity_mark = POLARITY_ZH.get(s.polarity, "平")

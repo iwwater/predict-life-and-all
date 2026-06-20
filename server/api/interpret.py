@@ -8,7 +8,7 @@ Response: newline-delimited JSON events:
 import json
 import logging
 import os
-from typing import List, Literal, Optional
+from typing import Literal
 
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
@@ -22,17 +22,17 @@ log = logging.getLogger("interpret")
 
 
 class InterpretRequest(BaseModel):
-    charts: List[dict] = Field(..., min_length=1)
-    question: Optional[str] = None
+    charts: list[dict] = Field(..., min_length=1)
+    question: str | None = None
     client: Literal["mock", "anthropic"] = "mock"
-    enhanced_data: Optional[dict] = None  # cross_validation, peach_blossom, etc.
+    enhanced_data: dict | None = None  # cross_validation, peach_blossom, etc.
 
 
 def _ndjson(payload: dict) -> str:
     return json.dumps(payload, ensure_ascii=False) + "\n"
 
 
-def _to_charts(chart_dicts: List[dict]) -> List[ChartResult]:
+def _to_charts(chart_dicts: list[dict]) -> list[ChartResult]:
     out = []
     for i, c in enumerate(chart_dicts):
         if not isinstance(c, dict):

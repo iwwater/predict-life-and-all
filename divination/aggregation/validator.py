@@ -1,4 +1,4 @@
-"""交叉验证引擎 — 对 12 术法的统一信号进行加权交叉验证。
+"""交叉验证引擎 — 对 17 术法的统一信号进行加权交叉验证, 输出五档极性 + 计票(无单一分数)。
 
 VAL-001: validate_signals(signals, weights)
 VAL-002: 按 signal_key 分组归并
@@ -6,8 +6,8 @@ VAL-003~005: 正向/负向/中性加权统计
 VAL-006~007: 阈值共识/冲突检测
 VAL-008: conflict severity (low/medium/high)
 VAL-009: conflict resolution 调和建议
-VAL-010: overall_score 0-100
-VAL-011: confidence_level (low/medium/medium_high/high)
+VAL-010: tally_by_scope — 按 time_scope 五档计票(替代单一综合分 0-100)
+VAL-011: dimension_polarity — 每维五档极性(替代 confidence_level 4档)
 VAL-012: 风险提取 (含 mixed 信号)
 VAL-013: 时间窗口提取 (time_scope + timing signals)
 VAL-014: 行动建议生成 (advice 字段)
@@ -20,9 +20,13 @@ from typing import Any
 from .schema import (
     ConflictItem,
     ConsensusItem,
+    DimensionPolarity,
     DivinationSignal,
+    ScopeTally,
+    TimeScope,
     ValidationResult,
 )
+from .scope_tally import TallyEngine, tally_signals
 from .selector import DIMENSION_CONFIG
 
 # Type: (signal, credit_multiplier) — credit_multiplier = 1/|D(M)| for multi-dim methods
@@ -33,24 +37,30 @@ WeightedSignal = tuple[DivinationSignal, float]
 CONSENSUS_THRESHOLD = 0.15  # 加权强度超过此值 → 共识
 CONFLICT_THRESHOLD = 0.06   # 正负双方都超过此值 → 冲突
 
+# ── 五档极性阈值(Sprint 0.1 — 替代单一综合分/confidence_level) ──────────
+# 单 scope 内正/负累计加权 strength 判定为强/弱支持/警示。
+SUPPORT_STRONG = 0.40    # 累计加权 ≥ 此值 + ≥METHODS_MIN 法一致 → strong
+SUPPORT_WEAK   = 0.15    # 累计加权 ≥ 此值 → weak
+METHODS_MIN    = 2       # "多法一致"的最小方法数
+
 
 def validate_signals(
     signals: list[DivinationSignal],
     weights: dict[str, float] | None = None,
     method_entries: list[dict[str, Any]] | None = None,
 ) -> ValidationResult:
-    """VAL-001: 输入 signals + weights，输出 ValidationResult。
+    """VAL-001: 输入 signals + weights，输出 ValidationResult(无单一分数)。
 
     Args:
         signals: 所有术法的统一信号列表 (strength 0-1, confidence 0-1)
         weights: {method_name: weight, ...} — 术法权重字典
         method_entries: [{method, label, tier}, ...] — 可选 tier 信息
+
+    Returns:
+        ValidationResult, 内含 tally_by_scope(按 time_scope 五档计票) + dimension_polarity(每维五档极性)
     """
     if not signals:
         return ValidationResult(
-            overall_score=50,
-            confidence=30,
-            confidence_level="low",
             risks=["未产生有效信号，建议提供更详细的信息后重试"],
         )
 
@@ -73,11 +83,12 @@ def validate_signals(
     # VAL-007~009: 冲突检测 (含 severity + resolution)
     conflict_items = _detect_conflicts_by_weight(stats, weights, signals)
 
-    # VAL-010: 综合评分
-    overall_score = _compute_overall_score(signals, weights, stats, consensus_items, conflict_items)
+    # VAL-010: 按 time_scope 计票(替代单一综合分) — Sprint 1.5 委派 scope_tally
+    tally_by_scope = tally_signals(signals, weights, normalize=True)
 
-    # VAL-011: 置信等级
-    confidence_num, confidence_level = _compute_confidence(signals, consensus_items, conflict_items)
+    # VAL-011: 每维五档极性(替代 confidence_level)
+    dim_groups = _group_by_dimension(signals)
+    dimension_polarity = _compute_dimension_polarity(dim_groups, weights)
 
     # VAL-012: 风险提取
     risks = _extract_risks(signals, stats, conflict_items)
@@ -88,21 +99,18 @@ def validate_signals(
     # VAL-014: 行动建议
     action_advice = _extract_action_advice(signals, consensus_items, conflict_items)
 
-    # VAL-015: 5 维分组 + per-dim 评分 (Phase 1)
-    dim_groups = _group_by_dimension(signals)
-    dim_scores, dim_signals_count = _compute_dim_scores(dim_groups, weights)
+    # VAL-015: 5 维分组 + per-dim 极性 + 信号计数
+    dim_signals_count = {dim: len(ws) for dim, ws in dim_groups.items()}
     per_dim_consensus = _build_per_dim_consensus(dim_groups, weights, consensus_items)
-    dim_breakdown = _build_dim_breakdown(dim_groups, dim_scores, dim_signals_count)
+    dim_breakdown = _build_dim_breakdown(dim_groups, dimension_polarity, dim_signals_count)
 
     return ValidationResult(
         consensus=consensus_items,
         conflicts=conflict_items,
-        overall_score=round(overall_score, 1),
-        confidence=round(confidence_num, 1),
-        confidence_level=confidence_level,
+        tally_by_scope=tally_by_scope,
+        dimension_polarity=dimension_polarity,
         risks=risks,
         timing=timing,
-        dim_scores=dim_scores,
         dim_signals_count=dim_signals_count,
         per_dim_consensus=per_dim_consensus,
         dim_breakdown=dim_breakdown,
@@ -382,97 +390,131 @@ def _generate_resolution(
         return f"分歧程度较轻，以{pos_methods_str}的积极面为参考，适当兼顾{neg_methods_str}的保守建议"
 
 
-# ── VAL-010: 综合评分 ─────────────────────────────────────────────────────────
+# ── VAL-010: 按 time_scope 五档计票(替代单一综合分 0-100) ─────────────────
 
-def _compute_overall_score(
+def _tally_by_scope(
     signals: list[DivinationSignal],
     weights: dict[str, float],
-    stats: dict[str, dict[str, float]],
-    consensus: list[ConsensusItem],
-    conflicts: list[ConflictItem],
-) -> float:
-    """计算综合评分 0-100。
+) -> dict[TimeScope, ScopeTally]:
+    """按 time_scope 分组, 每组计算五档极性票数。
 
-    正向加权强度多时分数上升；负向多时分数下降。
+    计票规则(单 scope 内):
+      - 正向(positive) + strength ≥ STRONG → strong_support, 计数+1, methods 加入 supporting
+      - 正向(positive) + strength < STRONG → weak_support, 计数+1
+      - 负向(negative) 同理映射 strong_warn / weak_warn
+      - 中性/混合 → neutral, 计数+1
+    阈值: weighted_strength = sum(method_weight × strength × confidence) ≥ SUPPORT_STRONG → 强
+
+    与 `_compute_dimension_polarity` 不同: tally 记录**单条信号级**计数,
+    dimension_polarity 是**维度聚合**后的五档结论。
     """
-    if not signals:
-        return 50.0
+    tally: dict[TimeScope, ScopeTally] = {}
 
-    total_score = 0.0
-    total_weight = 0.0
-
+    # scope 推断优先级: signal.time_scope → signal.dimension → "long_term"
     for s in signals:
-        w = weights.get(s.method, 0.05) * s.strength * s.confidence
+        scope = s.time_scope or s.dimension or "long_term"
+        # 兼容旧 schema 中 dimension 是 5 维而非 time_scope 的情况
+        if scope not in ("long_term", "current_cycle", "short_term",
+                         "space", "one_question", "relationship"):
+            scope = "long_term"
+        if scope not in tally:
+            tally[scope] = ScopeTally(scope=scope)
+        t = tally[scope]
         if s.polarity == "positive":
-            score = 50.0 + s.strength * 50.0
+            if s.strength >= SUPPORT_STRONG:
+                t.strong_support += 1
+                if s.method not in t.supporting_methods:
+                    t.supporting_methods.append(s.method)
+            else:
+                t.weak_support += 1
+                if s.method not in t.supporting_methods:
+                    t.supporting_methods.append(s.method)
         elif s.polarity == "negative":
-            score = 50.0 - s.strength * 50.0
-        elif s.polarity == "mixed":
-            score = 50.0 + (s.strength * 20.0)  # slightly positive bias
+            if s.strength >= SUPPORT_STRONG:
+                t.strong_warn += 1
+                if s.method not in t.warning_methods:
+                    t.warning_methods.append(s.method)
+            else:
+                t.weak_warn += 1
+                if s.method not in t.warning_methods:
+                    t.warning_methods.append(s.method)
+        else:  # neutral / mixed
+            t.neutral += 1
+
+    # 给每个 scope 生成一句话小结
+    for t in tally.values():
+        sup = t.strong_support + t.weak_support
+        warn = t.strong_warn + t.weak_warn
+        if sup > 0 and warn == 0:
+            tone = "支持" if t.strong_support > t.weak_support else "弱支持"
+            t.summary = f"{sup} 法{tone}, 无警示"
+        elif warn > 0 and sup == 0:
+            tone = "警示" if t.strong_warn > t.weak_warn else "弱警示"
+            t.summary = f"{warn} 法{tone}, 无支持"
+        elif sup > 0 and warn > 0:
+            t.summary = f"分歧: {sup} 法支持 vs {warn} 法警示"
         else:
-            score = 50.0
-        total_score += score * w
-        total_weight += w
+            t.summary = "中性, 无明确倾向"
 
-    base = total_score / max(0.01, total_weight)
-
-    # Consensus bonus
-    consensus_bonus = min(12, sum(c.weight_strength for c in consensus) * 0.08)
-
-    # Conflict penalty (weighted by severity)
-    sev_map = {"low": 3, "medium": 6, "high": 10}
-    conflict_penalty = min(20, sum(sev_map.get(c.severity, 5) for c in conflicts))
-
-    # Method diversity bonus
-    methods_used = len(set(s.method for s in signals))
-    method_bonus = min(8, methods_used * 0.6)
-
-    return min(95, max(5, base + consensus_bonus - conflict_penalty + method_bonus))
+    return tally
 
 
-# ── VAL-011: 置信度计算 ────────────────────────────────────────────────────────
+# ── VAL-011: 每维五档极性(替代 confidence_level 4档) ─────────────────────────
 
-def _compute_confidence(
-    signals: list[DivinationSignal],
-    consensus: list[ConsensusItem],
-    conflicts: list[ConflictItem],
-) -> tuple[float, str]:
-    """计算置信度数值和等级。
+def _compute_dimension_polarity(
+    dim_groups: dict[str, list[WeightedSignal]],
+    weights: dict[str, float],
+) -> dict[str, DimensionPolarity]:
+    """对每个 dimension, 累计正/负加权 strength → 五档极性。
 
-    VAL-011: 共识多、冲突少时 confidence 更高。
-    Returns (confidence_numeric, confidence_level)
+    规则(单 dim 内):
+      pos_w / neg_w = sum(method_weight × signal.strength × signal.confidence × dim_multiplier)
+      pos_w - neg_w = net
+      |pos_w| 或 |neg_w| ≥ SUPPORT_STRONG  → strong_support / strong_warn
+      ≥ SUPPORT_WEAK                        → weak_support / weak_warn
+      否则                                    → neutral
+      同时要求: 支持/警示方的方法数 ≥ METHODS_MIN 才记 strong, 否则降一级
     """
-    if not signals:
-        return 30.0, "low"
+    out: dict[str, DimensionPolarity] = {}
+    for dim, weighted_sigs in dim_groups.items():
+        # 过滤"_unspecified" 兜底分组 — dimension_polarity 只输出 5 个官方 dim
+        if dim not in DIM_LABELS:
+            continue
+        if not weighted_sigs:
+            out[dim] = DimensionPolarity.NEUTRAL
+            continue
+        pos_w = 0.0
+        neg_w = 0.0
+        pos_methods: set[str] = set()
+        neg_methods: set[str] = set()
+        for s, mult in weighted_sigs:
+            contrib = weights.get(s.method, 0.05) * s.strength * s.confidence * mult
+            if s.polarity == "positive":
+                pos_w += contrib
+                pos_methods.add(s.method)
+            elif s.polarity == "negative":
+                neg_w += contrib
+                neg_methods.add(s.method)
+            # neutral/mixed 不入正负累计
 
-    # Average per-signal confidence
-    avg_signal_conf = sum(s.confidence for s in signals) / len(signals) * 100
+        net = pos_w - neg_w
+        abs_net = abs(net)
+        if abs_net < SUPPORT_WEAK:
+            out[dim] = DimensionPolarity.NEUTRAL
+        elif net > 0:
+            # 支持方
+            if abs_net >= SUPPORT_STRONG and len(pos_methods) >= METHODS_MIN:
+                out[dim] = DimensionPolarity.STRONG_SUPPORT
+            else:
+                out[dim] = DimensionPolarity.WEAK_SUPPORT
+        else:
+            # 警示方
+            if abs_net >= SUPPORT_STRONG and len(neg_methods) >= METHODS_MIN:
+                out[dim] = DimensionPolarity.STRONG_WARN
+            else:
+                out[dim] = DimensionPolarity.WEAK_WARN
 
-    methods_count = len(set(s.method for s in signals))
-
-    # Consensus bonus
-    consensus_bonus = min(15, len(consensus) * 3.5)
-
-    # Conflict penalty
-    sev_map = {"low": 3, "medium": 7, "high": 12}
-    conflict_penalty = min(25, sum(sev_map.get(c.severity, 5) for c in conflicts))
-
-    # Method count bonus
-    method_bonus = min(8, methods_count * 0.6)
-
-    score = round(min(92, max(10, avg_signal_conf + consensus_bonus - conflict_penalty + method_bonus)), 1)
-
-    # Map to level
-    if score >= 75:
-        level = "high"
-    elif score >= 60:
-        level = "medium_high"
-    elif score >= 40:
-        level = "medium"
-    else:
-        level = "low"
-
-    return score, level
+    return out
 
 
 # ── VAL-012: 风险提取 ─────────────────────────────────────────────────────────
@@ -644,10 +686,14 @@ def _group_by_dimension(
 
     W7 fix: 方法出现在 N 个维度时，每个维度获得 1/N 的 credit 加权，
     防止该方法在两个维里都拿完整权重，导致 validator 评分偏袒 multi-dim 方法。
+    Sprint 0.1 fix: 无 dimension 字段的信号归入 long_term(默认长周期), 不再用 _unspecified 兜底键,
+    保证 dimension_polarity 只输出 5 个官方 dim。
     """
     groups: dict[str, list[WeightedSignal]] = {dim: [] for dim in DIM_LABELS}
     for s in signals:
-        d = getattr(s, "dimension", None) or "_unspecified"
+        d = getattr(s, "dimension", None) or "long_term"
+        if d not in DIM_LABELS:
+            d = "long_term"
         method = s.method
         dims = DIMENSION_CONFIG.get(method, [d])
         multiplier = 1.0 / len(dims)
@@ -659,38 +705,14 @@ def _group_by_dimension(
     return groups
 
 
-def _compute_dim_scores(
+def _compute_dim_signals_count(
     dim_groups: dict[str, list[WeightedSignal]],
-    weights: dict[str, float],
-) -> tuple[dict[str, float], dict[str, int]]:
-    """每维内部算 0-100 分数, 复用 _compute_overall_score 同公式但 scope 限到 dim 内。
+) -> dict[str, int]:
+    """每维有效信号数(供 dim_breakdown 展示)。
 
-    W7 fix: 每条 signal 的 credit = method_weight × signal_strength × signal_confidence × dim_credit_multiplier。
+    替代原 _compute_dim_scores 的计数部分(分数逻辑由 _compute_dimension_polarity 取代)。
     """
-    scores: dict[str, float] = {}
-    counts: dict[str, int] = {}
-    for dim, weighted_sigs in dim_groups.items():
-        raw_count = len(weighted_sigs)
-        counts[dim] = raw_count
-        if not weighted_sigs:
-            scores[dim] = 50.0
-            continue
-        total_score = 0.0
-        total_weight = 0.0
-        for s, multiplier in weighted_sigs:
-            w = weights.get(s.method, 0.05) * s.strength * s.confidence * multiplier
-            if s.polarity == "positive":
-                score = 50.0 + s.strength * 50.0
-            elif s.polarity == "negative":
-                score = 50.0 - s.strength * 50.0
-            elif s.polarity == "mixed":
-                score = 50.0 + (s.strength * 20.0)
-            else:
-                score = 50.0
-            total_score += score * w
-            total_weight += w
-        scores[dim] = round(min(95, max(5, total_score / max(0.01, total_weight))), 1)
-    return scores, counts
+    return {dim: len(ws) for dim, ws in dim_groups.items()}
 
 
 def _build_per_dim_consensus(
@@ -716,13 +738,13 @@ def _build_per_dim_consensus(
 
 def _build_dim_breakdown(
     dim_groups: dict[str, list[WeightedSignal]],
-    dim_scores: dict[str, float],
+    dimension_polarity: dict[str, DimensionPolarity],
     dim_signals_count: dict[str, int],
 ) -> dict[str, dict[str, Any]]:
-    """每维子结构 {score, signals_count, top_signal, summary}。"""
+    """每维子结构 {polarity, signals_count, top_signal, summary}。"""
     breakdown: dict[str, dict[str, Any]] = {}
     for dim, weighted_sigs in dim_groups.items():
-        top: Optional[DivinationSignal] = None
+        top: DivinationSignal | None = None
         if weighted_sigs:
             top = max(weighted_sigs, key=lambda ws: ws[0].strength * ws[0].confidence)[0]
         summary = ""
@@ -739,7 +761,7 @@ def _build_dim_breakdown(
         else:
             summary = "未归入 5 维的兜底信号"
         breakdown[dim] = {
-            "score": dim_scores.get(dim, 50.0),
+            "polarity": dimension_polarity.get(dim, DimensionPolarity.NEUTRAL).value,
             "signals_count": dim_signals_count.get(dim, 0),
             "top_signal": top,
             "summary": summary,

@@ -273,13 +273,7 @@ def _evaluate_condition(condition: dict, raw: dict, elements: dict) -> float:
         if key.startswith("elements."):
             elem = key.split(".")[1]
             actual = elements.get(elem, 0)
-            if op == ">=" and actual >= value:
-                score += 1
-            elif op == "<=" and actual <= value:
-                score += 1
-            elif op == ">" and actual > value:
-                score += 1
-            elif op == "<" and actual < value:
+            if (op == ">=" and actual >= value) or (op == "<=" and actual <= value) or (op == ">" and actual > value) or (op == "<" and actual < value):
                 score += 1
         elif key == "shensha":
             shensha_data = raw.get("shensha", {})
@@ -292,9 +286,7 @@ def _evaluate_condition(condition: dict, raw: dict, elements: dict) -> float:
             god_key = key.replace("_count", "")
             counts = raw.get("seasonal_strength_reference", {}).get("ten_god_counts", {})
             actual = counts.get(god_key, 0)
-            if op == ">=" and actual >= value:
-                score += 1
-            elif op == "<=" and actual <= value:
+            if (op == ">=" and actual >= value) or (op == "<=" and actual <= value):
                 score += 1
 
     return round(score / total_checks * 100, 1)

@@ -598,6 +598,227 @@ CLASSICAL_RULES = [
         "source": "渊海子平·五言独步",
         "confidence": 88,
     },
+
+    # ══════════════════════════════════════════════════════════════
+    # Phase F: 小六壬 · 六宫断事歌诀（新增）
+    # ══════════════════════════════════════════════════════════════
+    {
+        "id": "xlr_001",
+        "category": "小六壬",
+        "condition": "落大安宫",
+        "conclusion": "大安主稳。事可成、宜守成、按原计划推进；不宜冒进。",
+        "passage": "大安事事昌，求财在坤方，失物去不远，宅舍保安康。行人身未动，病者主无妨，将军回田野，仔细更推详。",
+        "source": "六壬课经·大安诀",
+        "confidence": 85,
+    },
+    {
+        "id": "xlr_002",
+        "category": "小六壬",
+        "condition": "落留连宫",
+        "conclusion": "留连主拖延、反复、牵连。事未成形，宜先理清关系与流程。",
+        "passage": "留连事难成，求谋日月明，讼事和为贵，婚姻久自宁。行人即便至，失物南方寻，求财渐有益，四时未安宁。",
+        "source": "六壬课经·留连诀",
+        "confidence": 85,
+    },
+    {
+        "id": "xlr_003",
+        "category": "小六壬",
+        "condition": "落速喜宫",
+        "conclusion": "速喜主消息来得快、有喜讯或转机。适合主动沟通、快速推进。",
+        "passage": "速喜喜来临，求财向南行，失物申未午，逢人路上寻。行人即便至，官事有和平，婚姻成就吉，病人即离身。",
+        "source": "六壬课经·速喜诀",
+        "confidence": 85,
+    },
+    {
+        "id": "xlr_004",
+        "category": "小六壬",
+        "condition": "落赤口宫",
+        "conclusion": "赤口主口舌、误会、冲突。先降火，避免硬碰硬；忌签约、动土。",
+        "passage": "赤口主口舌，是非莫妄动，求财谨防失，婚姻最忌见。行人惊且怯，疾病恐难安，求谋须谨慎，万事退为上。",
+        "source": "六壬课经·赤口诀",
+        "confidence": 85,
+    },
+    {
+        "id": "xlr_005",
+        "category": "小六壬",
+        "condition": "落小吉宫",
+        "conclusion": "小吉主小有顺遂，有人相助或局部好转。适合小步试探，忌大举。",
+        "passage": "小吉最吉昌，求财正相当，婚姻和合吉，谋事保安康。行人即便至，失物正西方，病人占无事，凡事细推详。",
+        "source": "六壬课经·小吉诀",
+        "confidence": 85,
+    },
+    {
+        "id": "xlr_006",
+        "category": "小六壬",
+        "condition": "落空亡宫",
+        "conclusion": "空亡主时机未到、信息不足。不宜重押，先补证据再行。",
+        "passage": "空亡事不祥，谋事最难当，婚姻难成就，求财有空囊。行人未归信，失物难寻访，万事皆虚妄，守之免灾殃。",
+        "source": "六壬课经·空亡诀",
+        "confidence": 85,
+    },
+
+    # ══════════════════════════════════════════════════════════════
+    # Phase F: 铁板神数 · 起数公式（新增）
+    # ══════════════════════════════════════════════════════════════
+    {
+        "id": "tbs_001",
+        "category": "铁板神数",
+        "condition": "太玄数起数",
+        "conclusion": "天干取数 1-10（甲己1、乙庚2、丙辛3、丁壬4、戊癸5、壬6、癸7…余类推），地支按阴阳分取；四柱 → 条文集数。",
+        "passage": "甲己子午九，乙庚丑未八，丙辛寅申七，丁壬卯酉六，戊癸辰戌五，己亥当四数。",
+        "source": "铁板神数·起数章",
+        "confidence": 90,
+    },
+    {
+        "id": "tbs_002",
+        "category": "铁板神数",
+        "condition": "考刻分（父母生肖校验）",
+        "conclusion": "条文查找前需校验父母生肖是否与条文索引一致；不一致则换条文集。",
+        "passage": "父生肖与条文集相冲，则不验；母生肖与父亲生肖互为阴阳校验。",
+        "source": "铁板神数·考刻分",
+        "confidence": 80,
+    },
+
+    # ══════════════════════════════════════════════════════════════
+    # Phase F: 老黄历 · 建除十二神（新增）
+    # ══════════════════════════════════════════════════════════════
+    {
+        "id": "almanac_001",
+        "category": "老黄历",
+        "condition": "建日",
+        "conclusion": "建为月建；宜祭祀、祈福、开张；忌动土、嫁娶（与月建同支）。",
+        "passage": "建宜出行通达、谋事遂心；动土犯月建不利。",
+        "source": "协纪辨方书·义例",
+        "confidence": 92,
+    },
+    {
+        "id": "almanac_002",
+        "category": "老黄历",
+        "condition": "除日",
+        "conclusion": "除主除旧布新；宜扫舍、治病、出行；忌嫁娶（'除'字不吉于婚）。",
+        "passage": "除可扫秽、出行、疗疾；嫁娶多忌。",
+        "source": "协纪辨方书·义例",
+        "confidence": 88,
+    },
+    {
+        "id": "almanac_003",
+        "category": "老黄历",
+        "condition": "满日",
+        "conclusion": "满主丰盛、圆满；宜祭祀、纳财；忌动土、破土（'满则溢'）。",
+        "passage": "满宜造仓库、纳财；动土犯'满'，损丁耗财。",
+        "source": "协纪辨方书·义例",
+        "confidence": 88,
+    },
+    {
+        "id": "almanac_004",
+        "category": "老黄历",
+        "condition": "破日",
+        "conclusion": "破主破败；忌嫁娶、开市、动土；仅宜破旧立新（如拆旧房）。",
+        "passage": "破日万事不利，仅破旧可取。",
+        "source": "协纪辨方书·义例",
+        "confidence": 92,
+    },
+
+    # ══════════════════════════════════════════════════════════════
+    # Phase F: 数字命理 · 主数含义（新增 · 现代体系）
+    # ══════════════════════════════════════════════════════════════
+    {
+        "id": "num_001",
+        "category": "数字命理",
+        "condition": "生命灵数 1",
+        "conclusion": "独立、领导、先驱；适合开创型事业，不宜长期依附他人。",
+        "passage": "1 is the number of independence, leadership, and new beginnings.",
+        "source": "Pythagorean Numerology · 主数体系",
+        "confidence": 70,
+    },
+    {
+        "id": "num_002",
+        "category": "数字命理",
+        "condition": "生命灵数 7",
+        "conclusion": "内省、智慧、分析；适合研究、哲学、技术领域。",
+        "passage": "7 is the number of introspection, analysis, and spiritual seeking.",
+        "source": "Pythagorean Numerology · 主数体系",
+        "confidence": 70,
+    },
+    {
+        "id": "num_003",
+        "category": "数字命理",
+        "condition": "大师数 11/22/33",
+        "conclusion": "11 主灵性直觉，22 主实干理想主义，33 主大爱导师；高于 9 不再化简。",
+        "passage": "Master Numbers 11, 22, and 33 are not reduced to single digits.",
+        "source": "Pythagorean Numerology · 大师数",
+        "confidence": 75,
+    },
+
+    # ══════════════════════════════════════════════════════════════
+    # Phase F: 吠陀占星 · Vimshottari Dasha（新增）
+    # ══════════════════════════════════════════════════════════════
+    {
+        "id": "vedic_001",
+        "category": "吠陀占星",
+        "condition": "Vimshottari Dasha 总和",
+        "conclusion": "九曜 Dasha 总和 = 7+20+6+10+7+18+16+19+17 = 120 年；与原典一致。",
+        "passage": "The Vimshottari Dasha system allocates 120 years across nine planets (Ketu 7, Venus 20, Sun 6, Moon 10, Mars 7, Rahu 18, Jupiter 16, Saturn 19, Mercury 17).",
+        "source": "Brihat Parashara Hora Shastra · Dasha 章",
+        "confidence": 95,
+    },
+    {
+        "id": "vedic_002",
+        "category": "吠陀占星",
+        "condition": "Navamsa (D9) 分盘",
+        "conclusion": "D9 每宫 3°20'；本命盘每宫再细分九宫，用以判断婚配与精神层面。",
+        "passage": "Navamsa is the 9th division chart, used primarily for marriage, dharma, and inner strength.",
+        "source": "Brihat Parashara Hora Shastra · 分盘章",
+        "confidence": 92,
+    },
+
+    # ══════════════════════════════════════════════════════════════
+    # Phase F: 西方占星 · 中西合参（新增）
+    # ══════════════════════════════════════════════════════════════
+    {
+        "id": "west_002",
+        "category": "占星",
+        "condition": "五行-五星对应",
+        "conclusion": "木星 ≈ 木（生发）、火星 ≈ 火（炎上）、土星 ≈ 土（承载）、金星 ≈ 金（肃杀）、水星 ≈ 水（润下）；用于跨体系合参。",
+        "passage": "Jupiter (wood/expansion), Mars (fire/heat), Saturn (earth/structure), Venus (metal/refinement), Mercury (water/flow).",
+        "source": "中西星象对照表 · 现代对照体系",
+        "confidence": 65,
+    },
+    {
+        "id": "west_003",
+        "category": "占星",
+        "condition": "Ptolemy 行星本质",
+        "conclusion": "土星-冷干；木星-温湿；火星-热干；太阳-温干；金星-温湿；水星-冷干双性；月亮-冷湿。",
+        "passage": "Saturn is cold and dry; Jupiter temperate and moist; Mars hot and dry; the Sun hot and dry; Venus temperate and moist; Mercury changeable; the Moon moist.",
+        "source": "Tetrabiblos · Book I",
+        "confidence": 88,
+    },
+
+    # ══════════════════════════════════════════════════════════════
+    # Phase F: 玄空飞星 · 山向飞星（新增）
+    # ══════════════════════════════════════════════════════════════
+    {
+        "id": "feng_002",
+        "category": "风水",
+        "condition": "山星向星合局",
+        "conclusion": "山星入中宫 → 顺飞；向星入中宫 → 逆飞；山星与向星会合之宫位为'旺山旺向'。",
+        "passage": "山星挨星入中顺飞，向星挨星入中逆飞；山向同宫则当元旺向。",
+        "source": "沈氏玄空学·飞星章",
+        "confidence": 90,
+    },
+
+    # ══════════════════════════════════════════════════════════════
+    # Phase F: 雷诺曼 · 牌组基本判断（新增）
+    # ══════════════════════════════════════════════════════════════
+    {
+        "id": "len_001",
+        "category": "雷诺曼",
+        "condition": "近邻牌修饰",
+        "conclusion": "两张相邻牌的组合含义 ≠ 单张相加；前一张修饰主体，后一张点明方向。",
+        "passage": "Card meanings are modified by neighboring cards; the card before gives context, the card after indicates direction.",
+        "source": "Petit Lenormand · 法国学派",
+        "confidence": 85,
+    },
 ]
 
 

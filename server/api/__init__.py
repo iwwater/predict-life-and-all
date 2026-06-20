@@ -1,2 +1,13 @@
 """API 路由集合。"""
-from . import birth_time, cases, chart, methods, prompts, interpret, daily, reading, compass, knowledge  # noqa: F401
+from . import (  # noqa: F401
+    birth_time,
+    cases,
+    chart,
+    compass,
+    daily,
+    interpret,
+    knowledge,
+    methods,
+    prompts,
+    reading,
+)

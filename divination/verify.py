@@ -11,7 +11,6 @@ Usage:
     result = score_accuracy(chart, known_facts)
 """
 
-from typing import Optional
 
 # ── Known Test Cases ────────────────────────────────────────────────────────
 # Format: {name, birth, known_facts, expected_*}
@@ -175,7 +174,7 @@ def score_accuracy(chart, known_facts: dict) -> dict:
                 "name": "职业匹配度",
                 "passed": False,
                 "score": 0,
-                "detail": f"Error: {str(e)}",
+                "detail": f"Error: {e!s}",
             })
 
     # Check 5: Strength score reasonableness
@@ -207,7 +206,7 @@ def score_accuracy(chart, known_facts: dict) -> dict:
     }
 
 
-def run_calibration(test_id: Optional[str] = None) -> list[dict]:
+def run_calibration(test_id: str | None = None) -> list[dict]:
     """Run calibration tests against known cases.
 
     Args:
@@ -216,8 +215,8 @@ def run_calibration(test_id: Optional[str] = None) -> list[dict]:
     Returns:
         List of calibration results
     """
-    from .router import compute
     from .contracts import Birth
+    from .router import compute
 
     cases = TEST_CASES
     if test_id:

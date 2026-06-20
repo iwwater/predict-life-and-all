@@ -7,14 +7,14 @@ from __future__ import annotations
 
 import hashlib
 import time
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
 
 from divination import Birth
-from divination.router import compute
 from divination.aggregation.schema import BirthModel
+from divination.router import compute
 
 router = APIRouter()
 
@@ -59,7 +59,7 @@ _EVENT_HINTS = {
 
 class HistoricalEvent(BaseModel):
     year: int = Field(..., ge=1500, le=2100)
-    month: Optional[int] = Field(None, ge=1, le=12)
+    month: int | None = Field(None, ge=1, le=12)
     category: Literal[
         "education",
         "career_start",
@@ -73,14 +73,14 @@ class HistoricalEvent(BaseModel):
         "health",
         "other",
     ] = "other"
-    description: Optional[str] = Field(None, max_length=300)
+    description: str | None = Field(None, max_length=300)
 
 
 class RectifyRequest(BaseModel):
     birth: BirthModel
     birth_time_accuracy: BirthAccuracy = "unknown"
-    approximate_hour: Optional[int] = Field(None, ge=0, le=23)
-    day_period: Optional[DayPeriod] = None
+    approximate_hour: int | None = Field(None, ge=0, le=23)
+    day_period: DayPeriod | None = None
     known_events: list[HistoricalEvent] = Field(default_factory=list, max_length=8)
     keep_top_n: int = Field(4, ge=1, le=12)
 
@@ -99,10 +99,10 @@ class RectifyResponse(BaseModel):
     status: Literal["single_exact", "candidate_hours"]
     birth_time_accuracy: BirthAccuracy
     candidates: list[RectifyCandidate]
-    best: Optional[RectifyCandidate]
-    second: Optional[RectifyCandidate]
+    best: RectifyCandidate | None
+    second: RectifyCandidate | None
     confidence_level: Literal["low", "medium", "high"]
-    next_question: Optional[dict[str, Any]] = None
+    next_question: dict[str, Any] | None = None
     common_conclusions: list[str] = Field(default_factory=list)
     main_differences: list[str] = Field(default_factory=list)
     uncertainty_note: str
@@ -217,7 +217,7 @@ def _overall_confidence(candidates: list[RectifyCandidate]) -> Literal["low", "m
     return "low"
 
 
-def _next_question(candidates: list[RectifyCandidate]) -> Optional[dict[str, Any]]:
+def _next_question(candidates: list[RectifyCandidate]) -> dict[str, Any] | None:
     if len(candidates) < 2 or candidates[0].score - candidates[1].score >= 0.07:
         return None
     return {

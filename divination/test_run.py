@@ -2,8 +2,7 @@
 
 执行: `python -m divination.test_run`
 """
-from divination import Birth, compute
-from divination import astro_math as am
+from divination import Birth, astro_math as am, compute
 
 B = Birth(year=1990, month=5, day=15, hour=8, minute=30,
           gender="male", lat=31.23, lng=121.47, tz="Asia/Shanghai")

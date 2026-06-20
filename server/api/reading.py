@@ -7,16 +7,16 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from divination.aggregation import (
     DISCLAIMER,
-    run_reading,
     ReadingRequest,
     ReadingResult,
+    run_reading,
 )
 from divination.aggregation.schema import BirthModel, SpaceModel
 
@@ -31,7 +31,7 @@ class ReadingAPIRequest(BaseModel):
 
     用户只需输入 question，其他字段可选。
     """
-    goal: Optional[str] = Field(
+    goal: str | None = Field(
         None,
         description="目标/意图 — 可留空",
         max_length=200,
@@ -42,23 +42,23 @@ class ReadingAPIRequest(BaseModel):
         max_length=2000,
         description="用户问题（必填）",
     )
-    birth: Optional[BirthModel] = Field(
+    birth: BirthModel | None = Field(
         None,
         description="求测者出生信息",
     )
-    target_birth: Optional[BirthModel] = Field(
+    target_birth: BirthModel | None = Field(
         None,
         description="关系对象出生信息",
     )
-    space: Optional[SpaceModel] = Field(
+    space: SpaceModel | None = Field(
         None,
         description="空间信息（风水用）",
     )
-    method_options: Optional[dict[str, Any]] = Field(
+    method_options: dict[str, Any] | None = Field(
         None,
         description="术法专属选项: liuyao_mode, meihua_mode, tarot_spread 等",
     )
-    methods: Optional[list[str]] = Field(
+    methods: list[str] | None = Field(
         None,
         min_length=1,
         max_length=12,

@@ -24,15 +24,13 @@
 import logging
 import random
 from datetime import date as date_cls
-from typing import Literal, Optional
+from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Query
-from lunar_python import Solar
+from lunar_python import Solar, Solar as LunarSolar
 from pydantic import BaseModel, Field
 
 from divination import Birth
-from lunar_python import Solar as LunarSolar
-
 
 # Lenormand 36 cards — names + core meanings for daily draw
 LENORMAND_DAILY = [
@@ -165,14 +163,18 @@ def _user_day_master(birth: Birth) -> tuple[str, str]:
     return day_gan, STEM_WX.get(day_gan, "")
 
 
-def _tarot_card_for_day(date_str: str, birth: Optional[Birth]) -> dict:
-    from divination.engines.tarot import ALL_CARDS, ALL_KEYWORDS
+def _tarot_card_for_day(date_str: str, birth: Birth | None) -> dict:
+    from divination.engines.tarot import (
+        ALL_CARDS, ALL_KEYWORDS, _make_rng, _draw_cryptographic,
+    )
     if birth is not None:
         seed = f"daily-{date_str}-{birth.year}-{birth.month}-{birth.day}"
     else:
         seed = f"daily-{date_str}"
-    rng = random.Random(seed)
-    name = rng.choice(ALL_CARDS)
+    # Sprint 4.2: 复用 tarot engine 工厂与洗牌 (风格统一, 保留 seed 确定性)
+    rng = _make_rng(seed)
+    indices = _draw_cryptographic(rng, len(ALL_CARDS))
+    name = ALL_CARDS[indices[0]]
     orient = "正位" if rng.random() < 0.65 else "逆位"
     kw = ALL_KEYWORDS.get(name, {"upright": "", "reversed": "", "image_hint": ""})
     keywords = kw["upright"] if orient == "正位" else kw["reversed"]
@@ -186,7 +188,7 @@ def _tarot_card_for_day(date_str: str, birth: Optional[Birth]) -> dict:
     }
 
 
-def _lenormand_card_for_day(date_str: str, birth: Optional[Birth]) -> dict:
+def _lenormand_card_for_day(date_str: str, birth: Birth | None) -> dict:
     """今日雷诺曼 — 无逆位, 直接具体。"""
     if birth is not None:
         seed = f"daily-lenormand-{date_str}-{birth.year}-{birth.month}-{birth.day}"
@@ -212,13 +214,13 @@ class BirthModel(BaseModel):
     minute: int = Field(0, ge=0, le=59)
     gender: str = "unspecified"
     calendar: str = "gregorian"
-    lat: Optional[float] = None
-    lng: Optional[float] = None
+    lat: float | None = None
+    lng: float | None = None
     tz: str = "Asia/Shanghai"
     is_leap_month: bool = False
 
 
-def _parse_date(s: Optional[str]) -> date_cls:
+def _parse_date(s: str | None) -> date_cls:
     if not s:
         return date_cls.today()
     try:
@@ -229,7 +231,7 @@ def _parse_date(s: Optional[str]) -> date_cls:
 
 @router.get("/daily")
 def get_daily(
-    date: Optional[str] = Query(None, description="YYYY-MM-DD; defaults to today"),
+    date: str | None = Query(None, description="YYYY-MM-DD; defaults to today"),
     card_type: Literal["tarot", "lenormand", "both"] = "both",
 ):
     d = _parse_date(date)
@@ -237,15 +239,15 @@ def get_daily(
 
 
 class DailyRequest(BaseModel):
-    birth: Optional[BirthModel] = None
-    date: Optional[str] = None
+    birth: BirthModel | None = None
+    date: str | None = None
     card_type: Literal["tarot", "lenormand", "both"] = "both"
 
 
 @router.post("/daily")
 def post_daily(body: DailyRequest):
     d = _parse_date(body.date)
-    birth: Optional[Birth] = None
+    birth: Birth | None = None
     if body.birth is not None:
         b = body.birth
         birth = Birth(
@@ -257,7 +259,7 @@ def post_daily(body: DailyRequest):
     return _build_daily(d, birth=birth, card_type=body.card_type)
 
 
-def _build_daily(d: date_cls, birth: Optional[Birth], card_type: str = "both") -> dict:
+def _build_daily(d: date_cls, birth: Birth | None, card_type: str = "both") -> dict:
     solar = Solar.fromYmdHms(d.year, d.month, d.day, 12, 0, 0)
     lunar = solar.getLunar()
     ec = lunar.getEightChar()

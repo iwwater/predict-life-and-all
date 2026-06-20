@@ -21,7 +21,8 @@ class AnthropicClient(LLMClient):
         self.api_key = api_key; self.model = model
 
     def complete(self, system: str, user: str) -> str:
-        import json, urllib.request
+        import json
+        import urllib.request
         req = urllib.request.Request(
             "https://api.anthropic.com/v1/messages",
             data=json.dumps({"model": self.model, "max_tokens": 1500,

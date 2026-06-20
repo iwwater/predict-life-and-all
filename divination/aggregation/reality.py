@@ -1,28 +1,251 @@
-"""现实条件校正引擎 — 方案 §十四。
+"""Sprint 1.6 — 现实条件校正引擎 (声明式 rules + 安全转介)。
 
-将多法信号与用户现实条件对比，发现"命理层说适合/现实层说不足"的
-接地气结论，输出警告和调整后的行动建议。
+设计:
+  1. CONSTRAINT_RULES 声明式: 每条规则 (trigger, severity, msg, advice) 独立可关
+  2. SAFETY_REFERRALS 表: 健康/法财/法律 关键词 → SAFE-002/003/004 降级
+  3. RealityConstraintEngine.evaluate() 主入口保持兼容
+  4. 自动转介: 用户问题含医疗/投资/法律关键词 → 加 safety_flag, 不出命理结论
 
-Usage:
-    from divination.aggregation.reality import RealityConstraintEngine, RealityResult
-    engine = RealityConstraintEngine()
-    result = engine.evaluate(signals=signals, constraints=constraints, domain=domain)
+参考:
+  - 心理咨询 initial interview 的 referral 模式: 严重问题直接转介专业
+  - 临床心理学的 triage 阈值 (sprint 1.6 不做临床, 只做"建议就医/咨询律师"提示)
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Any, Callable, Literal
 
 from .schema import DivinationSignal, RealityConstraints
 
+Operator = Literal["lt", "lte", "eq", "gte", "gt", "in", "is_true", "is_false", "is_none"]
+
+
+# ── 规则数据类 ────────────────────────────────────────────────────────────
+
+@dataclass
+class ConstraintRule:
+    """单条声明式约束规则。
+
+    trigger.field      — RealityConstraints 字段名
+    trigger.op         — 比较算子
+    trigger.value      — 比较值
+    severity           — "low" | "medium" | "high"
+    message            — 警告文本 (可用 {field} 占位)
+    advice             — 调整后建议 (可用 {field} 占位)
+    requires_signal    — 仅在命理信号满足某条件时触发 (None = 不限)
+    id                 — 稳定 ID
+    """
+    id: str
+    field: str
+    op: Operator
+    value: Any
+    severity: Literal["low", "medium", "high"]
+    message: str
+    advice: str
+    requires_signal: Callable[[list[DivinationSignal]], bool] | None = None
+
+    def matches(self, constraints: RealityConstraints) -> bool:
+        """规则是否触发。"""
+        v = getattr(constraints, self.field, None)
+        if self.op == "lt":
+            return v is not None and v < self.value
+        if self.op == "lte":
+            return v is not None and v <= self.value
+        if self.op == "gt":
+            return v is not None and v > self.value
+        if self.op == "gte":
+            return v is not None and v >= self.value
+        if self.op == "eq":
+            return v == self.value
+        if self.op == "in":
+            return v in self.value
+        if self.op == "is_true":
+            return v is True
+        if self.op == "is_false":
+            return v is False
+        if self.op == "is_none":
+            return v is None
+        return False
+
+
+# ── 规则表 ────────────────────────────────────────────────────────────────
+
+# 触发条件: 通常要求有正向命理信号时, 现实约束才"起冲突" — 无信号不强警告
+def _has_career_positive(signals: list[DivinationSignal]) -> bool:
+    return any(
+        s.polarity == "positive" and s.strength > 0.5
+        and s.domain in ("career", "wealth")
+        for s in signals
+    )
+
+def _has_wealth_strong(signals: list[DivinationSignal]) -> bool:
+    return any(
+        s.polarity == "positive" and s.strength > 0.6
+        and s.domain == "wealth"
+        for s in signals
+    )
+
+def _has_decision_positive(signals: list[DivinationSignal]) -> bool:
+    return any(
+        s.polarity == "positive" and s.strength > 0.6
+        and s.domain == "decision"
+        for s in signals
+    )
+
+def _has_health_pressure(signals: list[DivinationSignal]) -> bool:
+    return any(
+        s.polarity == "negative" and s.strength > 0.4
+        and s.domain == "health"
+        for s in signals
+    )
+
+def _has_dependents_pressure(signals: list[DivinationSignal]) -> bool:
+    return any(
+        s.polarity == "negative" and s.strength > 0.4
+        and s.domain in ("career", "wealth")
+        for s in signals
+    )
+
+
+CONSTRAINT_RULES: list[ConstraintRule] = [
+    # ── 现金储备 ──
+    ConstraintRule(
+        id="cash_severe_shortage",
+        field="cash_reserve_months", op="lt", value=1,
+        severity="high",
+        message="现金储备严重不足（{cash_reserve_months}个月）",
+        advice="短期内不宜做重大变动, 优先积累现金储备",
+        requires_signal=_has_career_positive,
+    ),
+    ConstraintRule(
+        id="cash_low",
+        field="cash_reserve_months", op="lte", value=3,
+        severity="medium",
+        message="现金储备偏低（{cash_reserve_months}个月）",
+        advice="确认新收入来源前, 不建议仓促离职或创业",
+        requires_signal=_has_career_positive,
+    ),
+    # ── 合同状态 ──
+    ConstraintRule(
+        id="contract_only_verbal",
+        field="has_formal_contract", op="is_false", value=None,
+        severity="high",
+        message="仅有口头意向, 尚无正式合同",
+        advice="建议等正式合同签署后再做离职决定",
+        requires_signal=_has_career_positive,
+    ),
+    # ── 健康 ──
+    ConstraintRule(
+        id="health_poor",
+        field="health_status", op="eq", value="poor",
+        severity="high",
+        message="当前健康状况较差",
+        advice="建议先将健康恢复到 fair 水平再考虑重大事业变动",
+    ),
+    ConstraintRule(
+        id="health_fair",
+        field="health_status", op="eq", value="fair",
+        severity="medium",
+        message="当前健康状况一般",
+        advice="变动期间保持规律作息, 避免过度劳累",
+    ),
+    # ── 资质 ──
+    ConstraintRule(
+        id="qualification_missing",
+        field="has_qualification", op="is_false", value=None,
+        severity="medium",
+        message="当前尚不具备目标方向所需资质",
+        advice="建议先获取必要资质（证书/许可）, 再进入新领域",
+        requires_signal=_has_career_positive,
+    ),
+    # ── 家庭依赖 ──
+    ConstraintRule(
+        id="dependents_with_weak_wealth",
+        field="has_dependents", op="is_true", value=None,
+        severity="high",
+        message="有抚养责任, 且当前财运信号偏弱",
+        advice="变动方案需优先考虑家庭保障, 不宜冒进",
+        requires_signal=_has_dependents_pressure,
+    ),
+    ConstraintRule(
+        id="dependents_general",
+        field="has_dependents", op="is_true", value=None,
+        severity="low",
+        message="有家庭依赖",
+        advice="变动决定需考虑家庭安排, 确保不严重影响生活质量",
+    ),
+    # ── 备选方案 ──
+    ConstraintRule(
+        id="no_backup_plan",
+        field="has_backup_plan", op="is_false", value=None,
+        severity="medium",
+        message="命理显示有机会但无备选退路, 高风险",
+        advice="不要把所有资源押在单一方向, 同时建立备选退路",
+        requires_signal=_has_decision_positive,
+    ),
+    # ── 搬迁/通勤 ──
+    ConstraintRule(
+        id="commute_rejected",
+        field="commute_tolerance", op="eq", value="reject",
+        severity="high",
+        message="目标地点超出通勤接受范围, 需要搬迁",
+        advice="如必须搬迁, 建议先确认新地点的住房和工作条件再决定",
+        requires_signal=_has_career_positive,
+    ),
+]
+
+
+# ── 安全转介 (SAFE-002/003/004) ───────────────────────────────────────
+
+# 关键词从 safety.py 复用 (避免重复定义)
+from .safety import (
+    INVESTMENT_DOWNGRADE_MSG,
+    LEGAL_DOWNGRADE_MSG,
+    MEDICAL_DOWNGRADE_MSG,
+    INVESTMENT_KEYWORDS,
+    LEGAL_KEYWORDS,
+    MEDICAL_KEYWORDS,
+)
+
+
+@dataclass
+class SafetyReferral:
+    """单一领域转介规则。"""
+    flag: str  # safety_flag 名 (medical_downgrade / investment_downgrade / legal_downgrade)
+    keywords: tuple[str, ...]
+    message: str
+
+
+SAFETY_REFERRALS: list[SafetyReferral] = [
+    SafetyReferral(
+        flag="medical_downgrade",
+        keywords=tuple(MEDICAL_KEYWORDS),
+        message=MEDICAL_DOWNGRADE_MSG,
+    ),
+    SafetyReferral(
+        flag="investment_downgrade",
+        keywords=tuple(INVESTMENT_KEYWORDS),
+        message=INVESTMENT_DOWNGRADE_MSG,
+    ),
+    SafetyReferral(
+        flag="legal_downgrade",
+        keywords=tuple(LEGAL_KEYWORDS),
+        message=LEGAL_DOWNGRADE_MSG,
+    ),
+]
+
+
+# ── 输出模型 ────────────────────────────────────────────────────────────
 
 @dataclass
 class RealityWarning:
     """单项现实警告。"""
-    dimension: str          # cash / contract / commute / health / qualification / dependents / backup
-    severity: str           # low / medium / high
-    message: str            # 人类可读警告文本
-    signal_adjusted: Optional[str] = None  # 调整后的建议文本
+    dimension: str
+    severity: str
+    message: str
+    signal_adjusted: str | None = None
+    rule_id: str | None = None  # Sprint 1.6: 关联规则 ID
 
 
 @dataclass
@@ -30,22 +253,22 @@ class RealityResult:
     """现实条件校正输出。"""
     has_warnings: bool
     warnings: list[RealityWarning]
-    # 调整后的行动建议（命理结论 + 现实调整）
     adjusted_advice: list[str]
-    # 核心结论：一句话
     core_conclusion: str
-    # 各维度判断
     dimension_judgments: dict[str, str] = field(default_factory=dict)
+    safety_flags: list[str] = field(default_factory=list)  # Sprint 1.6
+    safety_messages: list[str] = field(default_factory=list)
 
+
+# ── 引擎主入口 ──────────────────────────────────────────────────────────
 
 class RealityConstraintEngine:
-    """现实条件校正引擎。"""
+    """现实条件校正引擎 (Sprint 1.6: 声明式 + 安全转介)。"""
 
-    # 命理信号维度 → 现实约束维度的映射关系
     SIGNAL_TO_CONSTRAINT_MAP = {
+        # 保留向后兼容 — 旧字段映射
         "career_independence": ["cash_reserve_months", "has_backup_plan"],
         "career_pressure": ["cash_reserve_months", "has_dependents"],
-        "career_favorable": ["cash_reserve_months"],
         "wealth_opportunity": ["cash_reserve_months", "has_formal_contract"],
         "relationship_attraction": ["has_dependents"],
         "marriage_stability": ["has_dependents"],
@@ -56,92 +279,61 @@ class RealityConstraintEngine:
     def evaluate(
         self,
         signals: list[DivinationSignal],
-        constraints: Optional[RealityConstraints],
+        constraints: RealityConstraints | None,
+        question: str | None = None,  # Sprint 1.6: 用于安全转介关键词扫描
         domain: str = "general",
     ) -> RealityResult:
         """主评估入口。
 
         Args:
             signals: 标准化后的多法信号列表
-            constraints: 现实条件约束（可 None）
-            domain: 当前判断领域 (career/wealth/relationship/health/decision)
+            constraints: 现实条件约束 (可 None)
+            question: 原始问题 (用于扫描 SAFE 关键词)
+            domain: 当前判断领域
+
+        Returns:
+            RealityResult
         """
-        if constraints is None:
-            return self._empty_result()
-
         warnings: list[RealityWarning] = []
-        adjusted_advice: list[str] = []
         judgments: dict[str, str] = {}
+        safety_flags: list[str] = []
+        safety_messages: list[str] = []
 
-        # ── 现金储备判断 ──────────────────────────────────────────
-        if constraints.cash_reserve_months is not None:
-            judgment, warning = self._evaluate_cash(
-                constraints.cash_reserve_months, signals, domain
-            )
-            judgments["cash"] = judgment
-            if warning:
-                warnings.append(warning)
+        # ── 1. 声明式 rules 评估 ──
+        if constraints is not None:
+            for rule in CONSTRAINT_RULES:
+                if not rule.matches(constraints):
+                    continue
+                if rule.requires_signal is not None and not rule.requires_signal(signals):
+                    continue
+                # 字段格式化
+                try:
+                    field_val = getattr(constraints, rule.field, None)
+                    msg = rule.message.format(**{rule.field: field_val})
+                except (KeyError, IndexError):
+                    msg = rule.message
+                warnings.append(RealityWarning(
+                    dimension=rule.field,
+                    severity=rule.severity,
+                    message=msg,
+                    signal_adjusted=rule.advice,
+                    rule_id=rule.id,
+                ))
+                judgments[rule.field] = msg
 
-        # ── 合同状态判断 ──────────────────────────────────────────
-        if constraints.has_formal_contract is not None:
-            judgment, warning = self._evaluate_contract(
-                constraints.has_formal_contract, signals, domain
-            )
-            judgments["contract"] = judgment
-            if warning:
-                warnings.append(warning)
+        # ── 2. 安全转介 (Sprint 1.6 新) ──
+        if question:
+            for referral in SAFETY_REFERRALS:
+                for kw in referral.keywords:
+                    if kw in question:
+                        if referral.flag not in safety_flags:
+                            safety_flags.append(referral.flag)
+                            safety_messages.append(referral.message)
+                        break  # 一个 referral flag 只加一次
 
-        # ── 通勤/搬迁判断 ─────────────────────────────────────────
-        if constraints.target_city and constraints.current_city:
-            judgment, warning = self._evaluate_relocation(
-                constraints.target_city, constraints.current_city,
-                constraints.commute_tolerance, signals, domain
-            )
-            judgments["relocation"] = judgment
-            if warning:
-                warnings.append(warning)
-
-        # ── 健康状态判断 ──────────────────────────────────────────
-        if constraints.health_status is not None:
-            judgment, warning = self._evaluate_health(
-                constraints.health_status, signals, domain
-            )
-            judgments["health"] = judgment
-            if warning:
-                warnings.append(warning)
-
-        # ── 资质/证书判断 ─────────────────────────────────────────
-        if constraints.has_qualification is not None:
-            judgment, warning = self._evaluate_qualification(
-                constraints.has_qualification, signals, domain
-            )
-            judgments["qualification"] = judgment
-            if warning:
-                warnings.append(warning)
-
-        # ── 家庭依赖判断 ──────────────────────────────────────────
-        if constraints.has_dependents is not None:
-            judgment, warning = self._evaluate_dependents(
-                constraints.has_dependents, signals, domain
-            )
-            judgments["dependents"] = judgment
-            if warning:
-                warnings.append(warning)
-
-        # ── 备选方案判断 ──────────────────────────────────────────
-        if constraints.has_backup_plan is not None:
-            judgment, warning = self._evaluate_backup(
-                constraints.has_backup_plan, signals, domain
-            )
-            judgments["backup"] = judgment
-            if warning:
-                warnings.append(warning)
-
-        # ── 生成调整建议 ──────────────────────────────────────────
-        adjusted_advice = self._build_adjusted_advice(warnings, signals, domain)
-
-        # ── 核心结论 ──────────────────────────────────────────────
-        core_conclusion = self._build_core_conclusion(warnings, domain)
+        # ── 3. 调整建议 + 核心结论 ──
+        adjusted_advice = self._build_adjusted_advice(warnings)
+        core_conclusion = self._build_core_conclusion(warnings)
 
         return RealityResult(
             has_warnings=len(warnings) > 0,
@@ -149,249 +341,59 @@ class RealityConstraintEngine:
             adjusted_advice=adjusted_advice,
             core_conclusion=core_conclusion,
             dimension_judgments=judgments,
+            safety_flags=safety_flags,
+            safety_messages=safety_messages,
         )
 
-    def _empty_result(self) -> RealityResult:
-        return RealityResult(
-            has_warnings=False,
-            warnings=[],
-            adjusted_advice=[],
-            core_conclusion="",
-            dimension_judgments={},
-        )
-
-    # ── 子判断 ─────────────────────────────────────────────────────────────────
-
-    def _evaluate_cash(
-        self, months: int, signals: list[DivinationSignal], domain: str,
-    ) -> tuple[str, RealityWarning | None]:
-        """现金储备判断。"""
-        # 查找财运相关信号
-        wealth_signals = [s for s in signals if "wealth" in s.domain or "career" in s.domain]
-        favorable = any(s.polarity == "positive" and s.strength > 0.6 for s in wealth_signals)
-
-        if months <= 1:
-            judgment = "现金极度紧张，仅有不到1个月储备"
-            warning = RealityWarning(
-                dimension="cash",
-                severity="high",
-                message="现金储备严重不足（不足1个月生活费），建议先保障基本生存再考虑变动。",
-                signal_adjusted="短期内不宜做重大变动，优先积累现金储备。",
-            )
-        elif months <= 3:
-            judgment = "现金储备偏低，低于3个月"
-            warning = RealityWarning(
-                dimension="cash",
-                severity="medium",
-                message=f"现金储备仅{months}个月，处于风险区间。新机会需确认资金到位时间。",
-                signal_adjusted="确认新收入来源前，不建议仓促离职或创业。",
-            )
-        elif months >= 12 and favorable:
-            judgment = "现金储备充裕（12个月以上），可承受一定风险"
-            warning = None
-        else:
-            judgment = f"现金储备{months}个月，中等水平"
-            warning = None
-
-        return judgment, warning
-
-    def _evaluate_contract(
-        self, has_contract: bool, signals: list[DivinationSignal], domain: str,
-    ) -> tuple[str, RealityWarning | None]:
-        """合同状态判断。"""
-        career_signals = [s for s in signals if "career" in s.domain]
-        favorable = any(s.polarity == "positive" and s.strength > 0.5 for s in career_signals)
-
-        if not has_contract and favorable:
-            judgment = "仅有口头 offer，尚无正式合同"
-            warning = RealityWarning(
-                dimension="contract",
-                severity="high",
-                message="口头 offer 阶段风险较高，命理显示有机会但合同未落定前不宜做重大决定。",
-                signal_adjusted="建议等正式合同签署后再做离职决定，不宜在口头承诺阶段裸辞。",
-            )
-        elif has_contract:
-            judgment = "已有正式书面合同，保障充分"
-            warning = None
-        else:
-            judgment = "未提供合同状态信息"
-            warning = None
-
-        return judgment, warning
-
-    def _evaluate_relocation(
-        self, target: str, current: str, tolerance: Optional[str],
-        signals: list[DivinationSignal], domain: str,
-    ) -> tuple[str, RealityWarning | None]:
-        """搬迁/通勤判断。"""
-        if target == current:
-            return "无需搬迁，不涉及地点变化", None
-
-        judgment = f"涉及从{current}到{target}的搬迁"
-        if tolerance == "reject":
-            warning = RealityWarning(
-                dimension="commute",
-                severity="high",
-                message=f"目标地点{target}超出通勤接受范围，需要搬迁。",
-                signal_adjusted="如必须搬迁，建议先确认新地点的住房和工作条件再决定。",
-            )
-        elif tolerance == "negotiable":
-            warning = RealityWarning(
-                dimension="commute",
-                severity="medium",
-                message=f"搬迁至{target}需要适应新环境，目前有调整空间。",
-                signal_adjusted="搬迁后需留意适应期，保持弹性。",
-            )
-        else:
-            warning = RealityWarning(
-                dimension="commute",
-                severity="low",
-                message=f"接受搬迁至{target}，机遇与挑战并存。",
-                signal_adjusted=None,
-            )
-
-        return judgment, warning
-
-    def _evaluate_health(
-        self, status: str, signals: list[DivinationSignal], domain: str,
-    ) -> tuple[str, RealityWarning | None]:
-        """健康状态判断。"""
-        health_signals = [s for s in signals if "health" in s.domain]
-
-        if status == "poor":
-            judgment = "当前健康状况较差"
-            warning = RealityWarning(
-                dimension="health",
-                severity="high",
-                message="健康状况不佳，高压力变动可能加剧身体负担。",
-                signal_adjusted="建议先将健康恢复到fair水平再考虑重大事业变动。",
-            )
-        elif status == "fair":
-            judgment = "当前健康状况一般，需留意"
-            warning = RealityWarning(
-                dimension="health",
-                severity="medium",
-                message="健康状况一般，高强度变动需注意休息和调整节奏。",
-                signal_adjusted="变动期间保持规律作息，避免过度劳累。",
-            )
-        else:
-            judgment = "当前健康状况良好"
-            warning = None
-
-        return judgment, warning
-
-    def _evaluate_qualification(
-        self, has_qual: bool, signals: list[DivinationSignal], domain: str,
-    ) -> tuple[str, RealityWarning | None]:
-        """资质/证书判断。"""
-        career_signals = [s for s in signals if "career" in s.domain]
-        favorable = any(s.polarity == "positive" for s in career_signals)
-
-        if not has_qual and favorable:
-            judgment = "缺乏目标方向的资质/证书"
-            warning = RealityWarning(
-                dimension="qualification",
-                severity="medium",
-                message="命理显示有机会，但当前尚不具备相应资质，实现路径需补足。",
-                signal_adjusted="建议先获取必要资质（证书/许可），再进入新领域。",
-            )
-        elif has_qual:
-            judgment = "具备目标方向所需资质"
-            warning = None
-        else:
-            judgment = "未提供资质信息"
-            warning = None
-
-        return judgment, warning
-
-    def _evaluate_dependents(
-        self, has_deps: bool, signals: list[DivinationSignal], domain: str,
-    ) -> tuple[str, RealityWarning | None]:
-        """家庭依赖判断。"""
-        wealth_signals = [s for s in signals if "wealth" in s.domain]
-        favorable = any(s.polarity == "positive" and s.strength > 0.6 for s in wealth_signals)
-
-        if has_deps and not favorable:
-            judgment = "有家庭依赖，但当前财运信号偏弱"
-            warning = RealityWarning(
-                dimension="dependents",
-                severity="high",
-                message="有抚养责任，且当前财运信号不足，变动可能影响家庭稳定。",
-                signal_adjusted="变动方案需优先考虑家庭保障，不宜冒进。",
-            )
-        elif has_deps:
-            judgment = "有家庭依赖，需平衡家庭与事业"
-            warning = RealityWarning(
-                dimension="dependents",
-                severity="low",
-                message="有家庭依赖，变动决定需考虑家庭安排。",
-                signal_adjusted="确保变动方案不严重影响家庭生活质量。",
-            )
-        else:
-            judgment = "无家庭依赖，变动自由度较高"
-            warning = None
-
-        return judgment, warning
-
-    def _evaluate_backup(
-        self, has_backup: bool, signals: list[DivinationSignal], domain: str,
-    ) -> tuple[str, RealityWarning | None]:
-        """备选方案判断。"""
-        decision_signals = [s for s in signals if s.domain == "decision"]
-        favorable = any(s.polarity == "positive" and s.strength > 0.6 for s in decision_signals)
-
-        if not has_backup and favorable:
-            judgment = "缺乏备选方案/退路"
-            warning = RealityWarning(
-                dimension="backup",
-                severity="medium",
-                message="命理显示有机会但无退路，高风险。机会窗口存在时，建议同步准备备选方案。",
-                signal_adjusted="不要把所有资源押在单一方向，同时建立备选退路。",
-            )
-        elif has_backup:
-            judgment = "有备选方案/退路，风险可控"
-            warning = None
-        else:
-            judgment = "未提供备选方案信息"
-            warning = None
-
-        return judgment, warning
-
-    # ── 输出构建 ─────────────────────────────────────────────────────────────────
-
-    def _build_adjusted_advice(
-        self, warnings: list[RealityWarning],
-        signals: list[DivinationSignal], domain: str,
-    ) -> list[str]:
-        """从警告生成调整后的行动建议。"""
-        advice = []
-        high_severity = [w for w in warnings if w.severity == "high"]
-        medium_severity = [w for w in warnings if w.severity == "medium"]
-
-        for w in high_severity:
-            if w.signal_adjusted:
+    def _build_adjusted_advice(self, warnings: list[RealityWarning]) -> list[str]:
+        advice: list[str] = []
+        for w in warnings:
+            if w.severity == "high" and w.signal_adjusted:
                 advice.append(w.signal_adjusted)
-            else:
-                advice.append(w.message)
-
-        for w in medium_severity:
-            if w.signal_adjusted:
+        for w in warnings:
+            if w.severity == "medium" and w.signal_adjusted:
                 advice.append(w.signal_adjusted)
-
-        # 如果没有现实警告，追加一条通用建议
         if not advice:
-            advice.append("现实条件暂无明显阻碍，可按命理建议推进。")
-
+            advice.append("现实条件暂无明显阻碍, 可按命理建议推进。")
         return advice
 
-    def _build_core_conclusion(
-        self, warnings: list[RealityWarning], domain: str,
-    ) -> str:
-        """生成一句话核心结论。"""
+    def _build_core_conclusion(self, warnings: list[RealityWarning]) -> str:
         if not warnings:
-            return "现实条件支持当前方向，可以积极推进。"
-
+            return "现实条件支持当前方向, 可以积极推进。"
         high = [w for w in warnings if w.severity == "high"]
         if high:
-            return f"命理层信号有利，但现实条件存在 {len(high)} 项高风险，需谨慎处理。"
-        return f"命理层信号有利，但现实条件有 {len(warnings)} 项需关注，建议审慎推进。"
+            return f"命理层信号有利, 但现实条件存在 {len(high)} 项高风险, 需谨慎处理。"
+        return f"命理层信号有利, 但现实条件有 {len(warnings)} 项需关注, 建议审慎推进。"
+
+
+# ── 便捷 API ─────────────────────────────────────────────────────────
+
+def check_safety_referral(question: str) -> list[str]:
+    """仅检查问题是否触发安全转介 (不跑完整 reality 评估)。
+
+    Returns:
+        list of triggered safety flag names
+    """
+    flags: list[str] = []
+    for r in SAFETY_REFERRALS:
+        for kw in r.keywords:
+            if kw in question:
+                if r.flag not in flags:
+                    flags.append(r.flag)
+                break
+    return flags
+
+
+def list_active_rules() -> list[dict[str, Any]]:
+    """列出所有启用规则 (供 admin/debug)。"""
+    return [
+        {
+            "id": r.id,
+            "field": r.field,
+            "op": r.op,
+            "value": r.value,
+            "severity": r.severity,
+            "message": r.message,
+        }
+        for r in CONSTRAINT_RULES
+    ]

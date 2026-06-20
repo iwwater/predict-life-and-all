@@ -11,12 +11,9 @@
 """
 import logging
 from datetime import date as date_cls
-from datetime import timedelta
-from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Query
-from lunar_python import Solar, Lunar
-from pydantic import BaseModel, Field
+from lunar_python import Solar
 
 router = APIRouter()
 log = logging.getLogger("almanac")
@@ -64,7 +61,7 @@ BRANCH_ANIMAL: dict[str, str] = {
 }
 
 
-def _parse_date(s: Optional[str]) -> date_cls:
+def _parse_date(s: str | None) -> date_cls:
     if not s:
         return date_cls.today()
     try:
@@ -273,7 +270,7 @@ def _jie_qi_note(jie_qi: str, jie: str) -> str:
 
 @router.get("/almanac")
 def get_almanac(
-    date: Optional[str] = Query(None, description="YYYY-MM-DD; defaults to today"),
+    date: str | None = Query(None, description="YYYY-MM-DD; defaults to today"),
 ):
     """返回单日完整老黄历数据."""
     d = _parse_date(date)

@@ -5,12 +5,11 @@
 """
 from __future__ import annotations
 
-from dataclasses import replace
-from typing import Any, Optional
+from typing import Any
 
 from divination.contracts import Birth
-from .selector import ALL_METHODS
 
+from .selector import ALL_METHODS
 
 # ── 术法输入画像 ────────────────────────────────────────────────────────────────
 # 每种术法声明：需要哪些 Birth 字段、是否需要空间数据、支持的模式等
@@ -184,12 +183,15 @@ INPUT_PROFILES: dict[str, dict[str, Any]] = {
 
 
 def build_method_inputs(
-    birth: Optional[Birth],
-    target_birth: Optional[Birth],
-    space: Optional[Any],
-    method_options: Optional[dict[str, Any]],
+    birth: Birth | None,
+    target_birth: Birth | None,
+    space: Any | None,
+    method_options: dict[str, Any] | None,
     question: str,
     goal: str,
+    intent: dict[str, Any] | None = None,
+    situation: Any | None = None,
+    user_selections: dict[str, Any] | None = None,
 ) -> dict[str, Birth]:
     """为每种术法构造专属的 Birth 对象。
 
@@ -202,11 +204,23 @@ def build_method_inputs(
         method_options: 前端传来的术法选项（liuyao_mode, tarot_spread 等）
         question: 用户问题
         goal: 分析目标
+        intent: Sprint 1.1 — classify_intent() 返回的 dict (含 fsm_trace, flags 等)
+        situation: Sprint 1.3 — SituationContext (人事时地境限)
+        user_selections: Sprint 1.7 — 用户在追问中已选/已答的 (key → value)
 
     Returns:
         {method_name: Birth} — 每个术法一个定制 Birth
     """
-    opts = method_options or {}
+    opts = dict(method_options or {})
+
+    # Sprint 1.4: 注入 context meta (intent / situation / user_selections)
+    # 用下划线前缀避免与用户 method_options 冲突
+    if intent is not None:
+        opts["_intent"] = intent
+    if situation is not None:
+        opts["_situation"] = situation
+    if user_selections is not None:
+        opts["_user_selections"] = user_selections
 
     # 从 space 提取风水相关字段
     sitting = getattr(space, "sitting", None) if space else None
@@ -244,7 +258,7 @@ def build_method_inputs(
 
         # 决定用哪个出生
         needs_birth = profile.get("needs_birth", True)
-        use_birth: Optional[Birth] = None
+        use_birth: Birth | None = None
 
         if needs_birth is True:
             use_birth = birth if birth else _default_birth
@@ -383,7 +397,7 @@ def _pick_fields(source: Birth, fields: list[str]) -> Birth:
     return Birth(**kwargs)
 
 
-def _resolve_mode(method: str, opts: dict, profile: dict) -> Optional[str]:
+def _resolve_mode(method: str, opts: dict, profile: dict) -> str | None:
     """解析术法运行模式。"""
     if method == "liuyao":
         return opts.get("liuyao_mode", profile.get("default_mode", "time_qigua"))
@@ -391,7 +405,7 @@ def _resolve_mode(method: str, opts: dict, profile: dict) -> Optional[str]:
         return opts.get("meihua_mode", profile.get("default_mode", "time_qigua"))
     if method == "tarot":
         return opts.get("tarot_mode", profile.get("default_mode", "reflective"))
-    return profile.get("default_mode", None)
+    return profile.get("default_mode")
 
 
 def _question_seed(question: str) -> str:

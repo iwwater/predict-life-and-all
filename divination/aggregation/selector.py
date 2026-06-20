@@ -9,7 +9,7 @@ SEL-015: 少于 18 法时直接报错 (legacy 旁路下 12 法)
 """
 from __future__ import annotations
 
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 Tier = Literal["primary", "secondary", "reference"]
 
@@ -165,8 +165,8 @@ _GOAL_TIER_CONFIG: dict[str, dict[str, list[str]]] = {
 
 
 def select_methods(
-    goal: Optional[str] = None,
-    user_methods: Optional[list[str]] = None,
+    goal: str | None = None,
+    user_methods: list[str] | None = None,
     include_legacy_18: bool = True,
 ) -> list[dict[str, Any]]:
     """根据 goal 返回全部术法及其 tier 标记。
@@ -278,7 +278,7 @@ def get_methods_by_dim(methods: list[str]) -> dict[str, list[str]]:
     return out
 
 
-def get_dimension_for_method(method: str) -> Optional[str]:
+def get_dimension_for_method(method: str) -> str | None:
     """返回该方法所属的 5 维, 如有多个 (八字/紫微/西占/吠陀) 优先 current_cycle。"""
     if method in ("bazi_v2", "ziwei", "western", "vedic"):
         return "current_cycle"  # 多维方法, signal 会按 context 切

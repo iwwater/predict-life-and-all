@@ -12,10 +12,6 @@ Core features:
 4. Single-status analysis — understanding one's relationship patterns
 """
 
-from dataclasses import dataclass, field
-from typing import Any, Optional
-import math
-from collections import Counter
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
@@ -289,7 +285,7 @@ def _interpret_peach_blossom(score: float, level: str) -> str:
 
 # ── Timing Windows ───────────────────────────────────────────────────────────
 
-def compute_relationship_timing(raw: dict, timeline: Optional[list] = None) -> dict:
+def compute_relationship_timing(raw: dict, timeline: list | None = None) -> dict:
     """Identify best timing windows for relationships.
 
     Returns ranked periods with relationship opportunity scores.

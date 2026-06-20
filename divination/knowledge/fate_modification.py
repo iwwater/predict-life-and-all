@@ -24,10 +24,7 @@ and lifestyle adjustments — much like a weather forecast helps you decide
 when to bring an umbrella.
 """
 
-from dataclasses import dataclass, field
-from typing import Any, Optional
-import math
-
+from dataclasses import dataclass
 
 # ── Five Element Remedies ────────────────────────────────────────────────────
 
@@ -421,7 +418,7 @@ class ModificationPlan:
     summary: str
 
 
-def generate_plan(chart_result, known_facts: Optional[dict] = None) -> dict:
+def generate_plan(chart_result, known_facts: dict | None = None) -> dict:
     """Generate a comprehensive fate modification plan from chart data.
 
     Args:
