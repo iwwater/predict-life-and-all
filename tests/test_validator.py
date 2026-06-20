@@ -10,7 +10,9 @@ import pytest
 from divination.aggregation.schema import (
     ConflictItem,
     ConsensusItem,
+    DimensionPolarity,
     DivinationSignal,
+    ScopeTally,
     ValidationResult,
 )
 from divination.aggregation.validator import (
@@ -19,8 +21,6 @@ from divination.aggregation.validator import (
     _compute_weighted_stats,
     _detect_consensus_by_weight,
     _detect_conflicts_by_weight,
-    _compute_overall_score,
-    _compute_confidence,
     _extract_risks,
     _extract_timing,
     _extract_action_advice,
@@ -86,7 +86,8 @@ class TestConsensusDetection:
         result = validate_signals(signals, DEFAULT_WEIGHTS)
         # May or may not have consensus — depends on weighted strength
         # The key is: validate doesn't crash
-        assert result.overall_score >= 0
+        assert isinstance(result.dimension_polarity, dict)
+        assert isinstance(result.tally_by_scope, dict)
 
     def test_mixed_polarities_dont_form_consensus(self):
         signals = [
@@ -181,9 +182,13 @@ class TestOverallScore:
             _sig("qimen", "wealth", "wealth_growth", "positive", 0.8, 0.7),
         ]
         result = validate_signals(pos_signals, DEFAULT_WEIGHTS)
-        assert result.overall_score > 55, (
-            f"Positive signals should raise score above 55, got {result.overall_score}"
-        )
+        # VAL-017: 正向多时 polarity 应为 STRONG/WEAK_SUPPORT (替代原 overall_score>55)
+        # 信号未设 dimension, 落到 long_term 桶(Sprint 0.1 — 替代 _unspecified 兜底)
+        assert "long_term" in result.dimension_polarity
+        assert result.dimension_polarity["long_term"] in (
+            DimensionPolarity.STRONG_SUPPORT,
+            DimensionPolarity.WEAK_SUPPORT,
+        ), f"Positive signals should give support polarity, got {result.dimension_polarity['long_term']}"
 
     def test_negative_signals_lower_score(self):
         neg_signals = [
@@ -192,9 +197,12 @@ class TestOverallScore:
             _sig("qimen", "wealth", "wealth_risk", "negative", 0.8, 0.7),
         ]
         result = validate_signals(neg_signals, DEFAULT_WEIGHTS)
-        assert result.overall_score < 50, (
-            f"Negative signals should lower score below 50, got {result.overall_score}"
-        )
+        # VAL-017: 负向多时 polarity 应为 STRONG/WEAK_WARN (替代原 overall_score<50)
+        assert "long_term" in result.dimension_polarity
+        assert result.dimension_polarity["long_term"] in (
+            DimensionPolarity.STRONG_WARN,
+            DimensionPolarity.WEAK_WARN,
+        ), f"Negative signals should give warn polarity, got {result.dimension_polarity['long_term']}"
 
     def test_more_positive_means_higher_score(self):
         few_pos = [
@@ -209,8 +217,17 @@ class TestOverallScore:
         ]
         few_result = validate_signals(few_pos, DEFAULT_WEIGHTS)
         many_result = validate_signals(many_pos, DEFAULT_WEIGHTS)
-        assert many_result.overall_score > few_result.overall_score, (
-            f"More positive signals should yield higher score: {many_result.overall_score} vs {few_result.overall_score}"
+        # VAL-017: 更多正向信号应该让 polarity 倾向 support (替代原 overall_score 比较)
+        # 通过"支持票 - 警示票"差值比较倾向强度
+        def support_score(v):
+            score = 0
+            for t in v.tally_by_scope.values():
+                score += t.strong_support + t.weak_support
+                score -= t.strong_warn + t.weak_warn
+            return score
+        assert support_score(many_result) > support_score(few_result), (
+            f"More positive signals should yield higher support score: "
+            f"{support_score(many_result)} vs {support_score(few_result)}"
         )
 
     def test_consensus_raises_score(self):
@@ -226,12 +243,20 @@ class TestOverallScore:
         ]
         r_consensus = validate_signals(signals_with_consensus, DEFAULT_WEIGHTS)
         r_no_consensus = validate_signals(signals_no_consensus, DEFAULT_WEIGHTS)
-        assert r_consensus.overall_score > r_no_consensus.overall_score, (
-            f"Consensus should raise score: {r_consensus.overall_score} vs {r_no_consensus.overall_score}"
+        # VAL-017: 有共识的应该 polarity 更倾向 support (替代原 overall_score 比较)
+        def support_score(v):
+            score = 0
+            for t in v.tally_by_scope.values():
+                score += t.strong_support + t.weak_support
+                score -= t.strong_warn + t.weak_warn
+            return score
+        assert support_score(r_consensus) > support_score(r_no_consensus), (
+            f"Consensus should raise support score: "
+            f"{support_score(r_consensus)} vs {support_score(r_no_consensus)}"
         )
 
     def test_score_in_valid_range(self):
-        """Score must be 0-100."""
+        """polarity 必须是有效 DimensionPolarity 枚举值（替代原 overall_score 0-100 范围检查）。"""
         signals = [
             _sig("bazi_v2", "career", "career_stability", "positive", 0.99, 0.99),
             _sig("ziwei", "career", "career_stability", "positive", 0.99, 0.99),
@@ -240,7 +265,9 @@ class TestOverallScore:
             _sig("liuyao", "career", "career_stability", "negative", 0.99, 0.99),
         ]
         result = validate_signals(signals, DEFAULT_WEIGHTS)
-        assert 0 <= result.overall_score <= 100, f"Score out of range: {result.overall_score}"
+        valid_polarities = set(DimensionPolarity)
+        for dim, pol in result.dimension_polarity.items():
+            assert pol in valid_polarities, f"Invalid polarity for {dim}: {pol}"
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -248,7 +275,9 @@ class TestOverallScore:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 class TestConfidence:
-    """VAL-018: 共识多、冲突少时 confidence 更高。"""
+    """VAL-018: 共识多、冲突少时 consistency 更高 (替代原 confidence 数值)。
+    替代方案：用 tally_by_scope 的支持票总数与 consensus/conflicts 数量做综合判断。
+    """
 
     def test_more_consensus_higher_confidence(self):
         signals_consensus = [
@@ -265,8 +294,13 @@ class TestConfidence:
         ]
         r_low = validate_signals(signals_scattered, DEFAULT_WEIGHTS)
 
-        assert r_high.confidence > r_low.confidence, (
-            f"More consensus should give higher confidence: {r_high.confidence} vs {r_low.confidence}"
+        # 替代原 r_high.confidence > r_low.confidence：
+        # 共识多者应有更多支持票
+        def support_votes(v):
+            return sum(t.strong_support + t.weak_support for t in v.tally_by_scope.values())
+        assert support_votes(r_high) > support_votes(r_low), (
+            f"More consensus should give more support votes: "
+            f"{support_votes(r_high)} vs {support_votes(r_low)}"
         )
 
     def test_fewer_conflicts_higher_confidence(self):
@@ -285,24 +319,34 @@ class TestConfidence:
         ]
         r_conflict = validate_signals(signals_with_conflict, DEFAULT_WEIGHTS)
         r_clean = validate_signals(signals_no_conflict, DEFAULT_WEIGHTS)
-        assert r_clean.confidence >= r_conflict.confidence * 0.8, (
-            f"Fewer conflicts should not drastically reduce confidence: {r_clean.confidence} vs {r_conflict.confidence}"
+        # 替代原 r_clean.confidence >= r_conflict.confidence * 0.8：
+        # 无冲突组的支持票应不少于有冲突组的 80%
+        def support_votes(v):
+            return sum(t.strong_support + t.weak_support for t in v.tally_by_scope.values())
+        assert support_votes(r_clean) >= support_votes(r_conflict) * 0.8, (
+            f"Fewer conflicts should not drastically reduce support: "
+            f"{support_votes(r_clean)} vs {support_votes(r_conflict)}"
         )
 
-    def test_confidence_level_is_valid(self):
-        """VAL-011: confidence_level 必须是 low/medium/medium_high/high。"""
+    def test_dimension_polarity_is_valid(self):
+        """VAL-011: dimension_polarity 每维的 polarity 必须是有效 DimensionPolarity 枚举值。"""
         signals = [
             _sig("bazi_v2", "career", "career_stability", "positive", 0.7, 0.6),
         ]
         result = validate_signals(signals, DEFAULT_WEIGHTS)
-        assert result.confidence_level in ("low", "medium", "medium_high", "high"), (
-            f"Invalid confidence_level: {result.confidence_level}"
-        )
+        valid = set(DimensionPolarity)
+        for dim, pol in result.dimension_polarity.items():
+            assert pol in valid, f"VAL-011 FAIL: invalid polarity for {dim}: {pol}"
 
-    def test_confidence_0_to_100(self):
-        signals = [_sig("bazi_v2", "career", "career_stability", "positive", 0.5, 0.5)]
+    def test_polarity_keys_are_dimensions(self):
+        """VAL-011: dimension_polarity 的键必须是 5 个职责维度或 _unspecified。"""
+        signals = [
+            _sig("bazi_v2", "career", "career_stability", "positive", 0.7, 0.6),
+        ]
         result = validate_signals(signals, DEFAULT_WEIGHTS)
-        assert 0 <= result.confidence <= 100, f"Confidence out of range: {result.confidence}"
+        valid_dims = {"long_term", "current_cycle", "relationship", "one_question", "space", "_unspecified"}
+        for dim in result.dimension_polarity:
+            assert dim in valid_dims, f"Unknown dimension: {dim}"
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

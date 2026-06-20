@@ -14,10 +14,8 @@ Architecture:
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Optional
-import math
-from ..contracts import Birth, ChartResult
 
+from ..contracts import ChartResult
 
 # ── Five Element Constants ──────────────────────────────────────────────────
 
@@ -825,21 +823,32 @@ def validate_charts(charts: list[ChartResult], subject: str = "self_life") -> di
     """Run cross-validation and return serializable results.
 
     This is the main public function. Call it with charts from multiple
-    divination systems to get cross-validated confidence scores.
+    divination systems to get cross-validated results.
 
     Returns dict suitable for API response.
+    输出 polarity 改用 DimensionPolarity 五档枚举(替代 0-100 连续 confidence_level),
+    与聚合层 Sprint 0.1 的"档位制"红线保持一致。
     """
+    from ..aggregation.schema import DimensionPolarity
     ensemble = compute_ensemble(charts, subject)
+
+    # 五档极性映射(从内部 0-100 overall_confidence 派生)
+    oc = ensemble.overall_confidence
+    if oc >= 75:
+        polarity = DimensionPolarity.STRONG_SUPPORT.value
+    elif oc >= 60:
+        polarity = DimensionPolarity.WEAK_SUPPORT.value
+    elif oc >= 40:
+        polarity = DimensionPolarity.NEUTRAL.value
+    elif oc >= 25:
+        polarity = DimensionPolarity.WEAK_WARN.value
+    else:
+        polarity = DimensionPolarity.STRONG_WARN.value
 
     return {
         "method": "cross_validator",
         "systems_checked": len(charts),
-        "overall_confidence": ensemble.overall_confidence,
-        "confidence_level": (
-            "高" if ensemble.overall_confidence >= 75
-            else "中" if ensemble.overall_confidence >= 55
-            else "低"
-        ),
+        "dimension_polarity": polarity,
         "agreement_ratio": (
             sum(1 for c in ensemble.cross_checks if c.agree) /
             max(1, len(ensemble.cross_checks))

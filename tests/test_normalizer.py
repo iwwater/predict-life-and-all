@@ -60,6 +60,8 @@ class TestSignalKeysWhitelist:
         "fengshui":        {"environment_support", "direction_benefit", "layout_risk"},
         "longterm":        {"long_term_potential", "short_term_caution"},
         "fallback":        {"general_reference"},
+        "current_cycle":   {"current_cycle_dasha"},  # Sprint 2.1
+        "progressions":    {"prog_timing_opportunity", "prog_timing_obstacle", "prog_timing_transition"},  # Sprint 2.2
     }
 
     def test_all_expected_keys_present(self):
@@ -76,7 +78,7 @@ class TestSignalKeysWhitelist:
         )
 
     def test_total_key_count(self):
-        assert len(SIGNAL_KEYS) == 28, f"Expected 28, got {len(SIGNAL_KEYS)}"
+        assert len(SIGNAL_KEYS) == 32, f"Expected 32 (28 + Sprint 2.1 current_cycle_dasha + 3 Sprint 2.2 prog_*), got {len(SIGNAL_KEYS)}"
 
 
 class TestDomainKeys:

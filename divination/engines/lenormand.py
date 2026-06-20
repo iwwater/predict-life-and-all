@@ -12,7 +12,6 @@
 
 import hashlib
 from datetime import date
-from typing import Optional
 
 from ..contracts import Birth, ChartResult
 

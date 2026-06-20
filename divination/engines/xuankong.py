@@ -1,7 +1,7 @@
-"""玄空飞星排盘 —— 文献：《沈氏玄空学》。需 period(运 1-9) + sitting(坐山)。
+﻿"""玄空飞星排盘 —— 文献：《沈氏玄空学》。需 period(运 1-9) + sitting(坐山)。
 用法：compute(birth, period=8, sitting='子')；运缺省按建造/起造年推。"""
 from ..contracts import Birth, ChartResult
-from ..fengshui import xuankong as _xk, san_yuan_jiu_yun
+from ..fengshui import san_yuan_jiu_yun, xuankong as _xk
 
 
 def compute(b: Birth, period: int | None = None, sitting: str = "子") -> ChartResult:

@@ -110,9 +110,8 @@ def _sample_result():
                     "resolution": "建议短期观望",
                 },
             ],
-            "overall_score": 72,
-            "confidence": 0.75,
-            "confidence_level": "medium_high",
+            "tally_by_scope": {"long_term": {"scope": "long_term", "strong_support": 3, "weak_support": 1, "neutral": 0, "weak_warn": 0, "strong_warn": 0, "supporting_methods": ["bazi_v2"], "warning_methods": [], "summary": "支持"}},
+            "dimension_polarity": {"long_term": "strong_support"},
             "risks": ["仓促决策可能导致后悔", "行业不确定性较高"],
             "timing": {"summary": "未来3-6个月为关键窗口期", "optimal_window": "2025Q1"},
             "action_advice": ["观望1-2个月", "提升专业技能", "关注行业动态"],
@@ -178,10 +177,14 @@ class TestBuildReadingPrompt:
         assert "分歧" in prompt or "冲突" in prompt or "六爻" in prompt
 
     def test_prompt_contains_score(self):
-        """LLM-001: Prompt 包含综合评分"""
+        """LLM-001: Prompt 包含五档制计票/极性信息 (替代原综合评分)"""
         result = _sample_result()
         prompt = build_reading_prompt(result)
-        assert "72" in prompt  # score
+        # 新 schema: 包含"多术法计票"段落 + 五维极性
+        assert "多术法计票" in prompt, f"LLM-001: prompt missing tally section"
+        assert "strong_support" in prompt or "弱支持" in prompt, (
+            f"LLM-001: prompt missing polarity info"
+        )
 
     def test_prompt_free_depth_brief(self):
         """LLM-001: free 深度 prompt 不要求深度分析"""
@@ -217,10 +220,13 @@ class TestMockReport:
         assert len(report) > 100
 
     def test_mock_report_contains_score(self):
-        """LLM-006: Mock 报告包含评分"""
+        """LLM-006: Mock 报告包含五档制计票信息 (替代原综合评分数字)"""
         result = _sample_result()
         report = generate_mock_report(result)
-        assert "72" in report
+        # 新 schema: mock 报告改为显示"X 法支持 / Y 法警示"
+        assert "支持" in report and "警示" in report, (
+            f"LLM-006: mock report missing tally-based counts: {report[:300]}"
+        )
 
     def test_mock_report_contains_disclaimer(self):
         """LLM-006: Mock 报告包含免责声明"""

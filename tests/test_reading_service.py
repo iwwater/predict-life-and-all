@@ -84,10 +84,13 @@ class TestReadingServiceIntegration:
 
         # validation
         assert isinstance(result.validation, ValidationResult), "validation should be ValidationResult"
-        assert 0 <= result.validation.overall_score <= 100, f"Score out of range: {result.validation.overall_score}"
-        assert 0 <= result.validation.confidence <= 100, f"Confidence out of range: {result.validation.confidence}"
-        assert result.validation.confidence_level in ("low", "medium", "medium_high", "high"), (
-            f"Invalid confidence_level: {result.validation.confidence_level}"
+        # 五档制 (替代原 overall_score/confidence/confidence_level):
+        # 验证 tally_by_scope 是 dict、dimension_polarity 是 dict
+        assert isinstance(result.validation.tally_by_scope, dict), (
+            f"tally_by_scope should be dict, got {type(result.validation.tally_by_scope).__name__}"
+        )
+        assert isinstance(result.validation.dimension_polarity, dict), (
+            f"dimension_polarity should be dict, got {type(result.validation.dimension_polarity).__name__}"
         )
 
         # report — three tiers non-empty
