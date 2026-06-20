@@ -84,6 +84,7 @@ def houses(asc_lon: float, system: str = "whole") -> list[dict]:
 # ===== 以下为深度调查后新增并验证的部分 =====
 import math as _m
 
+
 def midheaven(ramc_deg: float, obliquity_deg: float = 23.4367) -> float:
     """天顶 MC 黄经。ramc=本地恒星时(度)。"""
     r = _m.radians(ramc_deg); e = _m.radians(obliquity_deg)

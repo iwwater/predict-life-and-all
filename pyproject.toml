@@ -39,3 +39,62 @@ pythonpath = ["."]
 filterwarnings = [
     "ignore:Using `httpx` with `starlette.testclient` is deprecated:starlette.exceptions.StarletteDeprecationWarning",
 ]
+markers = [
+    "golden: Golden tests for cross-validating classical literature tables",
+]
+
+# ── Ruff 配置 (Sprint 0.10) ──────────────────────────────────────────────────
+[tool.ruff]
+target-version = "py310"
+line-length = 110
+extend-exclude = [
+    "node_modules",
+    "apps/web/dist",
+    "skyfield_data",
+    "tmp",
+    "docs/*.pdf",
+    "docs/*.mobi",
+]
+
+[tool.ruff.lint]
+# Sprint 0.10 起步规则集 — 仅启用安全关键 + 风格基础, 避免一次性全开噪声过多
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort (import 排序)
+    "B",      # flake8-bugbear (常见 bug 模式)
+    "UP",     # pyupgrade (语法现代化)
+    "SIM",    # flake8-simplify
+    "RUF",    # ruff 自有规则
+]
+ignore = [
+    "E501",   # line-too-long (与 line-length 配置协同, 文档长行合理)
+    "B008",   # do not perform function calls in argument defaults (FastAPI Depends 常见)
+    "B905",   # zip() without explicit strict= (大量历史代码, 不强求)
+    "UP035",  # deprecated import (lunar_python 等老 API)
+    "RUF012", # mutable class attributes (Pydantic model 默认)
+    # ── CJK 文学性代码的合理字符 (Sprint 0.10 — 86% 的 violations 来源) ──
+    "RUF001", # ambiguous-unicode-string  ("天地玄黄" 等字面量)
+    "RUF002", # ambiguous-unicode-docstring
+    "RUF003", # ambiguous-unicode-comment
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011", "E402"]  # tests 允许 assert 多次调用和非常规 import 顺序
+"server/api/*" = ["B008"]    # FastAPI Depends 默认值
+
+[tool.ruff.lint.isort]
+known-first-party = ["divination", "server", "tests"]
+combine-as-imports = true
+
+# ── Custom linter 配置 (Sprint 0.10) ────────────────────────────────────────
+# 调 tools/lint_random.py 检测随机性反模式
+[tool.lint_random]
+forbidden_patterns = [
+    "random\\.random\\(\\)",          # 全局 random.random() — 必须用 seeded Random
+    "random\\.seed\\(",                # 全局 seed — 破坏可复现性
+    "math\\.random\\(\\)",             # 同上
+]
+allowed_paths = ["tests/"]             # tests 下允许(用于测试随机行为本身)
+target_paths = ["divination/", "server/"]
