@@ -252,7 +252,331 @@ def _analyze_tableau(cards: list[dict]) -> dict:
 
 
 # ═══════════════════════════════════════════════════════════════
-# 5. Main Compute
+# 5. Grand Tableau (36 张全牌 9×4 方阵) — 数据驱动, 纯函数
+# ═══════════════════════════════════════════════════════════════
+
+# Grand Tableau 宫位定义: 9 列 × 4 行 = 36 位置 (1-indexed, 左→右, 上→下)
+# 各宫位按传统 Grand Tableau 含义预设为查找表
+_GT_HOUSE_MEANINGS: dict[int, str] = {
+    1: "自我/求测者核心", 2: "财务/价值观", 3: "沟通/短途", 4: "家庭/根基",
+    5: "恋情/创造力", 6: "日常工作/健康", 7: "伴侣/合作", 8: "共享资源/深层",
+    9: "远行/信仰/高等心智",
+    10: "事业/社会地位", 11: "群体/愿望", 12: "潜意识/隐秘",
+    13: "新开始/自我层深层", 14: "金钱/资源深层", 15: "思想/信息深层",
+    16: "家宅/房产深层", 17: "爱情/创造性深层", 18: "日常/服务深层",
+    19: "伴侣/契约深层", 20: "隐秘/转换深层", 21: "哲学/远见深层",
+    22: "事业方向/使命深层", 23: "社交圈/人际深层", 24: "业力/潜意识底层",
+    25: "命运/关键转折", 26: "结局/定数", 27: "信息终局",
+    28: "根基/家族业力", 29: "财务终局/遗产", 30: "思想终局/智慧",
+    31: "家宅终局/归宿", 32: "情感终局/真爱", 33: "健康终局/养生",
+    34: "合作终局/婚姻", 35: "深层终局/灵魂", 36: "命运终局/业果",
+}
+
+# 心智宫位: 位置1-18 (上半+中上, 代表意识/思维层面)
+_GT_MIND_PALACE_POSITIONS: frozenset[int] = frozenset(range(1, 19))
+
+# 基础宫位: 位置19-36 (下半, 代表潜意识/根基/业力层面)
+_GT_FOUNDATION_PALACE_POSITIONS: frozenset[int] = frozenset(range(19, 37))
+
+# 四角: 左上(1), 右上(9), 左下(28), 右下(36)
+_GT_CORNERS: tuple[int, int, int, int] = (1, 9, 28, 36)
+
+# 中心四张: 9×4 网格的几何中心周围 4 张
+# 几何中心在 row 1.5 (0-indexed) 即 rows 1-2, col 4.0 即 cols 4-5
+# 中心4 = 位置 (row1,col4)=pos14, (row1,col5)=pos15, (row2,col4)=pos23, (row2,col5)=pos24
+_GT_CENTER_FOUR: tuple[int, int, int, int] = (14, 15, 23, 24)
+
+# 十字轴: 中心行(row2=pos19-27) + 中心列(col5=pos5,14,23,32)
+_GT_CROSS_ROW: frozenset[int] = frozenset(range(19, 28))   # 第三行
+_GT_CROSS_COL: frozenset[int] = frozenset({5, 14, 23, 32})  # 第六列
+
+# 宫位分组 — 数据驱动，纯查表
+_GT_HOUSE_GROUPS: dict[str, frozenset[int]] = {
+    "心智宫": _GT_MIND_PALACE_POSITIONS,
+    "基础宫": _GT_FOUNDATION_PALACE_POSITIONS,
+    "四角": frozenset(_GT_CORNERS),
+    "中心": frozenset(_GT_CENTER_FOUR),
+    "十字横轴": _GT_CROSS_ROW,
+    "十字纵轴": _GT_CROSS_COL,
+}
+
+
+def _linear_to_row_col(pos_1indexed: int, cols: int = 9) -> tuple[int, int]:
+    """将 1-indexed 位置转为 (row, col) 0-indexed。"""
+    idx = pos_1indexed - 1
+    return idx // cols, idx % cols
+
+
+def _get_neighbors(pos_1indexed: int, rows: int = 4, cols: int = 9) -> dict[str, int | None]:
+    """获取某位置的正交邻近位置 (上下左右)，纯函数查表。
+
+    Returns:
+        {"up": pos|None, "down": pos|None, "left": pos|None, "right": pos|None}
+    """
+    r, c = _linear_to_row_col(pos_1indexed, cols)
+    neighbors: dict[str, int | None] = {}
+    # 上
+    neighbors["up"] = pos_1indexed - cols if r > 0 else None
+    # 下
+    neighbors["down"] = pos_1indexed + cols if r < rows - 1 else None
+    # 左
+    neighbors["left"] = pos_1indexed - 1 if c > 0 else None
+    # 右
+    neighbors["right"] = pos_1indexed + 1 if c < cols - 1 else None
+    return neighbors
+
+
+def _get_diagonal_neighbors(pos_1indexed: int, rows: int = 4, cols: int = 9) -> dict[str, int | None]:
+    """获取对角线邻近位置。"""
+    r, c = _linear_to_row_col(pos_1indexed, cols)
+    diag: dict[str, int | None] = {}
+    diag["ul"] = pos_1indexed - cols - 1 if r > 0 and c > 0 else None
+    diag["ur"] = pos_1indexed - cols + 1 if r > 0 and c < cols - 1 else None
+    diag["dl"] = pos_1indexed + cols - 1 if r < rows - 1 and c > 0 else None
+    diag["dr"] = pos_1indexed + cols + 1 if r < rows - 1 and c < cols - 1 else None
+    return diag
+
+
+def _get_knights(pos_1indexed: int, rows: int = 4, cols: int = 9) -> list[int]:
+    """获取骑士步位置 (L形: ±2行±1列 or ±1行±2列)。"""
+    r, c = _linear_to_row_col(pos_1indexed, cols)
+    moves = [
+        (-2, -1), (-2, 1), (2, -1), (2, 1),
+        (-1, -2), (-1, 2), (1, -2), (1, 2),
+    ]
+    positions: list[int] = []
+    for dr, dc in moves:
+        nr, nc = r + dr, c + dc
+        if 0 <= nr < rows and 0 <= nc < cols:
+            positions.append(nr * cols + nc + 1)  # back to 1-indexed
+    return positions
+
+
+def compute_grand_tableau(cards: list[dict]) -> dict:
+    """计算 36 张全牌 Grand Tableau 的完整宫位分析。
+
+    输入 36 张牌（按 9×4 方阵排列，行优先 1→36），返回：
+      - grid: 9×4 阵列表 (list of 4 rows, each row 9 cards)
+      - center_four: 中心四张牌的详情
+      - corners: 四角牌的详情
+      - mind_palace: 心智宫位 (上半 1-18 位置) 牌汇总
+      - foundation_palace: 基础宫位 (下半 19-36 位置) 牌汇总
+      - cross_analysis: 十字轴 (第三行 + 第六列) 分析
+      - house_positions: 关键宫位牌映射 (significator, heart, ring 等)
+      - adjacency_modifiers: 每张牌的邻近修饰关系
+      - mansion_groups: 按宫位群组汇总 (心智/基础/四角/中心)
+      - summary: 总览摘要
+
+    纯函数，数据驱动，无 if-elif 堆叠。
+    """
+    if len(cards) != 36:
+        return {"error": f"Grand Tableau requires 36 cards, got {len(cards)}"}
+
+    # ── 构建 9×4 网格 ──
+    # 行优先: pos 1-9=row0, 10-18=row1, 19-27=row2, 28-36=row3
+    rows = 4
+    cols = 9
+    grid_rows = [cards[i * cols:(i + 1) * cols] for i in range(rows)]
+
+    # 位置索引映射: pos_1indexed -> card
+    card_by_pos: dict[int, dict] = {}
+    for i, card in enumerate(cards):
+        card_by_pos[i + 1] = card
+
+    # ── 宫位含义映射 — 数据驱动查表 ──
+    house_positions: dict[str, dict] = {}
+    for pos, meaning in _GT_HOUSE_MEANINGS.items():
+        card = card_by_pos.get(pos)
+        if card:
+            house_positions[str(pos)] = {
+                "position": pos,
+                "meaning": meaning,
+                "card_name": card["name"],
+                "card_name_zh": card.get("name_zh", ""),
+                "row": (pos - 1) // cols + 1,
+                "col": (pos - 1) % cols + 1,
+            }
+
+    # ── 中心四张 ──
+    center_four = {
+        "positions": list(_GT_CENTER_FOUR),
+        "cards": [
+            {
+                "position": p,
+                "name": card_by_pos[p]["name"] if p in card_by_pos else None,
+                "name_zh": card_by_pos[p].get("name_zh", "") if p in card_by_pos else None,
+                "row": (p - 1) // cols + 1,
+                "col": (p - 1) % cols + 1,
+            }
+            for p in _GT_CENTER_FOUR
+        ],
+        "description": "中心四张代表当前最核心的议题和能量焦点",
+    }
+
+    # ── 四角 ──
+    corner_labels = {1: "左上(过去/远因)", 9: "右上(远见/未来)", 28: "左下(根基/业力)", 36: "右下(结局/定数)"}
+    corners = {
+        "positions": list(_GT_CORNERS),
+        "cards": [
+            {
+                "position": p,
+                "label": corner_labels.get(p, ""),
+                "name": card_by_pos[p]["name"] if p in card_by_pos else None,
+                "name_zh": card_by_pos[p].get("name_zh", "") if p in card_by_pos else None,
+            }
+            for p in _GT_CORNERS
+        ],
+        "description": "四角勾勒全盘框架：左上过往→右上远见→左下根基→右下结局",
+    }
+
+    # ── 心智宫/基础宫 汇总 ──
+    def _summarize_palace(positions: frozenset[int], label: str) -> dict:
+        """汇总某宫位群组内的牌，数据驱动。"""
+        cards_in = [card_by_pos[p] for p in sorted(positions) if p in card_by_pos]
+        names = [c["name"] for c in cards_in]
+        positive = {"三叶草", "花束", "星星", "太阳", "钥匙", "心", "狗", "房子", "花园", "鱼", "锚", "鹳", "小孩", "百合"}
+        negative = {"云", "蛇", "棺材", "镰刀", "鞭子", "狐狸", "山", "老鼠", "十字架"}
+        pos_count = sum(1 for n in names if n in positive)
+        neg_count = sum(1 for n in names if n in negative)
+        tone = "吉" if pos_count > neg_count else ("凶" if neg_count > pos_count else "平")
+        return {
+            "label": label,
+            "positions": sorted(positions),
+            "card_count": len(cards_in),
+            "positive_count": pos_count,
+            "negative_count": neg_count,
+            "tone": tone,
+            "cards": names,
+            "card_names_zh": [c.get("name_zh", "") for c in cards_in],
+        }
+
+    mind_palace = _summarize_palace(_GT_MIND_PALACE_POSITIONS, "心智宫(意识/思维层)")
+    foundation_palace = _summarize_palace(_GT_FOUNDATION_PALACE_POSITIONS, "基础宫(潜意识/根基层)")
+
+    # ── 十字轴分析 ──
+    cross_row_cards = [card_by_pos[p] for p in sorted(_GT_CROSS_ROW) if p in card_by_pos]
+    cross_col_cards = [card_by_pos[p] for p in sorted(_GT_CROSS_COL) if p in card_by_pos]
+    cross_analysis = {
+        "horizontal_axis": {
+            "positions": sorted(_GT_CROSS_ROW),
+            "cards": [c["name"] for c in cross_row_cards],
+            "description": "横轴(第三行)代表当前生活主线和核心挑战",
+        },
+        "vertical_axis": {
+            "positions": sorted(_GT_CROSS_COL),
+            "cards": [c["name"] for c in cross_col_cards],
+            "description": "纵轴(第六列)代表命运的纵贯线和深层趋势",
+        },
+    }
+
+    # ── 关键牌位置 ──
+    significant_cards = {"Man", "Woman", "Heart", "Ring", "Key", "Sun", "Cross", "Ship", "House", "Tree", "Anchor", "Fish"}
+    key_positions: dict[str, dict] = {}
+    for pos, card in card_by_pos.items():
+        if card["name"] in significant_cards:
+            key_positions[card["name"]] = {
+                "position": pos,
+                "row": (pos - 1) // cols + 1,
+                "col": (pos - 1) % cols + 1,
+                "name_zh": card.get("name_zh", ""),
+            }
+
+    # ── 邻近距离修饰 — 数据驱动 ──
+    adjacency_modifiers: list[dict] = []
+    for pos, card in card_by_pos.items():
+        nbrs = _get_neighbors(pos)
+        modifiers_for_card = {
+            "position": pos,
+            "card": card["name"],
+            "card_zh": card.get("name_zh", ""),
+            "neighbors": {},
+        }
+        for direction, nbr_pos in nbrs.items():
+            if nbr_pos is not None and nbr_pos in card_by_pos:
+                nbr = card_by_pos[nbr_pos]
+                modifiers_for_card["neighbors"][direction] = {
+                    "position": nbr_pos,
+                    "name": nbr["name"],
+                    "name_zh": nbr.get("name_zh", ""),
+                    "combo": _combo_meaning(card, nbr),
+                }
+        # 也对角线邻
+        diag = _get_diagonal_neighbors(pos)
+        for direction, d_pos in diag.items():
+            if d_pos is not None and d_pos in card_by_pos:
+                d_nbr = card_by_pos[d_pos]
+                modifiers_for_card["neighbors"][f"diag_{direction}"] = {
+                    "position": d_pos,
+                    "name": d_nbr["name"],
+                    "name_zh": d_nbr.get("name_zh", ""),
+                    "combo": _combo_meaning(card, d_nbr),
+                }
+        # 骑士步修饰
+        knight_positions = _get_knights(pos)
+        kn_mods: list[dict] = []
+        for kp in knight_positions:
+            if kp in card_by_pos:
+                k_card = card_by_pos[kp]
+                kn_mods.append({
+                    "position": kp,
+                    "name": k_card["name"],
+                    "name_zh": k_card.get("name_zh", ""),
+                    "combo": _combo_meaning(card, k_card),
+                })
+        if kn_mods:
+            modifiers_for_card["knight_moves"] = kn_mods
+        adjacency_modifiers.append(modifiers_for_card)
+
+    # ── 宫位分组汇总 ──
+    mansion_groups: dict[str, dict] = {}
+    for group_name, positions in _GT_HOUSE_GROUPS.items():
+        mansion_groups[group_name] = _summarize_palace(positions, group_name)
+
+    # ── 总览摘要 ──
+    # 求测者牌位置
+    querent_pos = key_positions.get("男人") or key_positions.get("女人")
+    querent_info = None
+    if querent_pos:
+        querent_info = {
+            "card": "男人" if "男人" in key_positions else "女人",
+            "position": querent_pos["position"],
+            "row": querent_pos["row"],
+            "col": querent_pos["col"],
+        }
+
+    summary = {
+        "total_cards": 36,
+        "layout": "9×4 Grand Tableau",
+        "querent_card": querent_info,
+        "central_theme": center_four["cards"],
+        "corner_overview": [
+            f'{c["label"]}: {c["name"]}' for c in corners["cards"]
+        ],
+        "mind_tone": mind_palace["tone"],
+        "foundation_tone": foundation_palace["tone"],
+        "overall_tone": "吉" if mind_palace["tone"] == "吉" and foundation_palace["tone"] == "吉"
+        else ("凶" if mind_palace["tone"] == "凶" and foundation_palace["tone"] == "凶" else "平"),
+    }
+
+    return {
+        "layout": "9×4 Grand Tableau (36 cards)",
+        "grid": [[c["name"] for c in row] for row in grid_rows],
+        "grid_zh": [[c.get("name_zh", "") for c in row] for row in grid_rows],
+        "center_four": center_four,
+        "corners": corners,
+        "mind_palace": mind_palace,
+        "foundation_palace": foundation_palace,
+        "cross_analysis": cross_analysis,
+        "key_positions": key_positions,
+        "house_positions": house_positions,
+        "adjacency_modifiers": adjacency_modifiers,
+        "mansion_groups": mansion_groups,
+        "summary": summary,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════
+# 6. Main Compute
 # ═══════════════════════════════════════════════════════════════
 def compute(b: Birth) -> ChartResult:
     subject = getattr(b, "subject", None) or "lenormand_guidance"
@@ -316,6 +640,9 @@ def compute(b: Birth) -> ChartResult:
 
     analysis = _analyze_tableau(cards)
 
+    # Grand Tableau 分析 (若为 36 张全阵)
+    grand_tableau = compute_grand_tableau(cards) if spread_key == "grand_tableau" else None
+
     return ChartResult(
         method="lenormand",
         school="west",
@@ -335,6 +662,7 @@ def compute(b: Birth) -> ChartResult:
             ],
             "cards": cards,
             "analysis": analysis,
+            "grand_tableau": grand_tableau,
             "deck_size": 36,
             "deck_type": "Petit Lenormand (36 cards)",
             "seed_used": seed_used,

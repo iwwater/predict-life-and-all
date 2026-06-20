@@ -27,6 +27,7 @@ const NotFound = lazy(() => import("./pages/NotFound").then((m) => ({ default: m
 const DateSelect = lazy(() => import("./pages/DateSelect").then((m) => ({ default: m.DateSelect })));
 const Knowledge = lazy(() => import("./pages/Knowledge").then((m) => ({ default: m.Knowledge })));
 const DreamPage = lazy(() => import("./pages/DreamPage").then((m) => ({ default: m.DreamPage })));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy").then((m) => ({ default: m.PrivacyPolicy })));
 
 // Method pages — v2 routes /m/{method}
 const TarotPage = lazy(() => import("./pages/methods/TarotPage").then((m) => ({ default: m.TarotPage })));
@@ -118,6 +119,7 @@ export function App() {
                 <Route path="/dream" element={<DreamPage />} />
                 <Route path="/reading" element={<Reading />} />
                 <Route path="/reading-history" element={<ReadingHistory />} />
+                <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/about" element={<About />} />
 
                 {/* 旧 /method/* 路由 — 301 重定向到 /m/* */}

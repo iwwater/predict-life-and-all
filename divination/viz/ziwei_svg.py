@@ -924,3 +924,446 @@ def render_star_map_simple(
     cy = (size + 40) / 2 + 22  # 中宫下方留 22px 间距
     return _inject_center(svg, soul, body, five_elements,
                           cx=cx, cy=cy, dy=14)
+
+
+# ---------------------------------------------------------------------------
+# 5. 运程盘 (Scope renderers) -- 5 层: natal / decadal / yearly / monthly / xiaoxian
+# ---------------------------------------------------------------------------
+
+def _scope_square(
+    palaces: Sequence[Mapping[str, Any]],
+    *,
+    title: str = "紫微斗数",
+    size: int = 720,
+    scope_label: str = "",
+    scope_subtitle: str = "",
+    highlight_palace_idx: int | None = None,
+    highlight_label: str = "",
+    gan_zhi: str = "",
+    soul: str = "",
+    body: str = "",
+    five_elements: str = "",
+) -> str:
+    """复用传统方盘 4x3 布局, 叠加运程高亮.
+
+    Args:
+        palaces:             12 宫数据
+        title:               盘名
+        size:                SVG 画布尺寸
+        scope_label:         运程标签 (本命/大限/流年/流月/小限)
+        scope_subtitle:      运程副标题
+        highlight_palace_idx: 需要高亮的宫位索引 (None = 无高亮)
+        highlight_label:     高亮角标文字 ("大限"/"流年"/"流月"/"小限")
+        gan_zhi:             干支 (右上角显示)
+        soul:                命主
+        body:                身主
+        five_elements:       五行局
+    """
+    sorted_pcs = _sort_palaces(palaces)
+    cell = size / 4
+    grid_height = cell * 4
+    total_height = 30 + grid_height + 10
+    mid_x = cell * 2
+    mid_y = 30 + cell * 2
+    center_radius = cell
+
+    parts: list[str] = []
+    parts.append(
+        f'<svg xmlns="http://www.w3.org/2000/svg" '
+        f'viewBox="0 0 {size} {total_height}" width="{size}" height="{total_height}" '
+        f'class="ziwei-scope-square">'
+    )
+    parts.append(f'<rect width="{size}" height="{total_height}" fill="{COLORS["bg"]}" />')
+
+    # 标题
+    parts.append(
+        f'<text x="{size / 2}" y="22" text-anchor="middle" '
+        f'font-size="18" font-weight="bold" fill="{COLORS["title"]}">{_esc(title)}</text>'
+    )
+
+    # 网格背景
+    parts.append(
+        f'<rect x="0" y="30" width="{size}" height="{grid_height}" '
+        f'fill="{COLORS["cell_bg"]}" stroke="{COLORS["border"]}" stroke-width="3" />'
+    )
+    for r in range(1, 4):
+        parts.append(
+            f'<line x1="0" y1="{30 + cell * r}" x2="{size}" y2="{30 + cell * r}" '
+            f'stroke="{COLORS["border"]}" stroke-width="2" />'
+        )
+    for c in range(1, 4):
+        parts.append(
+            f'<line x1="{cell * c}" y1="30" x2="{cell * c}" y2="{30 + grid_height}" '
+            f'stroke="{COLORS["border"]}" stroke-width="2" />'
+        )
+
+    # 中宫
+    parts.append(
+        f'<rect x="{cell}" y="{30 + cell}" width="{cell * 2}" height="{cell * 2}" '
+        f'fill="{COLORS["bg"]}" stroke="{COLORS["border"]}" stroke-width="1" />'
+    )
+    parts.append(
+        f'<circle cx="{mid_x}" cy="{mid_y}" r="{center_radius * 0.7}" '
+        f'fill="none" stroke="{COLORS["grid_line"]}" stroke-dasharray="4 3" />'
+    )
+    parts.append(
+        f'<text x="{mid_x}" y="{mid_y - cell * 0.35}" text-anchor="middle" '
+        f'font-size="20" font-weight="bold" fill="{COLORS["title"]}">{_esc(scope_label)}</text>'
+    )
+    parts.append(
+        f'<text x="{mid_x}" y="{mid_y - cell * 0.05}" text-anchor="middle" '
+        f'font-size="10" fill="{COLORS["adj_star"]}">{_esc(scope_subtitle)}</text>'
+    )
+    # 命主/身主/五行局
+    info_lines: list[tuple[str, str, str]] = []
+    if five_elements:
+        info_lines.append((f"五行局 {_esc(five_elements)}", COLORS["adj_star"]))
+    if soul:
+        info_lines.append((f"命主 {_esc(soul)}", COLORS["body_palace"]))
+    if body:
+        info_lines.append((f"身主 {_esc(body)}", COLORS["major_star"]))
+    for i, (text, color) in enumerate(info_lines):
+        parts.append(
+            f'<text x="{mid_x}" y="{mid_y + cell * 0.2 + i * 14}" text-anchor="middle" '
+            f'font-size="11" fill="{color}">{text}</text>'
+        )
+
+    # 干支 (右上角)
+    if gan_zhi:
+        parts.append(
+            f'<text x="{size - 16}" y="22" text-anchor="end" '
+            f'font-size="14" font-weight="bold" fill="{COLORS["major_star"]}">{_esc(gan_zhi)}</text>'
+        )
+
+    # 12 宫位
+    for (row, col), p_idx in PALACE_POSITIONS.items():
+        if p_idx < 0 or p_idx >= len(sorted_pcs):
+            continue
+        p = sorted_pcs[p_idx]
+        x = col * cell
+        y = 30 + row * cell
+        cx_cell = x + cell / 2
+        is_body = bool(p.get("is_body_palace") or p.get("is_body"))
+        is_orig = bool(p.get("is_original_palace"))
+        is_highlighted = highlight_palace_idx is not None and p_idx == highlight_palace_idx
+        fill = COLORS["cell_bg_body"] if is_body else COLORS["cell_bg"]
+
+        parts.append(
+            f'<rect x="{x + 1}" y="{y + 1}" width="{cell - 2}" height="{cell - 2}" '
+            f'fill="{fill}" stroke="{COLORS["border"]}" stroke-width="0.5" />'
+        )
+
+        # 高亮环 (朱砂虚线 + 角标)
+        if is_highlighted:
+            parts.append(
+                f'<rect x="{x + 2}" y="{y + 2}" width="{cell - 4}" height="{cell - 4}" '
+                f'fill="none" stroke="{COLORS["body_palace"]}" stroke-width="2.5" '
+                f'stroke-dasharray="3 2" />'
+            )
+            if highlight_label:
+                badge_w = len(highlight_label) * 12 + 8
+                parts.append(
+                    f'<rect x="{x + cell - badge_w - 2}" y="{y + 22}" '
+                    f'width="{badge_w}" height="13" fill="{COLORS["body_palace"]}" />'
+                )
+                parts.append(
+                    f'<text x="{x + cell - badge_w / 2 - 2}" y="{y + 32}" text-anchor="middle" '
+                    f'font-size="9" font-weight="bold" fill="{COLORS["bg"]}">{_esc(highlight_label)}</text>'
+                )
+
+        # 宫名
+        accent = ""
+        if is_body:
+            accent = " ●"
+        elif is_orig:
+            accent = " ☆"
+        parts.append(
+            f'<text x="{x + 8}" y="{y + 18}" font-size="13" font-weight="bold" '
+            f'fill="{COLORS["body_palace"] if is_body else COLORS["ink"]}">{_esc(p.get("name", ""))}{accent}</text>'
+        )
+        # 干支
+        stem_branch = f'{p.get("heavenly_stem", "")}{p.get("earthly_branch", "")}'
+        if stem_branch:
+            parts.append(
+                f'<text x="{x + cell - 8}" y="{y + 18}" text-anchor="end" '
+                f'font-size="11" fill="{COLORS["adj_star"]}">{_esc(stem_branch)}</text>'
+            )
+
+        # 星曜
+        major = list(p.get("major_stars") or [])
+        minor = list(p.get("minor_stars") or [])
+        adj = list(p.get("adjective_stars") or [])
+        text_y = y + 36
+        for star in major:
+            parts.append(
+                f'<text x="{cx_cell}" y="{text_y}" text-anchor="middle" font-size="13" '
+                f'font-weight="bold" fill="{COLORS["major_star"]}">{_esc(star)}</text>'
+            )
+            text_y += 16
+        for star in minor:
+            parts.append(
+                f'<text x="{cx_cell}" y="{text_y}" text-anchor="middle" font-size="11" '
+                f'fill="{COLORS["minor_star"]}">{_esc(star)}</text>'
+            )
+            text_y += 14
+        for star in adj[:3]:
+            parts.append(
+                f'<text x="{cx_cell}" y="{text_y}" text-anchor="middle" font-size="10" '
+                f'fill="{COLORS["adj_star"]}">{_esc(star)}</text>'
+            )
+            text_y += 12
+
+        c12 = p.get("changsheng12") or ""
+        if c12:
+            parts.append(
+                f'<text x="{x + 8}" y="{y + cell - 10}" font-size="10" '
+                f'fill="{COLORS["adj_star"]}">{_esc(c12)}</text>'
+            )
+
+    parts.append("</svg>")
+    return "\n".join(parts)
+
+
+# --- 5 个 top-level scope renderers ---
+
+def render_natal_chart(
+    palaces: Sequence[Mapping[str, Any]],
+    soul: str = "",
+    body: str = "",
+    five_elements: str = "",
+    *,
+    title: str = "紫微斗数 · 本命盘",
+    size: int = 720,
+    gan_zhi: str = "",
+) -> str:
+    """渲染本命盘 (生年四化 · 命主先天).
+
+    高亮: 命宫 + 身宫 (通过 is_original_palace / is_body_palace 标记).
+    """
+    return _scope_square(
+        palaces,
+        title=title,
+        size=size,
+        scope_label="本命盘",
+        scope_subtitle="生年四化 · 命主先天",
+        highlight_palace_idx=None,
+        highlight_label="",
+        gan_zhi=gan_zhi,
+        soul=soul,
+        body=body,
+        five_elements=five_elements,
+    )
+
+
+def render_decadal_chart(
+    palaces: Sequence[Mapping[str, Any]],
+    soul: str = "",
+    body: str = "",
+    five_elements: str = "",
+    *,
+    title: str = "紫微斗数 · 大限盘",
+    size: int = 720,
+    gan_zhi: str = "",
+    decadal_palace_idx: int | None = None,
+) -> str:
+    """渲染大限盘 (十年大限 · 行运主题).
+
+    Args:
+        decadal_palace_idx: 大限所在宫位索引 (0-11). 高亮该宫.
+    """
+    return _scope_square(
+        palaces,
+        title=title,
+        size=size,
+        scope_label="大限盘",
+        scope_subtitle="十年大限 · 行运主题",
+        highlight_palace_idx=decadal_palace_idx,
+        highlight_label="大限",
+        gan_zhi=gan_zhi,
+        soul=soul,
+        body=body,
+        five_elements=five_elements,
+    )
+
+
+def render_yearly_chart(
+    palaces: Sequence[Mapping[str, Any]],
+    soul: str = "",
+    body: str = "",
+    five_elements: str = "",
+    *,
+    title: str = "紫微斗数 · 流年盘",
+    size: int = 720,
+    gan_zhi: str = "",
+    yearly_palace_idx: int | None = None,
+) -> str:
+    """渲染流年盘 (本年流年 · 太岁所临).
+
+    Args:
+        yearly_palace_idx: 流年所在宫位索引 (0-11). 高亮该宫.
+    """
+    return _scope_square(
+        palaces,
+        title=title,
+        size=size,
+        scope_label="流年盘",
+        scope_subtitle="本年流年 · 太岁所临",
+        highlight_palace_idx=yearly_palace_idx,
+        highlight_label="流年",
+        gan_zhi=gan_zhi,
+        soul=soul,
+        body=body,
+        five_elements=five_elements,
+    )
+
+
+def render_monthly_chart(
+    palaces: Sequence[Mapping[str, Any]],
+    soul: str = "",
+    body: str = "",
+    five_elements: str = "",
+    *,
+    title: str = "紫微斗数 · 流月盘",
+    size: int = 720,
+    gan_zhi: str = "",
+    monthly_palace_idx: int | None = None,
+) -> str:
+    """渲染流月盘 (本月流月 · 月建所主).
+
+    Args:
+        monthly_palace_idx: 流月所在宫位索引 (0-11). 高亮该宫.
+    """
+    return _scope_square(
+        palaces,
+        title=title,
+        size=size,
+        scope_label="流月盘",
+        scope_subtitle="本月流月 · 月建所主",
+        highlight_palace_idx=monthly_palace_idx,
+        highlight_label="流月",
+        gan_zhi=gan_zhi,
+        soul=soul,
+        body=body,
+        five_elements=five_elements,
+    )
+
+
+def render_xiaoxian_chart(
+    palaces: Sequence[Mapping[str, Any]],
+    soul: str = "",
+    body: str = "",
+    five_elements: str = "",
+    *,
+    title: str = "紫微斗数 · 小限盘",
+    size: int = 720,
+    gan_zhi: str = "",
+    birth_zhi: str = "",
+    age: int = 1,
+    gender: str = "male",
+) -> str:
+    """渲染小限盘 (小限所临 · 虚岁行运).
+
+    根据出生年支和虚岁计算小限所在宫位, 高亮该宫.
+
+    Args:
+        birth_zhi: 出生年支 "子"~"亥"
+        age:       虚岁 (1-120)
+        gender:    "male" 或 "female"
+    """
+    from divination.data.ziwei_xiaoxian import compute_xiaoxian_palace
+    try:
+        palace_idx = compute_xiaoxian_palace(birth_zhi, age, gender)
+    except (ValueError, ImportError):
+        palace_idx = None
+
+    return _scope_square(
+        palaces,
+        title=title,
+        size=size,
+        scope_label="小限盘",
+        scope_subtitle=f"小限所临 · 虚岁{age}",
+        highlight_palace_idx=palace_idx,
+        highlight_label="小限",
+        gan_zhi=f"{gan_zhi} 虚岁{age}" if gan_zhi else f"虚岁{age}",
+        soul=soul,
+        body=body,
+        five_elements=five_elements,
+    )
+
+
+def render_xiaoxian_at_age(
+    palaces: Sequence[Mapping[str, Any]],
+    birth_zhi: str,
+    age: int,
+    gender: str = "male",
+    soul: str = "",
+    body: str = "",
+    five_elements: str = "",
+    *,
+    title: str = "紫微斗数 · 小限盘",
+    size: int = 720,
+) -> str:
+    """便捷入口: 按出生年支 + 虚岁直接渲染小限盘.
+
+    Alias for render_xiaoxian_chart with essential params upfront.
+    """
+    return render_xiaoxian_chart(
+        palaces,
+        soul=soul,
+        body=body,
+        five_elements=five_elements,
+        title=title,
+        size=size,
+        birth_zhi=birth_zhi,
+        age=age,
+        gender=gender,
+    )
+
+
+def render_all_scopes(
+    palaces: Sequence[Mapping[str, Any]],
+    soul: str = "",
+    body: str = "",
+    five_elements: str = "",
+    *,
+    title_prefix: str = "紫微斗数",
+    size: int = 720,
+    gan_zhi: str = "",
+    decadal_palace_idx: int | None = None,
+    yearly_palace_idx: int | None = None,
+    monthly_palace_idx: int | None = None,
+    birth_zhi: str = "",
+    xiaoxian_age: int = 1,
+    gender: str = "male",
+) -> dict[str, str]:
+    """一键渲染全部 5 个运程盘.
+
+    Returns:
+        { "natal": svg, "decadal": svg, "yearly": svg, "monthly": svg, "xiaoxian": svg }
+    """
+    return {
+        "natal": render_natal_chart(
+            palaces, soul=soul, body=body, five_elements=five_elements,
+            title=f"{title_prefix} · 本命盘", size=size, gan_zhi=gan_zhi,
+        ),
+        "decadal": render_decadal_chart(
+            palaces, soul=soul, body=body, five_elements=five_elements,
+            title=f"{title_prefix} · 大限盘", size=size, gan_zhi=gan_zhi,
+            decadal_palace_idx=decadal_palace_idx,
+        ),
+        "yearly": render_yearly_chart(
+            palaces, soul=soul, body=body, five_elements=five_elements,
+            title=f"{title_prefix} · 流年盘", size=size, gan_zhi=gan_zhi,
+            yearly_palace_idx=yearly_palace_idx,
+        ),
+        "monthly": render_monthly_chart(
+            palaces, soul=soul, body=body, five_elements=five_elements,
+            title=f"{title_prefix} · 流月盘", size=size, gan_zhi=gan_zhi,
+            monthly_palace_idx=monthly_palace_idx,
+        ),
+        "xiaoxian": render_xiaoxian_chart(
+            palaces, soul=soul, body=body, five_elements=five_elements,
+            title=f"{title_prefix} · 小限盘", size=size,
+            birth_zhi=birth_zhi, age=xiaoxian_age, gender=gender,
+        ),
+    }

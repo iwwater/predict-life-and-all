@@ -32,6 +32,7 @@ from divination.engines.compass import (
     list_24_mountains,
     magnetic_to_true_heading,
     normalize_heading,
+    process_samples,
 )
 
 router = APIRouter(prefix="/compass", tags=["compass"])
@@ -51,7 +52,7 @@ class CompassReading(BaseModel):
 class CompassSessionCreate(BaseModel):
     """创建采样会话."""
     direction_hint: str = Field(..., description="预期坐向（用户口述）e.g. '大门朝东'")
-    sample_count: int = Field(default=5, ge=2, le=20, description="采样次数")
+    sample_count: int = Field(default=30, ge=30, le=1000, description="采样次数 (≥30)")
     north_ref: str = Field(default="magnetic", description="'magnetic' | 'true'")
 
 
@@ -112,6 +113,7 @@ class CompassMeasureResponse(BaseModel):
     quality: str
     tip: str
     fengshui_warning: str | None = None
+    sample_stats: dict | None = None  # process_samples result when samples list provided
 
 
 # ── 内存存储 ──────────────────────────────────────────────────────────────
@@ -248,6 +250,7 @@ def measure_compass(body: CompassMeasureRequest):
         quality=result["quality"],
         tip=result["tip"],
         fengshui_warning=warning,
+        sample_stats=process_samples(body.samples) if body.samples is not None else None,
     )
 
 
@@ -278,7 +281,10 @@ def create_session(body: CompassSessionCreate):
 
 @router.post("/sessions/{session_id}/samples")
 def add_sample(session_id: str, body: CompassSessionAddSample):
-    """向采样会话追加一个方位读数."""
+    """向采样会话追加一个方位读数.
+
+    采样要求 ≥30 个样本才自动结算 (数据充分性)。
+    """
     if session_id not in _sessions:
         raise HTTPException(404, "session not found")
     s = _sessions[session_id]
@@ -293,7 +299,7 @@ def add_sample(session_id: str, body: CompassSessionAddSample):
         sans=sans_info["sans"], direction=direction, azimuth_deg=az, device="phone_compass"
     ))
 
-    if len(s.samples) >= 3:
+    if len(s.samples) >= 30:
         result_sans, result_dir, result_az, std_dev, quality = compute_result(s.samples)
         sans_24_info = heading_to_24mountain(result_az)
         s.result_sans = result_sans

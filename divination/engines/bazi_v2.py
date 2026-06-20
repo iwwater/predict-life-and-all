@@ -54,6 +54,8 @@ for _name in _OPTIONAL_HELPERS:
 del _il, _bazi_mod, _name, _OPTIONAL_HELPERS
 
 from .shensha import compute_all as compute_shensha
+from ..data.wuxing_tiaohou import evaluate_tiaohou, get_tiaohou_advice
+from ..data.wuxing_geju import evaluate_dynamic_geju, GEOJU_PATTERNS
 
 # ── 用神体系 · Use God System ──────────────────────────────────────────────
 
@@ -443,6 +445,15 @@ def compute(b: Birth) -> ChartResult:
         yong_shen_data, elements, shensha_summary,
     )
 
+    # ── v2: 调候 (Seasonal Adjustment) evaluation ──
+    tiaohou_data = evaluate_tiaohou(day_master, season_branch)
+    tiaohou_advice = get_tiaohou_advice(day_master, season_branch)
+
+    # ── v2: dynamic 格局 (Pattern) evaluation ──
+    dynamic_geju_data = evaluate_dynamic_geju(
+        day_master, ten_god_counts, pillars, strength_score,
+    )
+
     # ── v2: element flow ──
     element_flow = _compute_element_flow(elements, pillars)
 
@@ -546,6 +557,10 @@ def compute(b: Birth) -> ChartResult:
         "pattern": pattern_data,
         "yong_shen": yong_shen_data,
         "yong_shen_quality": yong_shen_quality,
+        "tiaohou": tiaohou_data,
+        "tiaohou_advice": tiaohou_advice,
+        "dynamic_geju": dynamic_geju_data,
+        "dynamic_geju_count": len(dynamic_geju_data),
         "shensha": shensha_data,
         "element_flow": element_flow,
         "current_luck": current_luck,

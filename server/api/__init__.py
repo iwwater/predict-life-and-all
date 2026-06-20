@@ -10,4 +10,5 @@ from . import (  # noqa: F401
     methods,
     prompts,
     reading,
+    users,
 )

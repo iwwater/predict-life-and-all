@@ -77,16 +77,52 @@ COMPATIBLE_PAIRS = {
 }
 
 
+from .cache import CacheKey, get_cache
+
+
+def _birth_to_tuple(birth: Birth) -> tuple:
+    """Birth → hashable tuple for cache key."""
+    return (birth.year, birth.month, birth.day, birth.hour, birth.minute,
+            birth.gender, round(birth.lat or 0, 1), round(birth.lng or 0, 1), birth.tz or "")
+
+
 def compute(method: str, birth: Birth, **kw) -> ChartResult:
     if method not in _ENGINES:
         raise ValueError(f"未支持的术数: {method}（已支持 {list(_ENGINES)}）")
+    cache = get_cache()
+    ck = CacheKey(method=method, birth_tuple=_birth_to_tuple(birth), extra=tuple(sorted(kw.items())))
+    key = ck.to_hash()
+    cached = cache.get(key)
+    if cached is not None:
+        result = ChartResult(method=method,
+                             school=cached.get("school", "east"),
+                             engine=cached.get("engine", "self"),
+                             raw=cached.get("raw", {}),
+                             normalized=cached.get("normalized", {}))
+        return result
     result = _ENGINES[method](birth, **kw)
     result.method = method
+    cache.set(key, {"raw": getattr(result, "raw", {}),
+                     "normalized": getattr(result, "normalized", {}),
+                     "school": getattr(result, "school", "east"),
+                     "engine": getattr(result, "engine", "self")}, ttl_seconds=3600)
     return result
 
 
 def compute_all(methods: list[str], birth: Birth) -> dict[str, ChartResult]:
-    return {m: compute(m, birth) for m in methods}
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    import logging
+    logger = logging.getLogger(__name__)
+    results: dict[str, ChartResult] = {}
+    with ThreadPoolExecutor(max_workers=max(1, min(len(methods), 8))) as ex:
+        futures = {ex.submit(compute, m, birth): m for m in methods}
+        for fut in as_completed(futures):
+            method = futures[fut]
+            try:
+                results[method] = fut.result()
+            except Exception as e:
+                logger.warning(f"compute_all: {method} failed: {e}")
+    return {m: results.get(m) for m in methods}
 
 
 def compute_with_validation(methods: list[str], birth: Birth, subject: str = "self_life", do_validate: bool = True):

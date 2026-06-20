@@ -165,3 +165,39 @@ export function PaperSection({ num, children }: {
     </div>
   );
 }
+
+/** 通用按钮组件 (P2-7 ChartFooter 等复用) */
+export function Button({
+  variant = "primary",
+  size = "md",
+  onClick,
+  disabled,
+  type = "button",
+  children,
+}: {
+  variant?: "primary" | "ghost";
+  size?: "sm" | "md" | "lg";
+  onClick?: () => void;
+  disabled?: boolean;
+  type?: "button" | "submit" | "reset";
+  children: React.ReactNode;
+}) {
+  const cls = variant === "ghost" ? "paper-btn-ghost" : "paper-btn";
+  const sizeStyle: React.CSSProperties =
+    size === "sm"
+      ? { padding: "0.25rem 0.6rem", fontSize: "0.75rem" }
+      : size === "lg"
+        ? { padding: "0.6rem 1.4rem", fontSize: "0.95rem" }
+        : {};
+  return (
+    <button
+      type={type}
+      className={cls}
+      style={sizeStyle}
+      onClick={onClick}
+      disabled={disabled}
+    >
+      {children}
+    </button>
+  );
+}

@@ -19,7 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
-from .api import almanac, birth_time, cases, chart, compass, daily as daily_api, dream, extended_knowledge, hepan_share, interpret, knowledge, methods, prompts, reading
+from .api import almanac, birth_time, cases, chart, compass, daily as daily_api, dream, extended_knowledge, hepan_share, interpret, knowledge, methods, prompts, reading, users
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 log = logging.getLogger("mystic-hub")
@@ -53,6 +53,7 @@ app.include_router(hepan_share.router, prefix="/api", tags=["hepan-share"])
 app.include_router(knowledge.router, tags=["knowledge"])
 app.include_router(extended_knowledge.router, tags=["knowledge-ext"])
 app.include_router(dream.router)
+app.include_router(users.router, prefix="/api", tags=["users"])
 
 
 @app.get("/health", tags=["meta"])
