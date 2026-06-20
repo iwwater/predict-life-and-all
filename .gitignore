@@ -65,3 +65,16 @@ Thumbs.db
 
 # ChatGPT garbage screenshots in data/
 data/ChatGPT*
+
+# Scanned古籍/商业书籍（z-library 等版权文件，禁止入仓库）
+docs/*.pdf
+docs/*.mobi
+docs/*.epub
+
+# 临时提取文件（epub/pdf 文本转储）
+docs/*_content.txt
+docs/*_preview.txt
+docs/pdf_*.txt
+docs/part0003_*.txt
+docs/liuyao_corpus_preview.json
+docs/pdf_raw_text.json

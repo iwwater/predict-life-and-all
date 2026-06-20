@@ -145,7 +145,7 @@ cd apps/web && npx tsc --noEmit
 cd apps/web && npm run build
 ```
 
-**当前状态**: 1600 passed in ~3min · TypeScript 零错 · 0 flaky
+**当前状态**: 1639 passed in ~3min · TypeScript 零错 · 0 flaky
 **任何依赖升级必须全绿才可并入。**
 
 ---
@@ -156,6 +156,7 @@ cd apps/web && npm run build
 - [`docs/ALGORITHM_IMPROVEMENT_PLAN.md`](docs/ALGORITHM_IMPROVEMENT_PLAN.md) — 19 术法改进优先级矩阵 + 工时估算
 - [`docs/COMPETITOR_ANALYSIS_2026.md`](docs/COMPETITOR_ANALYSIS_2026.md) — 8 个 AI 玄学项目竞品调研 + Top 10 改进点
 - [`docs/CROSS_VALIDATION_COMPARISON.md`](docs/CROSS_VALIDATION_COMPARISON.md) — 与 dzcmemory-web/bazi-ziwei-skill 全面对比
+- [`docs/dev-plan-v1.0-ancient-optimization-compass.md`](docs/dev-plan-v1.0-ancient-optimization-compass.md) — 古籍优化 + 罗盘 v1.0 规划
 
 ### 算法 & 文献
 - [`docs/CLASSICAL_SOURCES.md`](docs/CLASSICAL_SOURCES.md) — 18 法 × 古籍 × 验证状态（60+ 本）
@@ -166,9 +167,10 @@ cd apps/web && npm run build
 - [`docs/ETHICS.md`](docs/ETHICS.md) — 7 项解读原则 + 4 类警示语 + 3 层护栏
 
 ### 验证 & 交接
-- [`docs/sprint-1-verification.md`](docs/sprint-1-verification.md) / [`sprint-2-verification.md`](docs/sprint-2-verification.md)
+- [`docs/sprint-1-verification.md`](docs/sprint-1-verification.md) / [`docs/sprint-2-verification.md`](docs/sprint-2-verification.md)
 - [`docs/dev-log-2026-06-15.md`](docs/dev-log-2026-06-15.md) — 工作日志
-- `SESSION_2026-06-19.md` — 当前 session handoff（本日 P0 修复详情）
+- [`docs/SESSION_2026-06-20.md`](docs/SESSION_2026-06-20.md) — **当前** session handoff（Sprint 4 状态 + docs 收口）
+- [`docs/SESSION_2026-06-19.md`](docs/SESSION_2026-06-19.md) — Sprint 3 + 6.18 P0 全绿
 
 ### 部署
 - [`docs/DEPLOY.md`](docs/DEPLOY.md) — Cloudflare Pages + Docker 部署指南
@@ -178,15 +180,15 @@ cd apps/web && npm run build
 ## 七、仍是 TODO
 
 ### P1 — 体验优化
-- 罗盘：WMM 磁偏角升级（高斯球谐展开, 数据源 NCEI）
+- ✅ 罗盘：WMM2025 磁偏角升级（高斯球谐展开 N=12, 数据源 NCEI）— Sprint 4.3
 - 紫微：SVG 4 种盘可视化（借鉴 SiwuXue）
-- 塔罗：密码学安全抽牌（`secrets` 模块）+ 韦特/托特/现代心理三系统
+- ✅ 塔罗：密码学安全抽牌（HMAC-SHA3-256 承诺方案 + NIST DRBG）— Sprint 4.2
 - 连续采样 UX：实时质量指示器 + 移动端自动暂停
 
 ### P2 — 深度升级
 - 六爻：六神（青龙/朱雀/勾陈/螣蛇/白虎/玄武）+ 伏神/飞神
-- 紫微：飞星四化集成 + 宫位飞化
-- 奇门：阴/阳遁自动判定 + 72 局自动定局（已部分完成）
+- ✅ 紫微：飞星四化集成 + 宫位飞化 — Sprint 4.1
+- ✅ 奇门：阴/阳遁自动判定 + 多盘式（时/日/月/年 + 转/飞 + 拆补/茅山）— 6.17
 - 铁板：太玄数公式精校 + 多流派切换
 - 西占：Aspects 网格 + 相位影响力（容许度差异化）
 
@@ -210,4 +212,4 @@ cd apps/web && npm run build
 
 ---
 
-*最近更新：2026-06-19（Sprint 3 + 6.18 P0 全绿 · 1600/1600 测试通过）*
+*最近更新：2026-06-20（Sprint 4.1-4.3 完成 · 1639/1639 测试通过）*
