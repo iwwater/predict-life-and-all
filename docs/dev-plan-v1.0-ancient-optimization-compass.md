@@ -1,6 +1,7 @@
-# 下一步开发方案 v1.0（2026-06）
+# 下一步开发方案 v1.0（2026-06，6.21 事实校准）
 
 > 基于「开发计划-古籍-优化-法器罗盘」整合精修版。
+> **2026-06-21 校准**：本文件保留原方案结构，但已按当前代码事实修正过期 TODO；最新执行状态以 `README.md` 与 `docs/SESSION_2026-06-21.md` 为准。
 > **范围**：A 开发计划（精确到文件级）· B 古籍推荐 + 版权规则 · C 优化清单 · D 法器与罗盘。
 > **红线**：档位制（无单一分数）/ 无真人案例 / 公版原文入 RAG / 确定性随机 / 临界角双候选。
 
@@ -10,13 +11,13 @@
 
 | 项 | 文档说法 | 实际状态 | 处理 |
 |----|----------|----------|------|
-| Golden 测试 | 43 项 | **18 项**（`tests/test_golden_astronomy.py`=4，`tests/test_golden_classics.py`=14） | Sprint 0 任务①扩到 30+ 项 |
+| Golden 测试 | 43 项 | golden 文件显式测试约 **47 项**；全量 `2146 passed` | ✅ 已超过 30+ 项门槛，后续继续补专业软件对照集 |
 | `server/data/celebrity_cases.json` | 需下架 | 已不存在 | ✅ 已完成 |
 | `uvicorn.log.err` | 需进 `.gitignore` | `.gitignore` 已有 `*.log`；文件还在工作树 | 一次性 rm，不入仓 |
-| 评分档位制 | 改五档极性+计票 | `validator.py: VAL-010 overall_score 0-100` **仍存在** | **Sprint 0 头号任务** |
+| 评分档位制 | 改五档极性+计票 | `DimensionPolarity` / `SignalDigest` / `tally_by_scope` 已落地；业务代码无 `overall_score` 输出 | ✅ 已完成，保留测试注释作为迁移说明 |
 | 古籍知识库 | 待建 | `divination/knowledge/{books,classical,domains,…}.py` 已成型 | RAG 入库语料与 cite 仍空 |
 | 罗盘 API | 待建 | `server/api/compass.py` 已存在 | D1 三大坑（磁北/真北/临界角）未在前端落地 |
-| 引擎数量 | 12 法 | **17 个 engine** 已落（超出 12 法） | Sprint 6 重排优先级 |
+| 引擎数量 | 12 法 | 路由含 20 个 method key（`bazi`/`bazi_v2` 共享引擎，约 19 法） | 继续做主推/长尾分层，不再按“未落地”处理 |
 
 ---
 
@@ -24,17 +25,17 @@
 
 **总纲**：先把"已验证但未合并"的成果塞进仓 + 把"档位制"红线落地，再做差异化（会审主线），最后扩面（流年/罗盘/古籍 RAG/新法）。
 
-### Sprint 0（第 1 周）· 合并 + 红线（**不过不准进 Sprint 1**）
+### Sprint 0（第 1 周）· 合并 + 红线（2026-06-21：主体已完成）
 
 | # | 任务 | 改/加文件 | 验收判据（可命令化） |
 |---|------|----------|--------------------|
-| 0.1 | **删单一分数**：`validator.py` 去掉 `overall_score` 与连续 `confidence_level`；改为 `DimensionPolarity` 五档枚举 `{strong_support / weak_support / neutral / weak_warn / strong_warn}` | `divination/aggregation/schema.py`、`divination/aggregation/validator.py`、`divination/aggregation/synthesizer.py`、`tests/test_validator.py` | `grep -RIn "overall_score" divination/ tests/` 返 0 命中；五档枚举全单测 |
-| 0.2 | **计票制**：`cross_validator.py` 新增 `tally_by_scope(time_scope=long/now/short/spatial)`，不混票、不加权 | `divination/aggregation/cross_validator.py`（新建） | 同输入两 run 出同 `tally`；混 time_scope 抛异常 |
-| 0.3 | **六爻六亲改用京房卦宫五行**：用 `yijing.PALACE_INDEX` 派生六亲，而非上卦五行 | `divination/engines/liuyao.py` | 晋卦六亲逐爻对《增删卜易》；乾为天回归不破；golden 加例 |
+| 0.1 | ✅ **删单一分数**：`DimensionPolarity` 五档枚举 `{strong_support / weak_support / neutral / weak_warn / strong_warn}` 已接入 | `divination/aggregation/schema.py`、`divination/aggregation/validator.py`、`divination/aggregation/synthesizer.py`、`tests/test_validator.py` | 业务代码无 `overall_score` 输出；测试保留迁移注释 |
+| 0.2 | ✅ **计票制**：`tally_by_scope` 已落地，按 scope 输出支持/警示票数 | `divination/aggregation/scope_tally.py`、`validator.py`、`reading_service.py` | `tests/test_scope_tally.py` / `tests/test_validator.py` 覆盖 |
+| 0.3 | ✅ **六爻深化**：纳甲六亲、六神、伏神/飞神、世应冲合已接入 | `divination/engines/liuyao.py` | `tests/test_liuyao_six_shen_fu_shen.py` 已解 skip，43 passed |
 | 0.4 | **八字旺衰 + 藏干**：`wuxing.py` 加藏干表 + `element_strength` + `day_master_strength`；`bazi.py` 接入 + `zi_hour` 开关 | `divination/wuxing.py`、`divination/engines/bazi.py`、`tests/test_golden_classics.py` | 庚生巳月中和、三寅身强、子月众水从弱；23:30 双开关日柱不同 |
-| 0.5 | **塔罗深化**：78 牌全义 + 9 阵 + 牌组分析；`prompts.py` 塔罗序列化升级 | `divination/engines/tarot.py`、`server/api/prompts.py`（如在）、`divination/aggregation/method_inputs.py` | 78 张唯一 id；每张含正/逆义；同 seed 同牌组 |
-| 0.6 | **吠陀深化**：Rahu/Ketu 真位置 + D9 Navamsa + 庙旺 + Vimshottari Dasha | `divination/engines/vedic.py` | Makar Sankranti 验证；Dasha 总和=120；Navamsa 古典规则 |
-| 0.7 | **黄金测试扩到 30+ 项**：把现 18 项补到 ≥30 项天文 + 经典对盘 | `tests/test_golden_astronomy.py`、`tests/test_golden_classics.py` | `pytest tests/ -k golden` 全绿；CI 必过门 |
+| 0.5 | ✅ **塔罗基础深化**：78 牌、9 阵、安全洗牌与承诺方案已完成；三系统融合仍另列 P3 | `divination/engines/tarot.py`、`divination/aggregation/method_inputs.py` | 78 张唯一 id；同 seed 同牌组；crypto 回归已入库 |
+| 0.6 | ✅ **吠陀深化**：Rahu/Ketu、D9 Navamsa、庙旺、Vimshottari Dasha、Yogas 已接入 | `divination/engines/vedic.py`、`divination/data/vedic_yogas.py` | Makar Sankranti、Dasha=120、Yogas 表/引擎测试覆盖 |
+| 0.7 | ✅ **黄金测试扩到 30+ 项**：当前 golden 文件显式测试约 47 项 | `tests/test_golden_*.py` | 全量 `python -m pytest tests/ -q` 已验证 2146 passed |
 | 0.8 | **卫生**：`rm -f uvicorn.log uvicorn.log.err`；`*.log` 已在 `.gitignore`，确认无残留 | 工作树 | `git status` 不再列日志文件 |
 | 0.9 | **奇门 golden 验证**：5 节气三元定局对照《烟波钓叟歌》 | `tests/test_golden_classics.py`（增） | 5 例皆过；不过即修排局算法 |
 | 0.10 | **Linter 兜底**：禁 `Math.random()`、禁全局 `random.seed`、禁字符串 hardcode 二十四山 | 新增 `tools/lint_random.py` 或 ruff 自定义规则 | `make lint` 全绿；CI 必过门 |
@@ -83,10 +84,10 @@
 |------|------|--------|
 | 大六壬 | `divination/engines/liuren.py`（已建 181 行） | P0 验证 + golden |
 | 小六壬 | `divination/engines/xiaoliuren.py`（已建 201 行） | P0 验证 + golden |
-| 铁板神数 | `divination/engines/tieban.py`（已建 212 行） | P1 **仅做"太玄数编码"框架**；条文库留空 |
+| 铁板神数 | `divination/engines/tieban.py` + `divination/data/tieban_verses.py` | ✅ 太玄数精校 / 纳音 / 分金 / 邵雍本与铁冠道人本双流派已接入 |
 | 雷诺曼 | `divination/engines/lenormand.py`（已建） | P0 验证 + golden |
 
-> 现有 17 engines 多于「12 法」，Sprint 6 收尾须做"主推 12 + 长尾 5"的取舍与文档化。
+> 当前 method key 已多于「12 法」。后续重点不是补空壳，而是做「主推核心法 + 长尾法」的信息架构和入口分层。
 
 **铁律**：Sprint 0 不全绿不进 Sprint 1；新引擎**先测试再实现**；档位制是绝对红线。
 
@@ -148,7 +149,7 @@
 
 #### 铁板神数 ⚠️
 - 原典传抄 ✅，但**条文/考刻表多为现代秘传或商业重构**（常有版权或不公开）。
-- **建议**：一期只做"太玄数编码"演示框架，条文库留空待合法来源。
+- 当前已做太玄数编码、纳音/分金、考刻分与双流派条文范围回归；后续新增条文仍必须确认合法来源。
 
 #### 西占
 - Tetrabiblos（托勒密 2c）✅ 原文；公版英译（Loeb / Ashmand 1822）
@@ -287,16 +288,16 @@
 | 版权古籍 | 只入公版原典原文 | 入库 schema 必填 `copyright` 字段 |
 | 随机不可复现 | 禁 `random.random()` | `RandomService(seed_hash + algo_version)` |
 | 空间系统性偏角 | 罗盘临界角必须双候选 | 距山界 < 5° → 双候选 + 复测 |
-| 铁板条文版权 | 一期只做编码框架 | 条文库留空待合法来源 |
+| 铁板条文版权 | 新增条文须有合法来源 | 现有条文库保留来源说明与回归测试 |
 
 ---
 
 ## 一句话收束
 
 **顺序就是价值**：
-1. Sprint 0 把档位制落地 + 黄金扩到 30+ 项 + 已验证引擎合并进仓；
-2. Sprint 1–2 把会审主线（追问 → 五档 SignalDigest → 计票分歧并陈 → 现实校正）做出来；
-3. Sprint 3–5 加流年 / 罗盘 / 古籍 RAG 把准度和留存垒厚；
-4. Sprint 6 把主推收口到 12 法、铁板只做框架、雷诺曼 / 大小六壬验完 golden。
+1. 已完成项不再回炉：五档制、golden 扩容、六神、铁板、塔罗安全抽牌、奇门阴阳遁等按现状维护。
+2. 继续推进还没产品化的差异项：塔罗三系统融合、观音/关帝灵签完整入口、古籍 RAG 与文献出处面板。
+3. 主推/长尾分层要服务上架和维护，不再以“12 法是否凑齐”为目标。
+4. 新增资料必须先解决版权与来源，再进入 engine/API/frontend。
 
 规划已经够多，现在是**精确落地**的阶段。
