@@ -18,6 +18,7 @@ const METHOD_LABELS: Record<string, string> = {
   meihua: "梅花易数",
   liuren: "大六壬",
   xiaoliuren: "小六壬",
+  qian: "灵签",
   chenggu: "称骨",
   hepan: "合盘",
   tarot: "塔罗",

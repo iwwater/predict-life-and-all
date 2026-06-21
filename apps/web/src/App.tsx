@@ -44,6 +44,7 @@ const MeihuaPage = lazy(() => import("./pages/methods/MeihuaPage").then((m) => (
 const BazhaiPage = lazy(() => import("./pages/methods/BazhaiPage").then((m) => ({ default: m.BazhaiPage })));
 const LiurenPage = lazy(() => import("./pages/methods/LiurenPage").then((m) => ({ default: m.LiurenPage })));
 const LenormandPage = lazy(() => import("./pages/methods/LenormandPage").then((m) => ({ default: m.LenormandPage })));
+const QianPage = lazy(() => import("./pages/methods/QianPage").then((m) => ({ default: m.QianPage })));
 const XiaoliurenPage = lazy(() => import("./pages/methods/XiaoliurenPage").then((m) => ({ default: m.XiaoliurenPage })));
 const TiebanPage = lazy(() => import("./pages/methods/TiebanPage").then((m) => ({ default: m.TiebanPage })));
 
@@ -84,6 +85,7 @@ export function App() {
                 <Route path="/m/meihua" element={<MeihuaPage />} />
                 <Route path="/m/liuren" element={<LiurenPage />} />
                 <Route path="/m/xiaoliuren" element={<XiaoliurenPage />} />
+                <Route path="/m/qian" element={<QianPage />} />
                 <Route path="/m/chenggu" element={<ChengguPage />} />
                 {/* 相类 */}
                 <Route path="/m/hepan" element={<HePanPage />} />

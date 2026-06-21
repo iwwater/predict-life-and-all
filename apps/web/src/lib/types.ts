@@ -4,14 +4,14 @@ export type Method =
   | "bazi" | "bazi_v2" | "ziwei" | "qimen" | "liuyao" | "meihua" | "chenggu"
   | "bazhai" | "xuankong"
   | "western" | "vedic" | "tarot" | "numerology"
-  | "lenormand" | "liuren" | "tieban" | "xiaoliuren" | "hepan"
+  | "lenormand" | "qian" | "liuren" | "tieban" | "xiaoliuren" | "hepan"
   | "cross_validator" | "hour_calibrator" | "compatibility"
   | "dream";
 
 export type Subject =
   | "self_life" | "annual_luck" | "career" | "relationship" | "wealth"
   | "decision" | "lost_item" | "home_fengshui" | "tarot_guidance"
-  | "lenormand_guidance";
+  | "lenormand_guidance" | "qian_guidance";
 
 export type TarotSpread =
   | "single" | "three_time" | "three_mind" | "choice_two"
@@ -132,6 +132,8 @@ export interface ComputeRequest {
     subject?: Subject;
     spread?: TarotSpread;
     tarot_system?: TarotSystem;
+    qian_type?: "guanyin" | "guandi";
+    qian_number?: number;
     seed?: number | string | null;
     question?: string;
     period?: number;
@@ -339,6 +341,7 @@ export const METHOD_LABELS_ZH: Record<string, string> = {
   western: "西方占星",
   vedic: "吠陀占星",
   tarot: "塔罗",
+  qian: "灵签",
   numerology: "数字命理",
   liuren: "大六壬",
   xiaoliuren: "小六壬",

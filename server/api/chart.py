@@ -75,6 +75,8 @@ ALLOWED_OPTIONS = {
     "seed",
     "question",
     "tarot_system",
+    "qian_type",
+    "qian_number",
     "tosses",
     "period",
     "sitting",

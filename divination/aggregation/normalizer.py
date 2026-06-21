@@ -34,6 +34,7 @@ _METHOD_DIMENSION: dict[str, str] = {
     "xiaoliuren":"one_question",
     "tieban":    "long_term",
     "lenormand": "one_question",
+    "qian":      "one_question",
     "shicao":    "one_question",
     "hepan":     "relationship",
     "chenggu":   "long_term",
@@ -54,6 +55,7 @@ _METHOD_TIME_SCOPE: dict[str, str] = {
     "xiaoliuren":"short_term",
     "tieban":    "long_term",
     "lenormand": "short_term",
+    "qian":      "short_term",
     "shicao":    "short_term",
     "hepan":     "long_term",
     "chenggu":   "long_term",
@@ -222,6 +224,8 @@ def normalize(method: str, chart: ChartResult) -> list[DivinationSignal]:
             signals = _normalize_tieban(method, raw, normalized)
         elif method == "lenormand":
             signals = _normalize_lenormand(method, raw, normalized)
+        elif method == "qian":
+            signals = _normalize_qian(method, raw, normalized)
     except Exception:
         pass
 
@@ -1176,6 +1180,30 @@ def _normalize_lenormand(method: str, raw: dict, _norm: dict) -> list[Divination
         ))
 
     return s
+
+
+def _normalize_qian(method: str, raw: dict, _norm: dict) -> list[DivinationSignal]:
+    """NOR-020: 灵签 — 签等 → 短期问事信号。"""
+    category = raw.get("签等", "中")
+    if category in ("上上", "上"):
+        pol = "positive"
+        decision_key = "decision_support"
+    elif category in ("下", "下下"):
+        pol = "negative"
+        decision_key = "decision_risk"
+    else:
+        pol = "neutral"
+        decision_key = "decision_delay"
+    strength = {"上上": 0.7, "上": 0.6, "中": 0.45, "下": 0.55, "下下": 0.7}.get(category, 0.45)
+    evidence = f"{raw.get('签谱名称', '灵签')} 第{raw.get('签号', '?')}签 {category}: {raw.get('签名', '')}"
+
+    return [
+        _make_signal(method, "decision", decision_key, pol, strength, evidence=evidence, confidence=0.45),
+        _make_signal(method, "timing", "timing_obstacle" if pol == "negative" else "timing_transition",
+                     pol, strength=max(0.35, strength - 0.1), evidence=raw.get("行动建议", evidence), confidence=0.4),
+        _make_signal(method, "relationship", "general_reference", "neutral", 0.35,
+                     evidence=f"灵签资料等级: {raw.get('source_quality', 'unknown')}", confidence=0.3),
+    ]
 
 
 # ── 批量标准化 ───────────────────────────────────────────────────────────────

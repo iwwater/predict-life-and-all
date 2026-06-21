@@ -11,6 +11,7 @@ SUBJECTS = {
     "home_fengshui": "住宅风水",
     "tarot_guidance": "塔罗指引",
     "lenormand_guidance": "雷诺曼指引",
+    "qian_guidance": "灵签指引",
 }
 
 METHOD_META = {
@@ -128,6 +129,14 @@ METHOD_META = {
         "subjects": ["lenormand_guidance", "relationship", "career", "decision", "self_life"],
         "modes": ["lenormand_spread"], "default_mode": "lenormand_spread",
         "required_inputs": {"lenormand_spread": ["question"]}, "recommended_for": ["日常具体占卜", "组合解读", "Grand Tableau 全貌"],
+    },
+    "qian": {
+        "school": "east", "name_zh": "观音/关帝灵签", "name_en": "Qian Oracle",
+        "group": "卜", "needs": ["question"], "engine": "self+public-qian-catalog",
+        "subjects": ["qian_guidance", "decision", "relationship", "career"],
+        "modes": ["random_draw", "manual_number"], "default_mode": "random_draw",
+        "required_inputs": {"random_draw": ["question"], "manual_number": ["qian_number"]},
+        "recommended_for": ["今日一签", "短期问事", "签号录入", "观音签/关帝签"],
     },
     "liuren": {
         "school": "east", "name_zh": "大六壬", "name_en": "Da Liu Ren",

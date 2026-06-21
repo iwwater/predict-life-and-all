@@ -22,15 +22,13 @@ from divination.aggregation.selector import (
 # ═══════════════════════════════════════════════════════════════════════════════
 
 
-def test_all_methods_count_is_18():
-    """Phase 1: 18 法全部纳入 (方案 §二十一)。
+def test_all_methods_count_is_19():
+    """Phase 1: 19 法全部纳入 (新增 qian 灵签)。
 
     NOTE: 当前 Wave 1 实现以 16-17 法落地 (12 经典 + 4 新增 + hepan)；
     sigil 等关系维在 Wave 2 单独加入。测试接受 16/17/18 实际值, 验证 4 新法已纳入。
     """
-    # 当前实现: 16-17 (bazi_v2..numerology + liuren/xiaoliuren/tieban/lenormand [+ hepan])
-    # 目标态 (Wave 2): 18 (+ sigil)
-    assert len(ALL_METHODS) in (16, 17, 18), f"Expected 16/17/18, got {len(ALL_METHODS)}"
+    assert len(ALL_METHODS) == 19, f"Expected 19, got {len(ALL_METHODS)}"
 
 
 def test_all_methods_contains_4_new():

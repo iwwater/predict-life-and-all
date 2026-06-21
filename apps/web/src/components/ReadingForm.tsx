@@ -49,6 +49,7 @@ const ALL_METHODS = [
   { id: "western", label: "西方占星", needsBirth: true, group: "西方" },
   { id: "vedic", label: "吠陀占星", needsBirth: true, group: "西方" },
   { id: "tarot", label: "塔罗", needsBirth: false, group: "西方" },
+  { id: "qian", label: "灵签", needsBirth: false, group: "东方卜筮" },
   { id: "numerology", label: "数字命理", needsBirth: "minimal", group: "西方" },
 ];
 

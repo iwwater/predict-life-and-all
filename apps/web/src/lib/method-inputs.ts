@@ -243,6 +243,25 @@ export const METHOD_INPUT_CONFIG: Record<string, MethodFormConfig> = {
     availableModes: [{ value: "lenormand_spread", label: "雷诺曼" }],
     defaultSpread: "three_line",
   },
+  qian: {
+    id: "qian",
+    needsBirth: false,
+    birthFields: [],
+    needsLocation: false,
+    needsQuestion: true,
+    needsSpread: false,
+    needsDirection: false,
+    needsCoinToss: false,
+    needsSeed: true,
+    needsName: false,
+    needsZodiac: false,
+    defaultMode: "random_draw",
+    availableModes: [
+      { value: "random_draw", label: "随机抽签" },
+      { value: "manual_number", label: "录入签号" },
+    ],
+    defaultSpread: "single",
+  },
 
   // ── Group D: no birth, coin/seed ─────────────────────────────────────
   liuyao: {
