@@ -1,6 +1,7 @@
 # 古典文献依据与古籍知识库
 
 > 本平台中国玄学部分排盘/断事规则均依传统文献，关键定数已实测对标。
+> **2026-06-21 校准**：本文件的书单仍以 `divination/knowledge/books.py` 和知识 API 为准；本次仅同步已完成/未完成状态，避免旧 Sprint TODO 误导后续开发。
 
 ## 0. 总览：18 法 · 60+ 本古典文献
 
@@ -243,7 +244,7 @@
 
 ### 实现
 - 雷诺曼：`divination/engines/lenormand.py`（36 张牌义 + Grand Tableau）
-- 塔罗：`divination/engines/tarot.py`（78 张 RWS + 凯尔特十字阵）
+- 塔罗：`divination/engines/tarot.py`（78 张 RWS + 9 阵 + 密码学安全抽牌；韦特/托特/现代心理三系统融合仍待接入）
 
 ### 已验证
 - 36 张牌义完整收录 + 时间指示、邻近修饰建模
@@ -411,30 +412,30 @@
 
 ---
 
-## 17. 后续 Sprint TODO
+## 17. 后续 Sprint TODO（2026-06-21 校准）
 
-### P1（全部完成 ✅）
+### P1（已完成 ✅）
 - [x] 大六壬完整课式（720 课框架 + 59 课体 + 30 神煞 + 10 已知课例）✅
 - [x] 铁板神数精确公式（条文 76→177 条 + 13 类 + 考刻分校验）✅
 - [x] 老黄历彭祖百忌完整表（22 类，与 lunar-python 对标 3/3）✅
-- [ ] 西方占星月亮交点 / 星历相位（待办）
-- [ ] 吠陀占星 Yogas (瑜伽) 完整体系（待办）
+- [x] 西方占星月亮交点 / 星历相位 / Lilith（`tests/test_western_aspects.py`、`tests/test_western_arabic_parts.py`）✅
+- [x] 吠陀占星 Yogas 体系（23 条 Yoga + engine 自动检测，`tests/test_vedic_yogas*.py`）✅
 
-### P2（全部完成 ✅）
+### P2（已完成 ✅）
 - [x] 玄空飞星 · 排龙诀 + 三元龙（24 山 + 排龙判断 + 净阴净阳）✅
 - [x] 紫微斗数 · 飞星四化深化（10 天干 × 4 化 + 十宫判断）✅
 - [x] 数字命理 · 中文三才五格姓名学全表（100 姓 + 80 名 + 1-81 数理）✅
-- [ ] 奇门遁甲 · 阴遁 9 局 + 阳遁 9 局完整（待办）
+- [x] 奇门遁甲 · 阴遁/阳遁 72 局与三元定局（`tests/test_qimen_72jun.py`、`tests/test_qimen_jiu_jun.py`）✅
 
-### P3（进行中 — subagent 后台执行中）
-- [ ] 与 `dzcmemory-web/bazi-ziwei-skill`（TS+HTML 跨验证海报）的交叉对照
-- [x] Golden 测试扩到 60+ 项（已扩展，见 `tests/test_golden_expanded.py` — 进行中）🔄
-- [ ] 古籍知识库 RAG 入库（`server/llm/references/`，P3-A 进行中）🔄
-- [ ] 在各专页（BaziPage / ZiweiPage 等）添加 "文献出处" 折叠面板（P3-B 进行中）🔄
+### P3（真实剩余）
+- [ ] 塔罗三系统融合：韦特 / 托特 / 现代心理目前只有参考资料，尚未接入塔罗 engine/API/frontend。
+- [ ] 观音灵签 / 关帝灵签：100 签资料库已建，但 26-100 多为待校订生成文案，完整 engine/API/frontend 仍待做。
+- [ ] 古籍知识库 RAG 入库与“文献出处”折叠面板：知识 API/书单已成型，引用语料和前端展示仍需产品化。
+- [ ] 与外部 `dzcmemory-web/bazi-ziwei-skill` 交叉对照：未见当前回归证据，保留为可选验证项。
 
 ---
 
-## 18. 项目交付统计 (2026-06-18)
+## 18. 项目交付统计 (2026-06-21)
 
 ### 古籍数据
 | 模块 | 数量 |
@@ -455,7 +456,7 @@
 ### 测试覆盖
 | 类别 | 数量 |
 |---|---|
-| pytest 测试 | **847 项** |
+| pytest 测试 | **2146 passed** |
 | TypeScript 检查 | **零错** |
 
 ### API 端点
