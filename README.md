@@ -145,7 +145,7 @@ cd apps/web && npx tsc --noEmit
 cd apps/web && npm run build
 ```
 
-**当前状态**: 2146 passed / 0 failed（六神测试解 skip + 称骨/铁板回归）· TypeScript 零错 · 0 flaky
+**当前状态**: 2150 passed / 0 failed（六神 + 称骨/铁板 + 塔罗三系统 + 灵签回归）· TypeScript 零错 · 0 flaky
 **任何依赖升级必须全绿才可并入。**
 
 ---
@@ -196,7 +196,7 @@ cd apps/web && npm run build
 ### P3 — 探索性
 - ✅ 紫微小限 + HTML/React 交互盘 — Sprint 4
 - ✅ 塔罗三系统融合（韦特 + 托特 + 现代心理）：engine/API/起卦页/专页/会审表单已接入 — 6.21
-- 观音灵签 / 关帝灵签：100 签资料库已建；完整术法入口 / API / 前端待接
+- ✅ 观音灵签 / 关帝灵签：`qian` engine + `/api/compute` + `/m/qian` + 结果盘面已接入；基础条目分层标注 — 6.21
 - ✅ Placidus 极区（|lat|>66°）专门处理：自动回退等宫 + warning — Sprint 4
 
 完整计划见 [`docs/ALGORITHM_IMPROVEMENT_PLAN.md`](docs/ALGORITHM_IMPROVEMENT_PLAN.md)
@@ -213,4 +213,4 @@ cd apps/web && npm run build
 
 ---
 
-*最近更新：2026-06-21（六神/称骨/铁板回归 · 2146/2146 测试通过）*
+*最近更新：2026-06-21（六神/称骨/铁板/塔罗/灵签回归 · 2150/2150 测试通过）*

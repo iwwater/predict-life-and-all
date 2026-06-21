@@ -428,7 +428,7 @@
 - [x] 奇门遁甲 · 阴遁/阳遁 72 局与三元定局（`tests/test_qimen_72jun.py`、`tests/test_qimen_jiu_jun.py`）✅
 
 ### P3（真实剩余）
-- [ ] 观音灵签 / 关帝灵签：100 签资料库已建，但 26-100 多为待校订生成文案，完整 engine/API/frontend 仍待做。
+- [x] 观音灵签 / 关帝灵签：`qian` engine/API/frontend 已接入；26-100 基础条目以 `base_catalog` 标注，后续可继续做古籍全文校订。✅
 - [ ] 古籍知识库 RAG 入库与“文献出处”折叠面板：知识 API/书单已成型，引用语料和前端展示仍需产品化。
 - [ ] 与外部 `dzcmemory-web/bazi-ziwei-skill` 交叉对照：未见当前回归证据，保留为可选验证项。
 
@@ -455,7 +455,7 @@
 ### 测试覆盖
 | 类别 | 数量 |
 |---|---|
-| pytest 测试 | **2146 passed** |
+| pytest 测试 | **2150 passed** |
 | TypeScript 检查 | **零错** |
 
 ### API 端点

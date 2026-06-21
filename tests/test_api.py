@@ -36,6 +36,7 @@ METHODS = [
     "numerology",
     "hepan",
     "lenormand",
+    "qian",
     "liuren",
     "xiaoliuren",
     "tieban",
@@ -196,6 +197,27 @@ def test_tarot_system_alias_defaults_to_modern():
         {"subject": "tarot_guidance", "spread": "single", "seed": 2, "tarot_system": "psychological"},
     )
     assert payload["raw"]["塔罗体系"] == "modern"
+
+
+def test_qian_compute_supports_guanyin_and_manual_number():
+    payload = _compute_with_options(
+        "qian",
+        {"mode": "manual_number", "qian_type": "guanyin", "qian_number": 1, "question": "今日一签"},
+    )
+    raw = payload["raw"]
+    assert payload["method"] == "qian"
+    assert raw["签谱"] == "guanyin"
+    assert raw["签号"] == 1
+    assert raw["draw_mode"] == "manual"
+    assert raw["source_quality"] in {"curated", "base_catalog"}
+
+
+def test_qian_seeded_draw_is_reproducible_and_supports_guandi():
+    first = _compute_with_options("qian", {"qian_type": "guandi", "seed": "fixed"})["raw"]
+    second = _compute_with_options("qian", {"qian_type": "guandi", "seed": "fixed"})["raw"]
+    assert first["签谱"] == "guandi"
+    assert first["签号"] == second["签号"]
+    assert first["签名"] == second["签名"]
 
 
 def test_tarot_position_template_filled_per_spread():

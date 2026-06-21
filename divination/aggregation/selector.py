@@ -1,7 +1,7 @@
 """术法选择器 — 根据 goal 返回全部 18 法并标记 primary/secondary/reference 三层。
 
 BE-004: 术法选择
-SEL-001: ALL_METHODS 固定 18 术法 (Phase 0 扩展: +liuren/xiaoliuren/tieban/lenormand, hepan 单独触发)
+SEL-001: ALL_METHODS 固定 19 术法 (Phase 0 扩展: +liuren/xiaoliuren/tieban/lenormand/qian, hepan 单独触发)
 SEL-002: select_methods(goal) 任意 goal 都返回 18 法 (默认) 或 12 法 (legacy 旁路)
 SEL-003: 每个术法标记 tier
 SEL-004~013: 每个 goal 各有 primary 配置
@@ -13,7 +13,7 @@ from typing import Any, Literal
 
 Tier = Literal["primary", "secondary", "reference"]
 
-# ── SEL-001: 固定 18 术法清单 (Phase 0 扩展) ──────────────────────────────
+# ── SEL-001: 固定 19 术法清单 (Phase 0 扩展) ──────────────────────────────
 
 ALL_METHODS: list[str] = [
     "bazi_v2",      # 1. 八字精算版 (long_term + current_cycle)
@@ -32,8 +32,9 @@ ALL_METHODS: list[str] = [
     "xiaoliuren",   # 14. 小六壬 (one_question)
     "tieban",       # 15. 铁板神数 (long_term)
     "lenormand",    # 16. 雷诺曼 (one_question)
-    "hepan",        # 17. 合盘 (relationship) — relationship 维核心
-    "chenggu",      # 18. 称骨 (long_term) — 袁天罡称骨歌
+    "qian",         # 17. 灵签 (one_question)
+    "hepan",        # 18. 合盘 (relationship) — relationship 维核心
+    "chenggu",      # 19. 称骨 (long_term) — 袁天罡称骨歌
 ]
 
 # 兼容老 API/老测试, 12 法旁路
@@ -59,6 +60,7 @@ METHOD_LABELS: dict[str, str] = {
     "xiaoliuren": "小六壬",
     "tieban":     "铁板神数",
     "lenormand":  "雷诺曼",
+    "qian":       "灵签",
     "hepan":      "合盘",
     "chenggu":    "称骨",
 }
@@ -70,7 +72,7 @@ DIMENSION_CONFIG: dict[str, list[str]] = {
     "long_term":     ["bazi_v2", "ziwei", "western", "vedic", "numerology", "tieban", "chenggu"],
     "current_cycle": ["bazi_v2", "ziwei", "western", "vedic"],
     "relationship":  ["hepan"],
-    "one_question":  ["liuyao", "qimen", "meihua", "tarot", "liuren", "xiaoliuren", "lenormand"],
+    "one_question":  ["liuyao", "qimen", "meihua", "tarot", "liuren", "xiaoliuren", "lenormand", "qian"],
     "space":         ["fengshui", "bazhai", "xuankong"],
 }
 

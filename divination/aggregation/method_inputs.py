@@ -170,6 +170,14 @@ INPUT_PROFILES: dict[str, dict[str, Any]] = {
         "default_spread": "three_line",
         "default_mode": "reflective",
     },
+    "qian": {
+        "needs_birth": False,
+        "birth_fields": [],
+        "needs_space": False,
+        "needs_question": True,
+        "needs_seed": True,
+        "default_mode": "random_draw",
+    },
     # ═══ 合盘 (relationship 维) ═══
     "hepan": {
         "needs_birth": True,           # 至少要本人 birth
@@ -242,6 +250,9 @@ def build_method_inputs(
     xiaoliuren_seed = opts.get("xiaoliuren_seed", None)
     lenormand_spread = opts.get("lenormand_spread", "three_line")
     lenormand_mode = opts.get("lenormand_mode", "reflective")
+    qian_type = opts.get("qian_type", "guanyin")
+    qian_number = opts.get("qian_number", None)
+    qian_seed = opts.get("qian_seed", None)
     father_zodiac = opts.get("father_zodiac", None)
     mother_zodiac = opts.get("mother_zodiac", None)
 
@@ -349,6 +360,15 @@ def build_method_inputs(
             b.spread = lenormand_spread or profile.get("default_spread", "three_line")
             b.mode = lenormand_mode or profile.get("default_mode", "reflective")
             if question:
+                b.seed = _question_seed(question)
+
+        if method == "qian":
+            b.mode = _resolve_mode(method, opts, profile)
+            b.qian_type = qian_type
+            b.qian_number = qian_number
+            if qian_seed:
+                b.seed = qian_seed
+            elif question:
                 b.seed = _question_seed(question)
 
         # 注入合盘 (Phase 0) — 用 target_birth 作为 partner

@@ -11,7 +11,7 @@
 
 | 项 | 文档说法 | 实际状态 | 处理 |
 |----|----------|----------|------|
-| Golden 测试 | 43 项 | golden 文件显式测试约 **47 项**；全量 `2146 passed` | ✅ 已超过 30+ 项门槛，后续继续补专业软件对照集 |
+| Golden 测试 | 43 项 | golden 文件显式测试约 **47 项**；全量 `2150 passed` | ✅ 已超过 30+ 项门槛，后续继续补专业软件对照集 |
 | `server/data/celebrity_cases.json` | 需下架 | 已不存在 | ✅ 已完成 |
 | `uvicorn.log.err` | 需进 `.gitignore` | `.gitignore` 已有 `*.log`；文件还在工作树 | 一次性 rm，不入仓 |
 | 评分档位制 | 改五档极性+计票 | `DimensionPolarity` / `SignalDigest` / `tally_by_scope` 已落地；业务代码无 `overall_score` 输出 | ✅ 已完成，保留测试注释作为迁移说明 |
@@ -35,7 +35,7 @@
 | 0.4 | **八字旺衰 + 藏干**：`wuxing.py` 加藏干表 + `element_strength` + `day_master_strength`；`bazi.py` 接入 + `zi_hour` 开关 | `divination/wuxing.py`、`divination/engines/bazi.py`、`tests/test_golden_classics.py` | 庚生巳月中和、三寅身强、子月众水从弱；23:30 双开关日柱不同 |
 | 0.5 | ✅ **塔罗基础深化**：78 牌、9 阵、安全洗牌与承诺方案已完成；三系统融合仍另列 P3 | `divination/engines/tarot.py`、`divination/aggregation/method_inputs.py` | 78 张唯一 id；同 seed 同牌组；crypto 回归已入库 |
 | 0.6 | ✅ **吠陀深化**：Rahu/Ketu、D9 Navamsa、庙旺、Vimshottari Dasha、Yogas 已接入 | `divination/engines/vedic.py`、`divination/data/vedic_yogas.py` | Makar Sankranti、Dasha=120、Yogas 表/引擎测试覆盖 |
-| 0.7 | ✅ **黄金测试扩到 30+ 项**：当前 golden 文件显式测试约 47 项 | `tests/test_golden_*.py` | 全量 `python -m pytest tests/ -q` 已验证 2146 passed |
+| 0.7 | ✅ **黄金测试扩到 30+ 项**：当前 golden 文件显式测试约 47 项 | `tests/test_golden_*.py` | 全量 `python -m pytest tests/ -q` 已验证 2150 passed |
 | 0.8 | **卫生**：`rm -f uvicorn.log uvicorn.log.err`；`*.log` 已在 `.gitignore`，确认无残留 | 工作树 | `git status` 不再列日志文件 |
 | 0.9 | **奇门 golden 验证**：5 节气三元定局对照《烟波钓叟歌》 | `tests/test_golden_classics.py`（增） | 5 例皆过；不过即修排局算法 |
 | 0.10 | **Linter 兜底**：禁 `Math.random()`、禁全局 `random.seed`、禁字符串 hardcode 二十四山 | 新增 `tools/lint_random.py` 或 ruff 自定义规则 | `make lint` 全绿；CI 必过门 |
@@ -296,7 +296,7 @@
 
 **顺序就是价值**：
 1. 已完成项不再回炉：五档制、golden 扩容、六神、铁板、塔罗安全抽牌、奇门阴阳遁等按现状维护。
-2. 继续推进还没产品化的差异项：观音/关帝灵签完整入口、古籍 RAG 与文献出处面板。
+2. 继续推进还没产品化的差异项：古籍 RAG 与文献出处面板；灵签后续只剩古籍全文校订，不再是入口/API/前端缺口。
 3. 主推/长尾分层要服务上架和维护，不再以“12 法是否凑齐”为目标。
 4. 新增资料必须先解决版权与来源，再进入 engine/API/frontend。
 

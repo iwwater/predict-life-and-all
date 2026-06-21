@@ -20,6 +20,7 @@ export const METHOD_PLAIN: Record<Method, MethodPlain> = {
   western: { tagline: "西方本命盘，太阳月亮上升与行星", bestFor: "行星相位、宫位大运、本命格局", sample: "我的上升和本命主题是什么?", source: "现代西方占星" },
   vedic: { tagline: "吠陀恒星黄道命盘", bestFor: "二十七宿、大运体系、星曜力度", sample: "吠陀盘里我的人生主题是什么?", source: "Jyotish" },
   tarot: { tagline: "按问题选择牌阵，而不是只抽几张", bestFor: "身心灵牌阵、当下指引、意象解读", sample: "这段关系现在应该怎么看?", source: "Waite-style Tarot" },
+  qian: { tagline: "观音/关帝灵签，抽签或录入签号", bestFor: "今日一签、短期问事、签号解读", sample: "今天这件事应不应该推进?", source: "观音灵签 / 关帝灵签" },
   numerology: { tagline: "生命灵数与数字主题", bestFor: "生命数字、周期年运、姓名数字", sample: "我的生命灵数是几?", source: "Pythagorean Numerology" },
   lenormand: { tagline: "36张具体象征牌，组合解读日常", bestFor: "Grand Tableau、日常决策、组合解读", sample: "今天的状况怎么看?", source: "Petit Lenormand 体系" },
   liuren: { tagline: "三式之首，天地盘四课三传断人事", bestFor: "人事决疑、天时地利、三式之首", sample: "这件事的因果走向如何?", source: "大六壬传统体系" },
@@ -42,7 +43,7 @@ export const SUBJECTS: Array<{
 }> = [
   { key: "self_life", label: "本命格局", desc: "长期命局、性格、人生阶段", methods: ["bazi", "bazi_v2", "ziwei", "western", "vedic", "chenggu", "numerology", "tieban"], modeByMethod: { bazi: "natal", bazi_v2: "natal", ziwei: "natal", tieban: "tieban_base" } },
   { key: "annual_luck", label: "流年/阶段运", desc: "今年、近几年、大运限运", methods: ["bazi", "bazi_v2", "ziwei", "western", "vedic"], modeByMethod: { bazi: "annual_luck", bazi_v2: "annual_luck", ziwei: "annual" } },
-  { key: "decision", label: "具体一事", desc: "成败、去留、该不该做", methods: ["liuyao", "meihua", "qimen", "tarot", "liuren"], modeByMethod: { liuyao: "time_qigua", meihua: "time_qigua", qimen: "hour_qimen", tarot: "tarot_spread", liuren: "liuren_divination" }, defaultSpread: "choice_two" },
+  { key: "decision", label: "具体一事", desc: "成败、去留、该不该做", methods: ["liuyao", "meihua", "qimen", "tarot", "qian", "liuren"], modeByMethod: { liuyao: "time_qigua", meihua: "time_qigua", qimen: "hour_qimen", tarot: "tarot_spread", qian: "random_draw", liuren: "liuren_divination" }, defaultSpread: "choice_two" },
   { key: "relationship", label: "关系感情", desc: "双方状态、互动、阻碍", methods: ["liuyao", "tarot", "lenormand", "ziwei", "western"], modeByMethod: { liuyao: "time_qigua", tarot: "tarot_spread", lenormand: "lenormand_spread", ziwei: "natal" }, defaultSpread: "relationship_cross" },
   { key: "career", label: "事业工作", desc: "工作路径、机会、阻力", methods: ["bazi", "bazi_v2", "liuyao", "qimen", "tarot", "lenormand"], modeByMethod: { bazi: "annual_luck", bazi_v2: "annual_luck", liuyao: "time_qigua", qimen: "hour_qimen", tarot: "tarot_spread", lenormand: "lenormand_spread" }, defaultSpread: "career_path" },
   { key: "wealth", label: "求财", desc: "财运、项目、交易", methods: ["liuyao", "qimen", "bazi", "bazi_v2"], modeByMethod: { liuyao: "time_qigua", qimen: "hour_qimen", bazi: "annual_luck", bazi_v2: "annual_luck" } },
@@ -50,6 +51,7 @@ export const SUBJECTS: Array<{
   { key: "home_fengshui", label: "住宅风水", desc: "命卦、坐向、三元九运", methods: ["bazhai", "xuankong"], modeByMethod: { bazhai: "residential_bazhai", xuankong: "residential_xuankong" } },
   { key: "tarot_guidance", label: "塔罗指引", desc: "今日建议、身心灵、复杂牌阵", methods: ["tarot"], modeByMethod: { tarot: "tarot_spread" }, defaultSpread: "single" },
   { key: "lenormand_guidance", label: "雷诺曼指引", desc: "日常具体占卜、组合解读", methods: ["lenormand"], modeByMethod: { lenormand: "lenormand_spread" } },
+  { key: "qian_guidance", label: "灵签指引", desc: "观音/关帝灵签、今日一签、签号录入", methods: ["qian"], modeByMethod: { qian: "random_draw" } },
 ];
 
 export const INTENTS = SUBJECTS.map((s) => ({

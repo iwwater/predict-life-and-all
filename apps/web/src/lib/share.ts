@@ -12,7 +12,7 @@ const METHOD_LABEL: Record<Method, string> = {
   bazhai: "八宅", xuankong: "玄空",
   western: "西方占星", vedic: "吠陀",
   tarot: "塔罗", numerology: "数字命理",
-  lenormand: "雷诺曼", liuren: "大六壬", tieban: "铁板神数", xiaoliuren: "小六壬",
+  lenormand: "雷诺曼", qian: "灵签", liuren: "大六壬", tieban: "铁板神数", xiaoliuren: "小六壬",
   cross_validator: "交叉验证", hour_calibrator: "时辰校准", compatibility: "合婚", hepan: "合盘",
   dream: "解梦",
 };
@@ -33,6 +33,7 @@ const SUBJECT_SUMMARY: Record<Subject, string> = {
   home_fengshui: "聚焦住宅命卦与坐向理气,适合环境参考。",
   tarot_guidance: "聚焦当下建议与身心灵整合,适合作为当下提问。",
   lenormand_guidance: "雷诺曼 36 张牌阵指引,聚焦日常决策与细节解读。",
+  qian_guidance: "观音/关帝灵签指引,适合今日一签或签号解读。",
 };
 
 const SUGGESTIONS = [

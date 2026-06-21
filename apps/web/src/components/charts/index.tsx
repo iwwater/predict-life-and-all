@@ -17,6 +17,7 @@ const LazyXuankongChart = lazy(() => import("./XuankongChart").then((m) => ({ de
 const LazyTarotChart = lazy(() => import("./TarotChart").then((m) => ({ default: m.TarotChart })));
 const LazyNumerologyChart = lazy(() => import("./NumerologyChart").then((m) => ({ default: m.NumerologyChart })));
 const LazyLenormandChart = lazy(() => import("./LenormandChart").then((m) => ({ default: m.LenormandChart })));
+const LazyQianChart = lazy(() => import("./QianChart").then((m) => ({ default: m.QianChart })));
 const LazyLiurenChart = lazy(() => import("./LiurenChart").then((m) => ({ default: m.LiurenChart })));
 const LazyTiebanChart = lazy(() => import("./TiebanChart").then((m) => ({ default: m.TiebanChart })));
 
@@ -57,6 +58,7 @@ export function ChartRenderer({ chart, crossValidation, peachBlossom, fateModifi
     case "tarot":      return <Suspense fallback={<ChartLoadingFallback />}><LazyTarotChart chart={chart} /></Suspense>;
     case "numerology": return <Suspense fallback={<ChartLoadingFallback />}><LazyNumerologyChart chart={chart} /></Suspense>;
     case "lenormand":  return <Suspense fallback={<ChartLoadingFallback />}><LazyLenormandChart chart={chart} /></Suspense>;
+    case "qian":       return <Suspense fallback={<ChartLoadingFallback />}><LazyQianChart chart={chart} /></Suspense>;
     case "liuren":     return <Suspense fallback={<ChartLoadingFallback />}><LazyLiurenChart chart={chart} /></Suspense>;
     case "tieban":     return <Suspense fallback={<ChartLoadingFallback />}><LazyTiebanChart chart={chart} /></Suspense>;
     default: return <div className="paper-empty">未知占卜法: {m}</div>;
