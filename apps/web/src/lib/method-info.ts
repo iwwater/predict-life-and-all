@@ -1,4 +1,4 @@
-import type { Method, Subject, TarotSpread } from "./types";
+import type { Method, Subject, TarotSpread, TarotSystem } from "./types";
 
 export interface MethodPlain {
   tagline: string;
@@ -68,4 +68,10 @@ export const TAROT_SPREADS: Array<{ code: TarotSpread; label: string; desc: stri
   { code: "relationship_cross", label: "关系十字", desc: "你、对方、互动、阻碍、建议", subjects: ["relationship"] },
   { code: "career_path", label: "事业路径", desc: "现状、优势、阻碍、机会、建议", subjects: ["career"] },
   { code: "celtic_cross", label: "凯尔特十字", desc: "复杂综合问题十张", subjects: ["decision", "career", "relationship"] },
+];
+
+export const TAROT_SYSTEMS: Array<{ code: TarotSystem; label: string; desc: string }> = [
+  { code: "waite", label: "韦特 RWS", desc: "图像叙事清晰，适合通用问题与新手读牌" },
+  { code: "thoth", label: "托特 Thoth", desc: "占星、炼金术与卡巴拉视角更重，适合深层结构" },
+  { code: "modern", label: "现代心理", desc: "聚焦情绪模式、关系边界与可执行行动" },
 ];
