@@ -68,14 +68,16 @@ def houses(asc_lon: float, system: str = "whole") -> list[dict]:
     """宫位划分。
     whole = 整宫制（上升所在星座为第1宫，每宫一整个星座）；
     equal = 等宫制（上升度数起，每 30° 一宫）。
-    Placidus 需迭代天文计算，留作 TODO。"""
+
+    Placidus 使用 placidus_houses(ramc_deg, lat_deg, obliquity_deg)，因为它需要 RAMC
+    与纬度，不能只由上升点黄经推出。"""
     cusps = []
     if system == "whole":
         start = (int(asc_lon // 30)) * 30  # 上升星座起点
     elif system == "equal":
         start = asc_lon
     else:
-        raise NotImplementedError("Placidus 待实现（B 路需自算，迭代法）")
+        raise ValueError(f"unsupported house system for asc-only houses(): {system}")
     for h in range(12):
         cusps.append({"house": h + 1, "cusp_lon": round((start + 30 * h) % 360, 2)})
     return cusps

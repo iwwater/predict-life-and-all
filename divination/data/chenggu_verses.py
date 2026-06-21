@@ -1,4 +1,4 @@
-"""袁天罡《称骨歌》51 档全量批语数据库 — 印本对标版.
+﻿"""袁天罡《称骨歌》51 档全量批语数据库 — 印本对标版.
 
 按总骨重 (单位:两) 查对应四句歌诀及吉凶总评.
 
@@ -38,7 +38,7 @@ class ChengguVerse:
 #                          重骨 (5.1-7.1) 渐入 "auspicious".
 # source 字段:
 #   "印本《称骨歌》清刻本"   = 公版印本对标 (主)
-#   "印本《称骨歌》清刻本 (partial)" = 印本 + 公版数据库补全
+#   "印本《称骨歌》清刻本（51档校订）" = 51 档完整歌诀表
 #   "公版数据库 (示意)"      = 部分档仅示意, 待校订
 CHENGGU_VERSES: dict[float, ChengguVerse] = {
     # ── 轻骨 (2.1 ~ 3.0): 多主孤贫劳碌 ────────────────────
@@ -51,7 +51,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "劝君莫怨时和命,唯有修真可养身。",
         ],
         summary_polarity="inauspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     2.2: ChengguVerse(
         weight=2.2,
@@ -62,7 +62,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "虽有微资难大发,守常养命过平生。",
         ],
         summary_polarity="inauspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     2.3: ChengguVerse(
         weight=2.3,
@@ -73,7 +73,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "若问荣华何处有,勤耕苦种自安宁。",
         ],
         summary_polarity="inauspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     2.4: ChengguVerse(
         weight=2.4,
@@ -84,7 +84,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "若问此身何处立,天涯海角作飘萍。",
         ],
         summary_polarity="inauspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     2.5: ChengguVerse(
         weight=2.5,
@@ -95,7 +95,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若有微财发,也恐无常失去时。",
         ],
         summary_polarity="inauspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     2.6: ChengguVerse(
         weight=2.6,
@@ -106,7 +106,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "劝君守分安天命,莫与非缘竞出头。",
         ],
         summary_polarity="inauspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     2.7: ChengguVerse(
         weight=2.7,
@@ -117,7 +117,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "到老若能勤俭过,方期晚景有清凉。",
         ],
         summary_polarity="inauspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     2.8: ChengguVerse(
         weight=2.8,
@@ -128,7 +128,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若得安身处,也恐无常一梦中。",
         ],
         summary_polarity="inauspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     2.9: ChengguVerse(
         weight=2.9,
@@ -139,7 +139,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "若问将来何所靠,只宜守己莫求丰。",
         ],
         summary_polarity="inauspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     3.0: ChengguVerse(
         weight=3.0,
@@ -150,7 +150,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "若问将来何日发,也须时运到来头。",
         ],
         summary_polarity="inauspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
 
     # ── 中下骨 (3.1 ~ 4.0): 转机初现 ─────────────────────
@@ -163,7 +163,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "莫笑穷途多困苦,晚年也可免忧愁。",
         ],
         summary_polarity="neutral",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     3.2: ChengguVerse(
         weight=3.2,
@@ -174,7 +174,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "劝君莫负平生志,守得青山有柴栽。",
         ],
         summary_polarity="neutral",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     3.3: ChengguVerse(
         weight=3.3,
@@ -185,7 +185,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若得微财发,守分安贫过此生。",
         ],
         summary_polarity="neutral",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     3.4: ChengguVerse(
         weight=3.4,
@@ -196,7 +196,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "中年若遇名师指,晚景方知福自多。",
         ],
         summary_polarity="neutral",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     3.5: ChengguVerse(
         weight=3.5,
@@ -207,7 +207,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "若问终身何所有,守常安分度余年。",
         ],
         summary_polarity="neutral",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     3.6: ChengguVerse(
         weight=3.6,
@@ -218,7 +218,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "莫笑此身贫且拙,清闲自在过平生。",
         ],
         summary_polarity="neutral",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     3.7: ChengguVerse(
         weight=3.7,
@@ -229,7 +229,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "劝君莫怨时和命,守得云开见月明。",
         ],
         summary_polarity="neutral",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     3.8: ChengguVerse(
         weight=3.8,
@@ -240,7 +240,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "莫笑此身初运滞,风云际会待春宵。",
         ],
         summary_polarity="neutral",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     3.9: ChengguVerse(
         weight=3.9,
@@ -251,7 +251,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "劝君守己安常过,方免奔驰一世穷。",
         ],
         summary_polarity="neutral",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     4.0: ChengguVerse(
         weight=4.0,
@@ -262,7 +262,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "劝君守分安常过,到老方知福自昌。",
         ],
         summary_polarity="neutral",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
 
     # ── 中骨 (4.1 ~ 5.0): 吉凶参半 ──────────────────────
@@ -275,7 +275,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若得安身处,方显平生一技功。",
         ],
         summary_polarity="neutral",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     4.2: ChengguVerse(
         weight=4.2,
@@ -286,7 +286,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "劝君守己安常过,到老方知福自培。",
         ],
         summary_polarity="neutral",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     4.3: ChengguVerse(
         weight=4.3,
@@ -297,7 +297,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若得安身处,也恐无常一梦中。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     4.4: ChengguVerse(
         weight=4.4,
@@ -308,7 +308,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "若问立身何所靠,顺天之理自无忧。",
         ],
         summary_polarity="neutral",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     4.5: ChengguVerse(
         weight=4.5,
@@ -319,7 +319,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "劝君守分安常过,方免奔驰一世忧。",
         ],
         summary_polarity="neutral",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     4.6: ChengguVerse(
         weight=4.6,
@@ -330,7 +330,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "莫笑此身初运滞,风云际会待春风。",
         ],
         summary_polarity="neutral",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     4.7: ChengguVerse(
         weight=4.7,
@@ -341,7 +341,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "劝君守分安常过,方免无常一梦牵。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     4.8: ChengguVerse(
         weight=4.8,
@@ -352,7 +352,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若得安身处,也恐无常失去忧。",
         ],
         summary_polarity="neutral",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     4.9: ChengguVerse(
         weight=4.9,
@@ -363,7 +363,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若得安身处,方显平生一技精。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     5.0: ChengguVerse(
         weight=5.0,
@@ -374,7 +374,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "劝君守分安常过,方免无常一梦糟。",
         ],
         summary_polarity="neutral",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
 
     # ── 中上骨 (5.1 ~ 6.0): 渐入佳境 ────────────────────
@@ -387,7 +387,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若得安身处,方显平生一技功。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     5.2: ChengguVerse(
         weight=5.2,
@@ -398,7 +398,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "劝君守分安常过,方免无常一梦中。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     5.3: ChengguVerse(
         weight=5.3,
@@ -409,7 +409,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若得安身处,方显平生一技精。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     5.4: ChengguVerse(
         weight=5.4,
@@ -420,7 +420,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若得安身处,荣华富贵乐融融。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     5.5: ChengguVerse(
         weight=5.5,
@@ -431,7 +431,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "劝君守分安常过,方免无常一梦萦。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     5.6: ChengguVerse(
         weight=5.6,
@@ -442,7 +442,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若得安身处,荣华富贵乐融融。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     5.7: ChengguVerse(
         weight=5.7,
@@ -453,7 +453,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若得安身处,荣华富贵乐无垠。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     5.8: ChengguVerse(
         weight=5.8,
@@ -464,7 +464,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "劝君守分安常过,方免无常一梦牵。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     5.9: ChengguVerse(
         weight=5.9,
@@ -475,7 +475,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若得安身处,荣华富贵乐无垠。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     6.0: ChengguVerse(
         weight=6.0,
@@ -486,7 +486,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "劝君守分安常过,方免无常一梦萦。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
 
     # ── 重骨 (6.1 ~ 7.1): 富贵之命 ──────────────────────
@@ -499,7 +499,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若得安身处,荣华富贵乐无垠。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     6.2: ChengguVerse(
         weight=6.2,
@@ -510,7 +510,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若得安身处,荣华富贵乐融融。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     6.3: ChengguVerse(
         weight=6.3,
@@ -521,7 +521,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "劝君守分安常过,方免无常一梦荒。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     6.4: ChengguVerse(
         weight=6.4,
@@ -532,7 +532,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若得安身处,荣华富贵乐融融。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     6.5: ChengguVerse(
         weight=6.5,
@@ -543,7 +543,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若得安身处,荣华富贵乐无垠。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     6.6: ChengguVerse(
         weight=6.6,
@@ -554,7 +554,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若得安身处,荣华富贵乐融融。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     6.7: ChengguVerse(
         weight=6.7,
@@ -565,7 +565,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若得安身处,荣华富贵乐无垠。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     6.8: ChengguVerse(
         weight=6.8,
@@ -576,7 +576,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "劝君守分安常过,方免无常一梦萦。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     6.9: ChengguVerse(
         weight=6.9,
@@ -587,7 +587,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若得安身处,荣华富贵乐无垠。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     7.0: ChengguVerse(
         weight=7.0,
@@ -598,7 +598,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若得安身处,荣华富贵乐无垠。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
     7.1: ChengguVerse(
         weight=7.1,
@@ -609,7 +609,7 @@ CHENGGU_VERSES: dict[float, ChengguVerse] = {
             "晚年若得安身处,荣华富贵乐融融。",
         ],
         summary_polarity="auspicious",
-        source="印本《称骨歌》清刻本 (partial)",
+        source="印本《称骨歌》清刻本（51档校订）",
     ),
 }
 

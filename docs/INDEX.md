@@ -1,6 +1,6 @@
 # 文档索引 (按用途分组)
 
-> 最后更新: 2026-06-20
+> 最后更新: 2026-06-21
 >
 > 本目录的所有文档按以下 5 类组织。README.md 第六节有更精简的版本。
 
@@ -36,8 +36,9 @@
 |------|------|------|
 | [`sprint-1-verification.md`](sprint-1-verification.md) | Sprint 1 验收报告 | 6.17 |
 | [`sprint-2-verification.md`](sprint-2-verification.md) | Sprint 2 验收报告 | 6.17 |
+| [`SESSION_2026-06-21.md`](SESSION_2026-06-21.md) | **当前** session handoff: 六神测试解 skip + 文档同步 | 6.21 |
+| [`SESSION_2026-06-20.md`](SESSION_2026-06-20.md) | Sprint 4 状态 + docs 收口（历史快照） | 6.20 |
 | [`SESSION_2026-06-19.md`](SESSION_2026-06-19.md) | Sprint 3 + 6.18 P0 全绿 (1600/1600) | 6.19 |
-| [`SESSION_2026-06-20.md`](SESSION_2026-06-20.md) | **当前** session handoff: docs 收口 + Sprint 4 状态 | 6.20 |
 | [`dev-log-2026-06-15.md`](dev-log-2026-06-15.md) | 工作日志样例 (6.15) | 6.15 |
 
 ## 五、部署 & 运维 (Deploy & Ops)

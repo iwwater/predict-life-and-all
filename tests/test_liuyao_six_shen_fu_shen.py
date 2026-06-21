@@ -27,9 +27,6 @@ from divination.engines.liuyao import (
     _find_fushen,
 )
 
-pytestmark = pytest.mark.skip(reason="TODO: align with engine API after multi-agent refactor")
-
-
 # ══════════════════════════════════════════════════════════════
 # 1. 六神含义注解（《卜筮正宗·六神篇》）
 # ══════════════════════════════════════════════════════════════

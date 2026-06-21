@@ -40,6 +40,12 @@ def test_every_verse_has_non_empty_source():
     assert not empty, f"source 为空的档: {empty}"
 
 
+def test_every_verse_source_not_partial():
+    """51 档主表已校订完成, source 不应再标 partial."""
+    partial = [w for w, v in CHENGGU_VERSES.items() if "partial" in v.source.lower()]
+    assert not partial, f"source 仍标 partial 的档: {partial}"
+
+
 def test_every_verse_has_4_lines():
     """每档必须 4 句歌诀 (原印本四言/七言)."""
     bad = [(w, len(v.verse_4_lines)) for w, v in CHENGGU_VERSES.items()

@@ -209,6 +209,14 @@ def test_compute_tieguan_lineage():
     assert "铁冠道人" in r.raw["lineage_name"]
 
 
+def test_compute_lineages_map_to_different_verse_ranges():
+    """同一出生信息在不同流派下应映射到不同条文范围。"""
+    b = Birth(year=1990, month=5, day=15, hour=10, minute=0)
+    shaoyong = compute(b, lineage="shaoyong")
+    tieguan = compute(b, lineage="tieguan")
+    assert shaoyong.raw["verse_result"]["verse_set_range"] != tieguan.raw["verse_result"]["verse_set_range"]
+
+
 def test_compute_invalid_lineage_raises():
     """不支持的流派应 raise ValueError."""
     b = Birth(year=1990, month=5, day=15, hour=10, minute=0)
