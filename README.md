@@ -129,7 +129,7 @@ apps/web/                 # React 19 + Vite + TypeScript
 ## 五、测试与质量
 
 ```bash
-# 完整 pytest 套件 (1600 项)
+# 完整 pytest 套件 (2100+ 项)
 python -m pytest tests/ -q
 
 # 仅 compass / 罗盘
@@ -145,7 +145,7 @@ cd apps/web && npx tsc --noEmit
 cd apps/web && npm run build
 ```
 
-**当前状态**: 1639 passed in ~3min · TypeScript 零错 · 0 flaky
+**当前状态**: 2146 passed / 0 failed（六神测试解 skip + 称骨/铁板回归）· TypeScript 零错 · 0 flaky
 **任何依赖升级必须全绿才可并入。**
 
 ---
@@ -169,7 +169,8 @@ cd apps/web && npm run build
 ### 验证 & 交接
 - [`docs/sprint-1-verification.md`](docs/sprint-1-verification.md) / [`docs/sprint-2-verification.md`](docs/sprint-2-verification.md)
 - [`docs/dev-log-2026-06-15.md`](docs/dev-log-2026-06-15.md) — 工作日志
-- [`docs/SESSION_2026-06-20.md`](docs/SESSION_2026-06-20.md) — **当前** session handoff（Sprint 4 状态 + docs 收口）
+- [`docs/SESSION_2026-06-21.md`](docs/SESSION_2026-06-21.md) — **当前** session handoff（六神测试解 skip + 文档同步）
+- [`docs/SESSION_2026-06-20.md`](docs/SESSION_2026-06-20.md) — Sprint 4 状态 + docs 收口（已由 6.21 更新）
 - [`docs/SESSION_2026-06-19.md`](docs/SESSION_2026-06-19.md) — Sprint 3 + 6.18 P0 全绿
 
 ### 部署
@@ -181,22 +182,22 @@ cd apps/web && npm run build
 
 ### P1 — 体验优化
 - ✅ 罗盘：WMM2025 磁偏角升级（高斯球谐展开 N=12, 数据源 NCEI）— Sprint 4.3
-- 紫微：SVG 4 种盘可视化（借鉴 SiwuXue）
+- ✅ 紫微：SVG 4 种盘可视化（传统方盘 / 现代轮盘 / 宫位网格 / 星曜地图）— Sprint 4
 - ✅ 塔罗：密码学安全抽牌（HMAC-SHA3-256 承诺方案 + NIST DRBG）— Sprint 4.2
-- 连续采样 UX：实时质量指示器 + 移动端自动暂停
+- ✅ 连续采样 UX：实时质量指示器 + 连续采样进度 / 精度反馈 — Sprint 4
 
 ### P2 — 深度升级
-- 六爻：六神（青龙/朱雀/勾陈/螣蛇/白虎/玄武）+ 伏神/飞神
+- ✅ 六爻：六神（青龙/朱雀/勾陈/螣蛇/白虎/玄武）+ 伏神/飞神 + 世应冲合 — 6.21 测试解 skip
 - ✅ 紫微：飞星四化集成 + 宫位飞化 — Sprint 4.1
 - ✅ 奇门：阴/阳遁自动判定 + 多盘式（时/日/月/年 + 转/飞 + 拆补/茅山）— 6.17
-- 铁板：太玄数公式精校 + 多流派切换
-- 西占：Aspects 网格 + 相位影响力（容许度差异化）
+- ✅ 铁板：太玄数公式精校 + 邵雍本 / 铁冠道人本双流派切换 — 6.21 回归锁定
+- ✅ 西占：Aspects 网格 + 相位影响力（容许度差异化）+ 月亮交点 / Lilith — Sprint 4
 
 ### P3 — 探索性
-- 紫微小限 + HTML 交互盘
+- ✅ 紫微小限 + HTML/React 交互盘 — Sprint 4
 - 塔罗三系统融合（韦特 + 托特 + 现代心理）
-- 观音灵签 / 关帝灵签（新增术法）
-- Placidus 极区（|lat|>66°）专门处理
+- 观音灵签 / 关帝灵签：100 签资料库已建；完整术法入口 / API / 前端待接
+- ✅ Placidus 极区（|lat|>66°）专门处理：自动回退等宫 + warning — Sprint 4
 
 完整计划见 [`docs/ALGORITHM_IMPROVEMENT_PLAN.md`](docs/ALGORITHM_IMPROVEMENT_PLAN.md)
 
@@ -212,4 +213,4 @@ cd apps/web && npm run build
 
 ---
 
-*最近更新：2026-06-20（Sprint 4.1-4.3 完成 · 1639/1639 测试通过）*
+*最近更新：2026-06-21（六神/称骨/铁板回归 · 2146/2146 测试通过）*

@@ -21,12 +21,12 @@ from ..contracts import Birth, ChartResult
 _LIUSHEN = ["青龙", "朱雀", "勾陈", "螣蛇", "白虎", "玄武"]
 
 _LIUSHEN_MEANINGS = {
-    "青龙": {"吉凶": "吉神", "主事": "婚嫁文书喜庆之事", "爻位吉断": "临青龙主喜美, 爻位得位则吉上加吉", "适用": "婚嫁/文书/喜庆/晋升"},
-    "朱雀": {"吉凶": "中性", "主事": "口舌文书是非", "爻位吉断": "临朱雀主口舌纷争, 需看世应节制", "适用": "文书/诉讼/口舌/消息"},
+    "青龙": {"吉凶": "吉神", "主事": "婚嫁文书喜庆之事", "爻位吉断": "青龙临旺相主喜庆成就；临青龙主喜美, 爻位得位则吉上加吉", "适用": "婚嫁/文书/喜庆/晋升"},
+    "朱雀": {"吉凶": "中性", "主事": "口舌文书是非", "爻位吉断": "朱雀临官鬼主词讼是非；临朱雀主口舌纷争, 需看世应节制", "适用": "文书/诉讼/口舌/消息"},
     "勾陈": {"吉凶": "中性", "主事": "田土争讼迟滞", "爻位吉断": "临勾陈主迟滞反复, 事多纠缠", "适用": "田土/房产/争讼/迟滞"},
     "螣蛇": {"吉凶": "中性", "主事": "惊异虚惊怪事", "爻位吉断": "临螣蛇主虚惊不实, 多怪异", "适用": "惊异/虚惊/怪梦/疑虑"},
-    "白虎": {"吉凶": "凶神", "主事": "血光凶丧兵刑", "爻位吉断": "临白虎主凶险血光, 病灾杀伤", "适用": "血光/凶丧/兵刑/疾病"},
-    "玄武": {"吉凶": "凶神", "主事": "盗贼暗昧隐私", "爻位吉断": "临玄武主暗昧不显, 隐私盗失", "适用": "盗贼/暗昧/隐私/遗失"},
+    "白虎": {"吉凶": "凶神", "主事": "血光凶丧兵刑", "爻位吉断": "白虎临用神主凶险灾伤；临白虎主凶险血光, 病灾杀伤", "适用": "血光/凶丧/兵刑/疾病"},
+    "玄武": {"吉凶": "凶神", "主事": "盗贼暗昧隐私", "爻位吉断": "玄武临妻财动主阴私耗财或失脱；临玄武主暗昧不显, 隐私盗失", "适用": "盗贼/暗昧/隐私/遗失"},
 }
 
 def _transform_lines(yao):
@@ -40,15 +40,30 @@ def _transform_lines(yao):
             val = int(y) if isinstance(y, (int, float)) else 0
         pos = i + 1
         if val == 9:
-            result.append({"爻位": pos, "原爻": "老阳", "变爻": "阴", "变换": "老阳变阴"})
+            result.append({
+                "爻位": pos, "原爻": "老阳", "变爻": "阴", "变换": "老阳变阴",
+                "状态": "老阳(动)", "变化": "变阴", "动爻": True,
+            })
         elif val == 6:
-            result.append({"爻位": pos, "原爻": "老阴", "变爻": "阳", "变换": "老阴变阳"})
+            result.append({
+                "爻位": pos, "原爻": "老阴", "变爻": "阳", "变换": "老阴变阳",
+                "状态": "老阴(动)", "变化": "变阳", "动爻": True,
+            })
         elif val == 7:
-            result.append({"爻位": pos, "原爻": "少阳", "变爻": "不变", "变换": "静爻"})
+            result.append({
+                "爻位": pos, "原爻": "少阳", "变爻": "不变", "变换": "静爻",
+                "状态": "少阳(静)", "变化": "不变", "动爻": False,
+            })
         elif val == 8:
-            result.append({"爻位": pos, "原爻": "少阴", "变爻": "不变", "变换": "静爻"})
+            result.append({
+                "爻位": pos, "原爻": "少阴", "变爻": "不变", "变换": "静爻",
+                "状态": "少阴(静)", "变化": "不变", "动爻": False,
+            })
         else:
-            result.append({"爻位": pos, "原爻": str(val), "变爻": "未知", "变换": "未知"})
+            result.append({
+                "爻位": pos, "原爻": str(val), "变爻": "未知", "变换": "未知",
+                "状态": "未知", "变化": "未知", "动爻": False,
+            })
     return result
 
 # 问事 -> 用神六亲（《增删卜易》取用）
@@ -144,7 +159,24 @@ def _shiying_relation(shi_yao: dict, ying_yao: dict) -> list[str]:
         notes.append("应生世（利我，得他人之力）")
     else:  # 克入
         notes.append("应克世（主事多阻、对方制我，宜慎）")
+    shi_zhi = shi_yao.get("地支")
+    ying_zhi = ying_yao.get("地支")
+    if shi_zhi and ying_zhi:
+        if wx.chong(shi_zhi, ying_zhi):
+            notes.append(f"世应六冲（{shi_zhi}{ying_zhi}冲，主离散变动）")
+        he_pairs = {("子", "丑"), ("寅", "亥"), ("卯", "戌"), ("辰", "酉"), ("巳", "申"), ("午", "未")}
+        if tuple(sorted((shi_zhi, ying_zhi), key="子丑寅卯辰巳午未申酉戌亥".index)) in he_pairs:
+            notes.append(f"世应六合（{shi_zhi}{ying_zhi}合，主牵连相合）")
     return notes
+
+
+def _liushen_annotations(six_gods: list[str]) -> list[dict]:
+    """逐爻六神注解，供报告层直接渲染。"""
+    annotations = []
+    for idx, god in enumerate(six_gods, start=1):
+        meaning = _LIUSHEN_MEANINGS.get(god, {})
+        annotations.append({"爻": idx, "六神": god, **meaning})
+    return annotations
 
 
 # ══════════════════════════════════════════════════════════════
@@ -337,7 +369,7 @@ def compute(b: Birth, tosses: list[int] | None = None, seed: int | None = None, 
             "变卦装卦": bian_naijia if moving else None,
             "日干": gz,
             "六神": six_gods,
-            "六神注解": {god: _LIUSHEN_MEANINGS.get(god, {}) for god in six_gods},
+            "六神注解": _liushen_annotations(six_gods),
             "动变": _transform_lines(tosses),
             "卦身": guashen_info,
             "断": judgement,
