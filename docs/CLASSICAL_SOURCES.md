@@ -244,7 +244,7 @@
 
 ### 实现
 - 雷诺曼：`divination/engines/lenormand.py`（36 张牌义 + Grand Tableau）
-- 塔罗：`divination/engines/tarot.py`（78 张 RWS + 9 阵 + 密码学安全抽牌；韦特/托特/现代心理三系统融合仍待接入）
+- 塔罗：`divination/engines/tarot.py`（78 张 RWS + 9 阵 + 密码学安全抽牌 + 韦特/托特/现代心理三系统融合）
 
 ### 已验证
 - 36 张牌义完整收录 + 时间指示、邻近修饰建模
@@ -428,7 +428,6 @@
 - [x] 奇门遁甲 · 阴遁/阳遁 72 局与三元定局（`tests/test_qimen_72jun.py`、`tests/test_qimen_jiu_jun.py`）✅
 
 ### P3（真实剩余）
-- [ ] 塔罗三系统融合：韦特 / 托特 / 现代心理目前只有参考资料，尚未接入塔罗 engine/API/frontend。
 - [ ] 观音灵签 / 关帝灵签：100 签资料库已建，但 26-100 多为待校订生成文案，完整 engine/API/frontend 仍待做。
 - [ ] 古籍知识库 RAG 入库与“文献出处”折叠面板：知识 API/书单已成型，引用语料和前端展示仍需产品化。
 - [ ] 与外部 `dzcmemory-web/bazi-ziwei-skill` 交叉对照：未见当前回归证据，保留为可选验证项。

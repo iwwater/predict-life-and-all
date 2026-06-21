@@ -15,6 +15,7 @@
  */
 import { useState, useCallback, type FormEvent } from "react";
 import type { Birth, ReadingAPIRequest, ReadingDepth } from "../lib/types";
+import { TAROT_SYSTEMS } from "../lib/method-info";
 
 // ── 12 standard goal types（无 emoji）───────────────────────────────────────
 
@@ -118,7 +119,7 @@ export interface FormData {
   target_year: string;
   // Method-specific options
   liuyao_mode: string; meihua_mode: string;
-  tarot_spread: string; tarot_mode: string;
+  tarot_spread: string; tarot_mode: string; tarot_system: string;
   showAdvanced: boolean;
   // Method toggles (all enabled by default)
   enabledMethods: string[];
@@ -135,7 +136,7 @@ const DEFAULT_FORM: FormData = {
   sitting: "", construction_year: "", address: "",
   alternatives: "", target_year: String(new Date().getFullYear()),
   liuyao_mode: "time_qigua", meihua_mode: "time_qigua",
-  tarot_spread: "celtic_cross", tarot_mode: "reflective",
+  tarot_spread: "celtic_cross", tarot_mode: "reflective", tarot_system: "waite",
   showAdvanced: false,
   enabledMethods: ["bazi_v2","ziwei","qimen","liuyao","meihua","fengshui","bazhai","xuankong","western","vedic","tarot","numerology"],
 };
@@ -298,6 +299,7 @@ export function ReadingForm({ onSubmit, loading, error }: ReadingFormProps) {
         meihua_mode: f.meihua_mode,
         tarot_spread: f.tarot_spread,
         tarot_mode: f.tarot_mode,
+        tarot_system: f.tarot_system,
       },
       depth: f.depth,
     };
@@ -520,6 +522,17 @@ export function ReadingForm({ onSubmit, loading, error }: ReadingFormProps) {
                       color: f.tarot_spread === opt.v ? "var(--cinnabar)" : "var(--ink-soft)",
                       borderColor: f.tarot_spread === opt.v ? "var(--cinnabar)" : "var(--rule)",
                     }}>{opt.l}</button>
+                ))}
+              </div>
+              <label className="paper-label" style={{ fontSize: "0.68rem", marginTop: "0.6rem" }}>塔罗 · 体系</label>
+              <div className="flex gap-1.5 flex-wrap" style={{ marginTop: "0.25rem" }}>
+                {TAROT_SYSTEMS.map((sys) => (
+                  <button key={sys.code} type="button" onClick={() => update({ tarot_system: sys.code })}
+                    className="paper-tag" style={{
+                      cursor: "pointer", fontSize: "0.62rem",
+                      color: f.tarot_system === sys.code ? "var(--cinnabar)" : "var(--ink-soft)",
+                      borderColor: f.tarot_system === sys.code ? "var(--cinnabar)" : "var(--rule)",
+                    }}>{sys.label}</button>
                 ))}
               </div>
             </div>

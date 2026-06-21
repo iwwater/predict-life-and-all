@@ -18,6 +18,8 @@ export type TarotSpread =
   | "relationship_cross" | "career_path" | "celtic_cross"
   | "three_line" | "five_cross" | "nine_square" | "grand_tableau";
 
+export type TarotSystem = "waite" | "thoth" | "modern";
+
 export interface Birth {
   year: number; month: number; day: number;
   hour: number; minute: number;
@@ -129,6 +131,7 @@ export interface ComputeRequest {
     mode?: string;
     subject?: Subject;
     spread?: TarotSpread;
+    tarot_system?: TarotSystem;
     seed?: number | string | null;
     question?: string;
     period?: number;

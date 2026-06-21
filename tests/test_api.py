@@ -175,6 +175,29 @@ def test_tarot_upright_reversed_keywords_separate():
         assert card["牌"]
 
 
+def test_tarot_three_systems_are_exposed():
+    payload = _compute_with_options(
+        "tarot",
+        {"subject": "tarot_guidance", "spread": "single", "seed": 1, "tarot_system": "thoth"},
+    )
+    raw = payload["raw"]
+    assert raw["塔罗体系"] == "thoth"
+    assert "托特" in raw["塔罗体系名称"]
+    assert {item["key"] for item in raw["塔罗体系说明"]["available"]} == {"waite", "thoth", "modern"}
+    card = raw["牌面"][0]
+    assert card["主体系"] == "thoth"
+    assert card["主体系解读"] == card["三系统解读"]["thoth"]
+    assert {"waite", "thoth", "modern"} <= set(card["三系统解读"])
+
+
+def test_tarot_system_alias_defaults_to_modern():
+    payload = _compute_with_options(
+        "tarot",
+        {"subject": "tarot_guidance", "spread": "single", "seed": 2, "tarot_system": "psychological"},
+    )
+    assert payload["raw"]["塔罗体系"] == "modern"
+
+
 def test_tarot_position_template_filled_per_spread():
     payload = _compute_with_options("tarot", {"subject": "decision", "spread": "choice_two", "seed": 7})
     raw = payload["raw"]

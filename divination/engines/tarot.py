@@ -26,6 +26,7 @@ import time
 from typing import Any
 
 from ..contracts import Birth, ChartResult
+from ..data.reference_equipment import TAROT_MEANING_DIFFS, TAROT_SYSTEMS
 
 # 大阿卡纳 22：(名, 正位, 逆位, 占星对应, Fool's Journey阶段, 叙事位置)
 # Fool's Journey 五幕: 觉醒(0-6) → 试炼(7-12) → 超越(13-17) → 启示(18-20) → 回归(21)
@@ -287,6 +288,89 @@ _SUIT_THEMES: dict[str, str] = {
     "宝剑": "思维、冲突、真相、决断",
     "钱币": "物质、健康、实务、丰盛",
 }
+
+TAROT_SYSTEM_ALIASES: dict[str, str] = {
+    "rws": "waite",
+    "rider-waite": "waite",
+    "rider_waite": "waite",
+    "waite": "waite",
+    "thoth": "thoth",
+    "crowley": "thoth",
+    "modern": "modern",
+    "psychological": "modern",
+    "心理": "modern",
+}
+
+
+def resolve_tarot_system(system: str | None) -> str:
+    """Normalize external tarot system names to waite/thoth/modern."""
+    if not system:
+        return "waite"
+    key = str(system).strip().lower()
+    return TAROT_SYSTEM_ALIASES.get(key, "waite")
+
+
+def _tarot_system_options() -> list[dict[str, str]]:
+    return [
+        {
+            "key": key,
+            "name": info.name,
+            "era": info.era,
+            "features": info.features,
+            "differences": info.differences,
+        }
+        for key, info in TAROT_SYSTEMS.items()
+    ]
+
+
+_DIFF_CARD_ALIASES: dict[str, tuple[str, ...]] = {
+    "死神": ("死神", "死亡", "XIII"),
+    "高塔": ("塔", "高塔", "XVI"),
+    "吊人": ("倒吊人", "吊人", "XII"),
+    "月亮": ("月亮", "XVIII"),
+    "恶魔": ("恶魔", "XV"),
+    "力量": ("力量", "VIII", "XI"),
+}
+
+
+def _meaning_diff_for_card(card_name: str) -> dict[str, str] | None:
+    for row in TAROT_MEANING_DIFFS:
+        label = row["card"]
+        aliases = ()
+        for canonical, names in _DIFF_CARD_ALIASES.items():
+            if canonical in label:
+                aliases = names
+                break
+        if aliases and any(alias in card_name for alias in aliases):
+            return row
+    return None
+
+
+def _system_lens_for_card(card: dict[str, Any], selected: str) -> dict[str, Any]:
+    """Build per-card Waite/Thoth/modern readings without replacing base RWS data."""
+    card_name = card["牌"]
+    orient = card["方位"]
+    base = card["牌义"]
+    is_major = card["类别"] == "大阿卡纳"
+    suit = card.get("花色") or "大阿卡纳"
+    element = card.get("元素") or card.get("占星", "")
+    diff = _meaning_diff_for_card(card_name)
+
+    waite = diff["waite"] if diff else f"图像叙事与正逆位关键词并读：{base}"
+    thoth = diff["thoth"] if diff else (
+        f"{'占星/卡巴拉' if is_major else '元素与数字'}视角：强调{element or suit}的动力结构，"
+        f"{orient}时读作能量的{'显化' if orient == '正位' else '阻滞或反转'}。"
+    )
+    modern = diff["modern"] if diff else (
+        f"心理整合视角：把「{base}」转译为可觉察的关系模式、情绪需求或行动选择。"
+    )
+    readings = {"waite": waite, "thoth": thoth, "modern": modern}
+    return {
+        "selected": selected,
+        "primary": readings[selected],
+        "readings": readings,
+        "comparison": diff,
+    }
 
 
 def _build_deck():
@@ -812,7 +896,8 @@ def get_court_profiles() -> dict[str, str]:
 
 def compute(b: Birth, spread: str = "three", seed: int | None = None,
             question: str | None = None,
-            client_seed: str | None = None) -> ChartResult:
+            client_seed: str | None = None,
+            tarot_system: str | None = None) -> ChartResult:
     """塔罗牌阵主入口。
 
     Args:
@@ -822,6 +907,7 @@ def compute(b: Birth, spread: str = "three", seed: int | None = None,
         seed: 显式随机种子 (None=密码学安全, int=可复现)
         question: 求问者问题 (用于正逆位智能偏置)
         client_seed: 用户提供的 client seed (可选, 用于可验证公平性)
+        tarot_system: 选用主体系 (waite/thoth/modern)
 
     安全保证:
         - seed=None + client_seed=None: SystemRandom CSPRNG (前向保密)
@@ -833,6 +919,7 @@ def compute(b: Birth, spread: str = "three", seed: int | None = None,
     seed = getattr(b, "seed", None) if getattr(b, "seed", None) is not None else seed
     question = getattr(b, "question", None) or question
     client_seed = getattr(b, "client_seed", None) or client_seed
+    tarot_system = resolve_tarot_system(getattr(b, "tarot_system", None) or tarot_system or getattr(b, "mode", None))
 
     # ── 熵源健康检查 (每次密码学抽牌前) ──
     entropy_health = None
@@ -887,6 +974,12 @@ def compute(b: Birth, spread: str = "three", seed: int | None = None,
         card["位置"] = pos
         card["方位"] = "逆位" if reversed_ else "正位"
         card["牌义"] = card["逆位"] if reversed_ else card["正位"]
+        lens = _system_lens_for_card(card, tarot_system)
+        card["主体系"] = tarot_system
+        card["主体系解读"] = lens["primary"]
+        card["三系统解读"] = lens["readings"]
+        if lens["comparison"]:
+            card["三系统差异"] = lens["comparison"]
         drawn.append(card)
     drawn_major = [c for c in drawn if c["类别"] == "大阿卡纳"]
     analysis = _analyze(drawn, spread)
@@ -905,10 +998,18 @@ def compute(b: Birth, spread: str = "three", seed: int | None = None,
 
     return ChartResult(
         method="tarot", school="west",
-        engine="self(RWS塔罗·深化)+FoolsJourney+cryptographic_draw+verifiable_shuffle",
+        engine="self(RWS塔罗·深化)+FoolsJourney+three_systems+cryptographic_draw+verifiable_shuffle",
         normalized={"elements": {}, "timeline": []},
         raw={"牌阵": spread, "牌阵名称": sp["名称"], "牌阵说明": positions,
              "适用": sp["fit"], "解读要领": sp["guide"], "问题": question,
+             "塔罗体系": tarot_system,
+             "塔罗体系名称": TAROT_SYSTEMS[tarot_system].name,
+             "塔罗体系说明": {
+                 "selected": tarot_system,
+                 "features": TAROT_SYSTEMS[tarot_system].features,
+                 "differences": TAROT_SYSTEMS[tarot_system].differences,
+                 "available": _tarot_system_options(),
+             },
              "牌面": drawn,
              "牌组分析": analysis,
              "抽牌参数": draw_params,

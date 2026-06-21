@@ -7,6 +7,7 @@ interface Card {
   name: string;
   orient: "正位" | "逆位";
   keywords: string;
+  system_reading?: string;
 }
 
 const ORIENT = {
@@ -44,18 +45,27 @@ function TarotCard({ card, index }: { card: Card; index: number }) {
 
 export function TarotChart({ chart }: { chart: ChartResult }) {
   const r = chart.raw;
-  const cards: Card[] = r.cards || [];
+  const cards: Card[] = (r.cards || r.牌面 || []).map((c: any) => ({
+    position: c.position || c.位置,
+    position_meaning: c.position_meaning || c.位置含义,
+    name: c.name || c.牌,
+    orient: c.orient || c.方位,
+    keywords: c.keywords || c.牌义,
+    system_reading: c.system_reading || c.主体系解读,
+  }));
   const basis = r.calculation_basis || {};
+  const systemName = r.塔罗体系名称 || r.tarot_system_name;
 
   return (
     <div className="space-y-4">
       <div className="paper-frame">
         <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <h3 className="text-lg" style={{ color: COLOR.goldBright }}>
-            塔罗 · {r.spread_name || r.spread}
+            塔罗 · {r.spread_name || r.牌阵名称 || r.spread || r.牌阵}
           </h3>
           <div className="flex gap-2 flex-wrap text-xs">
             <span className="paper-tag paper-tag-west">{cards.length} 张</span>
+            {systemName && <span className="paper-tag">{systemName}</span>}
             <span className="paper-tag">{r.subject || "tarot"}</span>
           </div>
         </div>
@@ -75,12 +85,13 @@ export function TarotChart({ chart }: { chart: ChartResult }) {
                 <span style={{ color: COLOR.ink }}>{card.name}</span>
                 <span className="text-[10px]" style={{ color: orient.color }}>{card.orient} · {orient.label}</span>
                 {card.keywords && <span className="text-[10px]" style={{ color: COLOR.muted }}>{card.keywords}</span>}
+                {card.system_reading && <span className="basis-full text-[10px]" style={{ color: COLOR.muted }}>{card.system_reading}</span>}
               </li>
             );
           })}
         </ul>
         <div className="mt-3 text-[10px] leading-relaxed" style={{ color: COLOR.muted }}>
-          起法: {basis.draw_rule || "78 张牌不放回抽样"}；seed: {String(r.seed_used ?? "随机")}
+          起法: {basis.draw_rule || "78 张牌不放回抽样"}；seed: {String(r.seed_used ?? r.抽牌参数?.seed ?? "随机")}
         </div>
       </div>
     </div>

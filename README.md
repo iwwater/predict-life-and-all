@@ -195,7 +195,7 @@ cd apps/web && npm run build
 
 ### P3 — 探索性
 - ✅ 紫微小限 + HTML/React 交互盘 — Sprint 4
-- 塔罗三系统融合（韦特 + 托特 + 现代心理）
+- ✅ 塔罗三系统融合（韦特 + 托特 + 现代心理）：engine/API/起卦页/专页/会审表单已接入 — 6.21
 - 观音灵签 / 关帝灵签：100 签资料库已建；完整术法入口 / API / 前端待接
 - ✅ Placidus 极区（|lat|>66°）专门处理：自动回退等宫 + warning — Sprint 4
 

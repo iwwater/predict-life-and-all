@@ -3,10 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { fetchMethods, computeChartMulti, computeMultiWithValidation } from "../lib/api";
-import type { Birth, Method, MethodMeta, Subject, TarotSpread } from "../lib/types";
+import type { Birth, Method, MethodMeta, Subject, TarotSpread, TarotSystem } from "../lib/types";
 import { CITY_PRESETS, CITY_REGIONS, cityOptionLabel, findCityByLatLng } from "../lib/cities";
 import { DIRECTIONS_8 } from "../lib/compass";
-import { METHOD_PLAIN, SUBJECTS, TAROT_SPREADS } from "../lib/method-info";
+import { METHOD_PLAIN, SUBJECTS, TAROT_SPREADS, TAROT_SYSTEMS } from "../lib/method-info";
 import { SkeletonBlock } from "../components/ui";
 import { useHistory, deriveTags } from "../store/history";
 import { ProgressArc } from "../components/Interactions";
@@ -23,6 +23,7 @@ interface FormState {
   sittingDir: string;
   constructionYear: number;
   tarotSpread: TarotSpread;
+  tarotSystem: TarotSystem;
   fixSeed: boolean;
   seed: string;
   question: string;
@@ -44,6 +45,7 @@ const DEFAULT: FormState = {
   sittingDir: "正东",
   constructionYear: new Date().getFullYear(),
   tarotSpread: "single",
+  tarotSystem: "waite",
   fixSeed: false,
   seed: "",
   question: "",
@@ -207,6 +209,7 @@ export function Cast() {
           subject: form.subject,
           modeByMethod: form.modeByMethod,
           spread: form.selected.includes("tarot") ? form.tarotSpread : undefined,
+          tarot_system: form.selected.includes("tarot") ? form.tarotSystem : undefined,
           seed: form.fixSeed && form.seed ? form.seed : undefined,
           question: form.question || undefined,
           father_zodiac: form.fatherZodiac || undefined,
@@ -248,6 +251,7 @@ export function Cast() {
             subject: form.subject,
             modeByMethod: form.modeByMethod,
             spread: form.selected.includes("tarot") ? form.tarotSpread : undefined,
+            tarot_system: form.selected.includes("tarot") ? form.tarotSystem : undefined,
             seed: form.fixSeed && form.seed ? form.seed : undefined,
             question: form.question || undefined,
             father_zodiac: form.fatherZodiac || undefined,
@@ -661,36 +665,62 @@ function StepParams({ form, setForm, showTarot, showSitting, showSeed, showTieba
             </div>
           )}
           {showTarot && (
-            <div>
-              <label className="paper-label">{lang === "zh" ? "塔罗牌阵" : "Tarot Spread"}</label>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                {TAROT_SPREADS.map((sp) => {
-                  const on = form.tarotSpread === sp.code;
-                  const recommended = sp.subjects.includes(form.subject);
-                  return (
-                    <button key={sp.code} type="button" onClick={() => setForm({ ...form, tarotSpread: sp.code })}
-                      className="paper-grid-cell text-left"
-                      style={{
-                        borderColor: on ? "var(--cinnabar)" : recommended ? "var(--verdigris)" : "var(--rule)",
-                        borderWidth: on ? 2 : 1,
-                        background: on ? "rgba(176,58,46,0.04)" : "var(--paper)",
-                        cursor: "pointer",
-                        padding: "0.65rem",
-                      }}>
-                      <div className="flex items-center justify-between">
-                        <span style={{ fontFamily: "'Noto Serif SC', serif", fontWeight: on ? 700 : 500, fontSize: "0.88rem", color: on ? "var(--cinnabar)" : "var(--ink)" }}>
-                          {sp.label}
-                        </span>
-                        {recommended && !on && (
-                          <span style={{ fontSize: "0.65rem", color: "var(--verdigris)", fontFamily: "'JetBrains Mono', monospace" }}>
-                            {lang === "zh" ? "推荐" : "Rec"}
+            <div className="space-y-3">
+              <div>
+                <label className="paper-label">{lang === "zh" ? "塔罗牌阵" : "Tarot Spread"}</label>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {TAROT_SPREADS.map((sp) => {
+                    const on = form.tarotSpread === sp.code;
+                    const recommended = sp.subjects.includes(form.subject);
+                    return (
+                      <button key={sp.code} type="button" onClick={() => setForm({ ...form, tarotSpread: sp.code })}
+                        className="paper-grid-cell text-left"
+                        style={{
+                          borderColor: on ? "var(--cinnabar)" : recommended ? "var(--verdigris)" : "var(--rule)",
+                          borderWidth: on ? 2 : 1,
+                          background: on ? "rgba(176,58,46,0.04)" : "var(--paper)",
+                          cursor: "pointer",
+                          padding: "0.65rem",
+                        }}>
+                        <div className="flex items-center justify-between">
+                          <span style={{ fontFamily: "'Noto Serif SC', serif", fontWeight: on ? 700 : 500, fontSize: "0.88rem", color: on ? "var(--cinnabar)" : "var(--ink)" }}>
+                            {sp.label}
                           </span>
-                        )}
-                      </div>
-                      <div style={{ fontSize: "0.72rem", color: "var(--ink-soft)", marginTop: "0.2rem" }}>{sp.desc}</div>
-                    </button>
-                  );
-                })}
+                          {recommended && !on && (
+                            <span style={{ fontSize: "0.65rem", color: "var(--verdigris)", fontFamily: "'JetBrains Mono', monospace" }}>
+                              {lang === "zh" ? "推荐" : "Rec"}
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ fontSize: "0.72rem", color: "var(--ink-soft)", marginTop: "0.2rem" }}>{sp.desc}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div>
+                <label className="paper-label">{lang === "zh" ? "解读体系" : "Tarot System"}</label>
+                <div className="grid sm:grid-cols-3 gap-2">
+                  {TAROT_SYSTEMS.map((sys) => {
+                    const on = form.tarotSystem === sys.code;
+                    return (
+                      <button key={sys.code} type="button" onClick={() => setForm({ ...form, tarotSystem: sys.code })}
+                        className="paper-grid-cell text-left"
+                        style={{
+                          borderColor: on ? "var(--cinnabar)" : "var(--rule)",
+                          borderWidth: on ? 2 : 1,
+                          background: on ? "rgba(176,58,46,0.04)" : "var(--paper)",
+                          cursor: "pointer",
+                          padding: "0.65rem",
+                        }}>
+                        <div style={{ fontFamily: "'Noto Serif SC', serif", fontWeight: on ? 700 : 500, fontSize: "0.88rem", color: on ? "var(--cinnabar)" : "var(--ink)" }}>
+                          {sys.label}
+                        </div>
+                        <div style={{ fontSize: "0.72rem", color: "var(--ink-soft)", marginTop: "0.2rem" }}>{sys.desc}</div>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           )}

@@ -236,6 +236,7 @@ def build_method_inputs(
     shicao_mode = opts.get("shicao_mode", "time_shicao")
     shicao_seed = opts.get("shicao_seed", None)
     tarot_mode = opts.get("tarot_mode", "reflective")
+    tarot_system = opts.get("tarot_system", "waite")
     # Phase 0 新建术法选项
     xiaoliuren_mode = opts.get("xiaoliuren_mode", "time_xiaoliuren")
     xiaoliuren_seed = opts.get("xiaoliuren_seed", None)
@@ -298,6 +299,7 @@ def build_method_inputs(
         if method == "tarot":
             b.spread = tarot_spread or profile.get("default_spread", "celtic_cross")
             b.mode = tarot_mode or profile.get("default_mode", "reflective")
+            b.tarot_system = tarot_system
             # 从 question 派生 seed（保证同一问题得相同牌）
             if question:
                 b.seed = _question_seed(question)

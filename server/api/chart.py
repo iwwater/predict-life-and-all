@@ -74,6 +74,7 @@ ALLOWED_OPTIONS = {
     "spread",
     "seed",
     "question",
+    "tarot_system",
     "tosses",
     "period",
     "sitting",

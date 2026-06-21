@@ -6,8 +6,8 @@ import { type FormEvent, useState, useCallback, useMemo } from "react";
 import type { Birth, ChartResult } from "../../lib/types";
 import { computeChart } from "../../lib/api";
 import { emptyBirth } from "../../lib/method-inputs";
-import { TAROT_SPREADS } from "../../lib/method-info";
-import type { TarotSpread } from "../../lib/types";
+import { TAROT_SPREADS, TAROT_SYSTEMS } from "../../lib/method-info";
+import type { TarotSpread, TarotSystem } from "../../lib/types";
 import { useI18n } from "../../lib/i18n";
 import { useBasket } from "../../store/basket";
 import { COLOR } from "../../components/ui";
@@ -36,6 +36,7 @@ export function TarotPage() {
 
   const [question, setQuestion] = useState("");
   const [spread, setSpread] = useState<TarotSpread>("three_time");
+  const [tarotSystem, setTarotSystem] = useState<TarotSystem>("waite");
   const suggestedSpread = useMemo(() => suggestSpread(question), [question]);
 
   // 翻牌状态
@@ -63,6 +64,7 @@ export function TarotPage() {
         options: {
           mode: "tarot_spread",
           spread: spread as any,
+          tarot_system: tarotSystem,
           question: question || "指引",
         },
       });
@@ -74,7 +76,7 @@ export function TarotPage() {
     } finally {
       setLoading(false);
     }
-  }, [question, spread]);
+  }, [question, spread, tarotSystem]);
 
   const revealCard = (idx: number) => {
     setRevealedIndices((prev) => {
@@ -183,6 +185,33 @@ export function TarotPage() {
             </div>
           </section>
 
+          <section className="paper-frame space-y-3">
+            <h2 className="paper-eyebrow">
+              {lang === "zh" ? "选择解读体系" : "Choose System"}
+            </h2>
+            <div className="grid sm:grid-cols-3 gap-2">
+              {TAROT_SYSTEMS.map((sys) => {
+                const on = tarotSystem === sys.code;
+                return (
+                  <button key={sys.code} type="button" onClick={() => setTarotSystem(sys.code)}
+                    className="paper-grid-cell text-left" style={{
+                      borderColor: on ? "var(--cinnabar)" : "var(--rule)",
+                      borderWidth: on ? 2 : 1,
+                      background: on ? "rgba(176,58,46,0.04)" : "var(--paper)",
+                      cursor: "pointer", padding: "0.7rem",
+                    }}>
+                    <div style={{ fontFamily: "'Noto Serif SC', serif", fontWeight: on ? 700 : 500, fontSize: "0.88rem", color: on ? "var(--cinnabar)" : "var(--ink)" }}>
+                      {sys.label}
+                    </div>
+                    <div style={{ fontSize: "0.7rem", color: "var(--ink-soft)", marginTop: "0.25rem", lineHeight: 1.4 }}>
+                      {sys.desc}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
           {/* 抽牌按钮 */}
           <div className="paper-frame text-center">
             <button type="button" className="paper-btn" onClick={startDraw} disabled={loading || !question.trim()}
@@ -217,9 +246,16 @@ export function TarotPage() {
               <h2 style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "1.1rem", fontWeight: 600, color: "var(--cinnabar)" }}>
                 {chart.raw?.牌阵名称 || spreadInfo.label}
               </h2>
-              <span className="paper-tag" style={{ fontSize: "0.68rem", color: "var(--ink-soft)" }}>
-                {cards.length} {lang === "zh" ? "张牌 · 点按翻牌" : "cards · tap to reveal"}
-              </span>
+              <div className="flex gap-2 flex-wrap">
+                {chart.raw?.塔罗体系名称 && (
+                  <span className="paper-tag" style={{ fontSize: "0.68rem", color: "var(--cinnabar)", borderColor: "rgba(176,58,46,0.3)" }}>
+                    {chart.raw.塔罗体系名称}
+                  </span>
+                )}
+                <span className="paper-tag" style={{ fontSize: "0.68rem", color: "var(--ink-soft)" }}>
+                  {cards.length} {lang === "zh" ? "张牌 · 点按翻牌" : "cards · tap to reveal"}
+                </span>
+              </div>
             </div>
 
             {/* 牌位布局 */}
@@ -262,7 +298,7 @@ export function TarotPage() {
                           color: card.方位 === "逆位" ? "var(--ink)" : "var(--cinnabar)",
                           transform: card.方位 === "逆位" ? "rotate(180deg)" : "none",
                         }}>
-                          {card.名称}
+                          {card.牌 || card.名称}
                         </div>
                         <div style={{
                           fontSize: "0.6rem",
@@ -274,6 +310,11 @@ export function TarotPage() {
                         <div style={{ fontSize: "0.65rem", color: "var(--ink-soft)", marginTop: "0.3rem", lineHeight: 1.4, maxWidth: 200 }}>
                           {card.牌义}
                         </div>
+                        {card.主体系解读 && (
+                          <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", marginTop: "0.25rem", lineHeight: 1.4, maxWidth: 220 }}>
+                            {card.主体系解读}
+                          </div>
+                        )}
                       </>
                     )}
                   </button>
@@ -303,6 +344,11 @@ export function TarotPage() {
               <h2 style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "1.1rem", fontWeight: 600, color: "var(--cinnabar)" }}>
                 {chart.raw?.牌阵名称} — {lang === "zh" ? "全牌解读" : "Full Reading"}
               </h2>
+              {chart.raw?.塔罗体系名称 && (
+                <span className="paper-tag" style={{ fontSize: "0.68rem", color: "var(--cinnabar)", borderColor: "rgba(176,58,46,0.3)" }}>
+                  {chart.raw.塔罗体系名称}
+                </span>
+              )}
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
               {cards.map((card: any, i: number) => (
@@ -321,7 +367,7 @@ export function TarotPage() {
                     color: card.方位 === "逆位" ? "var(--ink)" : "var(--cinnabar)",
                     transform: card.方位 === "逆位" ? "rotate(180deg)" : "none",
                   }}>
-                    {card.名称}
+                    {card.牌 || card.名称}
                   </div>
                   <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)", marginTop: "0.15rem" }}>
                     {card.方位}
@@ -329,6 +375,11 @@ export function TarotPage() {
                   <div style={{ fontSize: "0.65rem", color: "var(--ink-soft)", marginTop: "0.3rem", lineHeight: 1.4 }}>
                     {card.牌义}
                   </div>
+                  {card.主体系解读 && (
+                    <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", marginTop: "0.3rem", lineHeight: 1.4 }}>
+                      {card.主体系解读}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
