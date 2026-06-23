@@ -9,12 +9,15 @@ const METHOD_FALLBACK: MethodMeta[] = [
   { id: "bazi", name_zh: "八字四柱", name_en: "Four Pillars", school: "east" } as MethodMeta,
   { id: "ziwei", name_zh: "紫微斗数", name_en: "Zi Wei Dou Shu", school: "east" } as MethodMeta,
   { id: "tieban", name_zh: "铁板神数", name_en: "Iron Plate Numbers", school: "east" } as MethodMeta,
+  { id: "chenggu", name_zh: "称骨", name_en: "Bone Weight", school: "east" } as MethodMeta,
   { id: "qimen", name_zh: "奇门遁甲", name_en: "Qi Men Dun Jia", school: "east" } as MethodMeta,
   { id: "liuyao", name_zh: "六爻", name_en: "Six Lines", school: "east" } as MethodMeta,
   { id: "meihua", name_zh: "梅花易数", name_en: "Plum Blossom", school: "east" } as MethodMeta,
   { id: "liuren", name_zh: "大六壬", name_en: "Da Liu Ren", school: "east" } as MethodMeta,
+  { id: "xiaoliuren", name_zh: "小六壬", name_en: "Xiao Liu Ren", school: "east" } as MethodMeta,
   { id: "qian", name_zh: "灵签", name_en: "Qian Oracle", school: "east" } as MethodMeta,
   { id: "hepan", name_zh: "合盘", name_en: "Synastry", school: "east" } as MethodMeta,
+  { id: "bazhai", name_zh: "八宅", name_en: "Eight Mansions", school: "east" } as MethodMeta,
   { id: "tarot", name_zh: "塔罗", name_en: "Tarot", school: "west" } as MethodMeta,
   { id: "western", name_zh: "西方占星", name_en: "Natal Astrology", school: "west" } as MethodMeta,
   { id: "vedic", name_zh: "吠陀占星", name_en: "Vedic Astrology", school: "west" } as MethodMeta,
@@ -73,19 +76,32 @@ export function Home() {
   }, [historyItems]);
 
   const visibleMethods = useMemo(() => {
-    const source = methods.length > 0 ? methods : METHOD_FALLBACK;
+    // 后端 methods 列表不包含 dream 等非 engine 方法，但前端有独立页面，需合并补齐
+    const source =
+      methods.length > 0
+        ? [
+            ...methods,
+            ...METHOD_FALLBACK.filter(
+              (fb) => !methods.some((m) => m.id === fb.id),
+            ),
+          ]
+        : METHOD_FALLBACK;
     const preferred = [
       "bazi",
       "ziwei",
       "tieban",
+      "chenggu",
       "qimen",
       "liuyao",
       "meihua",
       "liuren",
+      "xiaoliuren",
       "qian",
+      "hepan",
       "tarot",
       "western",
       "vedic",
+      "bazhai",
       "xuankong",
       "numerology",
       "lenormand",

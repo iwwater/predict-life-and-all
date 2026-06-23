@@ -54,6 +54,8 @@ export function Layout() {
     if (location.pathname === "/fengshui") return "风水";
     if (location.pathname === "/history") return "历史";
     if (location.pathname === "/knowledge") return "知识馆";
+    if (location.pathname === "/dream" || location.pathname === "/m/dream") return "周公解梦";
+    if (location.pathname === "/compass") return "罗盘采集";
     if (location.pathname === "/about") return "凡例";
     return "玄枢";
   }, [location.pathname]);
