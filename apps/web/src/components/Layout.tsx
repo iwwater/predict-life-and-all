@@ -25,6 +25,7 @@ const METHOD_LABELS: Record<string, string> = {
   xiaoliuren: "小六壬",
   qian: "灵签",
   chenggu: "称骨",
+  dream: "周公解梦",
   hepan: "合盘",
   tarot: "塔罗",
   lenormand: "雷诺曼",
