@@ -66,6 +66,7 @@ class CompassSession(BaseModel):
     direction_hint: str
     target_sans: str
     target_direction: str
+    sample_count: int = 30
     samples: list[float]
     readings: list[CompassReading]
     result_sans: str
@@ -198,6 +199,10 @@ def measure_compass(body: CompassMeasureRequest):
             raise HTTPException(400, f"unknown direction: {body.map_direction}")
         raw_heading = direction_to_az[body.map_direction]
         channel = "map"
+    elif body.samples and len(body.samples) >= 3:
+        # Sprint 3 P1: 纯样本模式 — 用环形均值作为主朝向
+        raw_heading = circular_mean(body.samples)
+        channel = "continuous"
     else:
         raise HTTPException(400, "no input channel provided")
 
@@ -265,6 +270,7 @@ def create_session(body: CompassSessionCreate):
         direction_hint=body.direction_hint,
         target_sans=target_sans,
         target_direction=target_dir,
+        sample_count=body.sample_count,
         samples=[],
         readings=[],
         result_sans="",
@@ -283,13 +289,15 @@ def create_session(body: CompassSessionCreate):
 def add_sample(session_id: str, body: CompassSessionAddSample):
     """向采样会话追加一个方位读数.
 
-    采样要求 ≥30 个样本才自动结算 (数据充分性)。
+    采样达到 sample_count 时自动结算 (默认 30, 上限 1000).
     """
     if session_id not in _sessions:
         raise HTTPException(404, "session not found")
     s = _sessions[session_id]
     if s.closed:
         raise HTTPException(400, "session already closed")
+    if len(s.samples) >= s.sample_count:
+        raise HTTPException(400, f"sample cap reached ({s.sample_count})")
 
     az = body.azimuth_deg
     s.samples.append(az)
@@ -299,7 +307,7 @@ def add_sample(session_id: str, body: CompassSessionAddSample):
         sans=sans_info["sans"], direction=direction, azimuth_deg=az, device="phone_compass"
     ))
 
-    if len(s.samples) >= 30:
+    if len(s.samples) >= s.sample_count:
         result_sans, result_dir, result_az, std_dev, quality = compute_result(s.samples)
         sans_24_info = heading_to_24mountain(result_az)
         s.result_sans = result_sans

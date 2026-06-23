@@ -98,6 +98,23 @@ export function Cases() {
     setResult(null);
     setAnswers({});
     try {
+      // Sprint 3 P0: 将 CompassPage 注入的风水上下文作为 space 带入立档
+      const space: Record<string, any> | null = pendingFengShui
+        ? {
+            source: "compass",
+            sitting: pendingFengShui.sitting,
+            sitting_zh: pendingFengShui.sitting_zh,
+            direction: pendingDirection || pendingFengShui.direction,
+            true_heading: pendingFengShui.true_heading,
+            quality: pendingFengShui.quality,
+            dual_candidate: pendingFengShui.dual_candidate,
+            fengshui_summary: pendingFengShui.fengshui_summary,
+            bazhai: pendingFengShui.bazhai ?? null,
+            xuankong: pendingFengShui.xuankong ?? null,
+            fengshui_warning: pendingFengShui.fengshui_warning ?? null,
+          }
+        : null;
+
       const next = await createEventCase({
         question: question.trim(),
         birth: birthStore.toApiBirth(),
@@ -105,6 +122,7 @@ export function Cases() {
         time_horizon: timeHorizon.trim() || null,
         location: location.trim() || null,
         current_city: birthStore.birth.city || null,
+        space,
       });
       setEventCase(next);
     } catch (err: any) {
@@ -119,9 +137,27 @@ export function Cases() {
     setLoading("context");
     setError(null);
     try {
+      // Sprint 3 P0: 保留 CompassPage 注入的风水上下文到 context update
+      const space: Record<string, any> | null = pendingFengShui
+        ? {
+            source: "compass",
+            sitting: pendingFengShui.sitting,
+            sitting_zh: pendingFengShui.sitting_zh,
+            direction: pendingDirection || pendingFengShui.direction,
+            true_heading: pendingFengShui.true_heading,
+            quality: pendingFengShui.quality,
+            dual_candidate: pendingFengShui.dual_candidate,
+            fengshui_summary: pendingFengShui.fengshui_summary,
+            bazhai: pendingFengShui.bazhai ?? null,
+            xuankong: pendingFengShui.xuankong ?? null,
+            fengshui_warning: pendingFengShui.fengshui_warning ?? null,
+          }
+        : null;
+
       const next = await updateEventCaseContext(eventCase.case_id, {
         answers,
         birth: birthStore.toApiBirth(),
+        space,
         constraints: {
           target: target.trim() || null,
           time_horizon: timeHorizon.trim() || null,
