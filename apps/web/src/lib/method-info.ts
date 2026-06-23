@@ -20,7 +20,7 @@ export const METHOD_PLAIN: Record<Method, MethodPlain> = {
   western: { tagline: "西方本命盘，太阳月亮上升与行星", bestFor: "行星相位、宫位大运、本命格局", sample: "我的上升和本命主题是什么?", source: "现代西方占星" },
   vedic: { tagline: "吠陀恒星黄道命盘", bestFor: "二十七宿、大运体系、星曜力度", sample: "吠陀盘里我的人生主题是什么?", source: "Jyotish" },
   tarot: { tagline: "按问题选择牌阵，而不是只抽几张", bestFor: "身心灵牌阵、当下指引、意象解读", sample: "这段关系现在应该怎么看?", source: "Waite-style Tarot" },
-  qian: { tagline: "观音/关帝灵签，抽签或录入签号", bestFor: "今日一签、短期问事、签号解读", sample: "今天这件事应不应该推进?", source: "观音灵签 / 关帝灵签" },
+  qian: { tagline: "灵签，抽签或录入签号", bestFor: "今日一签、短期问事、签号解读", sample: "今天这件事应不应该推进?", source: "观音灵签 / 关帝灵签" },
   numerology: { tagline: "生命灵数与数字主题", bestFor: "生命数字、周期年运、姓名数字", sample: "我的生命灵数是几?", source: "Pythagorean Numerology" },
   lenormand: { tagline: "36张具体象征牌，组合解读日常", bestFor: "Grand Tableau、日常决策、组合解读", sample: "今天的状况怎么看?", source: "Petit Lenormand 体系" },
   liuren: { tagline: "三式之首，天地盘四课三传断人事", bestFor: "人事决疑、天时地利、三式之首", sample: "这件事的因果走向如何?", source: "大六壬传统体系" },

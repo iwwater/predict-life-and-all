@@ -131,7 +131,7 @@ METHOD_META = {
         "required_inputs": {"lenormand_spread": ["question"]}, "recommended_for": ["日常具体占卜", "组合解读", "Grand Tableau 全貌"],
     },
     "qian": {
-        "school": "east", "name_zh": "观音/关帝灵签", "name_en": "Qian Oracle",
+        "school": "east", "name_zh": "灵签", "name_en": "Qian Oracle",
         "group": "卜", "needs": ["question"], "engine": "self+public-qian-catalog",
         "subjects": ["qian_guidance", "decision", "relationship", "career"],
         "modes": ["random_draw", "manual_number"], "default_mode": "random_draw",
