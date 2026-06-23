@@ -121,6 +121,7 @@ export function App() {
                   <Route path="/dateselect" element={<DateSelect />} />
                   <Route path="/knowledge" element={<Knowledge />} />
                   <Route path="/dream" element={<DreamPage />} />
+                  <Route path="/m/dream" element={<DreamPage />} />
                   <Route path="/reading" element={<Reading />} />
                   <Route path="/reading-history" element={<ReadingHistory />} />
                   <Route path="/privacy" element={<PrivacyPolicy />} />
