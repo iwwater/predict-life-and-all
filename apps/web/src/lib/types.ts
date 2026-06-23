@@ -98,6 +98,8 @@ export interface CaseCreateRequest {
   time_horizon?: string | null;
   location?: string | null;
   current_city?: string | null;
+  /** Sprint 3 P0: CompassPage 风水上下文 — 八宅/玄空/坐向自动带入立档 */
+  space?: Record<string, any> | null;
 }
 
 export interface CaseContextRequest {

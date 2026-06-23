@@ -9,7 +9,7 @@ import {
   type CompassMeasureResponse,
   type CompassFengShuiResponse,
 } from "../lib/api";
-import { DIRECTIONS_8, describeSans } from "../lib/compass";
+import { DIRECTIONS_8, SANS_CENTER_DEG, describeSans } from "../lib/compass";
 import { COLOR } from "../components/ui";
 import { useBirthStore } from "../store/birth";
 
@@ -27,6 +27,7 @@ export default function CompassPage() {
 
   // 罗盘 dial
   const [direction, setDirection] = useState("正东");
+  const [selectedMountain, setSelectedMountain] = useState<string>(""); // 24 山精确选择
   const [manualDeg, setManualDeg] = useState("");
 
   // 设备状态
@@ -35,6 +36,12 @@ export default function CompassPage() {
   const [usingManual, setUsingManual] = useState(false);
   const [iosPermGranted, setIosPermGranted] = useState(false);
   const handlerRef = useRef<((e: DeviceOrientationEvent) => void) | null>(null);
+  const azimuthRef = useRef<number>(azimuth); // 连续采样用 — 始终反映最新方位
+
+  // 保持 azimuthRef 与 state 同步
+  useEffect(() => {
+    azimuthRef.current = azimuth;
+  }, [azimuth]);
 
   // 测量模式
   const [mode, setMode] = useState<MeasureMode>("single");
@@ -138,13 +145,13 @@ export default function CompassPage() {
     setError(null);
 
     // 采集第一个样本
-    const samples: number[] = [azimuth];
+    const samples: number[] = [azimuthRef.current];
     setContinuousSamples([...samples]);
     updateRunningStats(samples);
 
     continuousTimerRef.current = setInterval(() => {
       setContinuousSamples((prev) => {
-        const next = [...prev, azimuth];
+        const next = [...prev, azimuthRef.current];
         if (next.length >= CONTINUOUS_SAMPLE_COUNT) {
           stopContinuous(next);
         }
@@ -244,8 +251,22 @@ export default function CompassPage() {
 
   // ── 罗盘 → 风水 端到端 (Sprint 3.3) ──────────────────────────────
 
+  // P0: birth.year 必须在合理范围内 (后端 birth_year: int 强校验, undefined/越界会 422)
+  const currentYear = new Date().getFullYear();
+  const birthYearValid =
+    typeof birth.year === "number" &&
+    Number.isFinite(birth.year) &&
+    birth.year >= 1900 &&
+    birth.year <= currentYear;
+
   const computeFengShui = async () => {
     if (!result) return;
+    if (!birthYearValid) {
+      setError(
+        `请先在「我的出生信息」填写有效的出生年份 (1900-${currentYear}), 再计算风水.`,
+      );
+      return;
+    }
     setMeasuring(true);
     setError(null);
     try {
@@ -259,7 +280,11 @@ export default function CompassPage() {
       });
       setFengShuiResult(res);
     } catch (e: any) {
-      setError(e.message || "风水计算失败");
+      // 兜底: 后端可能返回 422 (Pydantic 校验) 或 400, 提取可读消息
+      const msg = String(e?.message || "风水计算失败");
+      setError(/422|unprocessable|invalid/i.test(msg)
+        ? "出生年份无效,请检查出生信息后再试."
+        : msg);
     } finally {
       setMeasuring(false);
     }
@@ -322,11 +347,21 @@ export default function CompassPage() {
           value={direction}
           onChange={(code) => {
             setDirection(code);
+            setSelectedMountain(""); // 切换 8 方位时清除 24 山选择
             const dir8 = DIRECTIONS_8.find((d) => d.code === code);
             if (dir8 && usingManual) {
               setAzimuth(DIRECTIONS_8.indexOf(dir8) * 45);
             }
           }}
+          onSelectMountain={(sans) => {
+            setSelectedMountain(sans);
+            // 用 24 山中心角度更新 azimuth
+            const centerDeg = SANS_CENTER_DEG[sans];
+            if (centerDeg !== undefined && usingManual) {
+              setAzimuth(Math.round(centerDeg));
+            }
+          }}
+          selectedMountain={selectedMountain}
           show24
           size={260}
         />
@@ -338,7 +373,9 @@ export default function CompassPage() {
           {displayAzimuth}°
         </span>
         <span className="text-sm ml-2" style={{ color: COLOR.muted }}>
-          {describeSans(result?.sans || DIRECTIONS_8.find((d) => d.code === direction)?.sans || "卯")}
+          {selectedMountain
+            ? `山: ${selectedMountain} (${describeSans(selectedMountain)})`
+            : describeSans(result?.sans || DIRECTIONS_8.find((d) => d.code === direction)?.sans || "卯")}
         </span>
         {/* 八字信息 */}
         {result && (
@@ -552,14 +589,29 @@ export default function CompassPage() {
 
         {/* ── 风水端到端结果 (Sprint 3.3) ── */}
         {result && !fengShuiResult && (
-          <button
-            onClick={computeFengShui}
-            disabled={measuring}
-            className="w-full py-2 rounded text-sm font-medium disabled:opacity-50"
-            style={{ background: "rgba(201,162,75,0.12)", border: `1px solid ${COLOR.goldDim}`, color: COLOR.goldBright }}
-          >
-            {measuring ? "计算中..." : "计算风水 (八宅+玄空) →"}
-          </button>
+          <>
+            <button
+              onClick={computeFengShui}
+              disabled={measuring || !birthYearValid}
+              className="w-full py-2 rounded text-sm font-medium disabled:opacity-50"
+              style={{
+                background: birthYearValid ? "rgba(201,162,75,0.12)" : "transparent",
+                border: `1px solid ${birthYearValid ? COLOR.goldDim : "var(--rule)"}`,
+                color: birthYearValid ? COLOR.goldBright : COLOR.muted,
+              }}
+            >
+              {measuring
+                ? "计算中..."
+                : birthYearValid
+                  ? "计算风水 (八宅+玄空) →"
+                  : "请先填写出生年份 →"}
+            </button>
+            {!birthYearValid && (
+              <div className="text-xs" style={{ color: COLOR.cinnabar }}>
+                出生年份无效 (需 1900-{currentYear}), 风水计算需要此信息.
+              </div>
+            )}
+          </>
         )}
 
         {fengShuiResult && (
