@@ -209,14 +209,18 @@ export function LiuyaoPage() {
                     transform: isLanding ? "scale(1.1)" : "scale(1)",
                   }}>
                     <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)" }}>{name}</div>
-                    <div style={{
-                      fontSize: "1.5rem",
-                      color: t ? (isYang ? "var(--cinnabar)" : "var(--ink)") : "var(--ink-soft)",
-                      fontWeight: isOld ? 700 : 400,
-                      transition: "all 0.3s",
-                    }}>
-                      {t === null ? "—" : isYang ? "⚊" : "⚋"}
-                    </div>
+                    {t !== null && (
+                      <div
+                        className={`coin coin--landed`}
+                        style={{ animationDelay: `${i * 450}ms` }}
+                        aria-hidden="true"
+                      >
+                        {isYang ? "⚊" : "⚋"}
+                      </div>
+                    )}
+                    {t === null && (
+                      <div style={{ fontSize: "1.5rem", color: "var(--ink-soft)", height: "1.8rem", lineHeight: "1.8rem" }}>—</div>
+                    )}
                     {t && (
                       <div style={{ fontSize: "0.55rem", color: isOld ? "var(--cinnabar)" : "var(--ink-soft)", marginTop: "0.1rem" }}>
                         {isOld ? (isYang ? "● 老阳" : "○ 老阴") : (isYang ? "少阳" : "少阴")}

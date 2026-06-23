@@ -3,6 +3,8 @@ import { lazy, Suspense } from "react";
 import type { ChartResult, Method } from "../../lib/types";
 import type { CrossValidationResult, PeachBlossomResult, FateModificationPlan } from "../../lib/api";
 
+export { XiaoliurenChart } from "./XiaoliurenChart";
+
 // ── 各盘面组件懒加载 ──
 const LazyBaziChart = lazy(() => import("./BaziChart").then((m) => ({ default: m.BaziChart })));
 const LazyZiweiChart = lazy(() => import("./ZiweiChart").then((m) => ({ default: m.ZiweiChart })));

@@ -7,6 +7,7 @@ import { computeChart } from "../../lib/api";
 import { useI18n } from "../../lib/i18n";
 import { useBasket } from "../../store/basket";
 import { useBirthStore } from "../../store/birth";
+import { useStaggeredReveal } from "../../lib/useStaggeredReveal";
 import { MethodSourcesPanel } from "../../components/MethodSourcesPanel";
 
 export function ZiweiPage() {
@@ -39,6 +40,7 @@ export function ZiweiPage() {
 
   const r = chart?.raw;
   const palaces = r?.palaces || [];
+  const { getStyle: getPalaceStyle } = useStaggeredReveal(12, { interval: 80 });
 
   return (
     <div className="space-y-6">
@@ -80,8 +82,8 @@ export function ZiweiPage() {
             {palaces.length > 0 ? (
               <div className="grid grid-cols-4 gap-1.5">
                 {palaces.map((p: any, i: number) => (
-                  <div key={i} className="text-center p-2 rounded-sm"
-                    style={{ border: `1px solid ${p.name === r?.ming_gong ? "var(--cinnabar)" : "var(--rule)"}`, background: p.name === r?.ming_gong ? "rgba(176,58,46,0.06)" : "var(--paper-2)" }}>
+                  <div key={i} className="text-center p-2 rounded-sm animate-fade-in"
+                    style={{ border: `1px solid ${p.name === r?.ming_gong ? "var(--cinnabar)" : "var(--rule)"}`, background: p.name === r?.ming_gong ? "rgba(176,58,46,0.06)" : "var(--paper-2)", ...getPalaceStyle(i) }}>
                     <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)" }}>{p.name}</div>
                     <div style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--ink)", fontFamily: "'Noto Serif SC', serif" }}>{p.stars?.slice(0, 2).join(" ") || p.zhi || ""}</div>
                   </div>

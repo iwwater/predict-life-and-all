@@ -85,7 +85,7 @@ const tabs: { key: TabKey; label: string }[] = [
   { key:"classical", label:"经典文摘" },
   { key:"profession", label:"职业适配" },
   { key:"wellness", label:"节气养生" },
-  { key:"books", label:"📚 文献书单" },
+  { key:"books", label:"文献书单" },
 ];
 
 export function Knowledge() {
@@ -362,7 +362,7 @@ function BooksTab() {
     <div className="space-y-4">
       {/* 顶部：术法选择 + 摘要 */}
       <section className="paper-frame">
-        <h3 className="paper-eyebrow" style={{ color: "var(--cinnabar)" }}>📚 古典文献推荐</h3>
+        <h3 className="paper-eyebrow" style={{ color: "var(--cinnabar)" }}>古典文献推荐</h3>
         <p className="paper-body" style={{ fontSize: "0.75rem", marginTop: "0.3rem", color: "var(--ink-soft)" }}>
           按术法分组；优先级 1=必修(★★★) / 2=进阶(★★) / 3=拓展(★)。
           推荐以公共领域版本为主，详见各条 <code>online_resources</code>。

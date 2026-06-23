@@ -53,7 +53,7 @@ export function MethodSourcesPanel({ method, maxPriority = 2 }: Props) {
         aria-expanded={open}
       >
         <h3 className="paper-eyebrow" style={{ color: "var(--cinnabar)", margin: 0 }}>
-          📚 文献出处{books.length > 0 ? `（${books.length} 本）` : ""}
+          文献出处{books.length > 0 ? `（${books.length} 本）` : ""}
         </h3>
         <span
           style={{

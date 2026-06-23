@@ -26,6 +26,25 @@
   --rule-soft:   rgba(201, 191, 169, 0.55);
   /* 暗色(墨纸方案,暂不启用) */
   --dark-bg:     #1C1915;
+
+  /* ── G2 字号 token(5 档) ── */
+  --font-display:  1.5rem;   /* 标题大字 */
+  --font-heading:  1.1rem;   /* 章节标题 */
+  --font-body:     0.95rem;  /* 正文 */
+  --font-small:    0.82rem;  /* 小注/说明 */
+  --font-micro:    0.7rem;   /* 标注/版权 */
+
+  /* ── G2 间距 token(4 档,8px 节奏) ── */
+  --space-xs:  0.5rem;  /*  8px */
+  --space-sm:  1rem;    /* 16px */
+  --space-md:  1.5rem;  /* 24px */
+  --space-lg:  3rem;    /* 48px */
+
+  /* ── G2 容器 token ── */
+  --width-main:    1200px;
+  --width-section: 1200px;
+  --width-footer:  880px;
+  --width-instrument: 640px;
 }
 
 /* 暗色主题(未来切换用) */
@@ -119,6 +138,31 @@
 .tarot-flip {
   animation: flip-in 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   transform-style: preserve-3d;
+}
+
+@keyframes coin-flip {
+  0%   { transform: perspective(600px) rotateY(0);    opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: perspective(600px) rotateY(720deg); opacity: 1; }
+}
+.coin {
+  display: inline-block;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  text-align: center;
+  line-height: 1.8rem;
+  font-family: "Noto Serif SC", serif;
+  font-size: 1rem;
+  color: var(--cinnabar);
+  transform-style: preserve-3d;
+  opacity: 0;
+  user-select: none;
+}
+.coin--landed {
+  animation: coin-flip 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
 }
 
 @keyframes ink-pulse {
@@ -718,7 +762,7 @@
 }
 
 .mystic-breadcrumb {
-  max-width: 1080px;
+  max-width: var(--width-main);
   margin: 0 auto;
   padding: 6.8rem 6vw 0;
   color: var(--bone-dim);
@@ -741,7 +785,7 @@
 }
 
 .mystic-main {
-  width: min(1080px, calc(100% - 12vw));
+  width: min(var(--width-main), calc(100% - 12vw));
   margin: 0 auto;
   padding: 3rem 0 7rem;
 }
@@ -871,7 +915,7 @@
 }
 
 .mystic-instrument svg {
-  width: min(46vw, 640px);
+  width: min(var(--width-instrument), 46vw);
   height: auto;
   overflow: visible;
 }
@@ -950,7 +994,7 @@
   justify-content: center;
   gap: 1.4rem;
   flex-wrap: wrap;
-  width: min(980px, calc(100% - 12vw));
+  width: min(var(--width-main), calc(100% - 12vw));
   margin: -5.5rem auto 4rem;
   padding: 1.4rem 0;
   border-top: 1px solid var(--hair);
@@ -976,7 +1020,7 @@
 }
 
 .mystic-section {
-  max-width: 1280px;
+  max-width: var(--width-section);
   margin: 0 auto;
   padding: 8rem 6vw 9rem;
 }
@@ -1082,7 +1126,7 @@
 }
 
 .mystic-footer {
-  width: min(780px, calc(100% - 12vw));
+  width: min(var(--width-footer), calc(100% - 12vw));
   margin: 0 auto;
   padding: 2rem 0 3rem;
   text-align: center;
@@ -1176,33 +1220,63 @@
 }
 
 .paper-btn {
-  min-height: 6rem;
-  min-width: 6rem;
-  border-radius: 999px;
-  border: 1px solid var(--hair-strong);
-  background: transparent;
-  color: var(--bone);
-  letter-spacing: 0.34em;
-  padding: 1rem;
+  /* 借鉴 Modern Dark 按钮:克制小尺寸 + 微圆角,回归规范朱砂填充 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.25rem;
+  min-height: 2.5rem;
+  border: 1px solid var(--cinnabar);
+  border-radius: 4px;
+  background: var(--cinnabar);
+  color: #fff;
+  font-family: "Noto Serif SC", serif;
+  font-weight: 600;
+  font-size: 0.88rem;
+  letter-spacing: 0.18em;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .paper-btn:hover {
-  border-color: var(--gold-1);
-  background: transparent;
-  color: var(--gold-1);
-  box-shadow: 0 0 40px rgba(214, 190, 138, 0.12);
+  background: var(--cinnabar-dim);
+  border-color: var(--cinnabar-dim);
+}
+
+.paper-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .paper-btn-ghost {
-  border-color: var(--hair);
+  /* ghost 与 btn 统一微圆角,避免方角突兀 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.1rem;
+  min-height: 2.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
   background: transparent;
-  color: var(--bone-dim);
-  border-radius: 0;
+  color: var(--bone);
+  font-family: "Noto Serif SC", serif;
+  font-weight: 400;
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
 }
 
 .paper-btn-ghost:hover {
-  border-color: var(--gold-1);
-  color: var(--gold-1);
+  border-color: var(--cinnabar);
+  color: var(--cinnabar);
+}
+
+.paper-btn-ghost:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .paper-input {
@@ -1236,6 +1310,65 @@ select.paper-input {
 .paper-hr-double {
   background: var(--hair);
   border-color: var(--hair);
+}
+
+/* ── Stage 1 补充 keyframe(被 TarotPage.spin 用) ── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── 灵签(签枝下落) ── */
+@keyframes qian-stick-fall {
+  0%   { transform: translateY(-110%) rotate(-6deg); opacity: 0; }
+  15%  { opacity: 1; }
+  60%  { transform: translateY(8%) rotate(3deg); }
+  78%  { transform: translateY(0) rotate(-2deg); }
+  90%  { transform: translateY(2%) rotate(1deg); }
+  100% { transform: translateY(0) rotate(0deg); opacity: 1; }
+}
+.qian-stick-fall {
+  animation: qian-stick-fall 1.2s cubic-bezier(0.34, 1.32, 0.4, 1) both;
+}
+
+/* ── CalculusReveal 组件样式 ── */
+.calculus-reveal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.calculus-reveal__label {
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  color: var(--cinnabar);
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--rule);
+}
+.calculus-reveal__stage {
+  min-height: 4rem;
+}
+.calculus-reveal__controls {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.calculus-reveal__btn {
+  font-family: "Noto Serif SC", serif;
+  font-size: 0.78rem;
+  padding: 0.4rem 0.9rem;
+  background: transparent;
+  border: 1px solid var(--rule);
+  color: var(--ink-soft);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.calculus-reveal__btn:hover {
+  border-color: var(--cinnabar);
+  color: var(--cinnabar);
+}
+.calculus-reveal__btn--skip {
+  margin-left: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1314,6 +1447,6 @@ select.paper-input {
   }
 
   .mystic-main {
-    width: min(100% - 10vw, 1080px);
+    width: min(100% - 10vw, var(--width-main));
   }
 }

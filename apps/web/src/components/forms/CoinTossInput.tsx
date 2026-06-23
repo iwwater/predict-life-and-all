@@ -70,7 +70,7 @@ export const CoinTossInput: FC<CoinTossInputProps> = ({ tosses, onChange }) => {
       </div>
       <button type="button" onClick={autoToss}
         className="paper-btn-ghost" style={{ marginTop: "0.5rem", fontSize: "0.72rem" }}>
-        🎲 {t("form.coin.auto")}
+        {t("form.coin.auto")}
       </button>
     </div>
   );

@@ -8,6 +8,7 @@ import { useI18n } from "../../lib/i18n";
 import { useBasket } from "../../store/basket";
 import { useBirthStore } from "../../store/birth";
 import { MethodSourcesPanel } from "../../components/MethodSourcesPanel";
+import { useStaggeredReveal } from "../../lib/useStaggeredReveal";
 
 const MODES = [
   { value: "natal", labelZh: "本命盘", labelEn: "Natal" },
@@ -48,6 +49,9 @@ export function WesternPage() {
   const planets = r?.planets || [];
   const houses = r?.houses || [];
   const aspects = r?.aspects || [];
+
+  // 行星表 stagger fade-in
+  const { getStyle: getPlanetStyle } = useStaggeredReveal(planets.length || 1, { interval: 100 });
 
   return (
     <div className="space-y-6">
@@ -97,7 +101,7 @@ export function WesternPage() {
             {planets.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {planets.map((p: any, i: number) => (
-                  <div key={i} className="p-2 rounded-sm" style={{ border: "1px solid var(--rule)", background: "var(--paper-2)", fontSize: "0.7rem" }}>
+                  <div key={i} className="p-2 rounded-sm animate-fade-in" style={{ border: "1px solid var(--rule)", background: "var(--paper-2)", fontSize: "0.7rem", ...getPlanetStyle(i) }}>
                     <span style={{ fontWeight: 600, color: "var(--ink)" }}>{p.name || p.planet}</span>
                     <span style={{ color: "var(--ink-soft)", marginLeft: "0.4rem" }}>{p.sign || p.zodiac || ""}{p.house ? ` H${p.house}` : ""}</span>
                     {p.retrograde && <span className="paper-tag" style={{ fontSize: "0.55rem", marginLeft: "0.3rem" }}>R</span>}
