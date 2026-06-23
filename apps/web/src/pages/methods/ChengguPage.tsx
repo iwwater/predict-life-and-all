@@ -34,7 +34,7 @@ export function ChengguPage() {
     birthStore.setBirth({ year, month, day, hour, minute, gender });
     try {
       const birth = { year, month, day, hour, minute, gender, calendar: "gregorian" as const, lat: null, lng: null, tz: "Asia/Shanghai", is_leap_month: false };
-      const result = await computeChart({ method: "chenggu", birth, options: { mode: "classic" } });
+      const result = await computeChart({ method: "chenggu", birth, options: { mode: "traditional_weight" } });
       setChart(result);
     } catch (err: any) { setError(String(err?.message || err)); }
     finally { setLoading(false); }
