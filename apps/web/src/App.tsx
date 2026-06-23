@@ -2,6 +2,7 @@
 // 依据: 前端重构指示v2-一法一专页
 import { BrowserRouter, Route, Routes, Navigate, useParams } from "react-router-dom";
 import { lazy, Suspense } from "react";
+import { MotionConfig } from "framer-motion";
 import { I18nProvider } from "./lib/i18n";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { SEO } from "./components/SEO";
@@ -66,74 +67,76 @@ function PageLoader() {
 export function App() {
   return (
     <I18nProvider>
-      <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
-        <ErrorBoundary>
-          <SEO />
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route element={<Layout />}>
-                <Route index element={<Home />} />
+      <MotionConfig reducedMotion="user">
+        <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+          <ErrorBoundary>
+            <SEO />
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route element={<Layout />}>
+                  <Route index element={<Home />} />
 
-                {/* v2 一法一专页 — 核心路由 */}
-                {/* 命类 */}
-                <Route path="/m/bazi" element={<BaziPage />} />
-                <Route path="/m/ziwei" element={<ZiweiPage />} />
-                <Route path="/m/tieban" element={<TiebanPage />} />
-                {/* 卜类 */}
-                <Route path="/m/qimen" element={<QimenPage />} />
-                <Route path="/m/liuyao" element={<LiuyaoPage />} />
-                <Route path="/m/meihua" element={<MeihuaPage />} />
-                <Route path="/m/liuren" element={<LiurenPage />} />
-                <Route path="/m/xiaoliuren" element={<XiaoliurenPage />} />
-                <Route path="/m/qian" element={<QianPage />} />
-                <Route path="/m/chenggu" element={<ChengguPage />} />
-                {/* 相类 */}
-                <Route path="/m/hepan" element={<HePanPage />} />
-                <Route path="/m/tarot" element={<TarotPage />} />
-                <Route path="/m/lenormand" element={<LenormandPage />} />
-                <Route path="/m/western" element={<WesternPage />} />
-                <Route path="/m/vedic" element={<VedicPage />} />
-                <Route path="/m/numerology" element={<NumerologyPage />} />
-                {/* 山类 */}
-                <Route path="/m/bazhai" element={<BazhaiPage />} />
-                <Route path="/m/xuankong" element={<XuankongPage />} />
+                  {/* v2 一法一专页 — 核心路由 */}
+                  {/* 命类 */}
+                  <Route path="/m/bazi" element={<BaziPage />} />
+                  <Route path="/m/ziwei" element={<ZiweiPage />} />
+                  <Route path="/m/tieban" element={<TiebanPage />} />
+                  {/* 卜类 */}
+                  <Route path="/m/qimen" element={<QimenPage />} />
+                  <Route path="/m/liuyao" element={<LiuyaoPage />} />
+                  <Route path="/m/meihua" element={<MeihuaPage />} />
+                  <Route path="/m/liuren" element={<LiurenPage />} />
+                  <Route path="/m/xiaoliuren" element={<XiaoliurenPage />} />
+                  <Route path="/m/qian" element={<QianPage />} />
+                  <Route path="/m/chenggu" element={<ChengguPage />} />
+                  {/* 相类 */}
+                  <Route path="/m/hepan" element={<HePanPage />} />
+                  <Route path="/m/tarot" element={<TarotPage />} />
+                  <Route path="/m/lenormand" element={<LenormandPage />} />
+                  <Route path="/m/western" element={<WesternPage />} />
+                  <Route path="/m/vedic" element={<VedicPage />} />
+                  <Route path="/m/numerology" element={<NumerologyPage />} />
+                  {/* 山类 */}
+                  <Route path="/m/bazhai" element={<BazhaiPage />} />
+                  <Route path="/m/xuankong" element={<XuankongPage />} />
 
-                {/* 合参（用户主动发起） */}
-                <Route path="/cases" element={<Cases />} />
-                <Route path="/birth-time" element={<BirthTimeRectifyPage />} />
-                <Route path="/compass" element={<CompassPage />} />
-                <Route path="/heshen" element={<HeShenPage />} />
+                  {/* 合参（用户主动发起） */}
+                  <Route path="/cases" element={<Cases />} />
+                  <Route path="/birth-time" element={<BirthTimeRectifyPage />} />
+                  <Route path="/compass" element={<CompassPage />} />
+                  <Route path="/heshen" element={<HeShenPage />} />
 
-                {/* 旧路由重定向 */}
-                <Route path="/cast" element={<Navigate to="/" replace />} />
-                <Route path="/aggregate" element={<Navigate to="/heshen" replace />} />
+                  {/* 旧路由重定向 */}
+                  <Route path="/cast" element={<Navigate to="/" replace />} />
+                  <Route path="/aggregate" element={<Navigate to="/heshen" replace />} />
 
-                {/* 保留的二级页面 */}
-                <Route path="/result" element={<Result />} />
-                <Route path="/methods/:id" element={<MethodInfo />} />
-                <Route path="/fengshui" element={<FengShui />} />
-                <Route path="/history" element={<History />} />
-                <Route path="/daily" element={<Daily />} />
-                <Route path="/almanac" element={<Almanac />} />
-                <Route path="/compatibility" element={<Compatibility />} />
-                <Route path="/dateselect" element={<DateSelect />} />
-                <Route path="/knowledge" element={<Knowledge />} />
-                <Route path="/dream" element={<DreamPage />} />
-                <Route path="/reading" element={<Reading />} />
-                <Route path="/reading-history" element={<ReadingHistory />} />
-                <Route path="/privacy" element={<PrivacyPolicy />} />
-                <Route path="/about" element={<About />} />
+                  {/* 保留的二级页面 */}
+                  <Route path="/result" element={<Result />} />
+                  <Route path="/methods/:id" element={<MethodInfo />} />
+                  <Route path="/fengshui" element={<FengShui />} />
+                  <Route path="/history" element={<History />} />
+                  <Route path="/daily" element={<Daily />} />
+                  <Route path="/almanac" element={<Almanac />} />
+                  <Route path="/compatibility" element={<Compatibility />} />
+                  <Route path="/dateselect" element={<DateSelect />} />
+                  <Route path="/knowledge" element={<Knowledge />} />
+                  <Route path="/dream" element={<DreamPage />} />
+                  <Route path="/reading" element={<Reading />} />
+                  <Route path="/reading-history" element={<ReadingHistory />} />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
+                  <Route path="/about" element={<About />} />
 
-                {/* 旧 /method/* 路由 — 301 重定向到 /m/* */}
-                <Route path="/method/:id" element={<MethodRedirect />} />
+                  {/* 旧 /method/* 路由 — 301 重定向到 /m/* */}
+                  <Route path="/method/:id" element={<MethodRedirect />} />
 
-                <Route path="/result-sample" element={<ResultSample />} />
-                <Route path="*" element={<NotFound />} />
-              </Route>
-            </Routes>
-          </Suspense>
-        </ErrorBoundary>
-      </BrowserRouter>
+                  <Route path="/result-sample" element={<ResultSample />} />
+                  <Route path="*" element={<NotFound />} />
+                </Route>
+              </Routes>
+            </Suspense>
+          </ErrorBoundary>
+        </BrowserRouter>
+      </MotionConfig>
     </I18nProvider>
   );
 }
