@@ -8,6 +8,7 @@ import { useI18n } from "../../lib/i18n";
 import { useBasket } from "../../store/basket";
 import { useBirthStore } from "../../store/birth";
 import { MethodSourcesPanel } from "../../components/MethodSourcesPanel";
+import { useStaggeredReveal } from "../../lib/useStaggeredReveal";
 
 // 九宫方位: 按 巽离坤/震中兑/艮坎乾 排列（方位是红线不能错）
 const PALACE_ORDER = [
@@ -46,6 +47,12 @@ export function QimenPage() {
   const r = chart?.raw;
   const palaces = r?.grid_palaces || r?.palaces || [];
 
+  const { getStyle: getPalaceStyle } = useStaggeredReveal(9, {
+    interval: 110,
+    initialDelay: 0,
+    maxTotal: 1500,
+  });
+
   return (
     <div className="space-y-6">
       <header>
@@ -80,11 +87,11 @@ export function QimenPage() {
               {r?.zhishi && <span className="paper-tag">{lang === "zh" ? "值使" : "Zhi Shi"}: {r.zhishi}</span>}
             </div>
             <div className="grid grid-cols-3 gap-1.5" style={{ maxWidth: 480, margin: "0 auto" }}>
-              {PALACE_ORDER.map((p) => {
+              {PALACE_ORDER.map((p, i) => {
                 const data = palaces.find((g: any) => g.palace === p.name || g.palace === p.idx);
                 return (
-                  <div key={p.name} className="text-center p-2 rounded-sm"
-                    style={{ border: `1px solid var(--rule)`, background: p.name === "中" ? "var(--paper-2)" : "var(--paper)", minHeight: 70 }}>
+                  <div key={p.name} className="text-center p-2 rounded-sm animate-fade-in"
+                    style={{ border: `1px solid var(--rule)`, background: p.name === "中" ? "var(--paper-2)" : "var(--paper)", minHeight: 70, ...getPalaceStyle(i) }}>
                     <div style={{ fontSize: "0.55rem", color: "var(--ink-soft)" }}>{p.name}{p.name !== "中" ? ` ${p.en}` : ""}</div>
                     {data ? (
                       <div style={{ fontSize: "0.65rem", color: "var(--ink)", lineHeight: 1.4 }}>

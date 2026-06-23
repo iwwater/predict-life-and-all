@@ -14,6 +14,7 @@ import { useBirthStore } from "../../store/birth";
 import { CITY_PRESETS } from "../../lib/cities";
 import { COLOR } from "../../components/ui";
 import { MethodSourcesPanel } from "../../components/MethodSourcesPanel";
+import { useStaggeredReveal } from "../../lib/useStaggeredReveal";
 
 export function BaziPage() {
   const { t, lang } = useI18n();
@@ -36,6 +37,9 @@ export function BaziPage() {
   const [useZiShi, setUseZiShi] = useState(false);
   const [useTrueSolar, setUseTrueSolar] = useState(false);
   const [mode, setMode] = useState("natal");
+
+  // 四柱同时并排,只是 stagger fade-in 进场 (不替换式揭示)
+  const { getStyle: getPillarStyle } = useStaggeredReveal(4, { interval: 350 });
 
   // 状态
   const [chart, setChart] = useState<ChartResult | null>(null);
@@ -180,6 +184,8 @@ export function BaziPage() {
         {error && <div className="paper-error">{error}</div>}
       </form>
 
+      <MethodSourcesPanel method="bazi" />
+
       {/* 盘面结果 — 闭环展示 */}
       {chart && (
         <div className="space-y-5 animate-fade-in">
@@ -195,52 +201,15 @@ export function BaziPage() {
             </div>
             <div className="grid grid-cols-4 gap-2 sm:gap-3">
               {[
-                { key: "year", term: "年柱", desc: lang === "zh" ? "祖辈·根" : "Ancestors" },
-                { key: "month", term: "月柱", desc: lang === "zh" ? "父母·苗" : "Parents" },
-                { key: "day", term: "日柱", desc: lang === "zh" ? "自己·花" : "Self" },
-                { key: "hour", term: "时柱", desc: lang === "zh" ? "子女·果" : "Children" },
-              ].map((col) => {
-                const gz: string = (pillars as any)[col.key] || "??";
-                const detail = pd.find((d: any) => d.label === col.key);
-                const hs = detail?.hidden_stems || [];
-                const shigan = detail?.ten_god_stem || "";
-                return (
-                  <div key={col.key} className="text-center rounded-sm p-3"
-                    style={{ background: "var(--paper-2)", border: "1px solid var(--rule)" }}>
-                    <div style={{ fontSize: "0.65rem", color: "var(--ink-soft)", letterSpacing: "0.1em", marginBottom: "0.3rem" }}>
-                      <Jargon term={col.term} override={{ plain: col.desc, hint: "" }} />
-                    </div>
-                    <div style={{
-                      fontFamily: "'Noto Serif SC', serif",
-                      fontSize: "clamp(1.8rem, 5vw, 3rem)",
-                      fontWeight: 700,
-                      color: "var(--cinnabar)",
-                      lineHeight: 1.2,
-                    }}>
-                      {gz[0] || "?"}
-                    </div>
-                    <div style={{
-                      fontFamily: "'Noto Serif SC', serif",
-                      fontSize: "clamp(1.8rem, 5vw, 3rem)",
-                      fontWeight: 700,
-                      color: "var(--ink)",
-                      lineHeight: 1.2,
-                    }}>
-                      {gz[1] || "?"}
-                    </div>
-                    {hs.length > 0 && (
-                      <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)", marginTop: "0.25rem" }}>
-                        {lang === "zh" ? "藏" : "H"}:{hs.join("/")}
-                      </div>
-                    )}
-                    {shigan && (
-                      <div style={{ fontSize: "0.6rem", color: "var(--verdigris)", marginTop: "0.15rem" }}>
-                        {shigan}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+                { key: "year", term: "年柱", desc: lang === "zh" ? "祖辈·根" : "Ancestors", gz: pillars.year || "??", detail: pd.find((d: any) => d.label === "year") },
+                { key: "month", term: "月柱", desc: lang === "zh" ? "父母·苗" : "Parents", gz: pillars.month || "??", detail: pd.find((d: any) => d.label === "month") },
+                { key: "day", term: "日柱", desc: lang === "zh" ? "自己·花" : "Self", gz: pillars.day || "??", detail: pd.find((d: any) => d.label === "day") },
+                { key: "hour", term: "时柱", desc: lang === "zh" ? "子女·果" : "Children", gz: pillars.hour || "??", detail: pd.find((d: any) => d.label === "hour") },
+              ].map((col, i) => (
+                <div key={col.key} className="animate-fade-in" style={getPillarStyle(i)}>
+                  {renderPillar(col.key, col.term, col.desc, col.gz, col.detail, lang)}
+                </div>
+              ))}
             </div>
           </section>
 
@@ -387,7 +356,58 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <div>
       <label className="paper-label">{label}</label>
       {children}
-      <MethodSourcesPanel method="bazi" />
     </div>
   );
 }
+
+// renderPillar: 单柱渲染,被 .map 调用
+// key/term/desc 仅用于保证渲染逻辑唯一; render 时直接使用传入的 gz + detail
+function renderPillar(
+  _key: string,
+  term: string,
+  desc: string,
+  gz: string,
+  detail: any,
+  lang: "zh" | "en",
+): React.ReactNode {
+  const hs = detail?.hidden_stems || [];
+  const shigan = detail?.ten_god_stem || "";
+  return (
+    <div className="text-center rounded-sm p-3"
+      style={{ background: "var(--paper-2)", border: "1px solid var(--rule)" }}>
+      <div style={{ fontSize: "0.65rem", color: "var(--ink-soft)", letterSpacing: "0.1em", marginBottom: "0.3rem" }}>
+        <Jargon term={term} override={{ plain: desc, hint: "" }} />
+      </div>
+      <div style={{
+        fontFamily: "'Noto Serif SC', serif",
+        fontSize: "clamp(1.8rem, 5vw, 3rem)",
+        fontWeight: 700,
+        color: "var(--cinnabar)",
+        lineHeight: 1.2,
+      }}>
+        {gz[0] || "?"}
+      </div>
+      <div style={{
+        fontFamily: "'Noto Serif SC', serif",
+        fontSize: "clamp(1.8rem, 5vw, 3rem)",
+        fontWeight: 700,
+        color: "var(--ink)",
+        lineHeight: 1.2,
+      }}>
+        {gz[1] || "?"}
+      </div>
+      {hs.length > 0 && (
+        <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)", marginTop: "0.25rem" }}>
+          {lang === "zh" ? "藏" : "H"}:{hs.join("/")}
+        </div>
+      )}
+      {shigan && (
+        <div style={{ fontSize: "0.6rem", color: "var(--verdigris)", marginTop: "0.15rem" }}>
+          {shigan}
+        </div>
+      )}
+    </div>
+  );
+}
+// ponytail: Field 故意保持纯 label+children,不挂 method-specific 副作用
+// (原 BaziPage.Field 内曾误挂 MethodSourcesPanel,导致 6 次渲染)

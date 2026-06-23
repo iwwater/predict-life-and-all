@@ -216,7 +216,7 @@ export function DreamPage() {
                 解读中…
               </>
             ) : (
-              <>🔮 开始解梦</>
+              <>开始解梦</>
             )}
           </button>
           <span style={{ fontSize: "0.76rem", color: "var(--ink-soft)", opacity: 0.85 }}>

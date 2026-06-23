@@ -8,6 +8,7 @@ import { useI18n } from "../lib/i18n";
 import { useBasket } from "../store/basket";
 import { useBirthStore } from "../store/birth";
 import { MethodSourcesPanel } from "../components/MethodSourcesPanel";
+import { useStaggeredReveal } from "../lib/useStaggeredReveal";
 
 type PersonForm = {
   year: number; month: number; day: number; hour: number; minute: number;
@@ -47,6 +48,9 @@ export function HePanPage() {
 
   const r = chart?.raw;
   const scores = r?.scores || r?.ratings || {};
+
+  // 四维评级 stagger fade-in
+  const { getStyle: getRatingStyle } = useStaggeredReveal(4, { interval: 120 });
 
   return (
     <div className="space-y-6">
@@ -109,10 +113,10 @@ export function HePanPage() {
                 { key: "wealth", labelZh: "财运契合", labelEn: "Wealth" },
                 { key: "health", labelZh: "健康互助", labelEn: "Health" },
                 { key: "growth", labelZh: "成长空间", labelEn: "Growth" },
-              ].map((dim) => {
+              ].map((dim, i) => {
                 const v = scores[dim.key] ?? 0;
                 return (
-                  <div key={dim.key} className="text-center p-3 rounded-sm" style={{ border: "1px solid var(--rule)", background: "var(--paper-2)" }}>
+                  <div key={dim.key} className="text-center p-3 rounded-sm animate-fade-in" style={{ border: "1px solid var(--rule)", background: "var(--paper-2)", ...getRatingStyle(i) }}>
                     <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)" }}>{lang === "zh" ? dim.labelZh : dim.labelEn}</div>
                     <div style={{ fontSize: "1.6rem", fontWeight: 700, color: v >= 70 ? "var(--verdigris)" : v >= 40 ? "var(--ink)" : "var(--cinnabar)" }}>
                       {v}
@@ -139,7 +143,12 @@ export function HePanPage() {
                   </div>
                   <ul style={{ fontSize: "0.7rem", color: "var(--ink)", listStyle: "none", padding: 0 }}>
                     {(r?.confirmations || []).slice(0, 5).map((c: any, i: number) => (
-                      <li key={i} style={{ padding: "0.2rem 0", borderBottom: "1px solid var(--rule)" }}>✓ {typeof c === "string" ? c : c.label || c.desc}</li>
+                      <li key={i} style={{ padding: "0.2rem 0", borderBottom: "1px solid var(--rule)", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                        <span className="paper-tag" style={{ fontSize: "0.6rem", color: "var(--verdigris)", borderColor: "rgba(74,99,79,0.3)", padding: "0.05rem 0.35rem" }}>
+                          {lang === "zh" ? "印证" : "OK"}
+                        </span>
+                        <span>{typeof c === "string" ? c : c.label || c.desc}</span>
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -151,7 +160,12 @@ export function HePanPage() {
                   </div>
                   <ul style={{ fontSize: "0.7rem", color: "var(--ink)", listStyle: "none", padding: 0 }}>
                     {(r?.conflicts || []).slice(0, 5).map((c: any, i: number) => (
-                      <li key={i} style={{ padding: "0.2rem 0", borderBottom: "1px solid var(--rule)" }}>⚠ {typeof c === "string" ? c : c.label || c.desc}</li>
+                      <li key={i} style={{ padding: "0.2rem 0", borderBottom: "1px solid var(--rule)", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                        <span className="paper-tag" style={{ fontSize: "0.6rem", color: "var(--cinnabar)", borderColor: "rgba(176,58,46,0.3)", padding: "0.05rem 0.35rem" }}>
+                          {lang === "zh" ? "分歧" : "Warn"}
+                        </span>
+                        <span>{typeof c === "string" ? c : c.label || c.desc}</span>
+                      </li>
                     ))}
                   </ul>
                 </div>

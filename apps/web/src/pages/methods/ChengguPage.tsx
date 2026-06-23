@@ -7,6 +7,7 @@ import { computeChart } from "../../lib/api";
 import { useI18n } from "../../lib/i18n";
 import { useBasket } from "../../store/basket";
 import { useBirthStore } from "../../store/birth";
+import { useStaggeredReveal } from "../../lib/useStaggeredReveal";
 import { MethodSourcesPanel } from "../../components/MethodSourcesPanel";
 
 export function ChengguPage() {
@@ -25,6 +26,8 @@ export function ChengguPage() {
   const [chart, setChart] = useState<ChartResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const { getStyle } = useStaggeredReveal(4, { interval: 100, initialDelay: 0 });
 
   const submit = useCallback(async (e: FormEvent) => {
     e.preventDefault(); setError(null); setLoading(true);
@@ -80,7 +83,7 @@ export function ChengguPage() {
                 { label: lang === "zh" ? "日" : "Day", w: r?.weight_day },
                 { label: lang === "zh" ? "时" : "Hour", w: r?.weight_hour },
               ].map((item, i) => (
-                <div key={i} className="p-3 rounded-sm" style={{ border: "1px solid var(--rule)", background: "var(--paper-2)" }}>
+                <div key={i} className="p-3 rounded-sm animate-fade-in" style={{ border: "1px solid var(--rule)", background: "var(--paper-2)", ...getStyle(i) }}>
                   <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)" }}>{item.label}</div>
                   <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--cinnabar)", fontFamily: "'Noto Serif SC', serif" }}>
                     {item.w || "—"}

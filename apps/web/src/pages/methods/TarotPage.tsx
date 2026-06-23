@@ -10,6 +10,7 @@ import { TAROT_SPREADS, TAROT_SYSTEMS } from "../../lib/method-info";
 import type { TarotSpread, TarotSystem } from "../../lib/types";
 import { useI18n } from "../../lib/i18n";
 import { useBasket } from "../../store/basket";
+import { useStaggeredReveal } from "../../lib/useStaggeredReveal";
 import { COLOR } from "../../components/ui";
 import { MethodSourcesPanel } from "../../components/MethodSourcesPanel";
 
@@ -48,6 +49,16 @@ export function TarotPage() {
 
   const spreadInfo = TAROT_SPREADS.find((s) => s.code === spread) || TAROT_SPREADS[0];
   const suggestedInfo = TAROT_SPREADS.find((s) => s.code === suggestedSpread) || TAROT_SPREADS[0];
+
+  const cards = (chart?.raw?.牌面 || []) as any[];
+  const analysis = chart?.raw?.牌组分析 as any;
+  const allRevealed = revealedIndices.size >= cards.length;
+
+  // 翻牌 3D 翻动动画的逐张延迟 (card 0 = 0ms, card 1 = 120ms, ...)
+  const { getDelay } = useStaggeredReveal(cards.length, {
+    interval: 120,
+    easing: "cubic-bezier(0.2, 0.7, 0.2, 1)",
+  });
 
   // 步骤1: 确认牌阵 → 抽牌
   const startDraw = useCallback(async () => {
@@ -105,10 +116,6 @@ export function TarotPage() {
     setRevealedIndices(new Set());
     setError(null);
   };
-
-  const cards = (chart?.raw?.牌面 || []) as any[];
-  const analysis = chart?.raw?.牌组分析 as any;
-  const allRevealed = revealedIndices.size >= cards.length;
 
   return (
     <div className="space-y-6">
@@ -231,7 +238,15 @@ export function TarotPage() {
       {/* 洗牌动画 */}
       {shuffling && (
         <section className="paper-frame" style={{ textAlign: "center", padding: "3rem 1rem" }}>
-          <div style={{ fontSize: "3rem", animation: "spin 0.5s linear infinite" }}>🃏</div>
+          <div style={{
+            width: "2.4rem",
+            height: "2.4rem",
+            margin: "0 auto",
+            border: "1px solid var(--rule)",
+            background: "var(--paper-2)",
+            animation: "spin 0.5s linear infinite",
+            borderRadius: "2px",
+          }} />
           <p style={{ fontSize: "0.85rem", color: "var(--ink-soft)", marginTop: "1rem", fontFamily: "'Noto Serif SC', serif" }}>
             {lang === "zh" ? "洗牌中… 请凝神专注于你的问题" : "Shuffling… Focus on your question"}
           </p>
@@ -264,7 +279,7 @@ export function TarotPage() {
                 const revealed = revealedIndices.has(i);
                 return (
                   <button key={i} type="button" onClick={() => !revealed && revealCard(i)}
-                    className="text-center rounded-sm transition-all"
+                    className={`text-center rounded-sm transition-all ${revealed ? "tarot-flip" : ""}`}
                     style={{
                       border: `1px solid ${revealed ? "var(--rule)" : "var(--cinnabar)"}`,
                       background: revealed ? "var(--paper-2)" : "rgba(176,58,46,0.06)",
@@ -275,10 +290,21 @@ export function TarotPage() {
                       flexDirection: "column",
                       justifyContent: "center",
                       alignItems: "center",
+                      animationDelay: revealed ? getDelay(i) : undefined,
                     }}>
                     {!revealed ? (
                       <>
-                        <div style={{ fontSize: "2rem", opacity: 0.6 }}>🂠</div>
+                        <div style={{
+                          width: "2rem",
+                          height: "2.8rem",
+                          border: "1px solid var(--rule)",
+                          background: "var(--paper-2)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          opacity: 0.7,
+                          borderRadius: "2px",
+                        }}>?</div>
                         <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)", marginTop: "0.3rem", fontFamily: "'JetBrains Mono', monospace" }}>
                           {card.位置 || `Card ${i + 1}`}
                         </div>

@@ -243,7 +243,7 @@ export function CompatibilityReport({ result, personAName, personBName }: Props)
                   {data.connections && data.connections.length > 0 && (
                     <div className="text-[9px] mt-0.5" style={{ color: COLOR.azure }}>
                       {data.connections.map((c: string, i: number) => (
-                        <div key={i}>✦ {c}</div>
+                        <div key={i}>{c}</div>
                       ))}
                     </div>
                   )}

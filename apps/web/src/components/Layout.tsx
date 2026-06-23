@@ -2,6 +2,11 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { useMemo } from "react";
 import { useI18n } from "../lib/i18n";
 
+// ponytail: G2 抽了 5 档字号 + 4 档间距 + 4 个容器 token 到 index.css
+// ponytail-debt: 24 个内联 fontSize 散布在 ~20 文件未迁;G3 范围
+// ponytail-debt: 容器内边距/间距未切到 --space-*;G3 范围
+// ponytail-debt: paper-* 类的 font-size 未切到 --font-* (dark 块同时覆写,要同步改)
+
 const METHOD_NAV = [
   { to: "/", label: "术数" },
   { to: "/cases", label: "问事" },

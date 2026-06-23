@@ -8,6 +8,7 @@ import { useI18n } from "../../lib/i18n";
 import { useBasket } from "../../store/basket";
 import { useBirthStore } from "../../store/birth";
 import { MethodSourcesPanel } from "../../components/MethodSourcesPanel";
+import { useStaggeredReveal } from "../../lib/useStaggeredReveal";
 
 export function MeihuaPage() {
   const { t, lang } = useI18n();
@@ -39,6 +40,9 @@ export function MeihuaPage() {
   }, [question, mode, seed, birthStore]);
 
   const r = chart?.raw;
+
+  // 主/互/变 三卦 stagger fade-in
+  const { getStyle: getTrigramStyle } = useStaggeredReveal(3, { interval: 200 });
 
   return (
     <div className="space-y-6">
@@ -82,7 +86,7 @@ export function MeihuaPage() {
             {(r?.trigrams || []).length > 0 ? (
               <div className="grid grid-cols-3 gap-3">
                 {(r?.trigrams || []).map((t: any, i: number) => (
-                  <div key={i} className="text-center p-3 rounded-sm" style={{ border: "1px solid var(--rule)", background: "var(--paper-2)" }}>
+                  <div key={i} className="text-center p-3 rounded-sm animate-fade-in" style={{ border: "1px solid var(--rule)", background: "var(--paper-2)", ...getTrigramStyle(i) }}>
                     <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)" }}>{t.role || ["主卦", "互卦", "变卦"][i]}</div>
                     <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--ink)", fontFamily: "'Noto Serif SC', serif" }}>{t.name || t.hexagram || ""}</div>
                     <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)" }}>{t.upper_trigram || ""} / {t.lower_trigram || ""}</div>
