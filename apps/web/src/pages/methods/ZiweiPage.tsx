@@ -9,6 +9,7 @@ import { useI18n } from "../../lib/i18n";
 import { useBasket } from "../../store/basket";
 import { useBirthStore } from "../../store/birth";
 import { MethodSourcesPanel } from "../../components/MethodSourcesPanel";
+import { ZiweiPalaceBrowser } from "../../components/ZiweiPalaceBrowser";
 
 /** 4 种盘型布局 (后端 viz/ziwei_svg.py) */
 const SVG_STYLES = [
@@ -171,22 +172,17 @@ export function ZiweiPage() {
                 }} />
             </div>
 
-            {/* 宫位速览 (SVG 之外的文本对照, 供复制/检索) */}
+            {/* 十二宫点选详情 (替代原来的折叠速览) */}
             {palaces.length > 0 && (
-              <details style={{ borderTop: "1px dashed var(--rule)", paddingTop: "0.75rem" }}>
-                <summary style={{ fontSize: "0.78rem", color: "var(--ink-soft)", cursor: "pointer" }}>
-                  {lang === "zh" ? `十二宫速览（${palaces.length} 宫）` : `Palace list (${palaces.length})`}
-                </summary>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5" style={{ marginTop: "0.75rem" }}>
-                  {palaces.map((p: any, i: number) => (
-                    <div key={i} className="text-center p-2 rounded-sm"
-                      style={{ border: `1px solid ${p.name === r?.ming_gong ? "var(--cinnabar)" : "var(--rule)"}`, background: p.name === r?.ming_gong ? "rgba(176,58,46,0.06)" : "var(--paper-2)" }}>
-                      <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>{p.name}</div>
-                      <div style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--ink)", fontFamily: "'Noto Serif SC', serif" }}>{p.stars?.slice(0, 2).join(" ") || p.zhi || ""}</div>
-                    </div>
-                  ))}
-                </div>
-              </details>
+              <ZiweiPalaceBrowser
+                palaces={palaces}
+                soul={r?.soul}
+                body={r?.body}
+                fiveElements={r?.five_elements}
+                fourTransformations={r?.four_transformations}
+                mingGong={r?.ming_gong}
+                isZh={lang === "zh"}
+              />
             )}
           </section>
           <ChartFooter chart={chart} method="ziwei" inBasket={inBasket} onBasket={() => basketAdd({ method: "ziwei", chart, birth: { year, month, day, hour, minute, gender, calendar: "gregorian", lat: b.lat, lng: b.lng, tz: b.tz, is_leap_month: false }, addedAt: Date.now() })} onReset={() => setChart(null)} />
