@@ -129,8 +129,9 @@ apps/web/                 # React 18.3 + Vite + TypeScript
 ## 五、测试与质量
 
 ```bash
-# 完整 pytest 套件 (2100+ 项)
+# 完整 pytest 套件 (2200+ 项)
 python -m pytest tests/ -q
+# 并行(可选, ~3x): pip install pytest-xdist && python -m pytest tests/ -q -n 8
 
 # 仅 compass / 罗盘
 python -m pytest tests/test_compass.py -v
@@ -145,7 +146,7 @@ cd apps/web && npx tsc --noEmit
 cd apps/web && npm run build
 ```
 
-**当前状态**: **2180 passed / 0 failed / 0 skipped**（全量 `pytest tests/`，含紫微 native 排盘 · 六神 · 称骨/铁板 · 塔罗三系统 · 灵签回归）· TypeScript 零错 · 0 flaky · CI 见 `.github/workflows/ci.yml`
+**当前状态**: **2215 passed / 0 failed / 0 skipped**（全量 `pytest tests/`，含紫微 native 排盘 · 六神 · 称骨/铁板 · 塔罗三系统 · 灵签回归 · 选项透传回归）· TypeScript 零错 · 0 flaky · CI 见 `.github/workflows/ci.yml`
 **任何依赖升级必须全绿才可并入。**
 
 ---
@@ -213,4 +214,4 @@ cd apps/web && npm run build
 
 ---
 
-*最近更新：2026-10-23（紫微 native 排盘回归 + 全量 2180/2180 测试通过 · CI 首次上线 · 仓库历史清理 166MB 电子书）*
+*最近更新：2026-10-23（选项真正透传引擎/生命灵数补实/梅花外应字占 · 紫微 native 回归 · CI 上线 · 仓库历史清理 166MB 电子书）*
