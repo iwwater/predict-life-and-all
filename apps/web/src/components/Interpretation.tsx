@@ -192,7 +192,9 @@ export function Interpretation({ charts, question, enhancedData }: Props) {
     try {
       for await (const ev of streamInterpret({ charts, question, client: "mock", enhancedData }, signal)) {
         if (signal.aborted) return;
-        if (ev.type === "delta") setState((s) => ({ ...s, text: ev.text, loading: true }));
+        // 逐段追加: 早前这里是 text: ev.text, 会把已收到的正文整段覆盖掉,
+        // 只留最后一个片段(真流式后更明显, 只剩几个字)
+        if (ev.type === "delta") setState((s) => ({ ...s, text: s.text + ev.text, loading: true }));
         else if (ev.type === "done") setState((s) => ({ ...s, loading: false, done: true, meta: ev.meta }));
         else if (ev.type === "error") setState((s) => ({ ...s, loading: false, error: ev.text }));
       }

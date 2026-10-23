@@ -1,6 +1,7 @@
 /** QimenPage v2 — 奇门遁甲专页（九宫式盘）
  *  问事 + 时间（默认此刻）→ 九宫盘 → 解读
  */
+import { ChartFooter } from "../../components/ChartFooter";
 import { type FormEvent, useState, useCallback } from "react";
 import type { ChartResult } from "../../lib/types";
 import { computeChart } from "../../lib/api";
@@ -113,18 +114,3 @@ export function QimenPage() {
   );
 }
 
-function ChartFooter({ chart, inBasket, onBasket, onReset }: any) {
-  const { lang } = useI18n();
-  return (
-    <div className="flex items-center justify-between gap-3 flex-wrap" style={{ borderTop: "1px solid var(--rule)", paddingTop: "1rem" }}>
-      <div style={{ fontSize: "0.7rem", color: "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace" }}>engine: {chart.engine} · {chart.elapsed_ms}ms</div>
-      <div className="flex gap-2">
-        <button type="button" className="paper-btn-ghost" onClick={onBasket} disabled={inBasket} style={{ fontSize: "0.78rem" }}>
-          {inBasket ? (lang === "zh" ? "已收入卷宗" : "In Docket") : (lang === "zh" ? "收入合参" : "Add to Cross-Ref")}
-        </button>
-        <button type="button" className="paper-btn" onClick={onReset} style={{ fontSize: "0.78rem" }}>{lang === "zh" ? "重新起盘" : "Recast"}</button>
-      </div>
-      <MethodSourcesPanel method="qimen" />
-    </div>
-  );
-}

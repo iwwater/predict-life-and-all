@@ -1,6 +1,7 @@
 /** XuankongPage v2 — 玄空飞星专页
  *  不需生辰, 只需坐向 + 建造年份 + 运期 → 九宫飞星
  */
+import { ChartFooter } from "../../components/ChartFooter";
 import { type FormEvent, useState, useCallback } from "react";
 import type { ChartResult } from "../../lib/types";
 import { computeChart } from "../../lib/api";
@@ -92,7 +93,7 @@ export function XuankongPage() {
               <div className="paper-empty">{lang === "zh" ? "飞星盘面载入中…" : "Loading grid…"}</div>
             )}
           </section>
-          <ChartFooter chart={chart} inBasket={inBasket}
+          <ChartFooter method="fengshui" recastLabel="重新排盘" chart={chart} inBasket={inBasket}
             onBasket={() => basketAdd({ method: "xuankong", chart, birth: { year: constructionYear, month: 1, day: 1, hour: 12, minute: 0, gender: "unspecified", calendar: "gregorian", lat: null, lng: null, tz: "Asia/Shanghai" }, addedAt: Date.now() })}
             onReset={() => setChart(null)} />
         </div>
@@ -103,18 +104,3 @@ export function XuankongPage() {
 
 function F({ label, children }: { label: string; children: React.ReactNode }) { return <div><label className="paper-label">{label}</label>{children}</div>; }
 
-function ChartFooter({ chart, inBasket, onBasket, onReset }: any) {
-  const { lang } = useI18n();
-  return (
-    <div className="flex items-center justify-between gap-3 flex-wrap" style={{ borderTop: "1px solid var(--rule)", paddingTop: "1rem" }}>
-      <div style={{ fontSize: "0.7rem", color: "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace" }}>engine: {chart.engine} · {chart.elapsed_ms}ms</div>
-      <div className="flex gap-2">
-        <button type="button" className="paper-btn-ghost" onClick={onBasket} disabled={inBasket} style={{ fontSize: "0.78rem" }}>
-          {inBasket ? (lang === "zh" ? "已收入卷宗" : "In Docket") : (lang === "zh" ? "收入合参" : "Add to Cross-Ref")}
-        </button>
-        <button type="button" className="paper-btn" onClick={onReset} style={{ fontSize: "0.78rem" }}>{lang === "zh" ? "重新排盘" : "Recast"}</button>
-      </div>
-      <MethodSourcesPanel method="fengshui" />
-    </div>
-  );
-}

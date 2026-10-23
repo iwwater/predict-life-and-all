@@ -1,6 +1,7 @@
 /** MeihuaPage v2 — 梅花易数专页（最轻量）
  *  默认此刻起卦，可改任意时刻，进页即排
  */
+import { ChartFooter } from "../../components/ChartFooter";
 import { type FormEvent, useState, useCallback, useEffect } from "react";
 import type { ChartResult } from "../../lib/types";
 import { computeChart } from "../../lib/api";
@@ -106,18 +107,3 @@ export function MeihuaPage() {
   );
 }
 
-function ChartFooter({ chart, inBasket, onBasket, onReset }: any) {
-  const { lang } = useI18n();
-  return (
-    <div className="flex items-center justify-between gap-3 flex-wrap" style={{ borderTop: "1px solid var(--rule)", paddingTop: "1rem" }}>
-      <div style={{ fontSize: "0.7rem", color: "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace" }}>engine: {chart.engine} · {chart.elapsed_ms}ms</div>
-      <div className="flex gap-2">
-        <button type="button" className="paper-btn-ghost" onClick={onBasket} disabled={inBasket} style={{ fontSize: "0.78rem" }}>
-          {inBasket ? (lang === "zh" ? "已收入卷宗" : "In Docket") : (lang === "zh" ? "收入合参" : "Add to Cross-Ref")}
-        </button>
-        <button type="button" className="paper-btn" onClick={onReset} style={{ fontSize: "0.78rem" }}>{lang === "zh" ? "重新起卦" : "Recast"}</button>
-      </div>
-      <MethodSourcesPanel method="meihua" />
-    </div>
-  );
-}

@@ -1,4 +1,5 @@
 /** NumerologyPage v2 — 生命灵数专页（最简） */
+import { ChartFooter } from "../../components/ChartFooter";
 import { type FormEvent, useState, useCallback } from "react";
 import type { Birth, ChartResult } from "../../lib/types";
 import { computeChart } from "../../lib/api";
@@ -105,7 +106,7 @@ export function NumerologyPage() {
             </section>
           )}
 
-          <ChartFooter chart={chart} inBasket={inBasket}
+          <ChartFooter method="numerology" recastLabel="重新推算" chart={chart} inBasket={inBasket}
             onBasket={() => basketAdd({ method: "numerology", chart, birth: baseBirth, addedAt: Date.now() })}
             onReset={() => setChart(null)} />
         </div>
@@ -116,18 +117,3 @@ export function NumerologyPage() {
 
 function F({ label, children }: { label: string; children: React.ReactNode }) { return <div><label className="paper-label">{label}</label>{children}</div>; }
 
-function ChartFooter({ chart, inBasket, onBasket, onReset }: any) {
-  const { lang } = useI18n();
-  return (
-    <div className="flex items-center justify-between gap-3 flex-wrap" style={{ borderTop: "1px solid var(--rule)", paddingTop: "1rem" }}>
-      <div style={{ fontSize: "0.7rem", color: "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace" }}>engine: {chart.engine} · {chart.elapsed_ms}ms</div>
-      <div className="flex gap-2">
-        <button type="button" className="paper-btn-ghost" onClick={onBasket} disabled={inBasket} style={{ fontSize: "0.78rem" }}>
-          {inBasket ? (lang === "zh" ? "已收入卷宗" : "In Docket") : (lang === "zh" ? "收入合参" : "Add to Cross-Ref")}
-        </button>
-        <button type="button" className="paper-btn" onClick={onReset} style={{ fontSize: "0.78rem" }}>{lang === "zh" ? "重新推算" : "Recalculate"}</button>
-      </div>
-      <MethodSourcesPanel method="numerology" />
-    </div>
-  );
-}

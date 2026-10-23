@@ -7,6 +7,7 @@ import type { Birth, ChartResult } from "../../lib/types";
 import { computeChart } from "../../lib/api";
 import { BirthForm, type CityInfo } from "../../components/forms/BirthForm";
 import { ElementsRadar } from "../../components/ElementsRadar";
+import { Interpretation } from "../../components/Interpretation";
 import { Jargon } from "../../components/Jargon";
 import { useI18n } from "../../lib/i18n";
 import { useBasket } from "../../store/basket";
@@ -333,6 +334,11 @@ export function BaziPage() {
                 {lang === "zh" ? "重新排盘" : "Recast"}
               </button>
             </div>
+          </div>
+
+          {/* AI 解读: 出盘即出解读, 与其它方法页保持一致 */}
+          <div style={{ marginTop: "1.25rem" }}>
+            <Interpretation charts={[chart]} question="" />
           </div>
         </div>
       )}

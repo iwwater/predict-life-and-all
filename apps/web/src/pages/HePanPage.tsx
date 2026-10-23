@@ -1,6 +1,7 @@
 /** HePanPage v2 — 合盘专页
  *  双人输入并排 → 四维档位评级 → 印证/分歧 → 分享卡片
  */
+import { ChartFooter } from "../components/ChartFooter";
 import { type FormEvent, useState, useCallback } from "react";
 import type { Birth, ChartResult } from "../lib/types";
 import { computeChart } from "../lib/api";
@@ -176,7 +177,7 @@ export function HePanPage() {
             )}
           </section>
 
-          <ChartFooter chart={chart} inBasket={inBasket}
+          <ChartFooter method="hepan" recastLabel="重新合盘" chart={chart} inBasket={inBasket}
             onBasket={() => basketAdd({
               method: "hepan", chart,
               birth: { ...self, calendar: "gregorian", lat: b.lat, lng: b.lng, tz: b.tz } as any,
@@ -209,17 +210,3 @@ function PersonFields({ p, onChange, lang }: { p: PersonForm; onChange: (patch: 
   );
 }
 
-function ChartFooter({ chart, inBasket, onBasket, onReset }: any) {
-  const { lang } = useI18n();
-  return (
-    <div className="flex items-center justify-between gap-3 flex-wrap" style={{ borderTop: "1px solid var(--rule)", paddingTop: "1rem" }}>
-      <div style={{ fontSize: "0.7rem", color: "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace" }}>engine: {chart?.engine} · {chart?.elapsed_ms}ms</div>
-      <div className="flex gap-2">
-        <button type="button" className="paper-btn-ghost" onClick={onBasket} disabled={inBasket} style={{ fontSize: "0.78rem" }}>
-          {inBasket ? (lang === "zh" ? "已收入卷宗" : "In Docket") : (lang === "zh" ? "收入合参" : "Add to Cross-Ref")}
-        </button>
-        <button type="button" className="paper-btn" onClick={onReset} style={{ fontSize: "0.78rem" }}>{lang === "zh" ? "重新合盘" : "Recast"}</button>
-      </div>
-    </div>
-  );
-}
