@@ -1,6 +1,6 @@
 """POST /api/compute - unified chart endpoint with mode/subject options."""
-import logging
 import inspect
+import logging
 import time
 from typing import Literal
 
@@ -116,6 +116,9 @@ ALLOWED_OPTIONS = {
 _MODE_REQUIRED: dict[tuple[str, str], list[str]] = {
     ("numerology", "destiny"): ["name"],
     ("numerology", "soul_urge"): ["name"],
+    ("liuyao", "manual_coin"): ["tosses"],
+    ("liuyao", "number_qigua"): ["seed"],
+    ("qian", "manual_number"): ["qian_number"],
 }
 
 
@@ -124,6 +127,14 @@ _MODE_TRANSLATE: dict[tuple[str, str], str] = {
     ("meihua", "time_qigua"): "time",
     ("meihua", "number_qigua"): "number",
     ("meihua", "external_omen"): "external_omen",
+}
+
+
+# 有些引擎根本不读 mode, 但 mode 的语义对应它的某个真实参数:
+# qimen 的 hour_qimen/day_qimen 其实是 pan_type。用户显式给的参数优先, mode 只补缺。
+_MODE_KWARGS: dict[tuple[str, str], dict] = {
+    ("qimen", "hour_qimen"): {"pan_type": "hour"},
+    ("qimen", "day_qimen"): {"pan_type": "day"},
 }
 
 
@@ -145,6 +156,8 @@ def _engine_kwargs(engine, options: dict, method: str = "") -> dict:
             kwargs[key] = value
     if "mode" in kwargs and (method, kwargs["mode"]) in _MODE_TRANSLATE:
         kwargs["mode"] = _MODE_TRANSLATE[(method, kwargs["mode"])]
+    for key, value in _MODE_KWARGS.get((method, options.get("mode") or ""), {}).items():
+        kwargs.setdefault(key, value)
     return kwargs
 
 
@@ -175,6 +188,16 @@ def compute_endpoint(body: ComputeRequest):
     missing = [k for k in required if not options.get(k) and not getattr(body.birth, k, None)]
     if missing:
         raise HTTPException(422, f"mode {mode} 需要参数: {', '.join(missing)}")
+
+    # 六爻掷币: 引擎要 list[int] (6老阴/7少阳/8少阴/9老阳)。发字符串枚举会让引擎的
+    # `t in (7,9)` 恒 False → 永远算出全阴坤为地、零动爻 —— 宁可当场拒绝, 不静默算错卦。
+    if body.method == "liuyao" and options.get("tosses") is not None:
+        ts = options["tosses"]
+        ok = isinstance(ts, list) and len(ts) == 6 and all(
+            isinstance(t, int) and not isinstance(t, bool) and t in (6, 7, 8, 9) for t in ts
+        )
+        if not ok:
+            raise HTTPException(422, "tosses 必须是 6 个整数 (6老阴/7少阳/8少阴/9老阳), 如 [7,8,9,7,7,6]")
 
     # Validate spread if provided and method supports spreads
     if "spread" in options:
@@ -216,6 +239,10 @@ def compute_endpoint(body: ComputeRequest):
     t0 = time.perf_counter()
     try:
         result = _ENGINES[body.method](birth, **engine_kwargs)
+    except ValueError as e:
+        # 引擎级输入拒绝 (如外应起卦字数不足) — 是客户端问题, 不是服务器故障
+        log.warning("compute rejected %s: %s", body.method, e)
+        raise HTTPException(422, str(e))
     except Exception as e:
         log.exception("compute failed: %s/%s", body.method, e)
         raise HTTPException(500, f"{type(e).__name__}: {e}")

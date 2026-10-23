@@ -80,3 +80,61 @@ def test_xuankong_period_passthrough(client):
     st2, b = _post(client, "xuankong", {"mode": "residential_xuankong", "period": 9, "sitting": "子"})
     assert st1 == st2 == 200
     assert a["raw"] != b["raw"]
+
+
+# ── 六爻 / 灵签 / 奇门: mode 不再是装饰 ────────────────────────────────────
+
+def test_liuyao_string_tosses_rejected(client):
+    """字符串枚举 ("old_yin"...) 让引擎的 `t in (7,9)` 恒 False → 永远坤为地零动爻。
+
+    这种请求必须 422 拒掉, 不能静默算一个错卦。
+    """
+    st, body = _post(client, "liuyao", {
+        "mode": "manual_coin", "question": "测试",
+        "tosses": ["old_yin", "young_yin", "young_yang", "old_yang", "young_yin", "young_yang"],
+    })
+    assert st == 422, body
+    assert "tosses" in str(body["detail"])
+
+
+def test_liuyao_manual_coin_int_tosses_move_yao(client):
+    """int 掷币 [6,7,8,9,7,8]: 动爻必须在第 1、4 爻, 而不是全静坤为地。"""
+    st, body = _post(client, "liuyao", {"mode": "manual_coin", "question": "测试", "tosses": [6, 7, 8, 9, 7, 8]})
+    assert st == 200, body
+    raw = body["raw"]
+    assert raw["摇钱"] == [6, 7, 8, 9, 7, 8]
+    assert raw["动爻"] == [1, 4]
+    assert raw["本卦"] != "坤为地"
+    assert raw["变卦"] is not None
+
+
+def test_liuyao_number_qigua_requires_seed(client):
+    st, _ = _post(client, "liuyao", {"mode": "number_qigua", "question": "测试"})
+    assert st == 422
+
+
+def test_qian_manual_number_requires_qian_number(client):
+    """mode=manual_number 不给签号 → 422, 而不是静默变随机抽。"""
+    st, _ = _post(client, "qian", {"mode": "manual_number", "question": "测试"})
+    assert st == 422
+
+
+def test_qimen_day_qimen_maps_to_pan_type(client):
+    """day_qimen 是引擎真支持的盘型 (模拟层), mode 应映射成 pan_type=day。"""
+    st, body = _post(client, "qimen", {"mode": "day_qimen", "question": "测试"})
+    assert st == 200, body
+    pan_info = body["raw"]["pan_info"]
+    assert pan_info["pan_type"] == "day"
+    assert pan_info.get("fallback_simulated") is True
+
+
+def test_qimen_minute_qimen_rejected(client):
+    """引擎没有刻家奇门, 谁再发 minute_qimen 就 422 —— 之前会静默出时家盘冒充。"""
+    st, _ = _post(client, "qimen", {"mode": "minute_qimen", "question": "测试"})
+    assert st == 422
+
+
+def test_engine_valueerror_is_422_not_500(client):
+    """引擎主动拒绝输入 (外应起卦字数不足) 是客户端问题, 不该是 500。"""
+    st, body = _post(client, "meihua", {"mode": "external_omen", "question": "好"})
+    assert st == 422, body

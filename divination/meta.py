@@ -43,8 +43,10 @@ METHOD_META = {
         "school": "east", "name_zh": "奇门遁甲", "name_en": "Qi Men Dun Jia",
         "group": "卜", "needs": ["birth", "question"], "engine": "lunar-python+self",
         "subjects": ["decision", "career", "wealth", "lost_item"],
-        "modes": ["hour_qimen", "day_qimen", "minute_qimen"], "default_mode": "hour_qimen",
-        "required_inputs": {"hour_qimen": ["birth", "question"]},
+        # 引擎 pan_type 只支持 hour/day/month/year; 「刻家奇门」引擎并无对应实现,
+        # 宣传即造假, 已删 (见 engines/qimen.py _PAN_TYPE_LABELS)
+        "modes": ["hour_qimen", "day_qimen"], "default_mode": "hour_qimen",
+        "required_inputs": {"hour_qimen": ["birth", "question"], "day_qimen": ["birth", "question"]},
         "recommended_for": ["短期事件", "出行求财", "行动时机"],
     },
     "liuyao": {

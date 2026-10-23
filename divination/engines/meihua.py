@@ -329,6 +329,7 @@ def compute(b: Birth, mode: str = "time", n1: int = 0, n2: int = 0, n3: int | No
         # 字占/数字起卦没有月令信息, 取当下月支而不是硬编一个"寅"
         try:
             from datetime import date as _date
+
             from lunar_python import Solar
             _today = _date.today()
             month_zhi = Solar.fromYmdHms(
