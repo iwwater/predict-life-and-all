@@ -15,6 +15,7 @@ import { useBirthStore } from "../../store/birth";
 import { CITY_PRESETS } from "../../lib/cities";
 import { COLOR } from "../../components/ui";
 import { MethodSourcesPanel } from "../../components/MethodSourcesPanel";
+import { BaziLuckTimeline } from "../../components/BaziLuckTimeline";
 import { useStaggeredReveal } from "../../lib/useStaggeredReveal";
 
 export function BaziPage() {
@@ -286,23 +287,12 @@ export function BaziPage() {
               <h3 className="paper-eyebrow">
                 <Jargon term="大运" /> · {lang === "zh" ? "十年一步大运" : "10-Year Luck Cycles"}
               </h3>
-              <div className="flex overflow-x-auto gap-1.5 pb-2" style={{ scrollbarWidth: "thin" }}>
-                {timeline.map((t, i) => (
-                  <div key={i} className="text-center px-3 py-2 rounded-sm shrink-0"
-                    style={{
-                      minWidth: 80,
-                      background: i === 0 ? "rgba(176,58,46,0.08)" : "var(--paper-2)",
-                      border: `1px solid ${i === 0 ? "var(--cinnabar)" : "var(--rule)"}`,
-                    }}>
-                    <div style={{ fontSize: "0.72rem", fontWeight: 600, color: "var(--ink)", fontFamily: "'Noto Serif SC', serif" }}>
-                      {t.label}
-                    </div>
-                    <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace" }}>
-                      {t.from}–{t.to}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <BaziLuckTimeline
+                timeline={timeline}
+                yearly={r?.horoscope?.yearly}
+                birthYear={birthStore.birth?.year}
+                isZh={lang === "zh"}
+              />
             </section>
           )}
 
