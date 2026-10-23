@@ -118,7 +118,7 @@ server/
 ├── llm/                  # LLM client + prompts + references (60+ 古籍)
 └── llm/references/       # 68 个 RAG 参考文件 (公版)
 
-apps/web/                 # React 19 + Vite + TypeScript
+apps/web/                 # React 18.3 + Vite + TypeScript
 ├── src/pages/            # Home / Cases / CompassPage / DreamPage / Knowledge / methods/*
 ├── src/components/       # Layout / Sidebar / ReadingReportView / CompassDial / ...
 └── src/lib/              # api.ts / types.ts / i18n / store/ (birth + readingHistory)
@@ -145,7 +145,7 @@ cd apps/web && npx tsc --noEmit
 cd apps/web && npm run build
 ```
 
-**当前状态**: 2150 passed / 0 failed（六神 + 称骨/铁板 + 塔罗三系统 + 灵签回归）· TypeScript 零错 · 0 flaky
+**当前状态**: **2180 passed / 0 failed / 0 skipped**（全量 `pytest tests/`，含紫微 native 排盘 · 六神 · 称骨/铁板 · 塔罗三系统 · 灵签回归）· TypeScript 零错 · 0 flaky · CI 见 `.github/workflows/ci.yml`
 **任何依赖升级必须全绿才可并入。**
 
 ---
@@ -213,4 +213,4 @@ cd apps/web && npm run build
 
 ---
 
-*最近更新：2026-06-21（六神/称骨/铁板/塔罗/灵签回归 · 2150/2150 测试通过）*
+*最近更新：2026-10-23（紫微 native 排盘回归 + 全量 2180/2180 测试通过 · CI 首次上线 · 仓库历史清理 166MB 电子书）*

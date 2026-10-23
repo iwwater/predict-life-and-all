@@ -79,3 +79,8 @@ docs/part0003_*.txt
 docs/liuyao_corpus_preview.json
 docs/pdf_raw_text.json
 .gstack/
+
+# GitHub Actions workflows 必须入库(上方全局 *.yml 规则会挡住)
+!.github/
+!.github/workflows/
+!.github/workflows/*.yml

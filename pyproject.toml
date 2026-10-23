@@ -6,8 +6,8 @@ requires-python = ">=3.10"
 dependencies = [
     # 排盘引擎(全 MIT/BSD,零 AGPL)
     "lunar-python>=1.4.0",   # 八字
-    "iztro-py>=0.1.0",        # 紫微(若 pypi 无此名,会回退到本地包)
-    "kinqimen>=0.0.6",         # 奇门(同上)
+    "py-iztro>=0.1.5",        # 紫微(发布名 py-iztro, import 名 py_iztro)
+    "kinqimen>=0.0.6",         # 奇门
     "skyfield>=1.48",         # 西方占星星历
     "skyfield-data>=7.0.0",   # 离线 JPL 星历
     "jplephem>=2.21",         # JPL 星历(可选,skyfield 自动拉)
