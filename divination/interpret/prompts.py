@@ -40,9 +40,12 @@ def _serialize(c: ChartResult) -> str:
                 f"动爻{r['动爻']}变{r['变卦']['name'] if r['变卦'] else '无'}；"
                 f"断：{j.get('断语', j.get('提示',''))}")
     if m == "meihua":
-        j = r.get("断", {})
-        return (f"【梅花易数】主卦{r['主卦']['name']}/互{r['互卦']['name']}/变{r['变卦']['name']}；"
-                f"体{r['体卦']}用{r['用卦']}；体用断：{j.get('总断')}（{j.get('断语','')}）")
+        j = r.get("断") or r.get("断法") or {}
+        return (f"【梅花易数】{r.get('起卦方式','')}；"
+                f"主卦{r.get('主卦',{}).get('name','?')}/互{r.get('互卦',{}).get('name','?')}"
+                f"/变{r.get('变卦',{}).get('name','?')}；"
+                f"体{j.get('体卦','?')}用{j.get('用卦','?')}（{j.get('体用关系','')}）；"
+                f"总断：{j.get('总断','')}（{j.get('断语','')}）")
     if m == "chenggu":
         return f"【称骨】总骨重{r['总骨重_两']}两；批语：{r['批语首句']}"
     if m == "bazhai":
@@ -83,12 +86,28 @@ def _serialize(c: ChartResult) -> str:
                 f"维度评级：{r['维度评级']}。"
                 + (r['印证'] or r['分歧'] or ""))
     if m == "numerology":
-        return f"【数字命理】生命灵数{r['生命灵数']}（{r['释义']}）" + (f"，命运数{r.get('命运数')}" if r.get('命运数') else "")
+        pr = r.get("primary") or {}
+        nums = []
+        for k, label in (("life_path", "生命灵数"), ("destiny", "命运数"), ("soul_urge", "灵魂驱策")):
+            d = r.get(k) or {}
+            if d.get("number") is not None:
+                nums.append(f"{label}{d['number']}({d.get('meaning','')})")
+        head = f"【数字命理】主数{pr.get('label','')}{pr.get('number','')}（{pr.get('meaning','')}）"
+        tail = f"备注：{r['备注']}" if r.get("备注") else ""
+        return "；".join(x for x in [head, "；".join(nums), tail] if x)
     return f"【{m}】{r}"
 
 
+def _facts(c: ChartResult) -> str:
+    """单盘序列化, 键位漂移时降级为通用 dump 而不是炸掉整次解读。"""
+    try:
+        return _serialize(c)
+    except Exception:
+        return f"【{c.method}】{c.raw}"
+
+
 def build_messages(charts: list[ChartResult], question: str | None = None) -> dict:
-    facts = "\n".join(_serialize(c) for c in charts)
+    facts = "\n".join(_facts(c) for c in charts)
     methods = "、".join(dict.fromkeys(c.method for c in charts))
     q = f"\n\n【求测者所问】{question}" if question else ""
     multi = "（已提供多种术数，请中西合参，印证与分歧都要说明）" if len(charts) > 1 else ""
