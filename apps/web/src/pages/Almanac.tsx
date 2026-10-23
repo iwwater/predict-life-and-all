@@ -77,7 +77,7 @@ export function Almanac() {
     <div className="space-y-5">
       {/* 页眉 */}
       <header>
-        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.65rem", color: "var(--cinnabar)", letterSpacing: "0.2em" }}>
+        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.72rem", color: "var(--cinnabar)", letterSpacing: "0.2em" }}>
           ALMANAC · 老黄历
         </div>
         <h1 className="paper-title" style={{ marginTop: "0.35rem" }}>
@@ -85,7 +85,7 @@ export function Almanac() {
           <span>{year}年{MONTH_NAMES[month - 1]}</span>
           <span className="sub">{dayData?.lunar?.date_str || ""}</span>
         </h1>
-        <div style={{ fontSize: "0.75rem", color: "var(--ink-soft)", marginTop: "0.3rem", fontFamily: "'Noto Serif SC', serif" }}>
+        <div style={{ fontSize: "0.78rem", color: "var(--ink-soft)", marginTop: "0.3rem", fontFamily: "'Noto Serif SC', serif" }}>
           {dayData?.lunar?.year_in_ganzhi}年 · {dayData?.lunar?.year_shengxiao}年
           {dayData?.jie_qi_note && <span style={{ marginLeft: "0.5rem", color: "var(--verdigris)" }}>· {dayData.jie_qi_note}</span>}
         </div>
@@ -100,7 +100,7 @@ export function Almanac() {
             <span style={{ fontFamily: "'Noto Serif SC', serif", fontWeight: 700, fontSize: "1.1rem", color: "var(--ink)" }}>
               {year}年{MONTH_NAMES[month - 1]}
             </span>
-            <button onClick={goToday} className="paper-link" style={{ fontSize: "0.7rem" }}>回今天</button>
+            <button onClick={goToday} className="paper-link" style={{ fontSize: "0.74rem", padding: "0.35rem 0.5rem" }}>回今天</button>
           </div>
           <button onClick={goNextMonth} className="paper-btn-ghost" style={{ fontSize: "0.78rem" }}>下月 →</button>
         </div>
@@ -115,57 +115,57 @@ export function Almanac() {
           ))}
         </div>
 
-        {/* 日期网格 */}
+        {/* 日期网格: 手机屏宽下 7 列会挤成 8px 字, 用 .almanac-scroll 横滑 */}
         {loadingMonth ? (
           <div className="grid grid-cols-7 gap-1">
             {Array.from({ length: 35 }).map((_, i) => (<SkeletonBlock key={i} height={64} />))}
           </div>
         ) : (
-          <div className="grid grid-cols-7 gap-1">
-            {calendarDays.map((cell, idx) => {
-              if (cell.solarDay === 0) return <div key={`empty-${idx}`} className="aspect-square" />;
-              const d = cell.dayData;
-              const active = cell.solarDay === selectedDay;
-              const today = isToday(cell.solarDay);
-              const isHuangdao = d?.is_huangdao;
-              const isHeidao = d && !d.is_huangdao && !!d.zhi_xing;
+          <div className="almanac-scroll">
+            <div className="almanac-grid">
+              {calendarDays.map((cell, idx) => {
+                if (cell.solarDay === 0) return <div key={`empty-${idx}`} className="aspect-square" />;
+                const d = cell.dayData;
+                const active = cell.solarDay === selectedDay;
+                const today = isToday(cell.solarDay);
+                const isHuangdao = d?.is_huangdao;
+                const isHeidao = d && !d.is_huangdao && !!d.zhi_xing;
 
-              return (
-                <button key={cell.solarDay} onClick={() => setSelectedDay(cell.solarDay)}
-                  className="aspect-square flex flex-col items-center justify-center transition-colors"
-                  style={{
-                    background: active ? "rgba(176,58,46,0.08)" : today ? "rgba(90,112,88,0.06)" : "transparent",
-                    border: active ? "1px solid var(--cinnabar)" : today ? "1px solid var(--verdigris)" : "1px solid transparent",
-                    borderRadius: "4px",
-                  }}>
-                  <span style={{
-                    fontSize: "0.8rem", fontWeight: 600,
-                    color: active ? "var(--cinnabar)" : today ? "var(--verdigris)" : "var(--ink)",
-                  }}>{cell.solarDay}</span>
-                  <span style={{ fontSize: "0.6rem", color: "var(--ink-soft)", lineHeight: 1.1 }}>
-                    {d?.lunar_day === 1 ? `${d.lunar_month}月` : (d?.lunar_day ? LUNAR_DAY_NAMES[d.lunar_day - 1] : "") || d?.lunar_day}
-                  </span>
-                  {d?.day_ganzhi && (
-                    <span style={{ fontSize: "0.55rem", color: "var(--ink-soft)", opacity: 0.7 }}>{d.day_ganzhi}</span>
-                  )}
-                  {d?.zhi_xing && (
-                    <span style={{
-                      fontSize: "0.55rem", padding: "0 2px", borderRadius: "2px",
-                      color: isHuangdao ? "var(--verdigris)" : "var(--cinnabar)",
-                      background: isHuangdao ? "rgba(90,112,88,0.1)" : "rgba(176,58,46,0.06)",
-                    }}>{d.zhi_xing}</span>
-                  )}
-                  {d?.chong_shengxiao && (
-                    <span style={{ fontSize: "0.52rem", color: "var(--cinnabar)", opacity: 0.7 }}>冲{d.chong_shengxiao}</span>
-                  )}
-                </button>
-              );
-            })}
+                return (
+                  <button key={cell.solarDay} onClick={() => setSelectedDay(cell.solarDay)}
+                    className="aspect-square flex flex-col items-center justify-center transition-colors"
+                    style={{
+                      background: active ? "rgba(176,58,46,0.08)" : today ? "rgba(90,112,88,0.06)" : "transparent",
+                      border: active ? "1px solid var(--cinnabar)" : today ? "1px solid var(--verdigris)" : "1px solid transparent",
+                      borderRadius: "4px",
+                    }}>
+                    <span className="almanac-cell-day" style={{
+                      color: active ? "var(--cinnabar)" : today ? "var(--verdigris)" : "var(--ink)",
+                    }}>{cell.solarDay}</span>
+                    <span className="almanac-cell-lunar">
+                      {d?.lunar_day === 1 ? `${d.lunar_month}月` : (d?.lunar_day ? LUNAR_DAY_NAMES[d.lunar_day - 1] : "") || d?.lunar_day}
+                    </span>
+                    {d?.day_ganzhi && (
+                      <span className="almanac-cell-ganzhi">{d.day_ganzhi}</span>
+                    )}
+                    {d?.zhi_xing && (
+                      <span className="almanac-cell-zhixing" style={{
+                        color: isHuangdao ? "var(--verdigris)" : "var(--cinnabar)",
+                        background: isHuangdao ? "rgba(90,112,88,0.1)" : "rgba(176,58,46,0.06)",
+                      }}>{d.zhi_xing}</span>
+                    )}
+                    {d?.chong_shengxiao && (
+                      <span className="almanac-cell-chong">冲{d.chong_shengxiao}</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
 
         {/* 图例 */}
-        <div className="flex items-center gap-4 mt-3 pt-3 text-[10px]" style={{ borderTop: "1px solid var(--rule)" }}>
+        <div className="flex flex-wrap items-center gap-4 mt-3 pt-3 text-[11px]" style={{ borderTop: "1px solid var(--rule)" }}>
           <span className="flex items-center gap-1" style={{ color: "var(--verdigris)" }}>
             <span style={{ display: "inline-block", width: "8px", height: "8px", borderRadius: "2px", background: "rgba(90,112,88,0.2)" }} /> 黄道吉日
           </span>
@@ -201,11 +201,11 @@ function AlmanacDetail({ data }: { data: AlmanacPayload }) {
       <section className="paper-frame" style={{ borderColor: isHuangdao ? "rgba(90,112,88,0.3)" : "var(--rule)" }}>
         <div className="flex items-start gap-5 flex-wrap">
           <div className="flex flex-col items-center">
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.6rem", color: "var(--ink-soft)", letterSpacing: "0.1em" }}>日柱</div>
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.68rem", color: "var(--ink-soft)", letterSpacing: "0.1em" }}>日柱</div>
             <div style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "2.4rem", fontWeight: 700, color: isHuangdao ? "var(--verdigris)" : "var(--cinnabar)", lineHeight: 1.2 }}>
               {d.ganzhi.day.full}
             </div>
-            <div style={{ fontSize: "0.65rem", color: "var(--ink-soft)" }}>{d.lunar.year_shengxiao}年 · {d.ganzhi.day.animal}</div>
+            <div style={{ fontSize: "0.72rem", color: "var(--ink-soft)" }}>{d.lunar.year_shengxiao}年 · {d.ganzhi.day.animal}</div>
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -215,24 +215,24 @@ function AlmanacDetail({ data }: { data: AlmanacPayload }) {
           </div>
 
           <div className="flex flex-col items-center gap-1">
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.6rem", color: "var(--ink-soft)", letterSpacing: "0.1em" }}>建除</div>
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.68rem", color: "var(--ink-soft)", letterSpacing: "0.1em" }}>建除</div>
             <div style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "1.5rem", fontWeight: 700, color: isHuangdao ? "var(--verdigris)" : "var(--cinnabar)" }}>
               {d.jian_chu.name}
             </div>
-            <span className="paper-tag" style={{ fontSize: "0.6rem", color: isHuangdao ? "var(--verdigris)" : "var(--cinnabar)", borderColor: isHuangdao ? "rgba(90,112,88,0.4)" : "rgba(176,58,46,0.4)" }}>
+            <span className="paper-tag" style={{ fontSize: "0.68rem", color: isHuangdao ? "var(--verdigris)" : "var(--cinnabar)", borderColor: isHuangdao ? "rgba(90,112,88,0.4)" : "rgba(176,58,46,0.4)" }}>
               {d.tian_shen.type || d.jian_chu.type}
               {d.tian_shen.luck ? ` · ${d.tian_shen.luck}` : ""}
             </span>
           </div>
 
           <div className="flex flex-col gap-1 ml-auto text-right">
-            <div style={{ fontSize: "0.65rem", color: "var(--ink-soft)" }}>
+            <div style={{ fontSize: "0.72rem", color: "var(--ink-soft)" }}>
               月柱: <span style={{ color: "var(--ink)" }}>{d.ganzhi.month.full}</span>
             </div>
-            <div style={{ fontSize: "0.65rem", color: "var(--ink-soft)" }}>
+            <div style={{ fontSize: "0.72rem", color: "var(--ink-soft)" }}>
               年柱: <span style={{ color: "var(--ink)" }}>{d.ganzhi.year.full}</span> ({d.lunar.year_shengxiao})
             </div>
-            <div style={{ fontSize: "0.65rem", color: "var(--ink-soft)" }}>
+            <div style={{ fontSize: "0.72rem", color: "var(--ink-soft)" }}>
               年份纳音: <span style={{ color: "var(--cinnabar)" }}>{d.na_yin.year}</span>
             </div>
           </div>
@@ -246,10 +246,10 @@ function AlmanacDetail({ data }: { data: AlmanacPayload }) {
           {d.yi_ji.yi.length > 0 ? (
             <div className="flex flex-wrap gap-1.5" style={{ marginTop: "0.5rem" }}>
               {d.yi_ji.yi.map((item) => (
-                <span key={item} className="paper-tag" style={{ color: "var(--verdigris)", borderColor: "rgba(90,112,88,0.35)", fontSize: "0.7rem" }}>{item}</span>
+                <span key={item} className="paper-tag" style={{ color: "var(--verdigris)", borderColor: "rgba(90,112,88,0.35)", fontSize: "0.74rem" }}>{item}</span>
               ))}
             </div>
-          ) : <div style={{ fontSize: "0.75rem", color: "var(--ink-soft)" }}>今日无特别宜事</div>}
+          ) : <div style={{ fontSize: "0.78rem", color: "var(--ink-soft)" }}>今日无特别宜事</div>}
         </section>
 
         <section className="paper-frame">
@@ -257,10 +257,10 @@ function AlmanacDetail({ data }: { data: AlmanacPayload }) {
           {d.yi_ji.ji.length > 0 ? (
             <div className="flex flex-wrap gap-1.5" style={{ marginTop: "0.5rem" }}>
               {d.yi_ji.ji.map((item) => (
-                <span key={item} className="paper-tag" style={{ color: "var(--cinnabar)", borderColor: "rgba(176,58,46,0.35)", fontSize: "0.7rem" }}>{item}</span>
+                <span key={item} className="paper-tag" style={{ color: "var(--cinnabar)", borderColor: "rgba(176,58,46,0.35)", fontSize: "0.74rem" }}>{item}</span>
               ))}
             </div>
-          ) : <div style={{ fontSize: "0.75rem", color: "var(--ink-soft)" }}>今日无忌事</div>}
+          ) : <div style={{ fontSize: "0.78rem", color: "var(--ink-soft)" }}>今日无忌事</div>}
         </section>
 
         <section className="paper-frame">
@@ -268,10 +268,10 @@ function AlmanacDetail({ data }: { data: AlmanacPayload }) {
           {d.shen_sha.ji_shen.length > 0 ? (
             <div className="flex flex-wrap gap-1.5" style={{ marginTop: "0.5rem" }}>
               {d.shen_sha.ji_shen.map((s) => (
-                <span key={s} className="paper-tag" style={{ color: "var(--cinnabar)", borderColor: "rgba(176,58,46,0.3)", fontSize: "0.7rem" }}>{s}</span>
+                <span key={s} className="paper-tag" style={{ color: "var(--cinnabar)", borderColor: "rgba(176,58,46,0.3)", fontSize: "0.74rem" }}>{s}</span>
               ))}
             </div>
-          ) : <div style={{ fontSize: "0.75rem", color: "var(--ink-soft)" }}>—</div>}
+          ) : <div style={{ fontSize: "0.78rem", color: "var(--ink-soft)" }}>—</div>}
         </section>
 
         <section className="paper-frame">
@@ -279,10 +279,10 @@ function AlmanacDetail({ data }: { data: AlmanacPayload }) {
           {d.shen_sha.xiong_sha.length > 0 ? (
             <div className="flex flex-wrap gap-1.5" style={{ marginTop: "0.5rem" }}>
               {d.shen_sha.xiong_sha.map((s) => (
-                <span key={s} className="paper-tag" style={{ color: "var(--cinnabar)", borderColor: "rgba(176,58,46,0.25)", fontSize: "0.7rem" }}>{s}</span>
+                <span key={s} className="paper-tag" style={{ color: "var(--cinnabar)", borderColor: "rgba(176,58,46,0.25)", fontSize: "0.74rem" }}>{s}</span>
               ))}
             </div>
-          ) : <div style={{ fontSize: "0.75rem", color: "var(--verdigris)" }}>今日无凶煞 · 较为清净</div>}
+          ) : <div style={{ fontSize: "0.78rem", color: "var(--verdigris)" }}>今日无凶煞 · 较为清净</div>}
         </section>
       </div>
 
@@ -325,13 +325,13 @@ function AlmanacDetail({ data }: { data: AlmanacPayload }) {
             <div className="flex items-center gap-2">
               <span style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "1.2rem", fontWeight: 700, color: "var(--ink)" }}>{d.xing_xiu.name}</span>
               <span className="paper-tag" style={{
-                fontSize: "0.6rem",
+                fontSize: "0.68rem",
                 color: d.xing_xiu.luck === "吉" ? "var(--verdigris)" : d.xing_xiu.luck === "凶" ? "var(--cinnabar)" : "var(--ink-soft)",
                 borderColor: d.xing_xiu.luck === "吉" ? "rgba(90,112,88,0.4)" : d.xing_xiu.luck === "凶" ? "rgba(176,58,46,0.4)" : "var(--rule)",
               }}>{d.xing_xiu.luck}</span>
             </div>
             {d.xing_xiu.song && (
-              <div style={{ fontSize: "0.65rem", color: "var(--ink-soft)", marginTop: "0.25rem", lineHeight: 1.5 }}>
+              <div style={{ fontSize: "0.72rem", color: "var(--ink-soft)", marginTop: "0.25rem", lineHeight: 1.5 }}>
                 {d.xing_xiu.song.length > 80 ? d.xing_xiu.song.slice(0, 80) + "…" : d.xing_xiu.song}
               </div>
             )}
@@ -344,11 +344,11 @@ function AlmanacDetail({ data }: { data: AlmanacPayload }) {
         <div className="paper-eyebrow">彭祖百忌</div>
         <div className="grid sm:grid-cols-2 gap-3" style={{ marginTop: "0.3rem", fontSize: "0.82rem" }}>
           <div className="flex items-center gap-2" style={{ color: "var(--ink-soft)" }}>
-            <span className="paper-tag" style={{ fontSize: "0.6rem", color: "var(--cinnabar)", borderColor: "rgba(176,58,46,0.3)" }}>干忌</span>
+            <span className="paper-tag" style={{ fontSize: "0.68rem", color: "var(--cinnabar)", borderColor: "rgba(176,58,46,0.3)" }}>干忌</span>
             <span>{d.pengzu_baiji.gan || "—"}</span>
           </div>
           <div className="flex items-center gap-2" style={{ color: "var(--ink-soft)" }}>
-            <span className="paper-tag" style={{ fontSize: "0.6rem", color: "var(--cinnabar)", borderColor: "rgba(176,58,46,0.3)" }}>支忌</span>
+            <span className="paper-tag" style={{ fontSize: "0.68rem", color: "var(--cinnabar)", borderColor: "rgba(176,58,46,0.3)" }}>支忌</span>
             <span>{d.pengzu_baiji.zhi || "—"}</span>
           </div>
         </div>
@@ -358,9 +358,9 @@ function AlmanacDetail({ data }: { data: AlmanacPayload }) {
       {(d.shu_jiu || d.jie_qi) && (
         <section className="paper-grid-cell" style={{ padding: "0.6rem 1rem", fontSize: "0.82rem" }}>
           <div className="flex items-center gap-2 flex-wrap">
-            <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.6rem", color: "var(--cinnabar)", letterSpacing: "0.1em" }}>节令</span>
-            {d.shu_jiu && <span className="paper-tag" style={{ color: "var(--indigo)", borderColor: "rgba(47,72,88,0.35)", fontSize: "0.7rem" }}>{d.shu_jiu}</span>}
-            {d.jie && <span className="paper-tag" style={{ color: "var(--verdigris)", borderColor: "rgba(90,112,88,0.35)", fontSize: "0.7rem" }}>{d.jie}</span>}
+            <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.68rem", color: "var(--cinnabar)", letterSpacing: "0.1em" }}>节令</span>
+            {d.shu_jiu && <span className="paper-tag" style={{ color: "var(--indigo)", borderColor: "rgba(47,72,88,0.35)", fontSize: "0.74rem" }}>{d.shu_jiu}</span>}
+            {d.jie && <span className="paper-tag" style={{ color: "var(--verdigris)", borderColor: "rgba(90,112,88,0.35)", fontSize: "0.74rem" }}>{d.jie}</span>}
           </div>
         </section>
       )}
@@ -381,9 +381,9 @@ function AlmanacDetail({ data }: { data: AlmanacPayload }) {
 
 function BadgeRow({ label, value, color }: { label: string; value: string; color: string }) {
   return (
-    <div className="flex items-center gap-2" style={{ fontSize: "0.75rem" }}>
+    <div className="flex items-center gap-2" style={{ fontSize: "0.78rem" }}>
       <span style={{ color: "var(--ink-soft)", minWidth: "56px" }}>{label}</span>
-      <span className="paper-tag" style={{ fontSize: "0.7rem", color, borderColor: color + "44" }}>{value}</span>
+      <span className="paper-tag" style={{ fontSize: "0.74rem", color, borderColor: color + "44" }}>{value}</span>
     </div>
   );
 }

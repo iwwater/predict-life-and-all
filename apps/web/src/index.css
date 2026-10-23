@@ -1152,8 +1152,55 @@
   margin-top: 2rem;
   color: #564f44;
   font-family: "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.24em;
+}
+
+/* 移动端底部导航: 桌面隐藏, 见文末 @media (max-width: 920px) */
+.mystic-tabbar {
+  display: none;
+}
+
+/* ── 老黄历月历: 手机屏宽下 7 列会挤成 8px 字, 改成可横向滑动的宽格子 ── */
+.almanac-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.almanac-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.almanac-cell-day {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.almanac-cell-lunar {
+  font-size: 0.62rem;
+  line-height: 1.15;
+  color: var(--ink-soft);
+}
+
+.almanac-cell-ganzhi {
   font-size: 0.58rem;
-  letter-spacing: 0.3em;
+  color: var(--ink-soft);
+  opacity: 0.72;
+}
+
+.almanac-cell-zhixing {
+  font-size: 0.58rem;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+.almanac-cell-chong {
+  font-size: 0.56rem;
+  color: var(--cinnabar);
+  opacity: 0.72;
 }
 
 .paper-page,
@@ -1448,5 +1495,161 @@ select.paper-input {
 
   .mystic-main {
     width: min(100% - 10vw, var(--width-main));
+  }
+}
+
+/* ============================================================
+ * 移动端: 底部标签栏 + 触屏点按目标 (2026-10)
+ * 破因: 顶栏 4 个 25x18px 的文字链接触屏点不中; 老黄历 7 列被挤成
+ * 8~9px 字号。这里把导航下移成 52px 底栏, 月历改成可横滑的 62px 格。
+ * ============================================================ */
+@media (max-width: 920px) {
+  .mystic-tabbar {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 60;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: linear-gradient(0deg, rgba(12, 10, 8, 0.97), rgba(12, 10, 8, 0.84));
+    border-top: 1px solid var(--hair);
+    backdrop-filter: blur(14px);
+  }
+
+  .mystic-tabbar a {
+    position: relative;
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+    color: var(--bone-dim);
+    font-family: "Noto Serif SC", "Songti SC", serif;
+    font-size: 0.82rem;
+    letter-spacing: 0.14em;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .mystic-tabbar a[data-active="true"] {
+    color: var(--gold-1);
+  }
+
+  .mystic-tabbar a[data-active="true"]::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 24%;
+    right: 24%;
+    height: 1px;
+    background: var(--gold-1);
+  }
+
+  /* 顶栏只留品牌与语言切换, 导航下移到底栏 */
+  .mystic-topnav a {
+    display: none;
+  }
+
+  .mystic-topnav button {
+    min-width: 44px;
+    min-height: 40px;
+    font-size: 0.76rem;
+    letter-spacing: 0.12em;
+  }
+
+  .mystic-topbar {
+    padding: 0.9rem 5vw;
+  }
+
+  /* 底栏不遮住页面尾部内容 */
+  .mystic-shell {
+    padding-bottom: calc(52px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* 老黄历: 横向滑动 + 可读字号 */
+  .almanac-grid {
+    grid-template-columns: repeat(7, 62px);
+    gap: 5px;
+    justify-content: start;
+  }
+
+  .almanac-grid > button {
+    aspect-ratio: auto;
+    height: 86px;
+  }
+
+  .almanac-cell-day { font-size: 0.86rem; }
+  .almanac-cell-lunar { font-size: 0.68rem; }
+  .almanac-cell-ganzhi { font-size: 0.64rem; }
+  .almanac-cell-zhixing { font-size: 0.64rem; }
+  .almanac-cell-chong { font-size: 0.62rem; }
+}
+
+/* 移动端: 文字型链接撑到可点范围 (≥44px), 老黄历只留 3 行信息 */
+@media (max-width: 920px) {
+  .mystic-cta,
+  .mystic-quiet-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.35rem 0;
+    font-size: 0.84rem;
+    letter-spacing: 0.3em;
+  }
+
+  .mystic-breadcrumb {
+    padding-top: 5.2rem;
+    gap: 0.5rem;
+  }
+
+  .mystic-breadcrumb a,
+  .mystic-breadcrumb strong {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 0.15rem;
+  }
+
+  .paper-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+  }
+
+  /* 月历格子里只留 日/农历/建除, 干支与冲煞在点开的下方详情里看 */
+  .almanac-cell-ganzhi,
+  .almanac-cell-chong {
+    display: none;
+  }
+
+  .almanac-cell-day { font-size: 0.96rem; }
+  .almanac-cell-lunar { font-size: 0.76rem; }
+  .almanac-cell-zhixing { font-size: 0.74rem; }
+
+  .almanac-grid > button {
+    height: 74px;
+    gap: 1px;
+  }
+}
+
+/* 移动端: 品牌与「今日个人化」也补齐点按高度 */
+@media (max-width: 920px) {
+  .mystic-wordmark {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .mystic-daily-ribbon {
+    gap: 0.6rem 1rem;
+    padding: 1.1rem 0;
+  }
+
+  .mystic-daily-ribbon a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: 0.9rem;
   }
 }

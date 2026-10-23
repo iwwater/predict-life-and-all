@@ -107,7 +107,8 @@ export function Knowledge() {
           return (
             <button key={t.key} type="button" onClick={() => setTab(t.key)}
               className="paper-tag" style={{
-                fontSize: "0.82rem", fontWeight: 600, cursor: "pointer", padding: "0.35rem 0.85rem",
+                fontSize: "0.86rem", fontWeight: 600, cursor: "pointer",
+                padding: "0.5rem 0.95rem", minHeight: "40px",
                 color: on ? "var(--cinnabar)" : "var(--ink-soft)",
                 borderColor: on ? "var(--cinnabar)" : "var(--rule)",
               }}>

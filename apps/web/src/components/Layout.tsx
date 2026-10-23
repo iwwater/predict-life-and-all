@@ -15,6 +15,15 @@ const METHOD_NAV = [
   { to: "/about", label: "凡例" },
 ];
 
+// 移动端底部导航: 触屏上一行 4 个 18px 高的文字链接点不中, 改成 52px 高的底栏
+const TAB_NAV = [
+  { to: "/", label: "术数" },
+  { to: "/daily", label: "今日" },
+  { to: "/cases", label: "问事" },
+  { to: "/heshen", label: "合参" },
+  { to: "/about", label: "凡例" },
+];
+
 // 面包屑方法名由 method-registry.ts 单一真源派生
 const METHOD_LABELS = METHOD_NAME_ZH_BY_ID;
 
@@ -81,6 +90,19 @@ export function Layout() {
         </p>
         <span>MYSTIC HUB · MIT/BSD · COMPUTED, NOT GUESSED</span>
       </footer>
+
+      <nav className="mystic-tabbar" aria-label="移动端主导航">
+        {TAB_NAV.map((item) => (
+          <Link
+            key={item.to}
+            to={item.to}
+            data-active={location.pathname === item.to ? "true" : "false"}
+            aria-current={location.pathname === item.to ? "page" : undefined}
+          >
+            <span>{item.label}</span>
+          </Link>
+        ))}
+      </nav>
     </div>
   );
 }
