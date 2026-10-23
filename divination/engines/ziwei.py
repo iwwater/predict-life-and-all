@@ -1,4 +1,4 @@
-﻿"""Zi Wei Dou Shu charting via the iztro Python ports."""
+"""Zi Wei Dou Shu charting via the iztro Python ports."""
 
 from __future__ import annotations
 
@@ -30,6 +30,57 @@ def _load_by_solar() -> Callable[[str, int, str], Any]:
             solar_date, time_index, gender, True, "zh-CN"
         )
 
+
+_JS_STRING_COERCION_INSTALLED = False
+
+
+def _install_js_string_coercion() -> None:
+    """Fix py-iztro's pydantic Literal validation on pythonmonkey strings.
+
+    pythonmonkey maps JavaScript strings onto *subclasses* of ``str``.  py-iztro's
+    ``StarModel.type`` is a ``Literal[...]`` and pydantic 2.9 only accepts the
+    native ``str`` type there, so every astrolabe build raised::
+
+        Input should be 'major' ... [type=literal_error, input_value='major']
+
+    The engine then silently degraded to the structural fallback, which is why the
+    ziwei tests were red.  We register a ``mode="before"`` validator on a StarModel
+    subclass and rebind the module-level name, so iztro's own construction path
+    normalises the JS strings to native ``str`` before Literal validation runs.
+    """
+    global _JS_STRING_COERCION_INSTALLED
+    if _JS_STRING_COERCION_INSTALLED:
+        return
+    _JS_STRING_COERCION_INSTALLED = True
+
+    try:
+        from pydantic import model_validator
+
+        from py_iztro.core import models as iztro_models
+    except Exception:  # pragma: no cover - optional dependency path
+        return
+
+    original = getattr(iztro_models, "StarModel", None)
+    if not isinstance(original, type):
+        return
+
+    def _native(value: Any) -> Any:
+        if isinstance(value, str) and type(value) is not str:
+            return str(value)
+        return value
+
+    class _CoercedStarModel(original):  # type: ignore[misc, valid-type]
+        @model_validator(mode="before")
+        @classmethod
+        def _coerce_js_strings(cls, data: Any) -> Any:
+            if isinstance(data, dict):
+                return {key: _native(value) for key, value in data.items()}
+            return data
+
+    iztro_models.StarModel = _CoercedStarModel
+
+
+_install_js_string_coercion()
 
 _by_solar = _load_by_solar()
 
