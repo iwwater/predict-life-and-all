@@ -15,20 +15,35 @@ ENGINE_NAME = "py-iztro"
 RULE_VERSION = "v1"
 
 
-def _load_by_solar() -> Callable[[str, int, str], Any]:
+def _load_by_solar() -> Callable[[str, int, str], Any] | None:
+    """加载排盘回调; 不可用返回 None (调用方回落结构化 fallback)。
+
+    探针必须真排一盘: pythonmonkey 在部分 Linux 环境(如 ubuntu-24.04 CI)能 import
+    成功但 JS 模块未初始化, py_iztro 的 bySolar 是 None —— 只有真调用才能暴露。
+    """
     try:
         from py_iztro import Astro  # type: ignore
 
         astro = Astro()
+        by_solar = astro.by_solar
+        probe = by_solar("2000-01-01", 0, "男", True, "zh-CN")
+        if probe is None:
+            raise RuntimeError("py-iztro 探针排盘返回 None (JS 运行时未初始化)")
         return lambda solar_date, time_index, gender: astro.by_solar(
             solar_date, time_index, gender, True, "zh-CN"
         )
-    except ModuleNotFoundError:
+    except Exception:
+        pass
+    try:
         import iztro_py  # type: ignore
 
+        if not callable(getattr(iztro_py, "by_solar", None)):
+            raise RuntimeError("iztro_py.by_solar 不可调用")
         return lambda solar_date, time_index, gender: iztro_py.by_solar(
             solar_date, time_index, gender, True, "zh-CN"
         )
+    except Exception:
+        return None
 
 
 _JS_STRING_COERCION_INSTALLED = False
@@ -494,6 +509,8 @@ def _compute_native(b: Birth) -> ChartResult:
 
 
 def compute(b: Birth) -> ChartResult:
+    if _by_solar is None:
+        return _fallback_chart(b, "py-iztro/iztro_py 均不可用 (JS 运行时未初始化或导入失败)")
     if _should_isolate_native_engine():
         return _compute_in_subprocess(b)
     return _compute_native(b)
