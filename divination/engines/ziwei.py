@@ -448,18 +448,25 @@ def _compute_in_subprocess(b: Birth) -> ChartResult:
 
 
 def _should_isolate_native_engine() -> bool:
+    """pythonmonkey (SpiderMonkey) 的 JS 上下文与初始化线程绑定:
+    import 线程里探针能过, 请求线程里 bySolar 变 None (ubuntu-24.04 CI 实锤)。
+    因此默认一律走子进程隔离 —— 子进程是全新主线程, 原生引擎稳定可用。
+    MYSTIC_ZIWEI_INLINE=1 可强制内联 (调试用)。"""
     if os.environ.get("MYSTIC_ZIWEI_CHILD") == "1":
         return False
     if os.environ.get("MYSTIC_ZIWEI_INLINE") == "1":
         return False
-    return os.name == "nt"
+    return True
 
 
 def _compute_native(b: Birth) -> ChartResult:
     gender = "男" if b.gender == "male" else "女"
     solar_date = f"{b.year}-{b.month}-{b.day}"
     time_index = _time_index(b.hour)
-    chart = _by_solar(solar_date, time_index, gender)
+    try:
+        chart = _by_solar(solar_date, time_index, gender)
+    except Exception as exc:  # JS 运行时在任何线程里死亡 → 结构化 fallback, 不 500
+        return _fallback_chart(b, f"py-iztro 运行时调用失败: {type(exc).__name__}: {exc}")
     palaces = _palaces(chart)
 
     raw = {
