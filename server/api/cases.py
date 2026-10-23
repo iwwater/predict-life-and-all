@@ -6,6 +6,7 @@ stable API shape that can later be backed by a database.
 """
 from __future__ import annotations
 
+import os
 import time
 import uuid
 from typing import Any, Literal
@@ -101,6 +102,49 @@ _CAST_BY_KEY: dict[tuple[str, str], str] = {}
 _VERSION_BY_PARENT: dict[str, list[str]] = {}  # parent_case_id -> [case_id, ...]
 _IDEMPOTENCY_INDEX: dict[str, str] = {}  # idempotency_key -> case_id
 
+# P2-8: 进程内 store 原本只增不减 —— 长时间运行的实例会一直涨, 而且 case 里带着
+# 用户的问题原文与出生信息。这里给一个上限 + TTL, 到期或超量就淘汰最旧的。
+_MAX_CASES = int(os.environ.get("MYSTIC_MAX_CASES", "500"))
+_CASE_TTL_SECONDS = float(os.environ.get("MYSTIC_CASE_TTL_SECONDS", str(24 * 3600)))
+
+
+def _prune_store() -> None:
+    """按 TTL 淘汰过期 case, 再按上限淘汰最旧的, 同步清理各辅助索引。"""
+    if not _CASES:
+        return
+    now = time.time()
+    expired = [cid for cid, case in _CASES.items() if now - case.updated_at > _CASE_TTL_SECONDS]
+    if len(_CASES) - len(expired) > _MAX_CASES:
+        survivors = sorted(
+            (c for cid, c in _CASES.items() if cid not in expired),
+            key=lambda c: c.updated_at,
+            reverse=True,
+        )
+        expired.extend(case.case_id for case in survivors[_MAX_CASES:])
+
+    for cid in expired:
+        _CASES.pop(cid, None)
+        _RESULTS_POP(cid)
+    if expired:
+        dropped = set(expired)
+        for key, value in list(_CAST_BY_KEY.items()):
+            if value in dropped:
+                _CAST_BY_KEY.pop(key, None)
+        for parent, children in list(_VERSION_BY_PARENT.items()):
+            remaining = [child for child in children if child not in dropped]
+            if remaining:
+                _VERSION_BY_PARENT[parent] = remaining
+            else:
+                _VERSION_BY_PARENT.pop(parent, None)
+        for key, cid in list(_IDEMPOTENCY_INDEX.items()):
+            if cid in dropped:
+                _IDEMPOTENCY_INDEX.pop(key, None)
+
+
+def _RESULTS_POP(case_id: str) -> None:
+    _RESULTS.pop(case_id, None)
+
+
 
 def _new_case_id() -> str:
     return f"case_{uuid.uuid4().hex[:12]}"
@@ -176,6 +220,7 @@ def _case_context_for_reading(case: EventCase) -> dict[str, Any]:
 
 @router.get("/cases", response_model=list[EventCase])
 def list_cases():
+    _prune_store()
     return sorted(_CASES.values(), key=lambda c: c.created_at, reverse=True)
 
 
@@ -190,6 +235,7 @@ def create_case(body: CaseCreateRequest, idempotent: bool = True):
     Returns:
         EventCase — 既存的或新建
     """
+    _prune_store()
     intent = classify_intent(body.question, body.goal)
     context = {"question": body.question}
     if body.current_city:
@@ -224,7 +270,10 @@ def create_case(body: CaseCreateRequest, idempotent: bool = True):
     _IDEMPOTENCY_INDEX[idem_key] = case.case_id
     # Sprint 1.7: 初始化版本索引
     _VERSION_BY_PARENT.setdefault(case.case_id, [case.case_id])
-    return _touch(case)
+    created = _touch(case)
+    # 插入后立刻收紧一次, 保证 _CASES 不会稳定超出 _MAX_CASES
+    _prune_store()
+    return created
 
 
 @router.post("/cases/{case_id}/context", response_model=EventCase)
@@ -251,6 +300,7 @@ async def cast_case(
     body: CaseCastRequest,
     idempotency_key: str = Header(..., alias="Idempotency-Key"),
 ):
+    _prune_store()
     case = _get_case(case_id)
     key = (case_id, idempotency_key)
 

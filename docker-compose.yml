@@ -8,6 +8,12 @@ services:
     restart: unless-stopped
     ports:
       - "8000:8000"
+    environment:
+      # 公网部署请覆盖这三项，说明见 docs/DEPLOY.md「访问控制与资源保护」。
+      # 前端经 nginx 同源代理 /api，通常不需要放开更多来源；前后端拆域名时再加。
+      - MYSTIC_CORS_ORIGINS=${MYSTIC_CORS_ORIGINS:-http://localhost:5173}
+      - MYSTIC_RATE_LIMIT_PER_MIN=${MYSTIC_RATE_LIMIT_PER_MIN:-120}
+      - MYSTIC_MAX_CASES=${MYSTIC_MAX_CASES:-500}
     healthcheck:
       test: ["CMD", "python", "-c", "import httpx, sys; sys.exit(0 if httpx.get('http://localhost:8000/api/methods', timeout=5).status_code == 200 else 1)"]
       interval: 30s

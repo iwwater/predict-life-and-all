@@ -235,15 +235,18 @@ class TestUsersAPI:
         assert "user_id" in data
 
     def test_post_delete_user_data(self):
-        """POST /api/users/me/delete 返回删除确认。"""
+        """POST /api/users/me/delete 返回删除确认, 且如实说明服务端无可删数据。"""
         response = client.post("/api/users/me/delete")
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "deleted"
         assert "deleted_fields" in data
         assert isinstance(data["deleted_fields"], list)
-        assert len(data["deleted_fields"]) >= 1
+        # 服务端不持久化个人数据 -> 没有字段被删, 也不许谎称删了
+        assert data["deleted_fields"] == []
+        assert data["server_side_persistence"] is False
         assert "message" in data
+        assert "localstorage" in data["message"].lower()
         assert "request_id" in data
 
     def test_delete_with_x_user_id_header(self):

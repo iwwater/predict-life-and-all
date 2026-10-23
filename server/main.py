@@ -15,11 +15,13 @@ import logging
 import time
 
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
 from .api import almanac, birth_time, cases, chart, compass, daily as daily_api, dream, extended_knowledge, hepan_share, interpret, knowledge, methods, prompts, reading, users
+from . import security
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 log = logging.getLogger("mystic-hub")
@@ -30,10 +32,10 @@ app = FastAPI(
     description="中西方统一算命引擎 + AI 解读后端",
 )
 
-# CORS:开发期全开,生产请收敛 origin
+# CORS: 默认放开给本地开发; 生产用 MYSTIC_CORS_ORIGINS 收敛成白名单(见 DEPLOY.md)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=security.cors_origins(),
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -63,6 +65,12 @@ def health():
 
 @app.middleware("http")
 async def _log_requests(request: Request, call_next):
+    # 先过安全守卫(可选 API Key + 烧钱端点限流), 直接把响应返回给客户端
+    blocked = security.guard_request(request)
+    if blocked is not None:
+        log.warning("blocked %s %s → %s", request.method, request.url.path, blocked.status_code)
+        return blocked
+
     t0 = time.perf_counter()
     response = await call_next(request)
     dt_ms = int((time.perf_counter() - t0) * 1000)
@@ -70,9 +78,17 @@ async def _log_requests(request: Request, call_next):
     return response
 
 
+@app.exception_handler(RequestValidationError)
+async def _request_validation_error(request, exc):
+    # FastAPI 请求体校验走 RequestValidationError(不是 pydantic 的 ValidationError),
+    # 默认响应会把 input 原样带出去 —— 统一改走脱敏版本
+    return JSONResponse(status_code=422, content=security.validation_error_payload(exc))
+
+
 @app.exception_handler(ValidationError)
 async def _validation_error(request, exc):
-    return JSONResponse(status_code=422, content={"detail": str(exc)})
+    # 不把 input_value 回显给客户端(出生信息/坐标/问题原文都可能出现在里面)
+    return JSONResponse(status_code=422, content=security.validation_error_payload(exc))
 
 
 @app.exception_handler(Exception)

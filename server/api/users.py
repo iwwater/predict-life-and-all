@@ -33,8 +33,14 @@ class DeleteResponse(BaseModel):
     """POST /users/me/delete 响应体。"""
     user_id: str
     status: str = Field("deleted", description="删除状态: deleted | pending")
-    deleted_fields: list[str] = Field(default_factory=list, description="已删除的字段列表")
-    message: str = Field(default="您的数据已标记删除，将在 30 天内彻底清除")
+    deleted_fields: list[str] = Field(default_factory=list, description="本次实际删除的字段列表")
+    server_side_persistence: bool = Field(
+        False, description="服务端是否持久化了可删除的个人数据(本服务为 False)"
+    )
+    message: str = Field(
+        default="本服务不持久化出生与解读数据：排盘是纯计算，历史报告只存在你浏览器的 localstorage。"
+        "服务端当前没有可删除的记录；如需清除本地痕迹，请在浏览器里清除本站点数据。"
+    )
     request_id: str = Field(default_factory=lambda: uuid.uuid4().hex[:12])
 
     model_config = {"extra": "forbid"}
@@ -105,16 +111,20 @@ async def delete_user_data(request: Request):
     """请求删除用户数据。
 
     GDPR 第 17 条: 被遗忘权。
-    本端点返回删除确认，标记所有关联字段。
+
+    诚实说明(重要): 本服务**不持久化**个人数据 —— 排盘是纯计算、解读是即用即弃、
+    历史报告只写在浏览器 localStorage。唯一落在服务端进程内的是匿名 case 记录
+    (问题原文 + 出生信息), 它有 TTL 上限(`MYSTIC_CASE_TTL_SECONDS`)且不绑定身份,
+    因此这里没有可删除的记录, 也就不再声称「30 天内彻底清除」这种做不到的承诺。
     """
     user_id = request.headers.get("X-User-Id", f"anon-{uuid.uuid4().hex[:8]}")
 
-    log.info("User %s requested data deletion", user_id)
+    log.info("User %s requested data deletion (no server-side persistence)", user_id)
 
     return DeleteResponse(
         user_id=user_id,
         status="deleted",
-        deleted_fields=["birth", "session_history", "reading_cache"],
-        message="您的数据已标记删除，将在 30 天内彻底清除。如需恢复请联系 support@mystichub.app",
+        deleted_fields=[],
+        server_side_persistence=False,
         request_id=uuid.uuid4().hex[:12],
     )

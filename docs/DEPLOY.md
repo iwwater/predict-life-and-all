@@ -153,6 +153,33 @@ OPENAI_MODEL=实际可用模型名
 
 不要把 Key 写进前端构建产物。
 
+### 访问控制与资源保护
+
+默认配置是「本地开发友好」：CORS 允许所有来源、不限流、不需要 API Key。放到公网前建议按下面收紧（三个都是可选环境变量，不设置就维持默认）：
+
+```bash
+# 只允许自己的前端域名访问 API（逗号分隔，支持多个）
+MYSTIC_CORS_ORIGINS=https://your-domain.com,https://www.your-domain.com
+
+# 每个 IP 每分钟最多打多少次「会调用 LLM 的」写接口（/api/interpret、/api/reading、/api/cases）
+# 0 / 不设置 = 不限流。公网建议 30~120。
+MYSTIC_RATE_LIMIT_PER_MIN=60
+
+# 设置后，所有写接口必须带请求头 X-API-Key 才能通过（读接口仍然公开）
+MYSTIC_API_KEY=换成你自己的随机串
+```
+
+> 限流是**进程内**滑动窗口，多 worker 部署时每个 worker 各自计数（够挡住脚本刷额度，不替代网关限流）。反向代理后面要保证 `X-Forwarded-For` 被正确设置，限流按它的首跳地址识别客户端。
+
+案例库（`/api/cases`）存在进程内存里，受两个开关约束，默认 500 条 / 24 小时：
+
+```bash
+MYSTIC_MAX_CASES=500
+MYSTIC_CASE_TTL_SECONDS=86400
+```
+
+注意：服务端**不持久化**用户的出生数据与解读结果，删除请求返回的 `deleted_fields` 为空是这个原因（历史记录只存在浏览器 localStorage）。
+
 ## 更新网站
 
 Git 部署：
