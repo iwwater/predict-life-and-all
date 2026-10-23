@@ -2,56 +2,18 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchDaily, fetchMethods, type DailyPayload } from "../lib/api";
 import { METHOD_PLAIN } from "../lib/method-info";
+import { CATEGORY_BY_ID, FALLBACK_METHOD_META } from "../lib/method-registry";
 import type { MethodMeta } from "../lib/types";
 import { useHistory } from "../store/history";
 
-const METHOD_FALLBACK: MethodMeta[] = [
-  { id: "bazi", name_zh: "八字四柱", name_en: "Four Pillars", school: "east" } as MethodMeta,
-  { id: "ziwei", name_zh: "紫微斗数", name_en: "Zi Wei Dou Shu", school: "east" } as MethodMeta,
-  { id: "tieban", name_zh: "铁板神数", name_en: "Iron Plate Numbers", school: "east" } as MethodMeta,
-  { id: "chenggu", name_zh: "称骨", name_en: "Bone Weight", school: "east" } as MethodMeta,
-  { id: "qimen", name_zh: "奇门遁甲", name_en: "Qi Men Dun Jia", school: "east" } as MethodMeta,
-  { id: "liuyao", name_zh: "六爻", name_en: "Six Lines", school: "east" } as MethodMeta,
-  { id: "meihua", name_zh: "梅花易数", name_en: "Plum Blossom", school: "east" } as MethodMeta,
-  { id: "liuren", name_zh: "大六壬", name_en: "Da Liu Ren", school: "east" } as MethodMeta,
-  { id: "xiaoliuren", name_zh: "小六壬", name_en: "Xiao Liu Ren", school: "east" } as MethodMeta,
-  { id: "qian", name_zh: "灵签", name_en: "Qian Oracle", school: "east" } as MethodMeta,
-  { id: "hepan", name_zh: "合盘", name_en: "Synastry", school: "east" } as MethodMeta,
-  { id: "bazhai", name_zh: "八宅", name_en: "Eight Mansions", school: "east" } as MethodMeta,
-  { id: "tarot", name_zh: "塔罗", name_en: "Tarot", school: "west" } as MethodMeta,
-  { id: "western", name_zh: "西方占星", name_en: "Natal Astrology", school: "west" } as MethodMeta,
-  { id: "vedic", name_zh: "吠陀占星", name_en: "Vedic Astrology", school: "west" } as MethodMeta,
-  { id: "xuankong", name_zh: "玄空飞星", name_en: "Flying Stars", school: "east" } as MethodMeta,
-  { id: "numerology", name_zh: "数字命理", name_en: "Numerology", school: "west" } as MethodMeta,
-  { id: "lenormand", name_zh: "雷诺曼", name_en: "Lenormand", school: "west" } as MethodMeta,
-  { id: "dream", name_zh: "周公解梦", name_en: "Dream Interpretation", school: "east", group: "杂·Misc", needs: ["dream_text"], engine: "self(周公解梦)" } as MethodMeta,
-];
-
-const CATEGORY: Record<string, string> = {
-  bazi: "命 · Ming",
-  ziwei: "命 · Ming",
-  tieban: "命 · Ming",
-  chenggu: "命 · Ming",
-  qimen: "卜 · Divination",
-  liuyao: "卜 · Divination",
-  meihua: "卜 · Divination",
-  liuren: "卜 · Divination",
-  xiaoliuren: "卜 · Divination",
-  qian: "卜 · Divination",
-  hepan: "相 · Physiognomy",
-  tarot: "相 · Physiognomy",
-  lenormand: "相 · Physiognomy",
-  western: "相 · Physiognomy",
-  vedic: "相 · Physiognomy",
-  numerology: "相 · Physiognomy",
-  bazhai: "山 · Feng Shui",
-  xuankong: "山 · Feng Shui",
-  dream: "杂 · Misc",
-};
+// 卡片兜底数据 / 分类角标 / 面包屑标签统一由 method-registry.ts 单一真源派生
+const METHOD_FALLBACK = FALLBACK_METHOD_META;
+const CATEGORY = CATEGORY_BY_ID;
 
 export function Home() {
   const [methods, setMethods] = useState<MethodMeta[]>([]);
   const [daily, setDaily] = useState<DailyPayload | null>(null);
+  const [activeCategory, setActiveCategory] = useState("全部");
   const historyItems = useHistory((s) => s.items);
 
   useEffect(() => {
@@ -107,9 +69,25 @@ export function Home() {
       "lenormand",
       "dream",
     ];
-    return preferred
+    const ordered = preferred
       .map((id) => source.find((m) => m.id === id))
       .filter(Boolean) as MethodMeta[];
+    return activeCategory === "全部"
+      ? ordered
+      : ordered.filter(
+          (m) => (CATEGORY[m.id] || m.school).split(" ")[0] === activeCategory,
+        );
+  }, [methods, activeCategory]);
+
+  const categoryTabs = useMemo(() => {
+    const order = ["命", "卜", "相", "山", "杂"];
+    const present = new Set(
+      (methods.length > 0
+        ? [...methods, ...METHOD_FALLBACK.filter((fb) => !methods.some((m) => m.id === fb.id))]
+        : METHOD_FALLBACK
+      ).map((m) => (CATEGORY[m.id] || m.school).split(" ")[0]),
+    );
+    return ["全部", ...order.filter((c) => present.has(c))];
   }, [methods]);
 
   return (
@@ -122,7 +100,7 @@ export function Home() {
             <br />
             而后 <b>从容</b>
           </h1>
-          <p className="mystic-latin-line">Fourteen arts of East &amp; West, computed not guessed.</p>
+          <p className="mystic-latin-line">Nineteen arts of East &amp; West, computed not guessed.</p>
           <div className="mystic-cta-row">
             <Link className="mystic-cta" to="/m/tieban">
               <span />
@@ -145,7 +123,36 @@ export function Home() {
       <section className="mystic-section" id="arts">
         <div className="mystic-section-head">
           <h2>术数</h2>
-          <span>The Fourteen Arts</span>
+          <span>The Nineteen Arts</span>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            gap: "0.5rem",
+            flexWrap: "wrap",
+            marginBottom: "1rem",
+          }}
+        >
+          {categoryTabs.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              style={{
+                border: "1px solid var(--ink-soft, #9c8f7a)",
+                borderRadius: "999px",
+                background: activeCategory === cat ? "var(--cinnabar, #c8102e)" : "transparent",
+                color: activeCategory === cat ? "#fff" : "var(--ink, #2b2b2b)",
+                padding: "0.25rem 0.9rem",
+                fontSize: "0.82rem",
+                cursor: "pointer",
+                fontFamily: "'Noto Serif SC', serif",
+                letterSpacing: "0.08em",
+              }}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
 
         <div className="mystic-arts">

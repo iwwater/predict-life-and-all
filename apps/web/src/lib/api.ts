@@ -125,6 +125,11 @@ async function localDreamInterpret(dreamText: string, topN: number): Promise<Dre
   };
 }
 
+/** 从后端拉取真实语料统计; 失败抛错, 调用方自行兜底 */
+export function fetchCorpusStats(): Promise<DreamCorpusStats> {
+  return jsonFetch<DreamCorpusStats>(`${BASE}/knowledge/dream/stats`);
+}
+
 /** 获取语料统计 */
 export function getCorpusStats(): DreamCorpusStats {
   return {

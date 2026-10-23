@@ -241,13 +241,25 @@ def normalize(method: str, chart: ChartResult) -> list[DivinationSignal]:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def _normalize_bazi(method: str, raw: dict, _norm: dict) -> list[DivinationSignal]:
-    """NOR-004: 八字 — ≥3 signals (natal long_term + 流年/神煞 current_cycle)。"""
+    """NOR-004: 八字 — ≥3 signals (natal long_term + 流年/神煞 current_cycle)。
+
+    兼容两种 raw：v1（horoscope 流年/大运）与 bazi_v2
+    （current_luck / elements_total / yong_shen.primary_zh）。
+    """
     s: list[DivinationSignal] = []
     day_master = raw.get("day_master", "")
     strength = raw.get("strength_score", 50) / 100  # normalize to 0-1
-    elements = raw.get("elements", {})
+    # bazi_v2 的 elements_total 用英文键（metal/wood/...），统一成中文五行
+    _en2zh = {"wood": "木", "fire": "火", "earth": "土", "metal": "金", "water": "水"}
+    raw_els = raw.get("elements") or raw.get("elements_total") or {}
+    elements = {_en2zh.get(str(k), k): v for k, v in raw_els.items()} if isinstance(raw_els, dict) else {}
     yong = raw.get("yong_shen", {})
-    yong_name = yong.get("yong_shen", "") if isinstance(yong, dict) else str(yong)
+    if isinstance(yong, dict):
+        pz = yong.get("primary_zh")  # bazi_v2: {"primary_zh": ["金", "土"], ...}
+        yong_name = ("、".join(str(x) for x in pz)
+                     if isinstance(pz, list) and pz else yong.get("yong_shen", ""))
+    else:
+        yong_name = str(yong)
     yong_score = raw.get("yong_shen_quality", {}).get("score", 50)
     if isinstance(yong_score, dict):
         yong_score = yong_score.get("score", 50)
@@ -347,6 +359,17 @@ def _normalize_bazi(method: str, raw: dict, _norm: dict) -> list[DivinationSigna
                 dimension="current_cycle", time_scope="current_cycle",
                 evidence=f"{current_year}流年{cur.get('ganzhi','')}: 日主{dm_tg}, 流年{liu_tg}({liu_wx})"))
 
+    # 4b. bazi_v2: 当前流年（current_luck.annual_ganzhi）
+    cl_v2 = raw.get("current_luck", {}) or {}
+    if not (current_year and yearly) and cl_v2.get("annual_ganzhi"):
+        dm_tg = day_master[:1] if day_master else ""
+        liu_tg = cl_v2["annual_ganzhi"][:1]
+        pol = _bazi_gan_relation(dm_tg, liu_tg)
+        s.append(_make_signal(method, "timing", "timing_transition", pol,
+            strength=0.55, confidence=0.5,
+            dimension="current_cycle", time_scope="current_cycle",
+            evidence=f"{cl_v2.get('today_year', '')}流年{cl_v2['annual_ganzhi']}: 日主{dm_tg}, 流年{liu_tg}"))
+
     # 5. 五行平衡 (natal, long_term)
     if elements:
         total = sum(elements.values())
@@ -370,6 +393,16 @@ def _normalize_bazi(method: str, raw: dict, _norm: dict) -> list[DivinationSigna
             strength=0.65, confidence=0.6,
             dimension="current_cycle", time_scope="current_cycle",
             evidence=f"当前大运: {gz} ({current_dayun.get('from','')}-{current_dayun.get('to','')})"))
+
+    # 6b. bazi_v2: 当前大运（current_luck.decade_ganzhi）
+    if not current_dayun and cl_v2.get("decade_ganzhi"):
+        dm_tg = day_master[:1] if day_master else ""
+        dayun_tg = cl_v2["decade_ganzhi"][:1]
+        pol = _bazi_gan_relation(dm_tg, dayun_tg)
+        s.append(_make_signal(method, "self_life", "current_cycle_dasha", pol,
+            strength=0.65, confidence=0.6,
+            dimension="current_cycle", time_scope="current_cycle",
+            evidence=f"当前大运: {cl_v2['decade_ganzhi']} ({cl_v2.get('decade_from','')}-{cl_v2.get('decade_to','')})"))
 
     # 7. Sprint 2.1: 流月 — 当前月的月柱
     current_month_num = horoscope.get("current_month")

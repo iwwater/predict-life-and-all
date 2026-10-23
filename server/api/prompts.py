@@ -13,9 +13,11 @@ PROMPT_DIR = Path(__file__).parent.parent / "llm" / "prompts"
 
 @router.get("/prompts/{method}")
 def get_prompt(method: str):
-    p = PROMPT_DIR / f"{method}.md"
-    if not p.exists():
+    # 白名单校验：method 必须精确匹配 PROMPT_DIR 下某个 .md 文件的 stem。
+    # 防路径穿越（Windows 下 ..%5C 编码可逃出目录读任意 .md 文件）。
+    if method not in {p.stem for p in PROMPT_DIR.glob("*.md")}:
         raise HTTPException(404, f"no prompt for method: {method}")
+    p = PROMPT_DIR / f"{method}.md"
     return {
         "method": method,
         "template": p.read_text(encoding="utf-8"),

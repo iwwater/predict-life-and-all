@@ -9,7 +9,7 @@ export function About() {
         <div className="paper-body" style={{ marginTop: "0.75rem" }}>
           <p>
             Mystic Hub 是一个面向研究 / 兴趣 / 自我反思的玄学工具。
-            集成十四种术数(命 / 卜 / 风水 / 西方)，统一排盘接口 + 多 LLM 流式解读。
+            集成十九种术数(命 / 卜 / 风水 / 西方)，统一排盘接口 + 多 LLM 流式解读。
             全栈 MIT/BSD 许可，零 AGPL，可闭源商用。
           </p>
         </div>

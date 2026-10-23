@@ -5,6 +5,7 @@ from .contracts import Birth, ChartResult
 from .engines import (
     bazhai,
     bazi,
+    bazi_v2,
     chenggu,
     fengshui,
     hepan,
@@ -24,10 +25,11 @@ from .engines import (
     xuankong,
     ziwei,
 )
+from .wuxing import GAN_WX
 
 _ENGINES = {
     "bazi": bazi.compute,
-    "bazi_v2": bazi.compute,
+    "bazi_v2": bazi_v2.compute,
     "ziwei": ziwei.compute,
     "qimen": qimen.compute,
     "liuyao": liuyao.compute,
@@ -127,71 +129,70 @@ def compute_all(methods: list[str], birth: Birth) -> dict[str, ChartResult]:
     return {m: results.get(m) for m in methods}
 
 
+# 各引擎 normalized.elements 键名不统一（bazi 系用英文 wood/metal，western 用中文但含
+# 四元素"风"），统一映射到中文五行后再比较；无法诚实映射的键不参与共识。
+_ELEMENT_EN2ZH = {"wood": "木", "fire": "火", "earth": "土", "metal": "金", "water": "水"}
+_WUXING = ("金", "木", "水", "火", "土")
+
+
+def _dominant_wuxing(chart: ChartResult | None) -> str | None:
+    """取单盘 normalized.elements 最旺五行（统一到中文五行；取不到或不可比返回 None）。"""
+    if chart is None:
+        return None
+    els = chart.normalized.get("elements") or {}
+    if not isinstance(els, dict) or not els:
+        return None
+    top = max(els, key=els.get)
+    zh = _ELEMENT_EN2ZH.get(top, top)
+    return zh if zh in _WUXING else None
+
+
 def compute_with_validation(methods: list[str], birth: Birth, subject: str = "self_life", do_validate: bool = True):
-    """Compute multiple charts with optional cross-system validation."""
+    """Compute multiple charts with optional cross-system validation.
+
+    agreement_matrix 基于各盘真实的最旺五行：某法与其余「有可比五行数据的法」
+    中最旺五行相同的比例；没有可比数据的法记 None，不伪造数值。
+    引擎计算失败时该法 chart 为 None，跳过而不是崩溃。
+    """
     charts = compute_all(methods, birth)
     result: dict = {"charts": charts}
 
-    if do_validate and len(charts) >= 2:
-        element_votes = Counter()
-        for chart in charts.values():
-            elems = chart.normalized.get("elements", {})
-            if elems:
-                dominant = max(elems, key=elems.get)
-                element_votes[dominant] += 1
+    if do_validate:
+        dominant = {m: _dominant_wuxing(c) for m, c in charts.items()}
+        comparable = {m: e for m, e in dominant.items() if e}
+        element_votes = Counter(comparable.values())
+        n = len(comparable)
+        # 交叉共识需要 ≥2 个可比系统；单法或零法时不存在"交叉"，不给 1.0 这种
+        # 自我印证的满分。
+        consensus_strength = (max(element_votes.values()) / n) if n >= 2 else 0.0
 
-        consensus_strength = max(element_votes.values()) / len(charts) if element_votes else 0.5
+        agreement_matrix: dict = {}
+        for m in methods:
+            if m not in comparable or n < 2:
+                agreement_matrix[m] = None
+            else:
+                others = [e for mm, e in comparable.items() if mm != m]
+                agreement_matrix[m] = round(
+                    sum(1 for e in others if e == comparable[m]) / len(others), 2
+                )
+
+        ok = sum(1 for c in charts.values() if c is not None)
+        if n >= 2:
+            assessment = f"跨{n}法五行共识 {consensus_strength:.0%}（{ok}/{len(methods)} 法计算成功）"
+        elif n == 1:
+            assessment = f"仅1法有可比五行数据，无法交叉验证（{ok}/{len(methods)} 法计算成功）"
+        else:
+            assessment = f"无可比较的五行数据（{ok}/{len(methods)} 法计算成功）"
         result["cross_validation"] = {
-            "ensemble_score": consensus_strength,
-            "confidence": 0.5 + 0.5 * consensus_strength,
-            "agreement_matrix": {m: round(1.0 - abs(hash(m) % 30) / 100, 2) for m in methods},
+            "ensemble_score": round(consensus_strength, 2),
+            "confidence": round(0.5 + 0.5 * consensus_strength, 2) if n >= 2 else 0.0,
+            "agreement_matrix": agreement_matrix,
             "domain_checks": {"elements": dict(element_votes)},
             "cross_checks": [],
-            "overall_assessment": f"跨{len(methods)}法一致性: {consensus_strength:.0%}",
+            "overall_assessment": assessment,
         }
 
     return result
-
-
-def calibrate_birth_hour(birth: Birth, known_traits: list = None, known_career: str = None, known_events: list = None):
-    """Score all 12 two-hour periods against known traits."""
-    results = []
-    for h in range(0, 24, 2):
-        test_birth = Birth(
-            year=birth.year,
-            month=birth.month,
-            day=birth.day,
-            hour=h,
-            minute=0,
-            gender=birth.gender,
-            calendar=birth.calendar,
-            lat=birth.lat,
-            lng=birth.lng,
-            tz=birth.tz,
-        )
-        try:
-            chart = compute("bazi", test_birth)
-            raw = chart.raw or {}
-            score = raw.get("day_master_strength", 0.5)
-            if score == 0.5:
-                elems = raw.get("elements", {})
-                if elems:
-                    vals = list(elems.values())
-                    balance = max(vals) - min(vals) if vals else 0.5
-                    score = 0.5 + (balance - 0.33) * 0.3
-                else:
-                    score = 0.5
-            score = max(0.3, min(0.95, score))
-            results.append({"hour": h, "label": f"{h:02d}:00-{(h + 2) % 24:02d}:00", "score": round(score, 3), "chart": raw})
-        except Exception:
-            results.append({"hour": h, "label": f"{h:02d}:00-{(h + 2) % 24:02d}:00", "score": 0.3, "chart": None})
-
-    results.sort(key=lambda x: x["score"], reverse=True)
-    return {
-        "candidates": results,
-        "best": results[0] if results else None,
-        "confidence": round(results[0]["score"] - results[1]["score"], 3) if len(results) >= 2 else 0,
-    }
 
 
 def estimate_hour_from_traits(traits: list):
@@ -221,12 +222,43 @@ def estimate_hour_from_traits(traits: list):
     return {"estimated_hours": candidates[:5], "traits_matched": len(traits)}
 
 
+def _extract_element(raw: dict) -> str:
+    """从引擎 raw 中提取代表五行（真实数据；取不到返回空串，绝不默认编造）。
+
+    优先级：日主天干 → 五行局（紫微）→ 显式元素键。
+    """
+    dm = raw.get("day_master", "")
+    if isinstance(dm, str) and dm[:1] in GAN_WX:
+        return GAN_WX[dm[:1]]
+    cls = raw.get("five_elements_class", "")
+    if isinstance(cls, str) and cls[:1] in _WUXING:
+        return cls[:1]
+    e = raw.get("day_master_element") or raw.get("dominant_element") or ""
+    if isinstance(e, str) and e[:1] in _WUXING:
+        return e[:1]
+    return ""
+
+
 def compute_compatibility_score(chart1_data: dict, chart2_data: dict, method: str) -> dict:
-    """Compute single-method compatibility score from chart raw data."""
+    """Compute single-method compatibility score from chart raw data.
+
+    只在有真实五行数据时打分；数据不足时显式返回 insufficient_data，
+    不再回退到常数 55。
+    """
     c1 = chart1_data.get("raw", chart1_data)
     c2 = chart2_data.get("raw", chart2_data)
-    e1 = c1.get("day_master_element") or c1.get("dominant_element", "")
-    e2 = c2.get("day_master_element") or c2.get("dominant_element", "")
+    e1 = _extract_element(c1)
+    e2 = _extract_element(c2)
+
+    if not e1 or not e2:
+        return {
+            "compatibility_score": None,
+            "total_score": None,
+            "level": "insufficient_data",
+            "interpretation": f"{method} 盘面缺少可比较的五行数据，无法给出匹配度",
+            "breakdown": {},
+            "advice": ["建议改用八字（bazi_v2）或西方合盘（synastry）等有完整数据的方法"],
+        }
 
     score = max(0.1, min(1.0, COMPATIBLE_PAIRS.get((e1, e2), 0.55)))
     level = "high" if score >= 0.75 else "medium" if score >= 0.5 else "low"
@@ -234,30 +266,13 @@ def compute_compatibility_score(chart1_data: dict, chart2_data: dict, method: st
         "compatibility_score": round(score * 100),
         "total_score": round(score * 100),
         "level": level,
-        "interpretation": f"五行匹配度 {score:.0%}",
-        "breakdown": {"element_match": round(score * 100)},
-        "advice": ["建议参考多法合参提高准确度"],
-    }
-
-
-def compute_multimethod_compatibility(charts1_raw: dict, charts2_raw: dict, methods: list) -> dict:
-    """Multi-method ensemble compatibility scoring."""
-    method_scores = []
-    total = 0.0
-    weight_sum = 0.0
-
-    weights = {"bazi": 1.2, "ziwei": 1.0, "western": 0.9, "vedic": 0.9, "numerology": 0.6}
-    for m in methods:
-        w = weights.get(m, 0.7)
-        s = compute_compatibility_score(charts1_raw.get(m, {}), charts2_raw.get(m, {}), m)
-        score = s["compatibility_score"] / 100
-        method_scores.append({"method": m, "score": round(score * 100), "weight": w})
-        total += score * w
-        weight_sum += w
-
-    ensemble = total / weight_sum if weight_sum > 0 else 0.5
-    return {
-        "ensemble_score": round(ensemble * 100),
-        "method_scores": method_scores,
-        "results": {m["method"]: {"compatibility_score": m["score"]} for m in method_scores},
+        "interpretation": f"日主五行 {e1}×{e2}，五行匹配度 {score:.0%}",
+        "breakdown": {
+            "elements": {
+                "score": round(score * 100),
+                "max": 100,
+                "detail": f"日主五行 {e1} × {e2}",
+            }
+        },
+        "advice": ["五行匹配只是合参维度之一，建议结合 synastry 跨盘相位综合看"],
     }

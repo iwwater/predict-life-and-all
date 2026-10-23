@@ -5,7 +5,7 @@
  */
 import { useState, useCallback, useEffect, type FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { interpretDream, getCorpusStats, type DreamMatch } from "../lib/api";
+import { interpretDream, fetchCorpusStats, getCorpusStats, type DreamMatch, type DreamCorpusStats } from "../lib/api";
 import { MethodSourcesPanel } from "../components/MethodSourcesPanel";
 
 type DreamResult = {
@@ -64,12 +64,17 @@ export function DreamPage() {
   const [error, setError] = useState<string | null>(null);
   const [openMatchIdx, setOpenMatchIdx] = useState<number | null>(0);
   const [history, setHistory] = useState<string[]>([]);
+  // 先用内置兜底数, 后端真实统计到达后覆盖
+  const [stats, setStats] = useState<DreamCorpusStats>(getCorpusStats());
 
   useEffect(() => {
     setHistory(loadHistory());
+    fetchCorpusStats()
+      .then((s) => setStats(s))
+      .catch(() => {
+        /* 后端不可用时保留兜底数 */
+      });
   }, []);
-
-  const stats = getCorpusStats();
 
   const submit = useCallback(
     async (e: FormEvent) => {

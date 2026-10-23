@@ -18,8 +18,8 @@ const SEO_MAP: Record<string, string> = {
 };
 
 const DEFAULT_DESC = {
-  zh: "中西融通命理平台：八字、紫微、奇门、六壬、风水 + 西方占星、塔罗、雷诺曼。AI 解读，十四术数一站式排盘。",
-  en: "East-West divination platform: Ba Zi, Zi Wei, Qi Men, Feng Shui + Western Astrology, Tarot, Lenormand. AI-powered readings across 14 arts.",
+  zh: "中西融通命理平台：八字、紫微、奇门、六壬、风水 + 西方占星、塔罗、雷诺曼。AI 解读，十九术数一站式排盘。",
+  en: "East-West divination platform: Ba Zi, Zi Wei, Qi Men, Feng Shui + Western Astrology, Tarot, Lenormand. AI-powered readings across 19 arts.",
 };
 
 export function SEO() {

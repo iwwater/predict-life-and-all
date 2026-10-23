@@ -99,6 +99,15 @@ CAREER_ELEMENT_PREF = {
     "spirituality": ("水", "木"),
 }
 
+# bazi_v2 raw 的 elements_total 用英文键（metal/wood/...），而打分表
+# （CAREER_ELEMENT_PREF / yong_shen.primary_zh / avoid_zh）用中文五行 — 统一成中文。
+_EN2ZH = {"wood": "木", "fire": "火", "earth": "土", "metal": "金", "water": "水"}
+
+
+def _zh_elements(elements: dict | None) -> dict:
+    """把元素计数字典的键统一为中文五行（已是中文的键原样保留）。"""
+    return {_EN2ZH.get(str(k), k): v for k, v in (elements or {}).items()}
+
 
 # ── True Solar Time (真太阳时) ──────────────────────────────────────────────
 
@@ -501,7 +510,7 @@ def _score_candidate(c: HourCandidate,
         pref_elements = CAREER_ELEMENT_PREF.get(known_career.lower(), ())
         if pref_elements:
             raw = c.chart.get("raw", {})
-            elements = raw.get("elements", {}) or raw.get("elements_total", {})
+            elements = _zh_elements(raw.get("elements") or raw.get("elements_total"))
             day_master_element = (raw.get("day_master", "") or "")
 
             # map day_master 天干 → 五行
@@ -527,7 +536,7 @@ def _score_candidate(c: HourCandidate,
     raw = c.chart.get("raw", {})
     yong_shen = raw.get("yong_shen", {})
     yong_quality = raw.get("yong_shen_quality", {})
-    elements = raw.get("elements", {}) or raw.get("elements_total", {})
+    elements = _zh_elements(raw.get("elements") or raw.get("elements_total"))
 
     if yong_shen and elements:
         primary = yong_shen.get("primary_zh", [])

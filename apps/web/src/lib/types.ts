@@ -331,23 +331,5 @@ export interface CastResponse {
   idempotent: boolean;
 }
 
-export const METHOD_LABELS_ZH: Record<string, string> = {
-  bazi_v2: "八字",
-  ziwei: "紫微",
-  qimen: "奇门",
-  liuyao: "六爻",
-  meihua: "梅花",
-  fengshui: "风水",
-  bazhai: "八宅",
-  xuankong: "玄空",
-  western: "西方占星",
-  vedic: "吠陀占星",
-  tarot: "塔罗",
-  qian: "灵签",
-  numerology: "数字命理",
-  liuren: "大六壬",
-  xiaoliuren: "小六壬",
-  tieban: "铁板",
-  lenormand: "雷诺曼",
-  hepan: "合盘",
-};
+// 报告内联方法标签由 method-registry.ts 单一真源派生
+export { METHOD_SHORT_ZH_BY_ID as METHOD_LABELS_ZH } from "./method-registry";

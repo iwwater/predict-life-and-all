@@ -1,6 +1,7 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useMemo } from "react";
 import { useI18n } from "../lib/i18n";
+import { METHOD_NAME_ZH_BY_ID } from "../lib/method-registry";
 
 // ponytail: G2 抽了 5 档字号 + 4 档间距 + 4 个容器 token 到 index.css
 // ponytail-debt: 24 个内联 fontSize 散布在 ~20 文件未迁;G3 范围
@@ -14,27 +15,8 @@ const METHOD_NAV = [
   { to: "/about", label: "凡例" },
 ];
 
-const METHOD_LABELS: Record<string, string> = {
-  bazi: "八字四柱",
-  ziwei: "紫微斗数",
-  tieban: "铁板神数",
-  qimen: "奇门遁甲",
-  liuyao: "六爻",
-  meihua: "梅花易数",
-  liuren: "大六壬",
-  xiaoliuren: "小六壬",
-  qian: "灵签",
-  chenggu: "称骨",
-  dream: "周公解梦",
-  hepan: "合盘",
-  tarot: "塔罗",
-  lenormand: "雷诺曼",
-  western: "西方占星",
-  vedic: "吠陀占星",
-  numerology: "数字命理",
-  bazhai: "八宅",
-  xuankong: "玄空飞星",
-};
+// 面包屑方法名由 method-registry.ts 单一真源派生
+const METHOD_LABELS = METHOD_NAME_ZH_BY_ID;
 
 export function Layout() {
   const location = useLocation();
@@ -46,7 +28,7 @@ export function Layout() {
       return METHOD_LABELS[location.pathname.replace("/m/", "")] || "观盘";
     }
     if (location.pathname === "/cases") return "问事档案";
-    if (location.pathname === "/reading") return "十二法合参";
+    if (location.pathname === "/reading") return "多法合参";
     if (location.pathname === "/heshen") return "合参卷";
     if (location.pathname === "/daily") return "今日";
     if (location.pathname === "/almanac") return "老黄历";

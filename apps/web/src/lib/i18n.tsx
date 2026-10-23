@@ -21,7 +21,7 @@ const I18nContext = createContext<I18nContextValue>({
 const DICT: Record<string, { zh: string; en: string }> = {
   // 通用
   "app.name": { zh: "玄枢", en: "Mystic Hub" },
-  "app.tagline": { zh: "中西融通 · 十四术数", en: "East-West Synthesis · 14 Arts" },
+  "app.tagline": { zh: "中西融通 · 十九术数", en: "East-West Synthesis · 19 Arts" },
   "app.disclaimer": { zh: "本站所有解读为传统文化象征视角的参考，非科学预测，亦不构成医疗、法律、财务等专业意见。重大决定请结合现实并咨询专业人士。", en: "All readings on this site are presented as traditional cultural and symbolic references, not scientific predictions. They do not constitute medical, legal, financial, or other professional advice. Important decisions should be made with professional consultation." },
   "app.compliance": { zh: "全栈 MIT/BSD 许可，零 AGPL，可闭源商用。你的 LLM API Key 仅存在浏览器本地，不会上传到本服务后端。", en: "Full-stack MIT/BSD licensed. Zero AGPL. Closed-source commercial use permitted. Your LLM API key stays in your browser — never uploaded to our backend." },
 
@@ -46,7 +46,7 @@ const DICT: Record<string, { zh: string; en: string }> = {
 
   // 首页
   "home.badge": { zh: "Mystic Hub · 玄枢", en: "Mystic Hub · Xuan Shu" },
-  "home.hero.title": { zh: "中西融通，十四术数", en: "East Meets West · 14 Divination Arts" },
+  "home.hero.title": { zh: "中西融通，十九术数", en: "East Meets West · 19 Divination Arts" },
   "home.hero.subtitle": { zh: "排盘解读 · 合盘姻缘", en: "Chart Reading · Synastry Matching" },
   "home.hero.desc": { zh: "命 · 卜 · 风水术数 + 西方占星 · 塔罗 · 雷诺曼 · 数字命理。AI 解读融合中西视角，重大决定请结合现实并咨询专业人士。", en: "Destiny · Divination · Feng Shui + Western Astrology · Tarot · Lenormand · Numerology. AI-powered readings blending Eastern and Western perspectives. Important decisions require real-world consultation." },
   "home.cta.cast": { zh: "开始排盘", en: "Cast Chart" },
@@ -187,7 +187,7 @@ const DICT: Record<string, { zh: string; en: string }> = {
 
   // 关于
   "about.title": { zh: "关于 Mystic Hub", en: "About Mystic Hub" },
-  "about.desc": { zh: "Mystic Hub 是一个面向研究 / 兴趣 / 自我反思的玄学工具。集成十四种术数(命 / 卜 / 风水 / 西方)，统一排盘接口 + 多 LLM 流式解读。全栈 MIT/BSD 许可，零 AGPL，可闭源商用。", en: "Mystic Hub is an esoteric arts tool for research, interest, and self-reflection. It integrates 14 methods (Destiny / Divination / Feng Shui / Western), with a unified casting interface and multi-LLM streaming interpretation. Full-stack MIT/BSD licensed." },
+  "about.desc": { zh: "Mystic Hub 是一个面向研究 / 兴趣 / 自我反思的玄学工具。集成十九种术数(命 / 卜 / 风水 / 西方)，统一排盘接口 + 多 LLM 流式解读。全栈 MIT/BSD 许可，零 AGPL，可闭源商用。", en: "Mystic Hub is an esoteric arts tool for research, interest, and self-reflection. It integrates 19 methods (Destiny / Divination / Feng Shui / Western), with a unified casting interface and multi-LLM streaming interpretation. Full-stack MIT/BSD licensed." },
   "about.disclaimer": { zh: "免责声明（全文）", en: "Disclaimer (Full)" },
   "about.llm": { zh: "LLM 解读设置", en: "LLM Settings" },
   "about.tech": { zh: "技术栈与合规", en: "Tech Stack & Compliance" },

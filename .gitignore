@@ -78,3 +78,4 @@ docs/pdf_*.txt
 docs/part0003_*.txt
 docs/liuyao_corpus_preview.json
 docs/pdf_raw_text.json
+.gstack/

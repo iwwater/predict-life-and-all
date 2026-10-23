@@ -7,6 +7,7 @@
  * 改为展示 tally_by_scope 累计计票（X 法支持 / Y 法警示）。
  */
 import { useState, useMemo, useCallback } from "react";
+import DOMPurify from "dompurify";
 import type { ReadingResult, DivinationSignal, ScopeTally } from "../lib/types";
 import { METHOD_LABELS_ZH } from "../lib/types";
 import { saveReadingToHistory, computeTone } from "../store/readingHistory";
@@ -93,8 +94,13 @@ function tallyTotals(tally: Record<string, ScopeTally> | undefined) {
 const EMOJI_STRIP = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}\u{200D}]/gu;
 
 function renderMarkdown(text: string): string {
+  // XSS 防护：先转义原始文本中的 & 和 <（> 保留给 blockquote 语法），
+  // 再做 markdown 结构替换，最后 DOMPurify 兜底。报告会持久化进
+  // localStorage 构成存储型 XSS 路径，必须在此净化而非信任 LLM 输出。
   let html = text
     .replace(EMOJI_STRIP, "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
     .replace(/^### (.+)$/gm, '<h3 style="font-size:0.82rem;font-weight:600;margin:0.9rem 0 0.35rem;color:var(--cinnabar);font-family:\'Noto Serif SC\',serif">$1</h3>')
     .replace(/^## (.+)$/gm, '<h2 style="font-size:0.9rem;font-weight:600;margin:1rem 0 0.45rem;color:var(--ink);font-family:\'Noto Serif SC\',serif">$1</h2>')
     .replace(/^# (.+)$/gm, '<h1 style="font-size:1rem;font-weight:700;margin:1.2rem 0 0.5rem;color:var(--ink)">$1</h1>')
@@ -108,7 +114,7 @@ function renderMarkdown(text: string): string {
     .replace(/\n/g, '<br/>');
 
   html = '<p style="margin:0.4rem 0;line-height:1.85;color:var(--ink-soft)">' + html + '</p>';
-  return html;
+  return DOMPurify.sanitize(html);
 }
 
 // ── Main Component ────────────────────────────────────────────────────────────

@@ -4,31 +4,39 @@ from abc import ABC, abstractmethod
 
 class LLMClient(ABC):
     @abstractmethod
-    def complete(self, system: str, user: str) -> str: ...
+    def complete(self, system: str, user: str, max_tokens: int = 1500) -> str: ...
 
 
 class MockClient(LLMClient):
     """测试用：不联网，回显结构化占位，便于验证 pipeline。"""
-    def complete(self, system: str, user: str) -> str:
+    def complete(self, system: str, user: str, max_tokens: int = 1500) -> str:
         return ("【整体】（示例占位输出，接入真实模型后此处为解读正文）\n"
                 "【事业财运】盘面显示金气偏旺、根气偏弱，倾向于在协作中借力会更顺。\n"
                 "【建议】1) 多与人合作；2) 留意春夏之交的机会。")
 
 
 class AnthropicClient(LLMClient):
-    """真实适配器示例（需自备 API Key）。api.anthropic.com。"""
-    def __init__(self, api_key: str, model: str = "claude-sonnet-4-20250514"):
-        self.api_key = api_key; self.model = model
+    """真实适配器（需自备 API Key）。api.anthropic.com。
 
-    def complete(self, system: str, user: str) -> str:
+    reading_service 以 complete(system=..., user=..., max_tokens=...) 调用，
+    此处签名必须对齐；网络调用带 timeout，避免无限阻塞事件循环。
+    """
+    DEFAULT_TIMEOUT_SECONDS = 120
+
+    def __init__(self, api_key: str, model: str = "claude-sonnet-4-20250514", timeout: int = DEFAULT_TIMEOUT_SECONDS):
+        self.api_key = api_key
+        self.model = model
+        self.timeout = timeout
+
+    def complete(self, system: str, user: str, max_tokens: int = 1500) -> str:
         import json
         import urllib.request
         req = urllib.request.Request(
             "https://api.anthropic.com/v1/messages",
-            data=json.dumps({"model": self.model, "max_tokens": 1500,
+            data=json.dumps({"model": self.model, "max_tokens": max_tokens,
                              "system": system, "messages": [{"role": "user", "content": user}]}).encode(),
             headers={"content-type": "application/json", "x-api-key": self.api_key,
                      "anthropic-version": "2023-06-01"})
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, timeout=self.timeout) as resp:
             data = json.load(resp)
         return "".join(b.get("text", "") for b in data.get("content", []))

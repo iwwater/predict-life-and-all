@@ -3,16 +3,15 @@ import logging
 import time
 from typing import Literal
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query, Response
 from pydantic import BaseModel, Field
 
 from divination import Birth
+from divination.engines.hour_calibrator import calibrate as calibrate_hour_engine
 from divination.meta import method_meta
 from divination.router import (
     _ENGINES,
-    calibrate_birth_hour,
     compute_compatibility_score,
-    compute_multimethod_compatibility,
     compute_with_validation,
     estimate_hour_from_traits,
 )
@@ -252,10 +251,11 @@ def compute_multi_endpoint(body: MultiComputeRequest):
 
 @router.post("/calibrate/hour")
 def calibrate_hour_endpoint(body: HourCalibrateRequest):
-    """Calibrate uncertain birth hour by scoring all 12 possibilities.
+    """Calibrate uncertain birth hour by scoring all 12 two-hour periods.
 
-    Generates 12 charts (one per two-hour period) and matches them
-    against known life facts to determine the most likely birth hour.
+    使用 engines/hour_calibrator 真实现：真太阳时 + 已知特质/职业/人生大事
+    多维打分（trait 20% / career 15% / 用神 25% / 大运流年事件 25% / 结构 10%）。
+    known_traits/known_career/known_events 真实参与打分排序。
     """
     b = body.birth
     birth = Birth(
@@ -267,16 +267,48 @@ def calibrate_hour_endpoint(body: HourCalibrateRequest):
 
     t0 = time.perf_counter()
     try:
-        result = calibrate_birth_hour(
-            birth, body.known_traits, body.known_career, body.known_events
+        result = calibrate_hour_engine(
+            birth, body.known_traits, body.known_career, body.known_events,
         )
     except Exception as e:
         log.exception("hour calibration failed: %s", e)
         raise HTTPException(500, f"{type(e).__name__}: {e}")
     dt_ms = int((time.perf_counter() - t0) * 1000)
 
-    result["elapsed_ms"] = dt_ms
-    return _sanitize_numpy(result)
+    def _candidate_payload(c) -> dict:
+        raw = (c.chart or {}).get("raw", {}) or {}
+        pattern = raw.get("pattern")
+        return {
+            "branch": c.branch,
+            "hour": c.hour,
+            "label": f"{c.hour:02d}:00-{(c.hour + 2) % 24:02d}:00",
+            "traits": c.traits,
+            "score": round(c.score, 1),
+            "score_breakdown": c.score_breakdown,
+            "match_details": c.match_details,
+            "yong_shen_match": round(c.yong_shen_match, 2),
+            "event_match_count": c.event_match_count,
+            "chart_summary": {
+                "pillars": raw.get("pillars"),
+                "day_master": raw.get("day_master"),
+                "strength_score": raw.get("strength_score"),
+                "pattern": pattern.get("pattern") if isinstance(pattern, dict) else None,
+            },
+        }
+
+    candidates = result.candidates or []
+    payload = {
+        "candidates": [_candidate_payload(c) for c in candidates],
+        "best": _candidate_payload(candidates[0]) if candidates else None,
+        "best_hour": result.best_hour,
+        "best_confidence": result.best_confidence,
+        "top_3": result.top_3,
+        "analysis": result.analysis,
+        "recommendation": result.recommendation,
+        "true_solar_time_info": result.true_solar_time_info,
+        "elapsed_ms": dt_ms,
+    }
+    return _sanitize_numpy(payload)
 
 
 @router.post("/estimate/traits")
@@ -294,12 +326,89 @@ def estimate_traits_endpoint(body: TraitEstimateRequest):
     return result
 
 
+def _synastry_single_result(birth1: Birth, birth2: Birth) -> dict:
+    """西方合盘：走真实 synastry 引擎（跨盘相位/宫位叠加/组合中点盘）。"""
+    from divination.engines import synastry
+    raw = synastry.compute(birth1, birth2).raw or {}
+    scoring = raw.get("scoring", {}) or {}
+    interp = raw.get("interpretation", {}) or {}
+    return {
+        "compatibility_score": scoring.get("compatibility_score"),
+        "total_score": scoring.get("compatibility_score"),
+        "level": interp.get("level"),
+        "interpretation": interp.get("description"),
+        "breakdown": scoring.get("breakdown", {}),
+        "overlays": raw.get("overlays"),
+        "cross_aspects": raw.get("cross_aspects"),
+        "composite_chart": raw.get("composite_chart"),
+        "scoring": scoring,
+        "advice": [],
+    }
+
+
+def _compatibility_single(method: str, birth1: Birth, birth2: Birth) -> dict:
+    if method == "western":
+        return _synastry_single_result(birth1, birth2)
+    chart1 = _ENGINES[method](birth1)
+    chart2 = _ENGINES[method](birth2)
+    return compute_compatibility_score({"raw": chart1.raw}, {"raw": chart2.raw}, method)
+
+
+def _compatibility_multi(methods: list, birth1: Birth, birth2: Birth) -> dict:
+    """多法合盘加权集成：只对产出真实评分的方法加权，跳过原因显式标注。"""
+    weights = {"bazi": 1.2, "bazi_v2": 1.2, "ziwei": 1.0,
+               "western": 0.9, "western_synastry": 0.9, "vedic": 0.9, "numerology": 0.6}
+    results: dict = {}
+    method_scores: list = []
+    for m in methods:
+        if m not in _ENGINES:
+            method_scores.append({"method": m, "score": None,
+                                  "weight": weights.get(m, 0.7), "skipped": "unsupported_method"})
+            continue
+        try:
+            if m == "western":
+                single = _synastry_single_result(birth1, birth2)
+                display = "western_synastry"
+                results[display] = single
+            else:
+                single = _compatibility_single(m, birth1, birth2)
+                display = "bazi" if m.startswith("bazi") else m
+                if single.get("compatibility_score") is None:
+                    method_scores.append({"method": display, "score": None,
+                                          "weight": weights.get(m, 0.7), "skipped": "insufficient_data"})
+                    continue
+                results[m] = single
+            method_scores.append({"method": display, "score": single.get("compatibility_score"),
+                                  "weight": weights.get(m, 0.7)})
+        except Exception as e:
+            log.warning("compatibility method %s failed: %s", m, e)
+            method_scores.append({"method": m, "score": None,
+                                  "weight": weights.get(m, 0.7), "skipped": "compute_failed"})
+
+    scored = [ms for ms in method_scores if isinstance(ms.get("score"), (int, float))]
+    if scored:
+        w_sum = sum(ms["weight"] for ms in scored)
+        ensemble = sum(ms["score"] * ms["weight"] for ms in scored) / w_sum if w_sum else None
+    else:
+        ensemble = None
+    return {
+        "ensemble_score": round(ensemble) if ensemble is not None else None,
+        "method_scores": method_scores,
+        "results": results,
+        "ensemble_basis": (
+            f"{len(scored)}/{len(methods)} 法真实评分加权"
+            if scored else "无方法产出真实评分"
+        ),
+    }
+
+
 @router.post("/compatibility")
 def compatibility_endpoint(body: CompatibilityRequest):
     """Compute relationship compatibility between two birth charts.
 
-    Supports single-method (bazi_v2 or western) and multi-method
-    (e.g., ["bazi_v2", "western"]) with weighted ensemble scoring.
+    - method=bazi_v2：日主五行真实匹配打分（数据不足时显式 insufficient_data）
+    - method=western：真实 synastry 引擎（跨盘相位/宫位叠加/组合盘）
+    - methods=[...]：多法加权集成，results.western_synastry 携带合盘细节
     """
     b1 = body.chart1_birth
     b2 = body.chart2_birth
@@ -317,45 +426,126 @@ def compatibility_endpoint(body: CompatibilityRequest):
     )
 
     t0 = time.perf_counter()
-
-    # Multi-method compatibility
-    if body.methods and len(body.methods) >= 2:
-        try:
-            charts1 = {}
-            charts2 = {}
-            for m in body.methods:
-                if m not in _ENGINES:
-                    continue
-                try:
-                    charts1[m] = _ENGINES[m](birth1)
-                    charts2[m] = _ENGINES[m](birth2)
-                except Exception:
-                    pass
-
-            result = compute_multimethod_compatibility(
-                {m: c.raw for m, c in charts1.items()},
-                {m: c.raw for m, c in charts2.items()},
-                body.methods,
-            )
-        except Exception as e:
-            log.exception("multi-method compatibility failed: %s", e)
-            raise HTTPException(500, f"{type(e).__name__}: {e}")
-    else:
-        # Single-method compatibility
-        method = body.method
-        if method not in _ENGINES:
-            raise HTTPException(422, f"unsupported method: {method}")
-
-        try:
-            chart1 = _ENGINES[method](birth1)
-            chart2 = _ENGINES[method](birth2)
-            result = compute_compatibility_score(
-                {"raw": chart1.raw}, {"raw": chart2.raw}, method
-            )
-        except Exception as e:
-            log.exception("compatibility compute failed: %s", e)
-            raise HTTPException(500, f"{type(e).__name__}: {e}")
+    try:
+        if body.methods and len(body.methods) >= 2:
+            result = _compatibility_multi(body.methods, birth1, birth2)
+        else:
+            method = body.method
+            if method not in _ENGINES:
+                raise HTTPException(422, f"unsupported method: {method}")
+            result = _compatibility_single(method, birth1, birth2)
+    except HTTPException:
+        raise
+    except Exception as e:
+        log.exception("compatibility compute failed: %s", e)
+        raise HTTPException(500, f"{type(e).__name__}: {e}") from e
 
     dt_ms = int((time.perf_counter() - t0) * 1000)
     result["elapsed_ms"] = dt_ms
     return _sanitize_numpy(result)
+
+
+# ── 紫微 SVG 可视化 (GET /api/ziwei/svg) ──────────────────────────────
+# 后端 divination/viz/ziwei_svg.py 的直出通道: 同参数同盘 → 可缓存、可 <img> 直引,
+# 也天然规避了 inline SVG 注入的 XSS 面 (浏览器以 image 语义解析, 不执行脚本)。
+
+_ZIWEI_SVG_STYLES = ("traditional", "wheel", "grid", "star_map")
+_ZIWEI_SVG_SCOPES = ("natal", "decadal", "yearly", "monthly", "xiaoxian")
+
+
+def _ziwei_svg_scope_title(scope: str) -> str:
+    return {
+        "natal": "紫微斗数 · 本命盘",
+        "decadal": "紫微斗数 · 大限盘",
+        "yearly": "紫微斗数 · 流年盘",
+        "monthly": "紫微斗数 · 流月盘",
+        "xiaoxian": "紫微斗数 · 小限盘",
+    }.get(scope, "紫微斗数 · 本命盘")
+
+
+@router.get("/ziwei/svg")
+def ziwei_svg_endpoint(
+    year: int = Query(..., ge=1500, le=2100),
+    month: int = Query(..., ge=1, le=12),
+    day: int = Query(..., ge=1, le=31),
+    hour: int = Query(12, ge=0, le=23),
+    minute: int = Query(0, ge=0, le=59),
+    gender: str = Query("male", pattern="^(male|female|unspecified)$"),
+    style: str = Query("traditional"),
+    scope: str = Query("natal"),
+    size: int = Query(720, ge=320, le=1080),
+    age: int = Query(0, ge=0, le=130, description="虚岁; 0 = 按当前年自动推算 (仅 xiaoxian 用)"),
+):
+    """紫微盘 SVG 直出.
+
+    style: traditional(经典方盘)/wheel(现代轮盘)/grid(宫位网格)/star_map(星曜地图)
+    scope: natal(本命)/decadal(大限)/yearly(流年)/monthly(流月)/xiaoxian(小限)
+           非 natal scope 固定用方盘布局 (带对应宫位高亮), style 参数忽略.
+    """
+    if "ziwei" not in _ENGINES:
+        raise HTTPException(503, "ziwei engine unavailable")
+    if style not in _ZIWEI_SVG_STYLES:
+        raise HTTPException(422, f"unsupported style: {style} (valid: {list(_ZIWEI_SVG_STYLES)})")
+    if scope not in _ZIWEI_SVG_SCOPES:
+        raise HTTPException(422, f"unsupported scope: {scope} (valid: {list(_ZIWEI_SVG_SCOPES)})")
+    try:
+        from divination.viz import ziwei_svg
+    except ImportError as e:  # pragma: no cover
+        raise HTTPException(503, f"svg renderer unavailable: {e}")
+
+    birth = Birth(
+        year=year, month=month, day=day, hour=hour, minute=minute,
+        gender=gender, calendar="gregorian", tz="Asia/Shanghai",
+    )
+    try:
+        result = _ENGINES["ziwei"](birth)
+    except Exception as e:
+        log.exception("ziwei svg compute failed: %s", e)
+        raise HTTPException(500, f"{type(e).__name__}: {e}")
+
+    raw = _sanitize_numpy(getattr(result, "raw", None) or {})
+    palaces = raw.get("palaces") or []
+    if not palaces:
+        raise HTTPException(422, "no palace data: check birth parameters")
+
+    common = dict(
+        soul=str(raw.get("soul") or ""),
+        body=str(raw.get("body") or ""),
+        five_elements=str(raw.get("five_elements") or ""),
+        size=size,
+    )
+    gan_zhi = str(raw.get("gan_zhi") or "")
+
+    if scope == "natal" and style != "traditional":
+        # 盘型渲染器签名: (palaces, *, title, size) — 无 soul/body 参数
+        render = {
+            "wheel": ziwei_svg.render_modern_wheel,
+            "grid": ziwei_svg.render_palace_grid,
+            "star_map": ziwei_svg.render_star_map,
+        }[style]
+        svg = render(palaces, title=_ziwei_svg_scope_title("natal"), size=size)
+    elif scope == "xiaoxian":
+        # 虚岁: 未显式传 age 时按当前年推算 (出生当年 = 虚岁 1)
+        if age <= 0:
+            from datetime import date
+            age = max(1, date.today().year - year + 1)
+        # 出生年支: (year - 4) % 12 → 子..亥 (1984 = 甲子 → 子)
+        birth_zhi = "子丑寅卯辰巳午未申酉戌亥"[(year - 4) % 12]
+        svg = ziwei_svg.render_xiaoxian_chart(
+            palaces, title=_ziwei_svg_scope_title(scope), gan_zhi=gan_zhi,
+            birth_zhi=birth_zhi, age=age, gender=gender, **common,
+        )
+    else:
+        render = {
+            "natal": ziwei_svg.render_natal_chart,
+            "decadal": ziwei_svg.render_decadal_chart,
+            "yearly": ziwei_svg.render_yearly_chart,
+            "monthly": ziwei_svg.render_monthly_chart,
+        }[scope]
+        svg = render(palaces, title=_ziwei_svg_scope_title(scope), gan_zhi=gan_zhi, **common)
+
+    return Response(
+        content=svg,
+        media_type="image/svg+xml; charset=utf-8",
+        headers={"Cache-Control": "public, max-age=3600"},
+    )
