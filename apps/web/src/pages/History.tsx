@@ -79,10 +79,10 @@ export function History() {
                   {it.question && <> · 「{it.question}」</>}
                 </div>
                 <div className="flex flex-wrap gap-1" style={{ marginTop: "0.3rem" }}>
-                  {it.subject && <span className="paper-tag" style={{ fontSize: "0.6rem", color: "var(--cinnabar)", borderColor: "rgba(176,58,46,0.3)" }}>{SUBJECT_LABEL[it.subject] || it.subject}</span>}
-                  {it.favorite && <span className="paper-tag" style={{ fontSize: "0.6rem", color: "var(--cinnabar)" }}>★ 收藏</span>}
-                  {it.reflection && <span className="paper-tag" style={{ fontSize: "0.6rem", color: "var(--ink-soft)" }}>反馈 · {REFLECT_LABEL[it.reflection.verdict] || it.reflection.verdict}</span>}
-                  {it.spread && <span className="paper-tag" style={{ fontSize: "0.6rem", color: "var(--ink-soft)" }}>spread: {it.spread}</span>}
+                  {it.subject && <span className="paper-tag" style={{ fontSize: "0.62rem", color: "var(--cinnabar)", borderColor: "rgba(176,58,46,0.3)" }}>{SUBJECT_LABEL[it.subject] || it.subject}</span>}
+                  {it.favorite && <span className="paper-tag" style={{ fontSize: "0.62rem", color: "var(--cinnabar)" }}>★ 收藏</span>}
+                  {it.reflection && <span className="paper-tag" style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>反馈 · {REFLECT_LABEL[it.reflection.verdict] || it.reflection.verdict}</span>}
+                  {it.spread && <span className="paper-tag" style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>spread: {it.spread}</span>}
                 </div>
               </div>
               <div className="flex flex-col gap-1 shrink-0">

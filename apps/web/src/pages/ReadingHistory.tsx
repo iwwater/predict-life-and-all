@@ -90,10 +90,10 @@ export function ReadingHistory() {
                 </div>
                 <p style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }} className="truncate">{entry.question.slice(0, 60) || "无问题"}</p>
                 <div className="flex items-center justify-between" style={{ marginTop: "0.25rem" }}>
-                  <span style={{ fontSize: "0.55rem", color: "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace" }}>
+                  <span style={{ fontSize: "0.62rem", color: "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace" }}>
                     {new Date(entry.savedAt).toLocaleString()}
                   </span>
-                  <span style={{ fontSize: "0.55rem", color: "var(--ink-soft)", opacity: 0.5, fontFamily: "'JetBrains Mono', monospace" }}>{entry.id}</span>
+                  <span style={{ fontSize: "0.62rem", color: "var(--ink-soft)", opacity: 0.5, fontFamily: "'JetBrains Mono', monospace" }}>{entry.id}</span>
                 </div>
               </button>
             ))}

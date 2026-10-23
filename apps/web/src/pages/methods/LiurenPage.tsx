@@ -51,7 +51,7 @@ export function LiurenPage() {
         <QuestionInput value={question} onChange={setQuestion} required placeholder={lang === "zh" ? "描述你要占的事，大六壬适合复杂决疑。" : "Describe your situation — Da Liu Ren excels at complex decisions."} />
       </section>
       <MethodSubmitBar loading={loading} error={error} inBasket={inBasket} onAddToBasket={addToBasket} submitLabel={lang === "zh" ? "起六壬课" : "Cast Liu Ren"} />
-      <p className="paper-source" style={{ fontSize: "0.6rem", textAlign: "center" }}>{t("method.notice")}</p>
+      <p className="paper-source" style={{ fontSize: "0.62rem", textAlign: "center" }}>{t("method.notice")}</p>
       <MethodSourcesPanel method="liuren" />
     </form>
   );

@@ -105,7 +105,7 @@ export function WesternPage() {
                   <div key={i} className="p-2 rounded-sm animate-fade-in" style={{ border: "1px solid var(--rule)", background: "var(--paper-2)", fontSize: "0.7rem", ...getPlanetStyle(i) }}>
                     <span style={{ fontWeight: 600, color: "var(--ink)" }}>{p.name || p.planet}</span>
                     <span style={{ color: "var(--ink-soft)", marginLeft: "0.4rem" }}>{p.sign || p.zodiac || ""}{p.house ? ` H${p.house}` : ""}</span>
-                    {p.retrograde && <span className="paper-tag" style={{ fontSize: "0.55rem", marginLeft: "0.3rem" }}>R</span>}
+                    {p.retrograde && <span className="paper-tag" style={{ fontSize: "0.62rem", marginLeft: "0.3rem" }}>R</span>}
                   </div>
                 ))}
               </div>

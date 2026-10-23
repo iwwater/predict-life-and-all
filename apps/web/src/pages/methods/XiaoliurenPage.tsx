@@ -154,7 +154,7 @@ export function XiaoliurenPage() {
         </div>
       )}
 
-      <p className="paper-source" style={{ fontSize: "0.6rem", textAlign: "center" }}>{t("method.notice")}</p>
+      <p className="paper-source" style={{ fontSize: "0.62rem", textAlign: "center" }}>{t("method.notice")}</p>
       <MethodSourcesPanel method="xiaoliuren" />
     </div>
   );

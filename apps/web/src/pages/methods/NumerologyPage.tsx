@@ -98,7 +98,7 @@ export function NumerologyPage() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {Object.entries(r.numbers as Record<string, number>).map(([k, v]) => (
                   <div key={k} className="text-center p-2 rounded-sm" style={{ border: "1px solid var(--rule)", background: "var(--paper-2)" }}>
-                    <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)" }}>{k}</div>
+                    <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>{k}</div>
                     <div style={{ fontSize: "1.2rem", fontWeight: 600, color: "var(--ink)" }}>{v}</div>
                   </div>
                 ))}

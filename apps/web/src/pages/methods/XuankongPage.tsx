@@ -82,7 +82,7 @@ export function XuankongPage() {
                 {grid.map((g: any, i: number) => (
                   <div key={i} className="text-center p-2 rounded-sm"
                     style={{ border: "1px solid var(--rule)", background: "var(--paper-2)", minHeight: 60 }}>
-                    <div style={{ fontSize: "0.55rem", color: "var(--ink-soft)" }}>{g.palace || g.name || i + 1}</div>
+                    <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>{g.palace || g.name || i + 1}</div>
                     <div style={{ fontSize: "0.7rem", fontWeight: 600, color: "var(--ink)", fontFamily: "'Noto Serif SC', serif" }}>
                       {Array.isArray(g.stars) ? g.stars.join(" ") : (g.star || "—")}
                     </div>

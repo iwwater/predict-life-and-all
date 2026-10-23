@@ -236,7 +236,7 @@ export function BaziPage() {
                         <div style={{ fontSize: "0.9rem", fontWeight: 700, color: lit ? "var(--cinnabar)" : "var(--ink-soft)", fontFamily: "'Noto Serif SC', serif" }}>
                           {f.key}
                         </div>
-                        <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)", marginTop: "0.15rem" }}>
+                        <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", marginTop: "0.15rem" }}>
                           {f.en}
                         </div>
                         <div style={{ fontSize: "0.65rem", color: lit ? "var(--cinnabar)" : "var(--ink-soft)", marginTop: "0.2rem" }}>
@@ -297,7 +297,7 @@ export function BaziPage() {
                     <div style={{ fontSize: "0.72rem", fontWeight: 600, color: "var(--ink)", fontFamily: "'Noto Serif SC', serif" }}>
                       {t.label}
                     </div>
-                    <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace" }}>
+                    <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace" }}>
                       {t.from}–{t.to}
                     </div>
                   </div>
@@ -403,12 +403,12 @@ function renderPillar(
         {gz[1] || "?"}
       </div>
       {hs.length > 0 && (
-        <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)", marginTop: "0.25rem" }}>
+        <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", marginTop: "0.25rem" }}>
           {lang === "zh" ? "藏" : "H"}:{hs.join("/")}
         </div>
       )}
       {shigan && (
-        <div style={{ fontSize: "0.6rem", color: "var(--verdigris)", marginTop: "0.15rem" }}>
+        <div style={{ fontSize: "0.62rem", color: "var(--verdigris)", marginTop: "0.15rem" }}>
           {shigan}
         </div>
       )}

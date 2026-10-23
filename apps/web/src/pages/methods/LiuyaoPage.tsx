@@ -208,7 +208,7 @@ export function LiuyaoPage() {
                     transition: "all 0.3s",
                     transform: isLanding ? "scale(1.1)" : "scale(1)",
                   }}>
-                    <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)" }}>{name}</div>
+                    <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>{name}</div>
                     {t !== null && (
                       <div
                         className={`coin coin--landed`}
@@ -222,7 +222,7 @@ export function LiuyaoPage() {
                       <div style={{ fontSize: "1.5rem", color: "var(--ink-soft)", height: "1.8rem", lineHeight: "1.8rem" }}>—</div>
                     )}
                     {t && (
-                      <div style={{ fontSize: "0.55rem", color: isOld ? "var(--cinnabar)" : "var(--ink-soft)", marginTop: "0.1rem" }}>
+                      <div style={{ fontSize: "0.62rem", color: isOld ? "var(--cinnabar)" : "var(--ink-soft)", marginTop: "0.1rem" }}>
                         {isOld ? (isYang ? "● 老阳" : "○ 老阴") : (isYang ? "少阳" : "少阴")}
                       </div>
                     )}
@@ -322,7 +322,7 @@ export function LiuyaoPage() {
                       {isYang ? "——⚊" : "— ⚋—"}
                     </span>
                     {isDong && (
-                      <span style={{ fontSize: "0.6rem", color: "#fff", background: "var(--cinnabar)", padding: "0.05rem 0.35rem", borderRadius: 2, fontFamily: "'JetBrains Mono', monospace" }}>
+                      <span style={{ fontSize: "0.62rem", color: "#fff", background: "var(--cinnabar)", padding: "0.05rem 0.35rem", borderRadius: 2, fontFamily: "'JetBrains Mono', monospace" }}>
                         {lang === "zh" ? "动" : "Δ"}
                       </span>
                     )}
@@ -362,7 +362,7 @@ export function LiuyaoPage() {
                         {isYang ? "——⚊" : "— ⚋—"}
                       </span>
                       {isDong && (
-                        <span style={{ fontSize: "0.6rem", color: "#fff", background: "var(--cinnabar)", padding: "0.05rem 0.35rem", borderRadius: 2 }}>
+                        <span style={{ fontSize: "0.62rem", color: "#fff", background: "var(--cinnabar)", padding: "0.05rem 0.35rem", borderRadius: 2 }}>
                           {lang === "zh" ? "动" : "Δ"}
                         </span>
                       )}

@@ -52,7 +52,7 @@ function DimSeal({ label, score }: { label: string; score: number }) {
       }}>
         {Math.round(score)}
       </span>
-      <div style={{ fontSize: "0.5rem", color: "var(--ink-soft)", marginTop: "0.15rem", letterSpacing: "0.04em" }}>
+      <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", marginTop: "0.15rem", letterSpacing: "0.04em" }}>
         {label}
       </div>
     </div>
@@ -205,7 +205,7 @@ export function ReadingReportView({ result }: ReadingReportViewProps) {
                 {result.methods_used.length} 术 · {result.signals.length} 信号
               </span>
             </h1>
-            <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace" }}>
+            <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace" }}>
               {result.session_id.slice(0, 12)} · {result.elapsed_ms}ms
             </div>
           </div>
@@ -221,7 +221,7 @@ export function ReadingReportView({ result }: ReadingReportViewProps) {
               }} title={`支持 ${tallyTotalsMemo.support} 法 / 警示 ${tallyTotalsMemo.warn} 法`}>
                 {toneMeta.zh}
               </span>
-              <div style={{ fontSize: "0.52rem", color: "var(--ink-soft)", marginTop: "0.1rem" }}>基调</div>
+              <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", marginTop: "0.1rem" }}>基调</div>
             </div>
 
             {/* X 法支持 / Y 法警示(五档计票) */}
@@ -230,7 +230,7 @@ export function ReadingReportView({ result }: ReadingReportViewProps) {
               border: `1px solid ${tallyTotalsMemo.warn > 0 ? "var(--cinnabar-dim)" : "var(--verdigris)"}`,
               borderRadius: "2px",
             }}>
-              <div style={{ fontSize: "0.55rem", color: "var(--ink-soft)", letterSpacing: "0.08em" }}>五档计票</div>
+              <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", letterSpacing: "0.08em" }}>五档计票</div>
               <div style={{
                 fontSize: "0.7rem", fontWeight: 700, fontFamily: "'Noto Serif SC', serif",
                 color: "var(--ink)",
@@ -248,7 +248,7 @@ export function ReadingReportView({ result }: ReadingReportViewProps) {
                 border: `1px solid ${CONFIDENCE_COLORS[legacyConfidence] || "var(--rule)"}`,
                 borderRadius: "2px",
               }}>
-                <div style={{ fontSize: "0.55rem", color: "var(--ink-soft)", letterSpacing: "0.08em" }}>可信</div>
+                <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", letterSpacing: "0.08em" }}>可信</div>
                 <div style={{
                   fontSize: "0.7rem", fontWeight: 700, fontFamily: "'Noto Serif SC', serif",
                   color: CONFIDENCE_COLORS[legacyConfidence] || "var(--ink-soft)",
@@ -262,7 +262,7 @@ export function ReadingReportView({ result }: ReadingReportViewProps) {
             {legacyScore !== null && (
               <div className="text-center" title="旧版综合分(0-100), 仅历史报告使用">
                 <ScoreSeal score={legacyScore} />
-                <div style={{ fontSize: "0.52rem", color: "var(--ink-soft)", marginTop: "0.1rem" }}>旧分</div>
+                <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", marginTop: "0.1rem" }}>旧分</div>
               </div>
             )}
           </div>
@@ -314,7 +314,7 @@ export function ReadingReportView({ result }: ReadingReportViewProps) {
             )}
           </div>
           {!hasPremium && result.is_unlocked_standard && (
-            <span style={{ fontSize: "0.55rem", color: "var(--ink-soft)" }}>
+            <span style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>
               AI 标准报告
             </span>
           )}
@@ -333,7 +333,7 @@ export function ReadingReportView({ result }: ReadingReportViewProps) {
         </div>
         <div className="flex flex-wrap gap-1">
           {result.methods_used.map((m) => (
-            <span key={m} className="paper-tag" style={{ fontSize: "0.6rem", color: "var(--cinnabar-dim)" }}>
+            <span key={m} className="paper-tag" style={{ fontSize: "0.62rem", color: "var(--cinnabar-dim)" }}>
               {METHOD_LABELS_ZH[m] || m}
             </span>
           ))}
@@ -356,14 +356,14 @@ export function ReadingReportView({ result }: ReadingReportViewProps) {
                   {methodSummary.map(([method, s]) => (
                     <div key={method} className="flex items-center gap-2" style={{ fontSize: "0.65rem", padding: "0.15rem 0" }}>
                       <span style={{
-                        fontSize: "0.55rem", width: "0.9rem", textAlign: "center", fontWeight: 700,
+                        fontSize: "0.62rem", width: "0.9rem", textAlign: "center", fontWeight: 700,
                         color: s.polarity === "positive" ? "var(--verdigris)" : s.polarity === "negative" ? "var(--cinnabar)" : "var(--ink-soft)",
                       }}>{POLARITY_MARK[s.polarity] || "平"}</span>
                       <span className="font-semibold" style={{ color: "var(--ink)", minWidth: 65, fontFamily: "'Noto Serif SC', serif" }}>
                         {METHOD_LABELS_ZH[s.method] || s.method}
                       </span>
                       <span style={{ color: "var(--ink-soft)" }}>{s.signal_key}</span>
-                      <span className="paper-mono" style={{ fontSize: "0.52rem", color: "var(--rule)", marginLeft: "auto" }}>
+                      <span className="paper-mono" style={{ fontSize: "0.62rem", color: "var(--rule)", marginLeft: "auto" }}>
                         s{s.strength.toFixed(2)} c{s.confidence.toFixed(2)}
                       </span>
                     </div>
@@ -381,7 +381,7 @@ export function ReadingReportView({ result }: ReadingReportViewProps) {
                         <span style={{ fontSize: "0.72rem", fontWeight: 600, color: "var(--verdigris)", fontFamily: "'Noto Serif SC', serif" }}>
                           {c.theme}
                         </span>
-                        <span className="paper-mono" style={{ fontSize: "0.52rem", color: "var(--verdigris)", marginLeft: "0.5rem" }}>
+                        <span className="paper-mono" style={{ fontSize: "0.62rem", color: "var(--verdigris)", marginLeft: "0.5rem" }}>
                           {c.weight_strength}/100
                         </span>
                         <p style={{ fontSize: "0.68rem", color: "var(--ink-soft)", lineHeight: 1.7, margin: "0.15rem 0" }}>
@@ -417,7 +417,7 @@ export function ReadingReportView({ result }: ReadingReportViewProps) {
                 <div className="paper-eyebrow" style={{ marginBottom: "0.3rem" }}>全量信号日志</div>
                 <div className="paper-frame space-y-0.5 max-h-64 overflow-y-auto" style={{ background: "var(--paper-2)", padding: "0.4rem" }}>
                   {signals.map((s, i) => (
-                    <div key={i} className="paper-mono" style={{ fontSize: "0.55rem", color: "var(--ink-soft)", lineHeight: 1.6 }}>
+                    <div key={i} className="paper-mono" style={{ fontSize: "0.62rem", color: "var(--ink-soft)", lineHeight: 1.6 }}>
                       [{s.method}] {s.domain}/{s.signal_key} | {s.polarity} | s={s.strength.toFixed(2)} c={s.confidence.toFixed(2)}
                       {s.evidence && ` | "${s.evidence.slice(0, 60)}"`}
                     </div>
@@ -442,7 +442,7 @@ export function ReadingReportView({ result }: ReadingReportViewProps) {
           className="paper-btn-ghost" style={{ fontSize: "0.7rem" }}>
           导出 PDF
         </button>
-        <span className="paper-source" style={{ marginLeft: "auto", fontSize: "0.58rem" }}>
+        <span className="paper-source" style={{ marginLeft: "auto", fontSize: "0.62rem" }}>
           出生信息仅用于本次分析 · 报告仅存本地
         </span>
       </div>
@@ -452,7 +452,7 @@ export function ReadingReportView({ result }: ReadingReportViewProps) {
         <div className="paper-error">
           <div style={{ fontWeight: 600, marginBottom: "0.2rem" }}>部分术法返回错误：</div>
           {result.errors.map((e, i) => (
-            <div key={i} style={{ fontSize: "0.6rem" }}>· {METHOD_LABELS_ZH[e.method] || e.method}: {e.error}</div>
+            <div key={i} style={{ fontSize: "0.62rem" }}>· {METHOD_LABELS_ZH[e.method] || e.method}: {e.error}</div>
           ))}
         </div>
       )}

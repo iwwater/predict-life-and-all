@@ -254,7 +254,7 @@ export function GanZhiStripe({ className = "" }: { className?: string }) {
     <div className={`flex items-center gap-0.5 opacity-15 ${className}`} aria-hidden>
       {all.map((item, i) => {
         const color = WUXING_COLORS[item.element] || "var(--ink-soft)";
-        return <span key={i} style={{ fontSize: "0.52rem", color, fontFamily: "serif" }}>{"gan" in item ? (item as typeof gans[0]).gan : (item as typeof zhis[0]).zhi}</span>;
+        return <span key={i} style={{ fontSize: "0.62rem", color, fontFamily: "serif" }}>{"gan" in item ? (item as typeof gans[0]).gan : (item as typeof zhis[0]).zhi}</span>;
       })}
     </div>
   );

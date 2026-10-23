@@ -190,7 +190,7 @@ function WuxingTab() {
 function DetailBlock({ label, value }: { label: string; value: string }) {
   return (
     <div className="paper-grid-cell" style={{ padding: "0.4rem 0.6rem" }}>
-      <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.05em" }}>{label}</div>
+      <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.05em" }}>{label}</div>
       <div style={{ fontSize: "0.82rem", fontWeight: 600, color: "var(--ink)", fontFamily: "'Noto Serif SC', serif", marginTop: "0.1rem" }}>{value}</div>
     </div>
   );

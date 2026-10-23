@@ -141,7 +141,7 @@ export function DateSelect() {
                 const isTop = score >= 3; const isGood = score > 0 && score < 3; const isBad = score < 0;
                 return (
                   <button key={dayNum} type="button"
-                    className="aspect-square flex flex-col items-center justify-center text-xs transition-colors"
+                    className="day-cell aspect-square flex flex-col items-center justify-center text-xs transition-colors"
                     style={{
                       borderRadius: "4px",
                       background: isTop ? "rgba(176,58,46,0.1)" : isGood ? "rgba(90,112,88,0.06)" : isBad ? "rgba(176,58,46,0.04)" : "transparent",
@@ -149,9 +149,9 @@ export function DateSelect() {
                       color: isTop ? "var(--cinnabar)" : isGood ? "var(--verdigris)" : isBad ? "var(--ink-soft)" : "var(--ink)",
                     }}
                     title={dayInfo?._reasons?.join(", ") || ""}>
-                    <span style={{ fontSize: "0.85rem", fontWeight: 600 }}>{dayNum}</span>
+                    <span className="day-cell-num" style={{ fontSize: "0.85rem", fontWeight: 600 }}>{dayNum}</span>
                     {dayInfo?.zhi_xing && (
-                      <span style={{ fontSize: "0.52rem", color: dayInfo.is_huangdao ? "var(--verdigris)" : "var(--cinnabar)", opacity: 0.8 }}>
+                      <span className="day-cell-zhi" style={{ fontSize: "0.62rem", color: dayInfo.is_huangdao ? "var(--verdigris)" : "var(--cinnabar)", opacity: 0.8 }}>
                         {dayInfo.zhi_xing}
                       </span>
                     )}
@@ -192,7 +192,7 @@ export function DateSelect() {
                     <span style={{ fontSize: "0.72rem", color: "var(--cinnabar)", fontWeight: 600 }}>★ {d._score}分</span>
                     {d.zhi_xing && (
                       <span className="paper-tag" style={{
-                        fontSize: "0.58rem",
+                        fontSize: "0.62rem",
                         color: d.is_huangdao ? "var(--verdigris)" : "var(--cinnabar)",
                         borderColor: d.is_huangdao ? "rgba(90,112,88,0.3)" : "rgba(176,58,46,0.3)",
                       }}>{d.zhi_xing}</span>

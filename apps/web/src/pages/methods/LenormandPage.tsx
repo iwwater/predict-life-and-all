@@ -49,7 +49,7 @@ export function LenormandPage() {
         <QuestionInput value={question} onChange={setQuestion} required />
       </section>
       <MethodSubmitBar loading={loading} error={error} inBasket={inBasket} onAddToBasket={addToBasket} submitLabel={lang === "zh" ? "抽牌" : "Draw"} />
-      <p className="paper-source" style={{ fontSize: "0.6rem", textAlign: "center" }}>{t("method.notice")}</p>
+      <p className="paper-source" style={{ fontSize: "0.62rem", textAlign: "center" }}>{t("method.notice")}</p>
       <MethodSourcesPanel method="lenormand" />
     </form>
   );

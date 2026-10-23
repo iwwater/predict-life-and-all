@@ -93,13 +93,13 @@ export function QimenPage() {
                 return (
                   <div key={p.name} className="text-center p-2 rounded-sm animate-fade-in"
                     style={{ border: `1px solid var(--rule)`, background: p.name === "中" ? "var(--paper-2)" : "var(--paper)", minHeight: 70, ...getPalaceStyle(i) }}>
-                    <div style={{ fontSize: "0.55rem", color: "var(--ink-soft)" }}>{p.name}{p.name !== "中" ? ` ${p.en}` : ""}</div>
+                    <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>{p.name}{p.name !== "中" ? ` ${p.en}` : ""}</div>
                     {data ? (
                       <div style={{ fontSize: "0.65rem", color: "var(--ink)", lineHeight: 1.4 }}>
                         <div>{data.stem || ""}{data.door || ""}</div>
                         <div style={{ color: "var(--ink-soft)" }}>{data.star || ""}{data.spirit || ""}</div>
                       </div>
-                    ) : <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)" }}>—</div>}
+                    ) : <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>—</div>}
                   </div>
                 );
               })}

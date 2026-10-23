@@ -305,16 +305,16 @@ export function TarotPage() {
                           opacity: 0.7,
                           borderRadius: "2px",
                         }}>?</div>
-                        <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)", marginTop: "0.3rem", fontFamily: "'JetBrains Mono', monospace" }}>
+                        <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", marginTop: "0.3rem", fontFamily: "'JetBrains Mono', monospace" }}>
                           {card.位置 || `Card ${i + 1}`}
                         </div>
-                        <div style={{ fontSize: "0.55rem", color: "var(--cinnabar)", marginTop: "0.2rem" }}>
+                        <div style={{ fontSize: "0.62rem", color: "var(--cinnabar)", marginTop: "0.2rem" }}>
                           {lang === "zh" ? "点按翻牌" : "Tap to flip"}
                         </div>
                       </>
                     ) : (
                       <>
-                        <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)", marginBottom: "0.2rem", letterSpacing: "0.05em" }}>
+                        <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", marginBottom: "0.2rem", letterSpacing: "0.05em" }}>
                           {card.位置}
                         </div>
                         <div style={{
@@ -327,7 +327,7 @@ export function TarotPage() {
                           {card.牌 || card.名称}
                         </div>
                         <div style={{
-                          fontSize: "0.6rem",
+                          fontSize: "0.62rem",
                           color: card.方位 === "逆位" ? "var(--ink-soft)" : "var(--cinnabar)",
                           marginTop: "0.2rem",
                         }}>
@@ -383,7 +383,7 @@ export function TarotPage() {
                     border: "1px solid var(--rule)",
                     background: "var(--paper-2)",
                   }}>
-                  <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)", marginBottom: "0.2rem" }}>
+                  <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", marginBottom: "0.2rem" }}>
                     {card.位置}
                   </div>
                   <div style={{
@@ -395,7 +395,7 @@ export function TarotPage() {
                   }}>
                     {card.牌 || card.名称}
                   </div>
-                  <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)", marginTop: "0.15rem" }}>
+                  <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", marginTop: "0.15rem" }}>
                     {card.方位}
                   </div>
                   <div style={{ fontSize: "0.65rem", color: "var(--ink-soft)", marginTop: "0.3rem", lineHeight: 1.4 }}>
@@ -459,7 +459,7 @@ export function TarotPage() {
 function StatBox({ label, value, total, accent }: { label: string; value: number; total: number; accent?: boolean }) {
   return (
     <div className="p-2 rounded-sm" style={{ background: "var(--paper-2)", border: "1px solid var(--rule)" }}>
-      <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)" }}>{label}</div>
+      <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>{label}</div>
       <div style={{
         fontSize: "1.2rem",
         fontWeight: 700,
@@ -467,7 +467,7 @@ function StatBox({ label, value, total, accent }: { label: string; value: number
         fontFamily: "'JetBrains Mono', monospace",
       }}>
         {value}
-        <span style={{ fontSize: "0.6rem", color: "var(--ink-soft)" }}>/{total}</span>
+        <span style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>/{total}</span>
       </div>
       <MethodSourcesPanel method="tarot" />
     </div>

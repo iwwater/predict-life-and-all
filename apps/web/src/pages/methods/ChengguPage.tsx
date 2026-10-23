@@ -84,11 +84,11 @@ export function ChengguPage() {
                 { label: lang === "zh" ? "时" : "Hour", w: r?.weight_hour },
               ].map((item, i) => (
                 <div key={i} className="p-3 rounded-sm animate-fade-in" style={{ border: "1px solid var(--rule)", background: "var(--paper-2)", ...getStyle(i) }}>
-                  <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)" }}>{item.label}</div>
+                  <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>{item.label}</div>
                   <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--cinnabar)", fontFamily: "'Noto Serif SC', serif" }}>
                     {item.w || "—"}
                   </div>
-                  <div style={{ fontSize: "0.55rem", color: "var(--ink-soft)" }}>{lang === "zh" ? "钱" : "qian"}</div>
+                  <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>{lang === "zh" ? "钱" : "qian"}</div>
                 </div>
               ))}
             </div>

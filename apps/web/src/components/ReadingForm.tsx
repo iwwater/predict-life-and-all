@@ -149,7 +149,7 @@ function Field({ label, children, hint }: { label: string; children: React.React
     <div className="flex flex-col gap-1">
       <label className="paper-label">{label}</label>
       {children}
-      {hint && <span style={{ fontSize: "0.58rem", color: "var(--ink-soft)" }}>{hint}</span>}
+      {hint && <span style={{ fontSize: "0.72rem", color: "var(--ink-soft)" }}>{hint}</span>}
     </div>
   );
 }
@@ -331,7 +331,7 @@ export function ReadingForm({ onSubmit, loading, error }: ReadingFormProps) {
                 color: f.goal === g.value ? "var(--cinnabar)" : "var(--ink)",
                 fontFamily: "'Noto Serif SC', serif",
               }}>{g.label}</div>
-              {g.desc && <div style={{ fontSize: "0.58rem", color: "var(--ink-soft)", marginTop: "0.15rem", lineHeight: 1.3 }}>{g.desc}</div>}
+              {g.desc && <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", marginTop: "0.15rem", lineHeight: 1.3 }}>{g.desc}</div>}
             </button>
           ))}
         </div>
@@ -367,7 +367,7 @@ export function ReadingForm({ onSubmit, loading, error }: ReadingFormProps) {
             const total = f.enabledMethods.length;
             if (needing.length === 0 && total > 0) {
               return (
-                <p style={{ fontSize: "0.6rem", color: "var(--verdigris)", marginTop: "0.4rem" }}>
+                <p style={{ fontSize: "0.62rem", color: "var(--verdigris)", marginTop: "0.4rem" }}>
                   ✓ 当前启用的术法均不需要出生信息，可留空直接提交。
                 </p>
               );
@@ -375,7 +375,7 @@ export function ReadingForm({ onSubmit, loading, error }: ReadingFormProps) {
             if (notNeeding.length > 0) {
               const notLabels = notNeeding.map(id => METHOD_LABELS[id] || id).join("、");
               return (
-                <p style={{ fontSize: "0.6rem", color: "var(--ink-soft)", marginTop: "0.4rem" }}>
+                <p style={{ fontSize: "0.62rem", color: "var(--ink-soft)", marginTop: "0.4rem" }}>
                   {notLabels} 不需要出生信息；出生信息仅供 {needing.map(id => METHOD_LABELS[id] || id).join("、")} 使用。
                 </p>
               );
@@ -461,7 +461,7 @@ export function ReadingForm({ onSubmit, loading, error }: ReadingFormProps) {
                       update({ enabledMethods: next });
                     }}
                     className="paper-tag" style={{
-                      cursor: "pointer", fontSize: "0.6rem",
+                      cursor: "pointer", fontSize: "0.62rem",
                       color: f.enabledMethods.includes(m.id) ? "var(--cinnabar)" : "var(--rule)",
                       borderColor: f.enabledMethods.includes(m.id) ? "var(--cinnabar)" : "var(--rule)",
                       opacity: f.enabledMethods.includes(m.id) ? 1 : 0.5,
@@ -580,7 +580,7 @@ export function ReadingForm({ onSubmit, loading, error }: ReadingFormProps) {
           "开始综合分析"
         )}
       </button>
-      <p className="paper-source" style={{ textAlign: "center", fontSize: "0.6rem" }}>
+      <p className="paper-source" style={{ textAlign: "center", fontSize: "0.62rem" }}>
         一次输入，系统自动调用多种术法交叉验证 · 包含免责声明
       </p>
     </form>

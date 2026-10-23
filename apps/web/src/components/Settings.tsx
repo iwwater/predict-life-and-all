@@ -76,7 +76,7 @@ export function Settings() {
             {reveal ? "隐藏" : "显示"}
           </button>
         </div>
-        <div style={{ fontSize: "0.58rem", color: "var(--ink-soft)", marginTop: "0.2rem" }}>Key 只保存在浏览器本地，不会上传到本服务后端。</div>
+        <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", marginTop: "0.2rem" }}>Key 只保存在浏览器本地，不会上传到本服务后端。</div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

@@ -201,7 +201,7 @@ function MiniStat({ label, value, sub, tone }: { label: string; value: string; s
   const color = tone === "verdigris" ? "var(--verdigris)" : tone === "indigo" ? "var(--indigo)" : tone === "cinnabar" ? "var(--cinnabar)" : "var(--ink)";
   return (
     <div className="paper-grid-cell" style={{ padding: "0.5rem 0.75rem" }}>
-      <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.05em" }}>{label}</div>
+      <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.05em" }}>{label}</div>
       <div style={{ fontSize: "0.88rem", fontWeight: 700, color, fontFamily: "'Noto Serif SC', serif", marginTop: "0.15rem" }}>{value}</div>
       {sub && <div style={{ fontSize: "0.65rem", color: "var(--ink-soft)", marginTop: "0.1rem" }}>{sub}</div>}
     </div>

@@ -1152,7 +1152,7 @@
   margin-top: 2rem;
   color: #564f44;
   font-family: "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   letter-spacing: 0.24em;
 }
 
@@ -1567,16 +1567,16 @@ select.paper-input {
     padding-bottom: calc(52px + env(safe-area-inset-bottom, 0px));
   }
 
-  /* 老黄历: 横向滑动 + 可读字号 */
+  /* 老黄历: 7 列铺满屏宽, 靠放大字号而不是横向滑动换取可读性 */
   .almanac-grid {
-    grid-template-columns: repeat(7, 62px);
-    gap: 5px;
-    justify-content: start;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 3px;
   }
 
   .almanac-grid > button {
     aspect-ratio: auto;
-    height: 86px;
+    height: 76px;
+    padding: 0.2rem 0.1rem;
   }
 
   .almanac-cell-day { font-size: 0.86rem; }
@@ -1586,8 +1586,20 @@ select.paper-input {
   .almanac-cell-chong { font-size: 0.62rem; }
 }
 
+/* 移动端: 盘面上密集的 9/10px 微标签放到能读的大小
+   (盘面在 390px 屏上本来就要靠缩放读, 但 9px 属于不可读而非紧凑) */
+@media (max-width: 920px) {
+  .text-\[9px\] { font-size: 10.5px; }
+  .text-\[10px\] { font-size: 11.5px; }
+  .text-\[11px\] { font-size: 11.5px; }
+}
+
 /* 移动端: 文字型链接撑到可点范围 (≥44px), 老黄历只留 3 行信息 */
 @media (max-width: 920px) {
+  .almanac-cell-lunar {
+    white-space: nowrap;
+    overflow: hidden;
+  }
   .mystic-cta,
   .mystic-quiet-link {
     display: inline-flex;
@@ -1651,5 +1663,40 @@ select.paper-input {
     align-items: center;
     min-height: 44px;
     font-size: 0.9rem;
+  }
+}
+
+/* 移动端: 共享控件的最小点按尺寸 + 择日日历格子 (390px 下 7 列只剩 30~42px) */
+@media (max-width: 920px) {
+  .paper-frame {
+    padding: 1.1rem 0.85rem;
+  }
+
+  .paper-btn,
+  .paper-btn-ghost,
+  .paper-link {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .paper-tag {
+    min-height: 34px;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.78rem;
+  }
+
+  .day-cell {
+    aspect-ratio: auto;
+    min-height: 48px;
+  }
+
+  .day-cell-num {
+    font-size: 0.94rem;
+  }
+
+  .day-cell-zhi {
+    font-size: 0.64rem;
   }
 }

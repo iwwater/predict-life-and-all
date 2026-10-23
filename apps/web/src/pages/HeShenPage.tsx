@@ -98,12 +98,12 @@ export function HeShenPage() {
                   <span style={{ fontFamily: "'Noto Serif SC', serif", fontWeight: 600, fontSize: "0.85rem", color: "var(--ink)" }}>
                     {METHOD_NAMES_ZH[entry.method] || entry.method}
                   </span>
-                  <span style={{ fontSize: "0.6rem", color: "var(--ink-soft)", marginLeft: "0.6rem" }}>
+                  <span style={{ fontSize: "0.62rem", color: "var(--ink-soft)", marginLeft: "0.6rem" }}>
                     {entry.chart ? `${entry.chart.engine}` : (isZh ? "未计算" : "not computed")}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span style={{ fontSize: "0.6rem", color: "var(--ink-soft)" }}>
+                  <span style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>
                     {new Date(entry.addedAt).toLocaleTimeString()}
                   </span>
                   <button type="button" onClick={() => removeItem(entry.method)}
@@ -168,7 +168,7 @@ export function HeShenPage() {
                     <div key={i} className="p-2 rounded-sm" style={{ border: "1px solid var(--rule)", background: "rgba(46,125,50,0.04)" }}>
                       <div style={{ fontSize: "0.72rem", fontWeight: 600, color: "var(--ink)" }}>{c.domain}: {c.theme}</div>
                       <div style={{ fontSize: "0.65rem", color: "var(--ink-soft)" }}>{c.explanation}</div>
-                      <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)", marginTop: "0.3rem" }}>
+                      <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", marginTop: "0.3rem" }}>
                         {isZh ? "支持方法" : "Supporting"}: {c.supporting_methods?.join(", ")}
                         {c.weight_strength ? ` · ${isZh ? "权重" : "weight"}: ${(c.weight_strength * 100).toFixed(0)}%` : ""}
                       </div>
@@ -257,13 +257,13 @@ export function HeShenPage() {
 
           {/* 安全标记 */}
           {result.safety_flags?.length > 0 && (
-            <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)", textAlign: "center" }}>
+            <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", textAlign: "center" }}>
               {result.safety_flags.join(" · ")}
             </div>
           )}
 
           {/* 免责声明 */}
-          <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)", textAlign: "center", lineHeight: 1.6 }}>
+          <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)", textAlign: "center", lineHeight: 1.6 }}>
             {result.disclaimer || (isZh ? "以上为传统文化参考，不构成人生决策建议。" : "Traditional cultural reference only. Not life advice.")}
           </div>
         </div>

@@ -156,7 +156,7 @@ export function MethodSourcesPanel({ method, maxPriority = 2 }: Props) {
                   {isVerified && (
                     <span
                       style={{
-                        fontSize: "0.6rem",
+                        fontSize: "0.62rem",
                         color: "var(--verdigris)",
                         marginLeft: "0.4rem",
                         border: "1px solid var(--verdigris)",

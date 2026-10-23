@@ -67,7 +67,7 @@ export function TiebanPage() {
         </div>
       </section>
       <MethodSubmitBar loading={loading} error={error} inBasket={inBasket} onAddToBasket={addToBasket} submitLabel={lang === "zh" ? "铁板考刻" : "Cast Tie Ban"} />
-      <p className="paper-source" style={{ fontSize: "0.6rem", textAlign: "center" }}>{t("method.notice")}</p>
+      <p className="paper-source" style={{ fontSize: "0.62rem", textAlign: "center" }}>{t("method.notice")}</p>
       <MethodSourcesPanel method="tieban" />
     </form>
   );

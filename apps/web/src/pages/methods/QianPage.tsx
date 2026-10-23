@@ -174,7 +174,7 @@ export function QianPage() {
         </div>
       )}
 
-      <p className="paper-source" style={{ fontSize: "0.6rem", textAlign: "center" }}>
+      <p className="paper-source" style={{ fontSize: "0.62rem", textAlign: "center" }}>
         {isZh ? "灵签仅供传统文化参考,基础条目会在结果中标明。" : "For cultural reference only. Base catalog entries are labelled."}
       </p>
       <MethodSourcesPanel method="qian" />

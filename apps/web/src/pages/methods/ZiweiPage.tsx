@@ -181,7 +181,7 @@ export function ZiweiPage() {
                   {palaces.map((p: any, i: number) => (
                     <div key={i} className="text-center p-2 rounded-sm"
                       style={{ border: `1px solid ${p.name === r?.ming_gong ? "var(--cinnabar)" : "var(--rule)"}`, background: p.name === r?.ming_gong ? "rgba(176,58,46,0.06)" : "var(--paper-2)" }}>
-                      <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)" }}>{p.name}</div>
+                      <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>{p.name}</div>
                       <div style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--ink)", fontFamily: "'Noto Serif SC', serif" }}>{p.stars?.slice(0, 2).join(" ") || p.zhi || ""}</div>
                     </div>
                   ))}

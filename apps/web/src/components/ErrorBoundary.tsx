@@ -54,7 +54,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 </summary>
                 <pre className="paper-mono"
                   style={{
-                    marginTop: "0.5rem", fontSize: "0.6rem", padding: "0.6rem",
+                    marginTop: "0.5rem", fontSize: "0.62rem", padding: "0.6rem",
                     background: "var(--paper-2)", color: "var(--cinnabar)",
                     border: "1px solid var(--rule)", overflow: "auto", maxHeight: "10rem",
                   }}>

@@ -118,11 +118,11 @@ export function HePanPage() {
                 const v = scores[dim.key] ?? 0;
                 return (
                   <div key={dim.key} className="text-center p-3 rounded-sm animate-fade-in" style={{ border: "1px solid var(--rule)", background: "var(--paper-2)", ...getRatingStyle(i) }}>
-                    <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)" }}>{lang === "zh" ? dim.labelZh : dim.labelEn}</div>
+                    <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>{lang === "zh" ? dim.labelZh : dim.labelEn}</div>
                     <div style={{ fontSize: "1.6rem", fontWeight: 700, color: v >= 70 ? "var(--verdigris)" : v >= 40 ? "var(--ink)" : "var(--cinnabar)" }}>
                       {v}
                     </div>
-                    <div style={{ fontSize: "0.55rem", color: "var(--ink-soft)" }}>
+                    <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>
                       {v >= 85 ? (lang === "zh" ? "上等" : "A") : v >= 70 ? (lang === "zh" ? "中上" : "B") : v >= 50 ? (lang === "zh" ? "中等" : "C") : (lang === "zh" ? "待修" : "D")}
                     </div>
                   </div>
@@ -145,7 +145,7 @@ export function HePanPage() {
                   <ul style={{ fontSize: "0.7rem", color: "var(--ink)", listStyle: "none", padding: 0 }}>
                     {(r?.confirmations || []).slice(0, 5).map((c: any, i: number) => (
                       <li key={i} style={{ padding: "0.2rem 0", borderBottom: "1px solid var(--rule)", display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                        <span className="paper-tag" style={{ fontSize: "0.6rem", color: "var(--verdigris)", borderColor: "rgba(74,99,79,0.3)", padding: "0.05rem 0.35rem" }}>
+                        <span className="paper-tag" style={{ fontSize: "0.62rem", color: "var(--verdigris)", borderColor: "rgba(74,99,79,0.3)", padding: "0.05rem 0.35rem" }}>
                           {lang === "zh" ? "印证" : "OK"}
                         </span>
                         <span>{typeof c === "string" ? c : c.label || c.desc}</span>
@@ -162,7 +162,7 @@ export function HePanPage() {
                   <ul style={{ fontSize: "0.7rem", color: "var(--ink)", listStyle: "none", padding: 0 }}>
                     {(r?.conflicts || []).slice(0, 5).map((c: any, i: number) => (
                       <li key={i} style={{ padding: "0.2rem 0", borderBottom: "1px solid var(--rule)", display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                        <span className="paper-tag" style={{ fontSize: "0.6rem", color: "var(--cinnabar)", borderColor: "rgba(176,58,46,0.3)", padding: "0.05rem 0.35rem" }}>
+                        <span className="paper-tag" style={{ fontSize: "0.62rem", color: "var(--cinnabar)", borderColor: "rgba(176,58,46,0.3)", padding: "0.05rem 0.35rem" }}>
                           {lang === "zh" ? "分歧" : "Warn"}
                         </span>
                         <span>{typeof c === "string" ? c : c.label || c.desc}</span>

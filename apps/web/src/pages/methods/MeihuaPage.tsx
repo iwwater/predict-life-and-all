@@ -88,9 +88,9 @@ export function MeihuaPage() {
               <div className="grid grid-cols-3 gap-3">
                 {(r?.trigrams || []).map((t: any, i: number) => (
                   <div key={i} className="text-center p-3 rounded-sm animate-fade-in" style={{ border: "1px solid var(--rule)", background: "var(--paper-2)", ...getTrigramStyle(i) }}>
-                    <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)" }}>{t.role || ["主卦", "互卦", "变卦"][i]}</div>
+                    <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>{t.role || ["主卦", "互卦", "变卦"][i]}</div>
                     <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--ink)", fontFamily: "'Noto Serif SC', serif" }}>{t.name || t.hexagram || ""}</div>
-                    <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)" }}>{t.upper_trigram || ""} / {t.lower_trigram || ""}</div>
+                    <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>{t.upper_trigram || ""} / {t.lower_trigram || ""}</div>
                   </div>
                 ))}
               </div>

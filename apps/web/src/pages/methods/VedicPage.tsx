@@ -103,7 +103,7 @@ export function VedicPage() {
                   <div key={i} className="p-2 rounded-sm animate-fade-in" style={{ border: "1px solid var(--rule)", background: "var(--paper-2)", fontSize: "0.7rem", ...getPlanetStyle(i) }}>
                     <span style={{ fontWeight: 600, color: "var(--ink)" }}>{p.name || p.planet}</span>
                     <span style={{ color: "var(--ink-soft)", marginLeft: "0.4rem" }}>{p.sign || p.rashi || ""}</span>
-                    {p.nakshatra && <div style={{ fontSize: "0.6rem", color: "var(--ink-soft)" }}>{p.nakshatra} pada {p.pada}</div>}
+                    {p.nakshatra && <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>{p.nakshatra} pada {p.pada}</div>}
                   </div>
                 ))}
               </div>
@@ -120,7 +120,7 @@ export function VedicPage() {
               </h2>
               <div className="grid grid-cols-3 sm:grid-cols-9 gap-1">
                 {nakshatras.slice(0, 27).map((n: any, i: number) => (
-                  <div key={i} className="text-center p-1 rounded-sm" style={{ border: "1px solid var(--rule)", fontSize: "0.55rem", color: n.name === r?.moon_nakshatra ? "var(--cinnabar)" : "var(--ink-soft)" }}>
+                  <div key={i} className="text-center p-1 rounded-sm" style={{ border: "1px solid var(--rule)", fontSize: "0.62rem", color: n.name === r?.moon_nakshatra ? "var(--cinnabar)" : "var(--ink-soft)" }}>
                     {n.name || n.nakshatra}
                   </div>
                 ))}
