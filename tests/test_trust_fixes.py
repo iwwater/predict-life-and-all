@@ -107,19 +107,23 @@ class TestAgreementMatrix:
         cv1, cv2 = r1["cross_validation"], r2["cross_validation"]
         # 同输入必须同输出（hash 版跨进程会漂移，这里锁同进程确定性）
         assert cv1["agreement_matrix"] == cv2["agreement_matrix"]
-        # 值必须来自真实最旺五行：bazi 火 / bazi_v2 水（英文键归一到中文）
-        assert cv1["domain_checks"]["elements"] == {"火": 1, "水": 1}
+        # 五行票必须来自真实最旺五行：bazi 火 / bazi_v2 水（英文键已归一到中文）
+        assert cv1["element_votes"] == {"火": 1, "水": 1}
         # 互不相同 → 各自与其余可比法的一致率为 0（真实数据，而非编造的 0.7x）
         assert cv1["agreement_matrix"]["bazi"] == 0.0
         assert cv1["agreement_matrix"]["bazi_v2"] == 0.0
 
     def test_unmappable_element_reported_as_none(self):
-        """western 的"风"在五行里无对应 → 不参与共识，记 None 而不是编造。"""
+        """western 的"风"在五行里无对应 → 不参与五行共识，记 None 而不是编造。"""
         r = compute_with_validation(["bazi", "western"], BIRTH)
         cv = r["cross_validation"]
         assert cv["agreement_matrix"]["western"] is None
         assert cv["agreement_matrix"]["bazi"] is None  # 只剩 1 个可比法
-        assert cv["ensemble_score"] == 0.0
+        assert len(cv["element_votes"]) == 1, "西方四元素不投五行票"
+        # 五行层面无法互证，但域级交叉校验(交叉校验器)仍会给出独立的一致度，
+        # 因此 ensemble_score 不再是 0 —— 它衡量的是域级结论是否互相印证。
+        assert 0 <= cv["ensemble_score"] <= 100
+        assert cv["domain_checks"], "域级校验应该照常产出"
 
     def test_engine_failure_does_not_crash(self, monkeypatch):
         from divination import router as router_mod

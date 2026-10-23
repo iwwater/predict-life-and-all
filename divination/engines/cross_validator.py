@@ -87,91 +87,208 @@ def _safe_get(d: dict, *keys, default=None):
     return d if d != {} else default
 
 
+# 引擎内部用英文五行键 (wood/fire/earth/metal/water), 交叉验证用中文五行。
+ELEMENT_EN2ZH = {"wood": "木", "fire": "火", "earth": "土", "metal": "金", "water": "水"}
+
+# 天干 → 五行 (日主取五行用)
+_GAN_WUXING = {
+    "甲": "木", "乙": "木", "丙": "火", "丁": "火", "戊": "土",
+    "己": "土", "庚": "金", "辛": "金", "壬": "水", "癸": "水",
+}
+
+
+def _as_zh_elements(elements) -> dict:
+    """把 elements 字典的键统一成中文五行, 丢掉无法映射的键。
+
+    bazi_v2 的 elements_total / elements_visible 是英文字典,
+    bazi(v1) 与部分归一化结果已经是中文键; 两种都收。
+    """
+    if not isinstance(elements, dict):
+        return {}
+    out: dict = {}
+    for key, value in elements.items():
+        if not isinstance(value, (int, float)):
+            continue
+        zh = ELEMENT_EN2ZH.get(str(key).lower(), key if key in WUXING else None)
+        if zh:
+            out[zh] = out.get(zh, 0.0) + float(value)
+    return out
+
+
+def _pillar_text(pillar) -> str:
+    """pillars 的每一柱可能是 "辛亥" 字符串, 也可能是 {ganzhi/stem/branch...} 字典。"""
+    if isinstance(pillar, str):
+        return pillar
+    if isinstance(pillar, dict):
+        for key in ("ganzhi", "pillar", "text", "value"):
+            value = pillar.get(key)
+            if isinstance(value, str) and len(value) >= 2:
+                return value
+        gan = pillar.get("gan") or pillar.get("heavenly_stem") or ""
+        zhi = pillar.get("zhi") or pillar.get("earthly_branch") or ""
+        if gan and zhi:
+            return f"{gan}{zhi}"
+    return ""
+
+
+def _strip_suffix(name: str, *suffixes: str) -> str:
+    for suffix in suffixes:
+        if name.endswith(suffix):
+            return name[: -len(suffix)]
+    return name
+
+
 # ── Feature Extraction ──────────────────────────────────────────────────────
 
 def extract_bazi_features(raw: dict) -> dict:
-    """Extract standardized features from Bazi/Bazi_v2 chart."""
-    feats = {}
-    feats["day_master"] = raw.get("day_master", "")
-    feats["day_master_element"] = raw.get("day_master", "")[0] if raw.get("day_master") else ""
+    """Extract standardized features from Bazi/Bazi_v2 chart.
 
-    elements = raw.get("elements", {})
+    同时兼容两代引擎的 raw 结构:
+      - v1 只有 pillars/day_master/horoscope, 没有 elements/pattern;
+      - v2 的五行是 elements_total / elements_visible (英文键), 用神在
+        yong_shen.primary_zh, 格局是 pattern.pattern 字符串。
+    """
+    feats = {}
+    day_master = raw.get("day_master", "") or ""
+    feats["day_master"] = day_master
+    # day_master 可能只是天干 "辛", 也可能带五行 "辛金"
+    feats["day_master_element"] = (
+        _GAN_WUXING.get(day_master[:1], "")
+        or next((c for c in day_master if c in WUXING), "")
+    )
+
+    elements = _as_zh_elements(
+        raw.get("elements")
+        or raw.get("elements_total")
+        or raw.get("elements_visible")
+        or {}
+    )
     feats["dominant_element"] = max(elements, key=elements.get) if elements else ""
     feats["weak_element"] = min(elements, key=elements.get) if elements else ""
     feats["element_balance"] = elements
 
-    feats["strength_score"] = raw.get("strength_score", 50)
+    strength = raw.get("strength_score")
+    feats["strength_score"] = strength if isinstance(strength, (int, float)) else 50
 
     pattern = raw.get("pattern", {})
-    feats["pattern"] = pattern.get("pattern", "")
-    feats["pattern_category"] = pattern.get("category", "")
+    if isinstance(pattern, str):
+        feats["pattern"] = pattern
+        feats["pattern_category"] = ""
+    else:
+        feats["pattern"] = pattern.get("pattern", "")
+        feats["pattern_category"] = pattern.get("category", "")
 
     yong_shen = raw.get("yong_shen", {})
-    feats["yong_shen"] = yong_shen.get("yong_shen", "")
-    feats["yong_shen_level"] = yong_shen.get("level", "中等")
-    feats["yong_shen_score"] = raw.get("yong_shen_quality", {}).get("score", 50)
+    primary_zh = yong_shen.get("primary_zh") if isinstance(yong_shen, dict) else None
+    if isinstance(primary_zh, (list, tuple)):
+        feats["yong_shen"] = "、".join(str(x) for x in primary_zh)
+    elif isinstance(yong_shen, dict):
+        feats["yong_shen"] = yong_shen.get("yong_shen", "")
+    else:
+        feats["yong_shen"] = str(yong_shen or "")
+    feats["yong_shen_level"] = (
+        yong_shen.get("level", "中等") if isinstance(yong_shen, dict) else "中等"
+    )
+    quality = raw.get("yong_shen_quality")
+    feats["yong_shen_score"] = (
+        quality.get("score", 50) if isinstance(quality, dict) else 50
+    )
 
     shensha = raw.get("shensha", {})
-    stars = shensha.get("stars", [])
+    stars = shensha.get("stars", []) if isinstance(shensha, dict) else []
     if isinstance(stars, list):
         feats["benefic_stars"] = [s.get("star", "") for s in stars
                                   if isinstance(s, dict) and s.get("category") == "吉"]
         feats["malefic_stars"] = [s.get("star", "") for s in stars
                                   if isinstance(s, dict) and s.get("category") == "凶"]
-    else:
+    elif isinstance(stars, dict):
         feats["benefic_stars"] = [k for k, v in stars.items()
                                   if isinstance(v, dict) and v.get("category") == "吉"]
         feats["malefic_stars"] = [k for k, v in stars.items()
                                   if isinstance(v, dict) and v.get("category") == "凶"]
-    feats["notable_stars"] = shensha.get("summary", {}).get("notable", [])
+    else:
+        feats["benefic_stars"] = []
+        feats["malefic_stars"] = []
+    summary = shensha.get("summary", {}) if isinstance(shensha, dict) else {}
+    feats["notable_stars"] = summary.get("notable", []) if isinstance(summary, dict) else []
 
     flow = raw.get("element_flow", {})
-    feats["flow_balance"] = flow.get("balance_score", 50)
-    feats["flow_interpretation"] = flow.get("interpretation", "")
+    if isinstance(flow, dict):
+        feats["flow_balance"] = flow.get("balance_score", 50)
+        feats["flow_interpretation"] = flow.get("interpretation", "")
+    else:
+        feats["flow_balance"] = 50
+        feats["flow_interpretation"] = ""
 
     # Career indicators
     feats["career_elements"] = _detect_dominant(elements, threshold=0.15)
     feats["wealth_elements"] = _detect_dominant(elements, threshold=0.15)
 
-    # Relationship indicators
+    # Relationship indicators: 日支即配偶宫
     pillars = raw.get("pillars", {})
-    feats["spouse_palace"] = pillars.get("day", "")[1] if pillars.get("day") else ""
+    day_pillar = _pillar_text(pillars.get("day")) if isinstance(pillars, dict) else ""
+    feats["spouse_palace"] = day_pillar[1] if len(day_pillar) >= 2 else ""
+    feats["pillars_text"] = (
+        {k: _pillar_text(v) for k, v in pillars.items()} if isinstance(pillars, dict) else {}
+    )
 
     return feats
 
 
 def extract_ziwei_features(raw: dict) -> dict:
-    """Extract standardized features from Ziwei chart."""
+    """Extract standardized features from Ziwei chart.
+
+    紫微引擎的宫名是 "命宫/官禄/财帛/夫妻" (不带"宫"字后缀, 命宫除外),
+    这里统一按去掉后缀的名字查表; 五行局在 five_elements (如 "土五局")。
+    """
     feats = {}
 
     palaces = raw.get("palaces", [])
     palace_map = {}
     for p in palaces:
-        name = p.get("name", "")
+        if not isinstance(p, dict):
+            continue
+        name = str(p.get("name", ""))
         palace_map[name] = p
-        major = p.get("major_stars", [])
-        minor = p.get("minor_stars", [])
-        feats[f"palace_{name}_stars"] = major + minor
+        palace_map.setdefault(_strip_suffix(name, "宫"), p)
+        major = p.get("major_stars", []) or []
+        minor = p.get("minor_stars", []) or []
+        feats[f"palace_{name}_stars"] = list(major) + list(minor)
+
+    def _palace(*names):
+        for n in names:
+            if n in palace_map:
+                return palace_map[n]
+        return {}
+
+    def _major(p):
+        stars = p.get("major_stars", []) if isinstance(p, dict) else []
+        return list(stars or [])
 
     # Ming palace analysis
-    ming = palace_map.get("命宫", {})
-    feats["ming_stars"] = ming.get("major_stars", [])
-    feats["ming_element"] = ming.get("element", "")
+    ming = _palace("命宫", "命")
+    feats["ming_stars"] = _major(ming)
+    five_elements = raw.get("five_elements", "") or raw.get("five_elements_class", "")
+    feats["ming_element"] = (
+        next((c for c in str(five_elements) if c in WUXING), "")
+        if five_elements else ""
+    )
 
     # Career palace
-    guanlu = palace_map.get("官禄宫", {})
-    feats["career_stars"] = guanlu.get("major_stars", [])
+    feats["career_stars"] = _major(_palace("官禄宫", "官禄"))
 
     # Wealth palace
-    caibo = palace_map.get("财帛宫", {})
-    feats["wealth_stars"] = caibo.get("major_stars", [])
+    feats["wealth_stars"] = _major(_palace("财帛宫", "财帛"))
 
     # Spouse palace
-    fuqi = palace_map.get("夫妻宫", {})
-    feats["spouse_stars"] = fuqi.get("major_stars", [])
+    feats["spouse_stars"] = _major(_palace("夫妻宫", "夫妻"))
 
-    # Four transformations
-    feats["sihua"] = raw.get("sihua", {})
+    # Four transformations (v2 raw: four_transformations / four_transformations_enriched)
+    feats["sihua"] = (
+        raw.get("sihua")
+        or raw.get("four_transformations")
+        or {}
+    )
 
     # Body/Ming lord
     feats["soul"] = raw.get("soul", "")
@@ -181,44 +298,71 @@ def extract_ziwei_features(raw: dict) -> dict:
 
 
 def extract_western_features(raw: dict) -> dict:
-    """Extract standardized features from Western astrology chart."""
+    """Extract standardized features from Western astrology chart.
+
+    西方引擎的 planets 每项已带 element (风/火/土/水), sign 形如 "双子" (无"座"),
+    aspects 的 aspect 是 "刑相/冲相/合相/拱相/六合相"。
+    """
     feats = {}
 
     planets = raw.get("planets", {})
+    if not isinstance(planets, dict):
+        planets = {}
     feats["sun_sign"] = _safe_get(planets, "太阳", "sign", default="")
     feats["moon_sign"] = _safe_get(planets, "月亮", "sign", default="")
-    feats["ascendant"] = raw.get("ascendant", {}).get("sign", "")
+    ascendant = raw.get("ascendant")
+    if isinstance(ascendant, dict):
+        feats["ascendant"] = ascendant.get("sign", "")
+    else:
+        feats["ascendant"] = str(ascendant or "")
 
     # Element distribution in Western (fire/earth/air/water)
-    sign_elements = {}
+    sign_elements: dict = {}
     for planet, data in planets.items():
-        if isinstance(data, dict):
-            sign = data.get("sign", "")
-            element = _western_sign_element(sign)
-            sign_elements[element] = sign_elements.get(element, 0) + _planet_weight(planet)
+        if not isinstance(data, dict):
+            continue
+        element = data.get("element") or _western_sign_element(str(data.get("sign", "")))
+        if not element:
+            continue
+        sign_elements[element] = sign_elements.get(element, 0.0) + _planet_weight(planet)
 
     feats["western_elements"] = sign_elements
-    feats["dominant_western_element"] = max(sign_elements, key=sign_elements.get) if sign_elements else ""
+    feats["dominant_western_element"] = (
+        max(sign_elements, key=sign_elements.get) if sign_elements else ""
+    )
 
-    # Aspects
+    def _aspect_name(item) -> str:
+        name = str(item.get("aspect", ""))
+        return name[:-1] if name.endswith("相") else name
+
     aspects = raw.get("aspects", [])
-    feats["major_aspects"] = [a for a in aspects
-                              if isinstance(a, dict) and a.get("aspect") in
-                              ("合", "冲", "刑", "拱", "六合")]
-    feats["hard_aspects"] = len([a for a in aspects
-                                  if isinstance(a, dict) and a.get("aspect") in ("冲", "刑")])
-    feats["soft_aspects"] = len([a for a in aspects
-                                  if isinstance(a, dict) and a.get("aspect") in ("合", "拱", "六合")])
+    if not isinstance(aspects, list):
+        aspects = []
+    normalised = [
+        {"a": a.get("a"), "b": a.get("b"), "aspect": _aspect_name(a),
+         "orb": a.get("orb"), "angle": a.get("angle")}
+        for a in aspects if isinstance(a, dict)
+    ]
+    # 中文占星术语: 冲=对分(180°)、刑=四分(90°)、三合=三分(120°)、六合=六分(60°)
+    # 部分引擎输出带"相"后缀(已由 _aspect_name 去掉), 这里三套写法都认
+    hard_names = {"冲", "对分", "刑", "四分"}
+    soft_names = {"合", "拱", "三合", "三分", "六合", "六分", "半合"}
+    feats["major_aspects"] = [
+        a for a in normalised if a["aspect"] in (hard_names | soft_names)
+    ]
+    feats["hard_aspects"] = len([a for a in normalised if a["aspect"] in hard_names])
+    feats["soft_aspects"] = len([a for a in normalised if a["aspect"] in soft_names])
 
     return feats
 
 
 def _western_sign_element(sign: str) -> str:
-    """Map Western zodiac sign to element."""
-    fire = {"白羊座", "狮子座", "射手座"}
-    earth = {"金牛座", "处女座", "摩羯座"}
-    air = {"双子座", "天秤座", "水瓶座"}
-    water = {"巨蟹座", "天蝎座", "双鱼座"}
+    """Map Western zodiac sign to element (接受 "双子" 与 "双子座" 两种写法)."""
+    sign = _strip_suffix(str(sign or ""), "座")
+    fire = {"白羊", "狮子", "射手"}
+    earth = {"金牛", "处女", "摩羯"}
+    air = {"双子", "天秤", "水瓶"}
+    water = {"巨蟹", "天蝎", "双鱼"}
     if sign in fire: return "火"
     if sign in earth: return "土"
     if sign in air: return "风"

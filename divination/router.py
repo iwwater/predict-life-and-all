@@ -136,23 +136,36 @@ _WUXING = ("金", "木", "水", "火", "土")
 
 
 def _dominant_wuxing(chart: ChartResult | None) -> str | None:
-    """取单盘 normalized.elements 最旺五行（统一到中文五行；取不到或不可比返回 None）。"""
+    """取单盘最旺五行（统一到中文五行；取不到或不可比返回 None）。
+
+    bazi 系在 normalized.elements；紫微没有元素分布, 但 raw.five_elements 是五行局
+    （"土五局"），这是一个真实可比的五行信号, 用它兜底。
+    """
     if chart is None:
         return None
     els = chart.normalized.get("elements") or {}
-    if not isinstance(els, dict) or not els:
-        return None
-    top = max(els, key=els.get)
-    zh = _ELEMENT_EN2ZH.get(top, top)
-    return zh if zh in _WUXING else None
+    if isinstance(els, dict) and els:
+        top = max(els, key=els.get)
+        zh = _ELEMENT_EN2ZH.get(top, top)
+        # 最旺项本身必须是五行之一才承认（西方四元素里的"风"不属于五行）
+        if zh in _WUXING:
+            return zh
+    five_elements = chart.raw.get("five_elements")
+    if isinstance(five_elements, str):
+        zh = next((c for c in five_elements if c in _WUXING), None)
+        if zh:
+            return zh
+    return None
 
 
 def compute_with_validation(methods: list[str], birth: Birth, subject: str = "self_life", do_validate: bool = True):
     """Compute multiple charts with optional cross-system validation.
 
-    agreement_matrix 基于各盘真实的最旺五行：某法与其余「有可比五行数据的法」
-    中最旺五行相同的比例；没有可比数据的法记 None，不伪造数值。
-    引擎计算失败时该法 chart 为 None，跳过而不是崩溃。
+    ensemble_score 是 0-100 的"多系统支持度"(前端进度条与百分数直接消费):
+      有 ≥2 个盘时取 cross_validator 的置信度加权总分;
+      不足 2 个盘时不制造高分, 直接 0 并在 overall_assessment 里说明原因。
+    agreement_matrix 仍是逐法的"最旺五行与其余可比法一致的比例", 没有可比数据的法记 None。
+    引擎计算失败时该法 chart 为 None, 跳过而不是崩溃。
     """
     charts = compute_all(methods, birth)
     result: dict = {"charts": charts}
@@ -177,18 +190,66 @@ def compute_with_validation(methods: list[str], birth: Birth, subject: str = "se
                 )
 
         ok = sum(1 for c in charts.values() if c is not None)
-        if n >= 2:
-            assessment = f"跨{n}法五行共识 {consensus_strength:.0%}（{ok}/{len(methods)} 法计算成功）"
-        elif n == 1:
-            assessment = f"仅1法有可比五行数据，无法交叉验证（{ok}/{len(methods)} 法计算成功）"
-        else:
-            assessment = f"无可比较的五行数据（{ok}/{len(methods)} 法计算成功）"
+        valid_charts = [c for c in charts.values() if c is not None]
+
+        ensemble_score = 0
+        domain_checks: dict = {}
+        cross_checks: list = []
+        recommendations: list = []
+        element_note = (
+            f"跨{n}法五行共识 {consensus_strength:.0%}"
+            if n >= 2
+            else ("仅1法有可比五行数据" if n == 1 else "无可比较的五行数据")
+        )
+        assessment = f"{element_note}（{ok}/{len(methods)} 法计算成功）"
+
+        # 真正的多系统交叉验证: 逐域(本命/事业/财富/感情/健康/时机)比对两两系统是否一致
+        if len(valid_charts) >= 2:
+            try:
+                from .engines.cross_validator import compute_ensemble
+
+                ensemble = compute_ensemble(valid_charts, subject)
+            except Exception as exc:  # 交叉验证是增强项, 失败不能连累主流程
+                logger.warning("compute_with_validation: 交叉验证失败: %s", exc)
+                ensemble = None
+            if ensemble is not None:
+                ensemble_score = round(float(ensemble.overall_confidence))
+                domain_checks = {
+                    domain: {
+                        "confidence": round(float(info.get("avg_confidence", 0)), 1),
+                        "agreement": round(float(info.get("agreement_ratio", 0)), 2),
+                        "checks": int(info.get("total_count", 0)),
+                    }
+                    for domain, info in (ensemble.domains or {}).items()
+                }
+                cross_checks = [
+                    {
+                        "domain": c.domain,
+                        "systems": list(c.systems_checked),
+                        "agree": bool(c.agree),
+                        "confidence": round(float(c.confidence), 1),
+                        "detail": c.detail,
+                    }
+                    for c in ensemble.cross_checks
+                ]
+                recommendations = list(ensemble.recommendations or [])
+                agree_count = sum(1 for c in ensemble.cross_checks if c.agree)
+                assessment = (
+                    f"{len(valid_charts)} 系统交叉验证一致度 {ensemble_score}%"
+                    f"（{len(cross_checks)} 项域级校验, {agree_count} 项结论一致）；"
+                    f"五行层面: {element_note}（{ok}/{len(methods)} 法计算成功）"
+                )
+
         result["cross_validation"] = {
-            "ensemble_score": round(consensus_strength, 2),
-            "confidence": round(0.5 + 0.5 * consensus_strength, 2) if n >= 2 else 0.0,
+            "ensemble_score": ensemble_score,
+            "confidence": round(ensemble_score / 100, 2),
             "agreement_matrix": agreement_matrix,
-            "domain_checks": {"elements": dict(element_votes)},
-            "cross_checks": [],
+            "domain_checks": domain_checks,
+            "cross_checks": cross_checks,
+            "recommendations": recommendations,
+            "element_votes": dict(element_votes),
+            "systems_checked": [c.method for c in valid_charts],
+            "chart_count": ok,
             "overall_assessment": assessment,
         }
 

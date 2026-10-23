@@ -102,9 +102,12 @@ export function Home() {
           </h1>
           <p className="mystic-latin-line">Nineteen arts of East &amp; West, computed not guessed.</p>
           <div className="mystic-cta-row">
-            <Link className="mystic-cta" to="/m/tieban">
+            <Link className="mystic-cta" to="/m/bazi">
               <span />
               起盘
+            </Link>
+            <Link className="mystic-quiet-link" to="/reading">
+              直接问一句
             </Link>
             <a className="mystic-quiet-link" href="#arts">
               浏览术数

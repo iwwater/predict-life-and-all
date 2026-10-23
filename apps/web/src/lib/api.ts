@@ -11,9 +11,19 @@ export interface CrossValidationResult {
   ensemble_score?: number;
   confidence?: number;
   agreement_matrix?: Record<string, number>;
-  domain_checks?: Record<string, any>;
-  cross_checks?: any[];
+  domain_checks?: Record<string, { confidence?: number; agreement?: number; checks?: number }>;
+  cross_checks?: Array<{
+    domain?: string;
+    systems?: string[];
+    agree?: boolean;
+    confidence?: number;
+    detail?: string;
+    evidence?: Record<string, unknown>;
+  }>;
   overall_assessment?: string;
+  recommendations?: Array<string | { level?: string; text?: string; action?: string }>;
+  element_votes?: Record<string, number>;
+  systems_checked?: string[];
 }
 
 export interface PeachBlossomResult {
