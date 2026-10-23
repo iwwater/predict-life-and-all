@@ -36,14 +36,20 @@ export function BazhaiPage() {
     birthStore.setBirth({ year, month, day, hour, minute, gender });
     try {
       const birth: Birth = { year, month, day, hour, minute, gender, calendar: "gregorian", lat: b.lat, lng: b.lng, tz: b.tz };
-      const result = await computeChart({ method: "bazhai", birth, options: { mode: "home_fengshui", sitting: sittingDir, construction_year: constructionYear } });
+      const result = await computeChart({ method: "bazhai", birth, options: { mode: "residential_bazhai", sitting: sittingDir, construction_year: constructionYear } });
       setChart(result);
     } catch (err: any) { setError(String(err?.message || err)); }
     finally { setLoading(false); }
   }, [year, month, day, hour, minute, gender, sittingDir, constructionYear, b, birthStore]);
 
-  const r = chart?.raw;
-  const directions = r?.directions || [];
+  const r = (chart?.raw || {}) as Record<string, any>;
+  // 引擎 raw 中文键: 命卦/命('东四命')/八方{宫:{游年,吉凶}}/吉方/凶方; 宫键繁体(兌/離)
+  const TRAD: Record<string, string> = { 兑: "兌", 离: "離" };
+  const pick = (d: Record<string, any> | undefined, name: string) => (d && (d[name] ?? d[TRAD[name] ?? name])) || undefined;
+  const bafang = r["八方"] || {};
+  const GUA_DIR: Record<string, string> = {
+    坎: "北", 艮: "东北", 震: "东", 巽: "东南", 离: "南", 坤: "西南", 兑: "西", 乾: "西北",
+  };
 
   return (
     <div className="space-y-6">
@@ -90,23 +96,32 @@ export function BazhaiPage() {
           <section className="paper-frame">
             <div className="flex items-center justify-between mb-3">
               <h2 style={{ fontFamily: "'Noto Serif SC', serif", fontWeight: 600, color: "var(--cinnabar)" }}>
-                {lang === "zh" ? "命卦" : "Life Gua"}: {r?.life_gua || "—"}
+                {lang === "zh" ? "命卦" : "Life Gua"}: {r["命卦"] || "—"}
               </h2>
-              <span className="paper-tag">{r?.east_west || ""}</span>
+              <span className="paper-tag">{r["命"] || ""}</span>
             </div>
-            {directions.length > 0 ? (
+            {Object.keys(bafang).length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {directions.map((d: any, i: number) => (
-                  <div key={i} className="p-2 rounded-sm"
-                    style={{ border: `1px solid ${d.auspicious ? "var(--verdigris)" : "var(--cinnabar)"}`, background: d.auspicious ? "rgba(46,125,50,0.06)" : "rgba(176,58,46,0.06)", fontSize: "0.75rem" }}>
-                    <div style={{ fontWeight: 600, color: "var(--ink)" }}>{d.direction || d.name}</div>
-                    <div style={{ fontSize: "0.65rem", color: "var(--ink-soft)" }}>{d.star || d.wu_xing || d.label}</div>
-                  </div>
-                ))}
+                {Object.keys(GUA_DIR).map((gua) => {
+                  const cell = pick(bafang, gua) as { 游年: string; 吉凶: string } | undefined;
+                  const good = cell?.["吉凶"] === "吉";
+                  return (
+                    <div key={gua} className="p-2 rounded-sm"
+                      style={{ border: `1px solid ${good ? "var(--verdigris)" : "var(--cinnabar)"}`, background: good ? "rgba(46,125,50,0.06)" : "rgba(176,58,46,0.06)", fontSize: "0.75rem" }}>
+                      <div style={{ fontWeight: 600, color: "var(--ink)" }}>{GUA_DIR[gua]} · {gua}</div>
+                      <div style={{ fontSize: "0.7rem", color: good ? "var(--verdigris)" : "var(--cinnabar)" }}>{cell?.["游年"] || "—"}</div>
+                    </div>
+                  );
+                })}
               </div>
             ) : (
-              <div className="paper-empty">{lang === "zh" ? "方位数据载入中…" : "Loading directions…"}</div>
+              <div className="paper-empty">{lang === "zh" ? "方位数据为空。" : "No direction data."}</div>
             )}
+            <div style={{ fontSize: "0.72rem", color: "var(--ink-soft)", marginTop: "0.6rem" }}>
+              {lang === "zh"
+                ? `本命吉方：${(Array.isArray(r["吉方"]) ? r["吉方"] : []).join(" ") || "—"} · 凶方：${(Array.isArray(r["凶方"]) ? r["凶方"] : []).join(" ") || "—"}`
+                : ""}
+            </div>
           </section>
           <ChartFooter method="fengshui" recastLabel="重新排盘" chart={chart} inBasket={inBasket}
             onBasket={() => basketAdd({ method: "bazhai", chart, birth: { year, month, day, hour, minute, gender, calendar: "gregorian", lat: b.lat, lng: b.lng, tz: b.tz }, addedAt: Date.now() })}

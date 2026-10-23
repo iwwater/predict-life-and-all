@@ -68,10 +68,25 @@ function buildPromptFromCharts(charts: ChartResult[], question: string, enhanced
       if (refs.length) parts.push(`古籍:${refs.map((rf: any) => rf.source).join("; ")}`);
       return parts.join("\n");
     }
-    if (m === "qimen") return `【奇门遁甲】${r.dun}${r.yuan}${r.ju}局 节气:${r.solar_term} 旬首:${r.xun_shou} 值符:${r.zhifu?.star}落${r.zhifu?.star_gong}`;
-    if (m === "liuyao") return `【六爻】本卦:${r.ben_gua} 变卦:${r.bian_gua} 用神:${r.using_god} 依据:${r.using_god_basis}`;
-    if (m === "meihua") return `【梅花】主:${r.zhu_gua}/互:${r.hu_gua}/变:${r.bian_gua} 体:${r.ti_gua}用:${r.yong_gua}`;
-    if (m === "tarot") return `【塔罗·${r.spread_name||r.spread}】${(r.cards||[]).map((c:any)=>`${c.position}:${c.name}(${c.orient}) ${c.keywords||""}`).join("; ")}`;
+    if (m === "qimen") {
+      const zfzs = (r as any)["值符值使"] || {};
+      const zf = Array.isArray(zfzs["值符星宮"]) ? `天${zfzs["值符星宮"][0]}星落${zfzs["值符星宮"][1]}宫` : "";
+      const zs = Array.isArray(zfzs["值使門宮"]) ? `${zfzs["值使門宮"][0]}门落${zfzs["值使門宮"][1]}宫` : "";
+      return `【奇门遁甲】${(r as any)["排局"] || ""} 干支:${(r as any)["干支"] || ""} 节气:${(r as any)["节气"] || ""} 旬首:${(r as any)["旬首"] || ""} 值符:${zf} 值使:${zs}`.replace(/\s+/g, " ");
+    }
+    if (m === "liuyao") {
+      const rr = r as any;
+      return `【六爻】本卦:${rr["本卦"]?.name || ""} 变卦:${rr["变卦"]?.name || "无"} 动爻:${(rr["动爻"] || []).join("、") || "无"} 世:${rr["世"]} 应:${rr["应"]} 日干:${rr["日干"] || ""}`;
+    }
+    if (m === "meihua") {
+      const rr = r as any; const df = rr["断法"] || {};
+      return `【梅花】主:${rr["主卦"]?.name || ""}/互:${rr["互卦"]?.name || ""}/变:${rr["变卦"]?.name || ""} 体:${df["体卦"] || ""}用:${df["用卦"] || ""} 总断:${df["总断"] || ""} ${df["断语"] || ""}`;
+    }
+    if (m === "tarot") {
+      const rr = r as any;
+      const cards = (rr["牌面"] || []).map((c: any) => `${c["位置"] || ""}:${c["牌"] || ""}(${c["方位"] || ""})`).join("; ");
+      return `【塔罗·${rr["牌阵名称"] || rr["牌阵"] || ""}】${cards} 牌组:${rr["牌组分析"]?.大牌数 || 0}大牌/${rr["牌组分析"]?.逆位数 || 0}逆位`;
+    }
     return `【${m}】${JSON.stringify(r).slice(0, 400)}`;
   };
   const today = new Date();

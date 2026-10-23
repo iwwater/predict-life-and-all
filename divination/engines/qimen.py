@@ -492,7 +492,15 @@ def compute(b: Birth, method: int = 1, pan_type: str = "hour",
     def expand(d, table):
         return {gong: table.get(v, v) for gong, v in d.items()}
 
-    pj = p["排局"]
+    _TRAD2SIM = {
+        "陽": "阳", "陰": "阴", "滿": "满", "種": "种", "驚": "惊",
+        "蟄": "蛰", "處": "处", "穀": "谷", "補": "补", "時": "时",
+    }
+
+    def _simp(s):
+        return "".join(_TRAD2SIM.get(c, c) for c in str(s))
+
+    pj = _simp(p["排局"])
     if pj.endswith("上"):
         pj = pj[:-1] + "上元"
     elif pj.endswith("中"):
@@ -501,12 +509,12 @@ def compute(b: Birth, method: int = 1, pan_type: str = "hour",
         pj = pj[:-1] + "下元"
 
     raw = {
-        "排盘方式": p["排盤方式"],
-        "干支": p["干支"],
-        "节气": p["節氣"],
+        "排盘方式": _simp(p["排盤方式"]),
+        "干支": _simp(p["干支"]),
+        "节气": _simp(p["節氣"]),
         "排局": pj,
-        "旬首": p["旬首"],
-        "旬空": p["旬空"],
+        "旬首": _simp(p["旬首"]),
+        "旬空": _simp(p["旬空"]),
         "值符值使": p["值符值使"],
         "天盘三奇六仪": p["天盤"],
         "地盘三奇六仪": p["地盤"],
@@ -518,8 +526,20 @@ def compute(b: Birth, method: int = 1, pan_type: str = "hour",
         "三元范围": {k: list(v) for k, v in SANYUAN_RANGES.items()},
     }
 
+    # 与 fallback 层同构的兼容字段: 遁/局数/三元 从排局解析 (应用与测试读这些键)
+    _cn_num = {"一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9}
+    raw["遁"] = "阳遁" if pj.startswith("阳") else "阴遁"
+    raw["局数"] = next((_cn_num[c] for c in pj if c in _cn_num), 0)
+    raw["三元"] = next((y for y in ("上元", "中元", "下元") if y in pj), "")
+
     raw["断"] = _judge(raw)
+    # 干组合格局顶层别名 (与 fallback 层字段名一致; 检测在 _judge 内做)
+    raw["qimen_patterns"] = list(raw["断"].get("干组合格局", []))
+    raw["qimen_pattern_count"] = len(raw["qimen_patterns"])
     raw["pan_info"] = _simulate_multi_pan(raw, pan_type, pan_style, zhi_run_method)
+    # 原生路径: 不是 fallback, 标记拨正
+    raw["pan_info"]["fallback_simulated"] = False
+    raw["pan_info"]["simulation_note"] = ""
     return ChartResult(
         method="qimen", school="east",
         engine=f"qimen-multipan-{pan_type}-{pan_style}-{zhi_run_method}",

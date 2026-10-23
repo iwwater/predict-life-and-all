@@ -1,5 +1,6 @@
-﻿// 玄空飞星:九宫格
+// 玄空飞星:九宫格
 // 术语:运/坐/向/山星/向星/格局 全部用 <Jargon> 翻白话
+// 引擎 raw 为中文键: 九宫{宫:{运,山,向}}/运/坐/向/格局(list)/向首/坐山; 宫键繁体(兌/離)
 import type { ChartResult } from "../../lib/types";
 import { COLOR } from "../ui";
 import { Jargon, JargonBox } from "../Jargon";
@@ -10,16 +11,21 @@ const GONG_BY_LUO_SHU: Record<string, [number, number]> = {
   艮: [2, 0], 坎: [2, 1], 乾: [2, 2],
 };
 
-// 格局对应"人话评级"
-const PATTERN_PLAIN: Record<string, { plain: string; tone: "ok" | "danger" | "warn" }> = {
-  旺山旺向: { plain: "最佳格局", tone: "ok" },
-  上山下水: { plain: "较差格局", tone: "danger" },
-  双星到向: { plain: "偏财格局", tone: "warn" },
-};
+const TRAD: Record<string, string> = { 兑: "兌", 离: "離" };
+const pick = (d: Record<string, any> | undefined, name: string) =>
+  (d && (d[name] ?? d[TRAD[name] ?? name])) || undefined;
+
+// 格局对应"人话评级" — 引擎格局是描述句, 按关键词归类
+const PATTERN_PLAIN: Array<{ key: string; plain: string; tone: "ok" | "danger" | "warn" }> = [
+  { key: "旺山旺向", plain: "最佳格局", tone: "ok" },
+  { key: "上山下水", plain: "较差格局", tone: "danger" },
+  { key: "双星到向", plain: "偏财格局", tone: "warn" },
+  { key: "双星到坐", plain: "旺丁格局", tone: "warn" },
+];
 
 export function XuankongChart({ chart }: { chart: ChartResult }) {
-  const r = chart.raw;
-  const grid: Record<string, { 运: number; 山: number; 向: number; 运_旺衰?: string; 山_旺衰?: string; 向_旺衰?: string }> = r.grid || {};
+  const r = chart.raw as Record<string, any>;
+  const grid: Record<string, { 运: number; 山: number; 向: number }> = r["九宫"] || {};
 
   // Timeliness color map
   const TML_COLOR: Record<string, string> = {
@@ -28,8 +34,9 @@ export function XuankongChart({ chart }: { chart: ChartResult }) {
   const TML_BG: Record<string, string> = {
     "旺": "rgba(90,164,105,0.15)", "生": "rgba(91,141,239,0.12)", "退": "rgba(201,162,75,0.10)", "死": "rgba(200,169,81,0.08)", "煞": "rgba(200,85,61,0.10)", "平": "rgba(255,255,255,0.03)",
   };
-  const pattern = r.pattern || "";
-  const patInfo = PATTERN_PLAIN[pattern] || { plain: pattern, tone: "warn" as const };
+  const gejuList: string[] = Array.isArray(r["格局"]) ? r["格局"] : [];
+  const patInfo = PATTERN_PLAIN.find((p) => gejuList.some((g) => String(g).includes(p.key)))
+    || { key: "", plain: gejuList[0] || "待定", tone: "warn" as const };
   const patColor = patInfo.tone === "ok" ? COLOR.ok : patInfo.tone === "danger" ? COLOR.danger : COLOR.gold;
 
   return (
@@ -39,10 +46,10 @@ export function XuankongChart({ chart }: { chart: ChartResult }) {
           <h3 className="text-lg" style={{ color: COLOR.goldBright }}>玄空飞星</h3>
           <div className="flex gap-2 text-xs flex-wrap">
             <span className="paper-tag paper-tag-east">
-              <Jargon term="运" mode="plain" /> {r.period || "—"}
+              <Jargon term="运" mode="plain" /> {r["运"] || "—"}
             </span>
             <span className="paper-tag">
-              <Jargon term="坐" mode="plain" /> {r.sitting} · <Jargon term="向" mode="plain" /> {r.facing}
+              <Jargon term="坐" mode="plain" /> {r["坐"] || "—"} · <Jargon term="向" mode="plain" /> {r["向"] || "—"}
             </span>
             <span className="paper-tag" style={{ color: patColor, borderColor: `${patColor}66` }}>
               <Jargon term="格局" mode="plain" /> {patInfo.plain}
@@ -53,7 +60,7 @@ export function XuankongChart({ chart }: { chart: ChartResult }) {
         <div className="grid grid-cols-3 gap-1.5 max-w-sm mx-auto" style={{ aspectRatio: "1 / 1" }}>
           {Object.entries(GONG_BY_LUO_SHU).map(([gua, [row, col]]) => {
             const idx = row * 3 + col;
-            const data = grid[gua] || { 运: 0, 山: 0, 向: 0 };
+            const data = pick(grid, gua) || { 运: 0, 山: 0, 向: 0 };
             const isCenter = gua === "中";
             return (
               <div key={gua}
@@ -118,8 +125,14 @@ export function XuankongChart({ chart }: { chart: ChartResult }) {
         <div className="mt-1">
           格局判定: <Jargon term="格局" mode="plain" /> ·{" "}
           <span style={{ color: patColor }}>{patInfo.plain}</span>
+          {gejuList.length > 0 && <span> — {gejuList.join("；")}</span>}
           (简化算法,真实使用需结合峦头/形局)。
         </div>
+        {(r["向首"] || r["坐山"]) && (
+          <div className="mt-1">
+            向首: {r["向首"] ? `向${r["向首"]["向星"]}/山${r["向首"]["山星"]}` : "—"} · 坐山: {r["坐山"] ? `向${r["坐山"]["向星"]}/山${r["坐山"]["山星"]}` : "—"}
+          </div>
+        )}
       </div>
     </div>
   );

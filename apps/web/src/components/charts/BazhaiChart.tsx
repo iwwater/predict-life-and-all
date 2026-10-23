@@ -1,5 +1,6 @@
-﻿// 八宅:八方罗盘图
+// 八宅:八方罗盘图
 // 术语:命卦/东四命/西四命 + 八星(生气/延年/天医/伏位/五鬼/六煞/祸害/绝命)
+// 引擎 raw 为中文键: 命卦/命('东四命'字串)/八方{宫:{游年,吉凶}}/吉方/凶方; 宫键繁体(兌/離)
 import type { ChartResult } from "../../lib/types";
 import { COLOR } from "../ui";
 import { Jargon, JargonBox } from "../Jargon";
@@ -9,24 +10,18 @@ const GUA_DIR: Record<string, string> = {
   离: "南", 坤: "西南", 兑: "西", 乾: "西北",
 };
 
-const GUA_STAR: Record<string, { star: string; good: boolean; plain: string }> = {
-  坎: { star: "生气", good: true,  plain: "大吉" },
-  艮: { star: "延年", good: true,  plain: "次吉" },
-  震: { star: "天医", good: true,  plain: "健康位" },
-  巽: { star: "伏位", good: true,  plain: "平稳位" },
-  离: { star: "五鬼", good: false, plain: "凶" },
-  坤: { star: "祸害", good: false, plain: "凶" },
-  兑: { star: "六煞", good: false, plain: "凶" },
-  乾: { star: "绝命", good: false, plain: "凶" },
-};
+const TRAD: Record<string, string> = { 兑: "兌", 离: "離" };
+const pick = (d: Record<string, any> | undefined, name: string) =>
+  (d && (d[name] ?? d[TRAD[name] ?? name])) || undefined;
 
 export function BazhaiChart({ chart }: { chart: ChartResult }) {
-  const r = chart.raw;
-  const lifeGua = r.life_gua || "—";
-  const eastFour: string[] = r.east_four || [];
-  const westFour: string[] = r.west_four || [];
-  const isEast = r.is_east;
-  const own = isEast ? eastFour : westFour;
+  const r = chart.raw as Record<string, any>;
+  const lifeGua = r["命卦"] || "—";
+  const ming = String(r["命"] || "");
+  const isEast = ming.includes("东");
+  const own: string[] = Array.isArray(r["吉方"]) ? r["吉方"] : [];
+  const notOwn: string[] = Array.isArray(r["凶方"]) ? r["凶方"] : [];
+  const bafang: Record<string, { 游年: string; 吉凶: string }> = r["八方"] || {};
 
   const cellGua: Record<string, string> = {};
   for (const g of Object.keys(GUA_DIR)) {
@@ -90,8 +85,8 @@ export function BazhaiChart({ chart }: { chart: ChartResult }) {
               })?.[1]) || null;
             if (!dir) return <div key={i} />;
             const gua = cellGua[dir] || "—";
-            const starInfo = GUA_STAR[gua] || { star: "—", good: false, plain: "—" };
-            const isGoodDir = own.includes(gua);
+            const starData = pick(bafang, gua) as { 游年: string; 吉凶: string } | undefined;
+            const isGoodDir = starData ? starData["吉凶"] === "吉" : own.includes(gua);
             return (
               <div key={i} className="rounded-md p-2 text-[11px] flex flex-col"
                 style={{
@@ -103,8 +98,7 @@ export function BazhaiChart({ chart }: { chart: ChartResult }) {
                   <span style={{ color: COLOR.gold }}>{gua}</span>
                 </div>
                 <div className="mt-auto">
-                  <span style={{ color: isGoodDir ? COLOR.ok : COLOR.danger }}>{starInfo.star}</span>
-                  <span className="text-[9px] ml-1" style={{ color: COLOR.muted }}>·{starInfo.plain}</span>
+                  <span style={{ color: isGoodDir ? COLOR.ok : COLOR.danger }}>{starData?.["游年"] || "—"}</span>
                 </div>
               </div>
             );
@@ -127,68 +121,9 @@ export function BazhaiChart({ chart }: { chart: ChartResult }) {
       />
 
       <div className="card-raised text-xs space-y-1" style={{ color: COLOR.muted }}>
-        <div>年柱: <span style={{ color: COLOR.ink }}>{r.year_gz}</span></div>
-        <div>本命凶方: <span style={{ color: COLOR.danger }}>{((r.inauspicious_dirs || []) as string[]).join(" ")}</span></div>
-        {r.sitting && <div>坐山: <span style={{ color: COLOR.ink }}>{r.sitting}</span></div>}
+        <div>本命吉方: <span style={{ color: COLOR.ok }}>{own.join(" ") || "—"}</span></div>
+        <div>本命凶方: <span style={{ color: COLOR.danger }}>{notOwn.join(" ") || "—"}</span></div>
       </div>
-
-      {/* House-Resident Match */}
-      {r.house_resident_match && (
-        <div className="paper-frame">
-          <h4 className="text-sm mb-2" style={{ color: COLOR.gold }}>宅命相配</h4>
-          <div className="flex items-center gap-3 flex-wrap text-sm">
-            <span style={{ color: COLOR.gold }}>
-              宅卦: {r.house_gua}({r.house_is_east ? "东四宅" : "西四宅"})
-            </span>
-            <span style={{ color: r.house_resident_match.matched ? COLOR.jade : COLOR.danger }}>
-              {r.house_resident_match.matched ? "✓ 相配" : "✗ 不配"}
-            </span>
-          </div>
-          <div className="text-xs mt-2 leading-relaxed" style={{ color: COLOR.inkSoft }}>
-            {r.house_resident_match.description}
-          </div>
-        </div>
-      )}
-
-      {/* 八星方位 from 大游年歌 */}
-      {r.bazhai_stars && (
-        <div className="paper-frame">
-          <h4 className="text-sm mb-3" style={{ color: COLOR.gold }}>
-            大游年 · 八星方位
-            <span className="text-[10px] ml-2 font-normal" style={{ color: COLOR.muted }}>
-              — 以宅卦{r.house_gua}定八方星曜
-            </span>
-          </h4>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {Object.entries(r.bazhai_stars as Record<string, any>)
-              .sort(([, a], [, b]) => (a.rank || 9) - (b.rank || 9))
-              .map(([dir, star]) => {
-                const isAuspicious = star.auspicious;
-                return (
-                  <div
-                    key={dir}
-                    className="p-2 rounded text-center"
-                    style={{
-                      background: isAuspicious ? "rgba(90,164,105,0.08)" : "rgba(200,85,61,0.06)",
-                      border: `1px solid ${isAuspicious ? "rgba(90,164,105,0.3)" : "rgba(200,85,61,0.2)"}`,
-                    }}
-                  >
-                    <div className="text-[10px]" style={{ color: COLOR.muted }}>{dir}</div>
-                    <div
-                      className="text-sm font-semibold mt-0.5"
-                      style={{ color: isAuspicious ? COLOR.jade : COLOR.danger }}
-                    >
-                      {star.star}
-                    </div>
-                    <div className="text-[9px] mt-0.5" style={{ color: COLOR.muted }}>
-                      {star.nature?.split("·")[0] || ""} #{star.rank}
-                    </div>
-                  </div>
-                );
-              })}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

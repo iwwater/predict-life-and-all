@@ -146,7 +146,7 @@ cd apps/web && npx tsc --noEmit
 cd apps/web && npm run build
 ```
 
-**当前状态**: **2230 passed / 0 failed / 0 skipped**（全量 `pytest tests/`，含紫微 native 排盘 · 六神 · 称骨/铁板 · 塔罗三系统 · 灵签回归 · 选项透传/解读序列化回归）· TypeScript 零错 · 0 flaky · CI 见 `.github/workflows/ci.yml`
+**当前状态**: **2231 passed / 0 failed / 0 skipped**（全量 `pytest tests/`，含紫微 native 排盘 · 六神 · 称骨/铁板 · 塔罗三系统 · 灵签回归 · 选项透传/解读序列化回归 · 奇门 kinqimen 原生层）· TypeScript 零错 · 0 flaky · CI 见 `.github/workflows/ci.yml`
 **任何依赖升级必须全绿才可并入。**
 
 ---

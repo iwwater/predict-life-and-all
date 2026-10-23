@@ -320,15 +320,19 @@ def test_engine_distinguishes_fallback():
 # 11. 多盘种与局数一致性 (不污染原 72 局表)
 # ══════════════════════════════════════════════════════════════
 def test_pan_type_does_not_change_jun_num():
-    """pan_type 变化不改变 局数 (同节气同一日, 局数固定)."""
+    """pan_type 不改变局数: 日/月/年家同为模拟层三者局数一致;
+    时家走 kinqimen 原生(拆补法定局), 与模拟层算法不同, 只验证自身自洽(局数与排局一致)."""
     b = Birth(2024, 6, 25, 14, 30, 0)
     r_hour = qimen.compute(b, pan_type="hour")
     r_day = qimen.compute(b, pan_type="day")
     r_month = qimen.compute(b, pan_type="month")
     r_year = qimen.compute(b, pan_type="year")
-    assert r_hour.raw["局数"] == r_day.raw["局数"]
     assert r_day.raw["局数"] == r_month.raw["局数"]
     assert r_month.raw["局数"] == r_year.raw["局数"]
+    # 原生时家: 局数必须等于排局里解析出的数字
+    CN = {"一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9}
+    from_paiju = next(CN[c] for c in r_hour.raw["排局"] if c in CN)
+    assert r_hour.raw["局数"] == from_paiju
 
 
 def test_pan_style_does_not_change_jun_num():
@@ -339,13 +343,15 @@ def test_pan_style_does_not_change_jun_num():
     assert r_turn.raw["局数"] == r_fly.raw["局数"]
 
 
-def test_maoshan_same_jun_as_chaibu_in_same_day():
-    """同一日, 茅山与拆补在同一三元内局数相同."""
-    b = Birth(2024, 6, 22, 14, 30, 0)   # 夏至后第 2 天 -> 上元
-    r_cb = qimen.compute(b, zhi_run_method="chaibu")
-    r_ms = qimen.compute(b, zhi_run_method="maoshan")
-    # 上元二者必同
-    assert r_cb.raw["局数"] == r_ms.raw["局数"]
+def test_maoshan_same_day_both_complete():
+    """同一日, 拆补(kinqimen 原生)与茅山(模拟层)各自给出完整局信息.
+    两法定局规则不同(茅山按自然三元不拆不补), 局数可不同, 不再断言相等."""
+    b = Birth(2024, 6, 22, 14, 30, 0)   # 夏至后第 2 天
+    for kw in ({"zhi_run_method": "chaibu"}, {"zhi_run_method": "maoshan"}):
+        r = qimen.compute(b, **kw)
+        assert 1 <= r.raw["局数"] <= 9
+        assert r.raw["三元"] in ("上元", "中元", "下元")
+        assert r.raw["遁"] in ("阳遁", "阴遁")
 
 
 # ══════════════════════════════════════════════════════════════

@@ -74,36 +74,41 @@ export function ChengguPage() {
 
       {chart && (
         <div className="space-y-5 animate-fade-in">
-          {/* 秤砣挂上动画 — 四个重量 */}
+          {/* 秤砣挂上动画 — 四个重量（引擎 raw 为中文键: 年骨重/月骨重/日骨重/时骨重） */}
           <section className="paper-frame">
             <div className="grid grid-cols-4 gap-3 text-center">
               {[
-                { label: lang === "zh" ? "年" : "Year", w: r?.weight_year },
-                { label: lang === "zh" ? "月" : "Month", w: r?.weight_month },
-                { label: lang === "zh" ? "日" : "Day", w: r?.weight_day },
-                { label: lang === "zh" ? "时" : "Hour", w: r?.weight_hour },
+                { label: lang === "zh" ? "年" : "Year", w: r?.["年骨重"] },
+                { label: lang === "zh" ? "月" : "Month", w: r?.["月骨重"] },
+                { label: lang === "zh" ? "日" : "Day", w: r?.["日骨重"] },
+                { label: lang === "zh" ? "时" : "Hour", w: r?.["时骨重"] },
               ].map((item, i) => (
                 <div key={i} className="p-3 rounded-sm animate-fade-in" style={{ border: "1px solid var(--rule)", background: "var(--paper-2)", ...getStyle(i) }}>
                   <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>{item.label}</div>
                   <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--cinnabar)", fontFamily: "'Noto Serif SC', serif" }}>
-                    {item.w || "—"}
+                    {item.w ?? "—"}
                   </div>
                   <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>{lang === "zh" ? "钱" : "qian"}</div>
                 </div>
               ))}
             </div>
+            {(r?.["干支年"] || r?.["农历月"]) && (
+              <div style={{ fontSize: "0.72rem", color: "var(--ink-soft)", textAlign: "center", marginTop: "0.6rem" }}>
+                {[r?.["干支年"], r?.["农历月"] != null ? `${r["农历月"]}月` : null, r?.["农历日"] != null ? `${r["农历日"]}日` : null, r?.["时支"] != null ? `${r["时支"]}时` : null].filter(Boolean).join(" · ")}
+              </div>
+            )}
           </section>
 
-          {/* 总骨重 + 歌诀 */}
+          {/* 总骨重 + 歌诀（总骨重_两 数字; verse_4_lines 为 4 句数组） */}
           <section className="paper-frame" style={{ textAlign: "center", borderColor: "var(--cinnabar)", borderWidth: "1.5px" }}>
             <div style={{ fontSize: "0.8rem", color: "var(--ink-soft)", marginBottom: "0.3rem" }}>
               {lang === "zh" ? "总骨重" : "Total Weight"}
             </div>
             <div style={{ fontSize: "3rem", fontWeight: 700, color: "var(--cinnabar)", fontFamily: "'Noto Serif SC', serif" }}>
-              {r?.total_weight || "—"}
+              {r?.["总骨重_两"] ?? "—"}
             </div>
             <div style={{ fontSize: "0.65rem", color: "var(--ink-soft)" }}>{lang === "zh" ? "两" : "liang"}</div>
-            {r?.ballad && (
+            {(r?.["verse_4_lines"] || []).length > 0 && (
               <div style={{
                 marginTop: "1.5rem",
                 fontSize: "0.9rem",
@@ -114,7 +119,7 @@ export function ChengguPage() {
                 maxHeight: lang === "zh" ? 400 : "auto",
                 margin: "1.5rem auto 0",
               }}>
-                {r.ballad}
+                {lang === "zh" ? (r!["verse_4_lines"] as string[]).join("\n") : (r!["verse_4_lines"] as string[]).join(" ")}
               </div>
             )}
           </section>

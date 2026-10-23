@@ -138,6 +138,14 @@ export interface ComputeRequest {
     qian_number?: number;
     seed?: number | string | null;
     question?: string;
+    tosses?: number[];          // 六爻: 6 个爻值 (6老阴/7少阳/8少阴/9老阳)
+    n1?: number;                // 梅花数字起卦: 上卦数
+    n2?: number;                // 梅花数字起卦: 下卦数
+    n3?: number;                // 梅花数字起卦: 动爻数(可选)
+    name?: string;              // 数字命理: 英文/拼音姓名
+    pan_type?: string;          // 奇门: hour/day/month/year
+    lines?: number;             // 小六壬抽行数
+    query?: string;              // 六壬/小六壬: 问事
     period?: number;
     sitting?: string | null;
     construction_year?: number;

@@ -151,7 +151,7 @@ export const METHOD_INPUT_CONFIG: Record<string, MethodFormConfig> = {
     defaultMode: "hour_qimen",
     availableModes: [
       { value: "hour_qimen", label: "时家奇门" },
-      { value: "minute_qimen", label: "刻家奇门" },
+      { value: "day_qimen", label: "日家奇门" },
     ],
     defaultSpread: "single",
   },

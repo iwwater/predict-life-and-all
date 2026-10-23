@@ -17,9 +17,14 @@ const YAO_NAMES_EN = ["L1", "L2", "L3", "L4", "L5", "L6"];
 
 type CoinToss = "old_yin" | "young_yin" | "young_yang" | "old_yang";
 
+// 掷币 → 爻值: 6老阴(动) 7少阳 8少阴 9老阳(动) —— 引擎契约 list[int]
+const TOSS_INT: Record<CoinToss, number> = { old_yin: 6, young_yang: 7, young_yin: 8, old_yang: 9 };
+
+// 真三枚铜钱: 每枚正面3/背面2, 三枚之和 6-9 —— 老阴/老阳各 1/8, 动爻率与实物一致
 function randomToss(): CoinToss {
-  const r = Math.floor(Math.random() * 4);
-  return (["old_yin", "young_yin", "young_yang", "old_yang"] as const)[r];
+  let sum = 0;
+  for (let i = 0; i < 3; i++) sum += Math.random() < 0.5 ? 3 : 2;
+  return sum === 6 ? "old_yin" : sum === 7 ? "young_yang" : sum === 8 ? "young_yin" : "old_yang";
 }
 
 export function LiuyaoPage() {
@@ -46,10 +51,12 @@ export function LiuyaoPage() {
   const animTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 代摇：自动连摇6爻
+  // 局部数组快照逐爻落定 —— 不用函数式更新, 避免同 tick 的 reset 与更新竞态丢首爻
   const autoShake = useCallback(() => {
     if (shaking) return;
     setShaking(true);
-    setTosses([null, null, null, null, null, null]);
+    const results: (CoinToss | null)[] = [null, null, null, null, null, null];
+    setTosses([...results]);
     setShakeIdx(0);
     let idx = 0;
     const go = () => {
@@ -58,11 +65,8 @@ export function LiuyaoPage() {
         setShakeIdx(-1);
         return;
       }
-      setTosses((prev) => {
-        const next = [...prev];
-        next[idx] = randomToss();
-        return next;
-      });
+      results[idx] = randomToss();
+      setTosses([...results]);
       setShakeIdx(idx);
       idx++;
       animTimer.current = setTimeout(go, 450);
@@ -104,7 +108,8 @@ export function LiuyaoPage() {
         options: {
           mode: shakeMode === "auto" ? "time_qigua" : "manual_coin",
           question: question || "问事",
-          ...(shakeMode === "manual" ? { tosses: tosses.filter(Boolean) as CoinToss[] } : {}),
+          // 掷币映射成引擎契约的 int 爻值; 代摇也发送 —— 页面上看到的铜钱就是入盘的铜钱
+          tosses: (tosses.filter(Boolean) as CoinToss[]).map((t) => TOSS_INT[t]),
         },
       });
       setChart(chart);
@@ -120,11 +125,28 @@ export function LiuyaoPage() {
   };
 
   const allTossed = tosses.every((t) => t !== null);
-  const r = chart?.raw;
-  const yaos: any[] = r?.yao_details || [];
-  const hexagram = r?.hexagram_name || "";
-  const yongshen = r?.yongshen || "";
-  const yongshenAdvice = r?.yongshen_advice || "";
+  const r = chart?.raw as Record<string, any> | undefined;
+  // 引擎 raw 中文键: 摇钱(list[int])/本卦/变卦/动爻/世/应/六爻装卦(naijia)/断{用神六亲,断语,世应关系,提示}
+  const yaoQian: number[] = Array.isArray(r?.["摇钱"]) ? r!["摇钱"] : [];
+  const dongYao: number[] = Array.isArray(r?.["动爻"]) ? r!["动爻"] : [];
+  const naijia: any[] = Array.isArray(r?.["六爻装卦"]) ? r!["六爻装卦"] : [];
+  const duan = (r?.["断"] || {}) as Record<string, any>;
+  const hexagram = r?.["本卦"]?.["name"] || "";
+  const bianGua = r?.["变卦"]?.["name"] || "";
+  const yongshen = duan["用神六亲"] || "";
+  const yongshenAdvice = Array.isArray(duan["断语"]) ? duan["断语"].join("；") : String(duan["断语"] || "");
+  // 装卦表 + 摇钱合并成渲染行: is_yang 由摇钱 7/9 推, is_dong 由动爻表推
+  const yaos: any[] = naijia.map((nj: any, i: number) => ({
+    position: nj["爻"],
+    is_yang: yaoQian.length === 6 ? [7, 9].includes(yaoQian[i]) : false,
+    is_dong: dongYao.includes(nj["爻"]),
+    dizhi: nj["地支"],
+    liuqin: nj["六亲"],
+    liushen: nj["六神"],
+    shiying: nj["世应"],
+    xunkong: nj["旬空"],
+    yuepo: nj["月破"],
+  }));
 
   return (
     <div className="space-y-6">
@@ -292,6 +314,11 @@ export function LiuyaoPage() {
               <h2 style={{ fontFamily: "'Noto Serif SC', serif", fontSize: "1.2rem", fontWeight: 700, color: "var(--cinnabar)" }}>
                 {hexagram || (lang === "zh" ? "本卦" : "Hexagram")}
               </h2>
+              {bianGua && (
+                <span className="paper-tag" style={{ color: "var(--ink-soft)" }}>
+                  {lang === "zh" ? `之 ${bianGua}` : `→ ${bianGua}`}
+                </span>
+              )}
               {yongshen && (
                 <span className="paper-tag" style={{ borderColor: "var(--cinnabar)", color: "var(--cinnabar)" }}>
                   {lang === "zh" ? "用神" : "Yong Shen"}: {yongshen}
@@ -382,6 +409,11 @@ export function LiuyaoPage() {
               <div style={{ fontSize: "0.88rem", color: "var(--ink)", lineHeight: 1.7, fontFamily: "'Noto Serif SC', serif" }}>
                 {yongshenAdvice}
               </div>
+              {duan["提示"] && (
+                <div style={{ fontSize: "0.72rem", color: "var(--ink-soft)", marginTop: "0.5rem", lineHeight: 1.6 }}>
+                  {Array.isArray(duan["提示"]) ? duan["提示"].join("；") : String(duan["提示"])}
+                </div>
+              )}
             </section>
           )}
 

@@ -172,25 +172,26 @@ export function FengShui() {
 }
 
 function CombinedSummary({ bazhai, xuankong }: { bazhai: ChartResult; xuankong: ChartResult }) {
-  const br = bazhai.raw || {}; const xr = xuankong.raw || {};
-  const lifeGua = br.life_gua || "?";
-  const isEast = br.is_east ? "东四命" : "西四命";
-  const houseGua = br.house_gua;
-  const match = br.house_resident_match;
-  const pattern = xr.pattern || "?"; const period = xr.period || "?";
+  const br = (bazhai.raw || {}) as Record<string, any>;
+  const xr = (xuankong.raw || {}) as Record<string, any>;
+  const lifeGua = br["命卦"] || "—";
+  const ming = String(br["命"] || "");
+  const geju = Array.isArray(xr["格局"]) ? xr["格局"] : [];
+  const zhou = xr["坐"] ? `坐${xr["坐"]}向${xr["向"]}` : "—";
 
   return (
     <section className="paper-frame">
       <h3 className="paper-eyebrow" style={{ color: "var(--cinnabar)" }}>风水合参 · 宅命总览</h3>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3" style={{ marginTop: "0.5rem", fontSize: "0.78rem" }}>
-        <MiniStat label="命卦" value={lifeGua} sub={isEast} tone="cinnabar" />
-        <MiniStat label="宅卦" value={houseGua || "未指定坐向"} sub={houseGua ? (br.house_is_east ? "东四宅" : "西四宅") : ""} tone="indigo" />
-        <MiniStat label="宅命相配" value={match ? (match.matched ? "✓ 相配" : "✗ 不配") : "—"} sub={match?.level || ""} tone={match?.matched ? "verdigris" : "cinnabar"} />
-        <MiniStat label="玄空格局" value={pattern} sub={period} tone="cinnabar" />
+        <MiniStat label="命卦" value={lifeGua} sub={ming} tone="cinnabar" />
+        <MiniStat label="玄空坐向" value={zhou} sub={xr["坐卦"] ? `${xr["坐卦"]}山${xr["向卦"]}向` : ""} tone="indigo" />
+        <MiniStat label="入运" value={xr["运"] != null ? String(xr["运"]) : "—"}
+          sub={xr["向首"] ? `向首 向${xr["向首"]["向星"]}/山${xr["向首"]["山星"]}` : ""} tone="indigo" />
+        <MiniStat label="玄空格局" value={geju[0] || "—"} sub={geju.length > 1 ? geju.slice(1).join("；") : ""} tone="cinnabar" />
       </div>
-      {match?.description && (
-        <div style={{ marginTop: "0.5rem", fontSize: "0.78rem", lineHeight: 1.7, color: "var(--ink-soft)", borderLeft: "3px solid var(--cinnabar)", paddingLeft: "0.75rem" }}>
-          {match.description}
+      {geju.length === 0 && (
+        <div style={{ marginTop: "0.5rem", fontSize: "0.75rem", color: "var(--ink-soft)" }}>
+          玄空格局未判定（须指定坐向与运期）。
         </div>
       )}
     </section>

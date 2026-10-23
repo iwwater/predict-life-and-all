@@ -155,10 +155,25 @@ def test_compute_returns_chart_result():
     assert r.school == "east"
 
 
-def test_compute_fallback_engine():
-    """kinqimen 缺失 → fallback engine."""
+def test_compute_fallback_engine(monkeypatch):
+    """kinqimen 不可导入(模拟库缺失) → fallback engine + 模拟盘标记."""
+    import sys as _sys
+    monkeypatch.setitem(_sys.modules, "kinqimen", None)
     r = qimen.compute(Birth(2024, 6, 25, 14, 30, 0))
     assert "fallback" in r.engine
+    assert r.raw["pan_info"]["fallback_simulated"] is True
+
+
+def test_compute_native_when_kinqimen_present():
+    """kinqimen 已安装的环境 → 原生引擎 (不再伪造 fallback)."""
+    r = qimen.compute(Birth(2024, 6, 25, 14, 30, 0))
+    try:
+        import kinqimen  # noqa: F401
+    except ImportError:
+        pytest.skip("kinqimen 未安装, 无原生路径可测")
+    assert "fallback" not in r.engine
+    assert r.raw["pan_info"]["fallback_simulated"] is False
+    assert r.raw["qimen_pattern_count"] == len(r.raw["qimen_patterns"])
 
 
 def test_compute_paiju_in_raw():
