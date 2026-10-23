@@ -1,5 +1,6 @@
 """POST /api/compute - unified chart endpoint with mode/subject options."""
 import logging
+import inspect
 import time
 from typing import Literal
 
@@ -85,10 +86,66 @@ ALLOWED_OPTIONS = {
     "mother_zodiac",
     "name",
     "full_name",
+    # 姓名学 (numerology 三才五格)
+    "surname",
+    "given_name",
+    "system",
+    # 奇门 / 玄空 / 六爻 / 梅花等引擎的实际参数
+    "pan_type",
+    "pan_style",
+    "zhi_run_method",
+    "house_system",
+    "facing_deg",
+    "lineage",
+    "question_keywords",
+    "top_n",
+    "n1",
+    "n2",
+    "n3",
+    "lines",
+    "query",
+    "zi_hour",
+    "client_seed",
     # Multi-method orchestration (accepted but not used by single-method compute)
     "methods",
     "modeByMethod",
 }
+
+
+# 模式级必需参数: 白名单式登记, 避免把 meta 里「推荐输入」当成硬性要求
+_MODE_REQUIRED: dict[tuple[str, str], list[str]] = {
+    ("numerology", "destiny"): ["name"],
+    ("numerology", "soul_urge"): ["name"],
+}
+
+
+# 元数据里的 mode 名不一定等于引擎参数值 (如 meihua 的 time_qigua ↔ 引擎的 time)
+_MODE_TRANSLATE: dict[tuple[str, str], str] = {
+    ("meihua", "time_qigua"): "time",
+    ("meihua", "number_qigua"): "number",
+    ("meihua", "external_omen"): "external_omen",
+}
+
+
+def _engine_kwargs(engine, options: dict, method: str = "") -> dict:
+    """按引擎签名挑出它能接受的具名参数。
+
+    只传签名里显式声明的位置/关键字参数, 不吃 **kwargs 的引擎不会被塞垃圾。
+    """
+    try:
+        params = inspect.signature(engine).parameters
+    except (TypeError, ValueError):  # pragma: no cover - 内建/C 函数
+        return {}
+    kwargs = {}
+    for key, value in options.items():
+        p = params.get(key)
+        if p is None or p.kind is inspect.Parameter.VAR_KEYWORD:
+            continue
+        if value is not None:
+            kwargs[key] = value
+    if "mode" in kwargs and (method, kwargs["mode"]) in _MODE_TRANSLATE:
+        kwargs["mode"] = _MODE_TRANSLATE[(method, kwargs["mode"])]
+    return kwargs
 
 
 @router.post("/compute")
@@ -112,6 +169,12 @@ def compute_endpoint(body: ComputeRequest):
         raise HTTPException(422, f"unsupported mode for {body.method}: {mode}")
     options["mode"] = mode
     options.setdefault("subject", (meta.get("subjects") or [None])[0])
+
+    # 只有「不给就一定算错」的输入才拦 (question 之类是可选的, 不能一刀切)
+    required = _MODE_REQUIRED.get((body.method, mode)) or []
+    missing = [k for k in required if not options.get(k) and not getattr(body.birth, k, None)]
+    if missing:
+        raise HTTPException(422, f"mode {mode} 需要参数: {', '.join(missing)}")
 
     # Validate spread if provided and method supports spreads
     if "spread" in options:
@@ -146,9 +209,13 @@ def compute_endpoint(body: ComputeRequest):
         if key in ALLOWED_OPTIONS:
             setattr(birth, key, value)
 
+    # 引擎真正接受的具名参数 (options 以前只 setattr 到 Birth 上, 名字/牌阵/掷币数
+    # 等参数被静默丢弃 —— 前端选了牌阵也永远出同一个默认牌阵)
+    engine_kwargs = _engine_kwargs(_ENGINES[body.method], options, body.method)
+
     t0 = time.perf_counter()
     try:
-        result = _ENGINES[body.method](birth)
+        result = _ENGINES[body.method](birth, **engine_kwargs)
     except Exception as e:
         log.exception("compute failed: %s/%s", body.method, e)
         raise HTTPException(500, f"{type(e).__name__}: {e}")

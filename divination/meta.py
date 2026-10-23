@@ -112,8 +112,9 @@ METHOD_META = {
     "numerology": {
         "school": "west", "name_zh": "数字命理", "name_en": "Numerology",
         "group": "西方", "needs": ["birth"], "engine": "self+pythagoras",
-        "subjects": ["self_life"], "modes": ["life_path"], "default_mode": "life_path",
-        "required_inputs": {"life_path": ["birth"]}, "recommended_for": ["生命灵数", "人生方向参考"],
+        "subjects": ["self_life"], "modes": ["life_path", "destiny", "soul_urge"],
+        "default_mode": "life_path",
+        "required_inputs": {"life_path": ["birth"], "destiny": ["name"], "soul_urge": ["name"]}, "recommended_for": ["生命灵数", "人生方向参考"],
     },
     "fengshui": {
         "school": "east", "name_zh": "风水", "name_en": "Feng Shui Composite",

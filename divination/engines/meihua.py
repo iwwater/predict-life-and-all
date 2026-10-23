@@ -254,12 +254,41 @@ def _comprehensive_narrative(result: dict) -> str:
     )
 
 
-def compute(b: Birth, mode: str = "time", n1: int = 0, n2: int = 0, n3: int | None = None) -> ChartResult:
+_QUESTION_PUNCT = set("？?。，,.!！、；;：:“”\"'‘’（）()【】[]…— ")
+
+
+def _qigua_external_omen(question: str) -> dict:
+    """外应起卦 —— 梅花易数「字占」: 以问句字数分上下卦。
+
+    传世字占以字数取卦(一字太极、二字两仪…多字则分前后两半各取八卦),
+    这里用可复核的确定性规则, 不做"看意象随手编一个卦":
+      上卦 = 前半字数 % 8 (0 取 8)
+      下卦 = 后半字数 % 8 (0 取 8)
+      动爻 = 总字数 % 6   (0 取 6)
+    """
+    chars = [c for c in (question or "") if not c.isspace() and c not in _QUESTION_PUNCT]
+    total = len(chars)
+    if total < 2:
+        raise ValueError("外应起卦(字占)至少需要 2 个字的问题")
+    half = (total + 1) // 2
+    up_n = half % 8 or 8
+    low_n = (total - half) % 8 or 8
+    moving = total % 6 or 6
+    return {
+        "up": _XIANTIAN[up_n], "low": _XIANTIAN[low_n], "moving": moving,
+        "total_chars": total, "up_chars": half, "low_chars": total - half,
+        "up_n": up_n, "low_n": low_n,
+    }
+
+
+def compute(b: Birth, mode: str = "time", n1: int = 0, n2: int = 0, n3: int | None = None,
+            question: str | None = None) -> ChartResult:
     """梅花易数起卦入口。
 
     Args:
         b: Birth 输入
-        mode: "time" (时间起卦) 或 "number" (数字起卦)
+        mode: "time" (时间起卦) / "number" (数字起卦) / "external_omen" (字占: 以问题字数起卦)
+        question: external_omen 模式下的问句
         n1, n2: 数字起卦的两个数字
         n3: 数字起卦的动爻数字（可选, 默认 n1+n2）
     """
@@ -269,8 +298,14 @@ def compute(b: Birth, mode: str = "time", n1: int = 0, n2: int = 0, n3: int | No
     elif mode == "number":
         qigua = _qigua_number(n1, n2, n3)
         method_desc = f"数字起卦(n1={n1}/n2={n2}/n3={n3})"
+    elif mode == "external_omen":
+        qigua = _qigua_external_omen(question or "")
+        method_desc = (
+            f"外应起卦·字占(共{qigua['total_chars']}字: 上卦{qigua['up_chars']}字→{qigua['up']}卦, "
+            f"下卦{qigua['low_chars']}字→{qigua['low']}卦, 动爻{qigua['moving']})"
+        )
     else:
-        raise ValueError(f"meihua mode 不支持: {mode!r}（仅 time/number）")
+        raise ValueError(f"meihua mode 不支持: {mode!r}（仅 time/number/external_omen）")
 
     up, low, moving = qigua["up"], qigua["low"], qigua["moving"]
     month_zhi = qigua.get("month_zhi", "")
@@ -291,7 +326,16 @@ def compute(b: Birth, mode: str = "time", n1: int = 0, n2: int = 0, n3: int | No
 
     # 卦气旺衰（5 卦）
     if not month_zhi:
-        month_zhi = "寅"  # fallback 占位
+        # 字占/数字起卦没有月令信息, 取当下月支而不是硬编一个"寅"
+        try:
+            from datetime import date as _date
+            from lunar_python import Solar
+            _today = _date.today()
+            month_zhi = Solar.fromYmdHms(
+                _today.year, _today.month, _today.day, b.hour, b.minute, 0
+            ).getLunar().getMonthZhi()
+        except Exception:
+            month_zhi = "寅"
     wangshuai = {
         "本卦": _gua_qi_wang_shuai(five["本卦"]["upper"], month_zhi),
         "互卦": _gua_qi_wang_shuai(five["互卦"]["upper"], month_zhi),

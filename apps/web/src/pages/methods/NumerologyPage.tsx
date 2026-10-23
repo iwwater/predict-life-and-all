@@ -59,9 +59,14 @@ export function NumerologyPage() {
           <F label={lang === "zh" ? "月" : "Mon"}><input className="paper-input" type="number" value={month} onChange={(e) => setMonth(parseInt(e.target.value) || 0)} min={1} max={12} /></F>
           <F label={lang === "zh" ? "日" : "Day"}><input className="paper-input" type="number" value={day} onChange={(e) => setDay(parseInt(e.target.value) || 0)} min={1} max={31} /></F>
         </div>
-        <F label={`${lang === "zh" ? "名字" : "Name"} (${lang === "zh" ? "可选" : "optional"})`}>
-          <input className="paper-input" style={{ maxWidth: 260 }} value={name} onChange={(e) => setName(e.target.value)} placeholder={lang === "zh" ? "用于表达数/灵魂驱策" : "For destiny/soul urge"} />
+        <F label={`${lang === "zh" ? "英文/拼音姓名" : "Name (latin)"} (${lang === "zh" ? "命运数与灵魂驱策必需" : "for destiny & soul urge"})`}>
+          <input className="paper-input" style={{ maxWidth: 260 }} value={name} onChange={(e) => setName(e.target.value)} placeholder={lang === "zh" ? "如 Zhang San" : "e.g. Zhang San"} />
         </F>
+        {mode !== "life_path" && !name.trim() && (
+          <p style={{ fontSize: "0.72rem", color: "var(--cinnabar)" }}>
+            {lang === "zh" ? "该模式需要填写英文/拼音姓名。" : "This mode needs a latin name."}
+          </p>
+        )}
         <div className="flex gap-1.5 flex-wrap">
           {MODES.map((m) => (
             <button key={m.value} type="button" onClick={() => setMode(m.value)}
@@ -78,31 +83,70 @@ export function NumerologyPage() {
 
       {chart && (
         <div className="space-y-5 animate-fade-in">
+          {/* 主数字 */}
           <section className="paper-frame" style={{ textAlign: "center" }}>
-            <div style={{ fontSize: "0.8rem", color: "var(--ink-soft)", marginBottom: "0.5rem" }}>
-              {lang === "zh" ? MODES.find((m) => m.value === mode)?.labelZh : MODES.find((m) => m.value === mode)?.labelEn}
+            <div style={{ fontSize: "0.8rem", color: "var(--ink-soft)", marginBottom: "0.4rem" }}>
+              {r?.primary?.label ?? (lang === "zh" ? MODES.find((m) => m.value === mode)?.labelZh : MODES.find((m) => m.value === mode)?.labelEn)}
             </div>
             <div style={{ fontSize: "4rem", fontWeight: 700, color: "var(--cinnabar)", fontFamily: "'Noto Serif SC', serif", lineHeight: 1 }}>
-              {r?.number ?? r?.life_path ?? r?.destiny ?? r?.soul_urge ?? "—"}
+              {r?.primary?.number ?? "—"}
             </div>
-            {r?.master_number && (
-              <div style={{ fontSize: "0.8rem", color: "var(--verdigris)", marginTop: "0.5rem" }}>
-                {lang === "zh" ? "大师数" : "Master Number"}: {r.master_number}
+            {r?.primary?.meaning && (
+              <div style={{ fontSize: "0.9rem", color: "var(--ink)", marginTop: "0.5rem", fontFamily: "'Noto Serif SC', serif" }}>
+                {r.primary.meaning}
+              </div>
+            )}
+            {r?.primary?.is_master && (
+              <div style={{ fontSize: "0.75rem", color: "var(--verdigris)", marginTop: "0.35rem" }}>
+                {lang === "zh" ? "大师数 · 不归约" : "Master Number"}
+              </div>
+            )}
+            {r?.primary?.calculation_basis && (
+              <div style={{ fontSize: "0.68rem", color: "var(--ink-soft)", marginTop: "0.5rem" }}>
+                {r.primary.calculation_basis}
               </div>
             )}
           </section>
 
-          {/* 衍生数字 */}
-          {r?.numbers && (
-            <section className="paper-frame">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {Object.entries(r.numbers as Record<string, number>).map(([k, v]) => (
-                  <div key={k} className="text-center p-2 rounded-sm" style={{ border: "1px solid var(--rule)", background: "var(--paper-2)" }}>
-                    <div style={{ fontSize: "0.62rem", color: "var(--ink-soft)" }}>{k}</div>
-                    <div style={{ fontSize: "1.2rem", fontWeight: 600, color: "var(--ink)" }}>{v}</div>
+          {/* 三个数字对照 */}
+          <section className="paper-frame">
+            <h2 className="paper-eyebrow">{lang === "zh" ? "三数对照" : "Three Numbers"}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {[
+                { key: "life_path", labelZh: "生命灵数", labelEn: "Life Path" },
+                { key: "destiny", labelZh: "命运数", labelEn: "Destiny" },
+                { key: "soul_urge", labelZh: "灵魂驱策", labelEn: "Soul Urge" },
+              ].map((m) => {
+                const v = (r as any)?.[m.key];
+                return (
+                  <div key={m.key} className="text-center p-2 rounded-sm"
+                    style={{ border: `1px solid ${r?.primary?.label === (lang === "zh" ? m.labelZh : m.labelEn) ? "var(--cinnabar)" : "var(--rule)"}`, background: "var(--paper-2)" }}>
+                    <div style={{ fontSize: "0.66rem", color: "var(--ink-soft)" }}>{lang === "zh" ? m.labelZh : m.labelEn}</div>
+                    <div style={{ fontSize: "1.4rem", fontWeight: 600, color: v ? "var(--ink)" : "var(--ink-soft)", fontFamily: "'Noto Serif SC', serif" }}>
+                      {v?.number ?? "—"}
+                    </div>
+                    <div style={{ fontSize: "0.66rem", color: "var(--ink-soft)", minHeight: "1.1em" }}>{v?.meaning ?? (m.key === "life_path" ? "" : lang === "zh" ? "需英文姓名" : "needs latin name")}</div>
                   </div>
-                ))}
-              </div>
+                );
+              })}
+            </div>
+            {r?.备注 && (
+              <p style={{ fontSize: "0.72rem", color: "var(--ink-soft)", marginTop: "0.5rem" }}>{r.备注}</p>
+            )}
+          </section>
+
+          {/* 综合解读 + 文献 */}
+          {(r?.综合解读 || r?.evidence_sources) && (
+            <section className="paper-frame space-y-2">
+              <h2 className="paper-eyebrow">{lang === "zh" ? "综合" : "Summary"}</h2>
+              {r?.综合解读 && (
+                <p style={{ fontSize: "0.85rem", color: "var(--ink)", lineHeight: 1.75 }}>{r.综合解读}</p>
+              )}
+              {Array.isArray(r?.evidence_sources) && (
+                <p style={{ fontSize: "0.68rem", color: "var(--ink-soft)" }}>
+                  {lang === "zh" ? "文献" : "Sources"}: {(r.evidence_sources as string[]).join(" · ")}
+                </p>
+              )}
             </section>
           )}
 

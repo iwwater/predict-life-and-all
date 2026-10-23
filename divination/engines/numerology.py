@@ -91,6 +91,29 @@ def _destiny_chaldean(name: str) -> dict:
     }
 
 
+_VOWELS = set("AEIOU")
+
+
+def _soul_urge_pythagorean(name: str) -> dict:
+    """毕达哥拉斯灵魂驱策数 (姓名中元音字母之和)。
+
+    元音代表内在动机与渴望, 辅音代表外在表现 —— 这里只算元音部分。
+    中文姓名没有元音概念, 由调用方按「无可用数据」处理。
+    """
+    letters = [ch.upper() for ch in name if ch.isalpha()]
+    ascii_letters = [ch for ch in letters if "A" <= ch <= "Z"]
+    total = sum(_LETTER_PYTHAGOREAN.get(ch, 0) for ch in ascii_letters if ch in _VOWELS)
+    soul = _reduce(total) if total else 0
+    return {
+        "system": "毕达哥拉斯",
+        "name": name,
+        "sum": total,
+        "soul_urge": soul,
+        "is_master": soul in (11, 22, 33),
+        "vowels": "".join(ch for ch in ascii_letters if ch in _VOWELS),
+    }
+
+
 def _wuge_chinese(surname: str, given_name: str) -> dict:
     """中文三才五格 (康熙字典笔画)。"""
     return compute_wuge(surname, given_name)
@@ -128,7 +151,8 @@ def _wuxing_from_name(wuge_result: dict) -> dict:
 # 主 compute 函数
 # ══════════════════════════════════════════════════════════════
 def compute(b: Birth, name: str | None = None, surname: str | None = None,
-            given_name: str | None = None, system: str = "pythagoras") -> ChartResult:
+            given_name: str | None = None, system: str = "pythagoras",
+            mode: str = "life_path") -> ChartResult:
     """数字命理综合引擎主函数。
 
     Args:
@@ -137,11 +161,15 @@ def compute(b: Birth, name: str | None = None, surname: str | None = None,
         surname: 中文姓氏 (用于三才五格)
         given_name: 中文名字 (用于三才五格)
         system: "pythagoras" | "chaldean"
+        mode: "life_path" | "destiny" | "soul_urge" —— 决定 primary 展示哪一个
+              (三个数字都会算, 只是在页面上主次不同)
 
     Returns:
         ChartResult 含:
-            - life_path: 生命灵数 (必填)
+            - primary: 当前 mode 对应的数字 (页面主展示)
+            - life_path: 生命灵数 (必有)
             - destiny: 命运数 (如有 name)
+            - soul_urge: 灵魂驱策 (如有 name 且含元音)
             - wuge: 三才五格 (如有 surname + given_name)
             - system_info: 所用体系
             - 综合解读
@@ -176,8 +204,11 @@ def compute(b: Birth, name: str | None = None, surname: str | None = None,
         raw["elements"]["土"] = 0.2 if life in (5, 11) else 0.05
         raw["elements"]["金"] = 0.2 if life in (2, 7) else 0.05
 
-    # 命运数 (西方姓名)
-    if name:
+    # 命运数 (西方姓名): 只认拉丁字母, 中文名请用三才五格
+    _has_latin = bool(name) and any("A" <= ch.upper() <= "Z" for ch in name if ch.isalpha())
+    if name and not _has_latin:
+        raw["备注"] = "姓名不含拉丁字母，命运数与灵魂驱策需英文/拼音姓名；中文姓名请填姓与名算三才五格"
+    if name and _has_latin:
         if system == "chaldean":
             dest = _destiny_chaldean(name)
         else:
@@ -190,6 +221,16 @@ def compute(b: Birth, name: str | None = None, surname: str | None = None,
             "is_master": dest.get("is_master", False),
         }
 
+        soul = _soul_urge_pythagorean(name)
+        if soul.get("soul_urge"):
+            raw["soul_urge"] = {
+                "number": soul["soul_urge"],
+                "meaning": _meaning(soul["soul_urge"]),
+                "calculation_basis": f"毕达哥拉斯元音求和归约（元音 {soul['vowels']}）",
+                "raw_sum": soul.get("sum"),
+                "is_master": soul.get("is_master", False),
+            }
+
     # 三才五格 (中文姓名)
     if surname and given_name:
         wuge = _wuge_chinese(surname, given_name)
@@ -200,12 +241,32 @@ def compute(b: Birth, name: str | None = None, surname: str | None = None,
         raw["综合判断"] = wuge["overall"]
         raw["三才关系"] = wuge["san_cai"]
 
+    # primary: 由 mode 决定主展示的数字
+    _mode_sources = {
+        "life_path": ("生命灵数", raw["life_path"]),
+        "destiny": ("命运数", raw.get("destiny")),
+        "soul_urge": ("灵魂驱策", raw.get("soul_urge")),
+    }
+    label, picked = _mode_sources.get(mode) or _mode_sources["life_path"]
+    if picked is None:
+        mode, label, picked = "life_path", "生命灵数", raw["life_path"]
+    raw["mode"] = mode
+    raw["primary"] = {
+        "label": label,
+        "number": picked.get("number"),
+        "meaning": picked.get("meaning"),
+        "is_master": bool(picked.get("is_master")),
+        "calculation_basis": picked.get("calculation_basis"),
+    }
+
     # 综合解读
     parts = []
     if life:
         parts.append(f"生命灵数 {life} ({_meaning(life)})")
     if "destiny" in raw:
         parts.append(f"命运数 {raw['destiny']['number']} ({raw['destiny']['meaning']})")
+    if "soul_urge" in raw:
+        parts.append(f"灵魂驱策 {raw['soul_urge']['number']} ({raw['soul_urge']['meaning']})")
     if "wuge" in raw:
         parts.append(
             f"三才五格：{raw['wuge']['tiange']['wuxing']}/"
